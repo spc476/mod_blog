@@ -1,0 +1,62 @@
+
+2007-08-29T16:44-05:00
+
+	About adding backlinks in old entries to new entries, one thing to
+	keep in mind is to put said links at the top, according to
+
+http://www.wordyard.com/2007/08/28/can-newspapers-fix-old-errors/#comment-124268
+
+2007-08-28T18:40-05:00
+
+	Some quick notes on adding the archive section.  Create
+	"cmd=archive" with parameters "unit=MONTH|DAY".  For "unit=MONTH",
+	pick up the "date" parameter (should only be year).  If not defined,
+	list out each year, with each month listed and linked---otherwise,
+	do just the year listed.  for 'unit=DAY', 'date' should be YYYY/MM,
+	go through, and for each day of the month, list out the title and
+	link to the article.
+
+	The robots META tags should read "noindex, follow".
+
+	Also, it's not an archive section, it's an overview section.  Rename
+	the command appropriately.
+
+2007-02-07T03:05-05:00
+
+	Add code to translate HTML entities in the title field to numeric
+	HTML entities because RSS (and presumedly Atom) consumers don't
+	understand the named HTML entities.
+
+2005-09-21T15:45-05:00
+
+        Add a configuration option to specify which field of an htpasswd
+        file has the real name.
+
+==============================
+
+2007-08-27T12:00-05:00	DONE
+
+	Fix the navigation links.  They're broken.
+
+2007-08-06T01:14-05:00	DONE
+
+	Detect URLs of the form YYYY/M/D and redirect to YYYY/MM/DD
+
+2006-07-30T05:10-05:00	DONE
+
+	Extend the "ad word" feature to *not* URL encode it, so I can throw
+	it into the Google search box on the sidebar.
+
+2006-01-29T02:02-05:00 DONE
+
+	Add an "ad word" feature.  For each entry, take the tags, add them
+	all together.  Then, pick a random word from that list, weighted,
+	according to how many times each tag appears.  Then use that to tag
+	the advertisement (say, Amazon).
+
+	Actually, we don't need to weight them ... just separate out the
+	(long) string of comma separated tags, then pick one at random.  The
+	tag that appears most often will, statistically speaking, be picked
+	more often.
+
+

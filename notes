@@ -1,0 +1,276 @@
+How about this:
+
+#define ---	&mdash;
+#define --	&ndash;
+#define ``	&lsquo;
+#define ''	&rdquo;
+#define ...	&hellip;
+
+or some similar type of declaration for inputing data?  
+
+see 2007/01/09.1 for some details
+
+----------
+
+
+
+restructuring both bp.c and addentry.c
+
+
+
+int main(int argc,char *argv[])
+{
+  Cgi cgi;
+
+  MemInit();
+  BufferInit();
+  DdtInit();
+  CleanInit();
+
+  if (CgiNew(&cgi,NULL) == ERR_OKAY)
+  {
+    switch(CgiMethod(cgi))
+    {
+      case GET:  rc = main_cgi_get (cgi,argv,argc); break;
+      case POST: rc = main_cgi_post(cgi,argv,argc); break;
+      default:   rc = XXX ; break;
+    }
+  }
+  else
+    rc = main_cli(argc,argv);
+  
+  return(rc);
+}
+
+int main_cgi_get(Cgi cgi,int argc,char *argv[])
+{
+}
+
+int main_cgi_post(Cgi cgi,int argc,char *argv[])
+{
+}
+
+int main_cli(int argc,char *argv[])
+{
+}
+
+
+
+GET:
+	$PATH_INFO	tumbler
+
+POST:
+	email	= 'yes'  | 'no'
+	filter	= 'text' | 'mixed'  | 'html'
+	update  = 'new'  | 'modify' | 'edit' | 'template' | 'other'
+	author	= string || $REMOTE_USER
+	title	= string
+	class	= string
+	date	= string
+	body	= string
+	cmd	= --> 'new' | 'show' | 'edit' | 'delete'
+
+
+PUT:
+
+DELETE:
+
+
+CLI:
+	--config	filespec
+	--cmd		'new' | --> 'show' [ | 'edit' | 'delete' ]
+	--file		input
+	--stdin		read from stdin
+	--email		read from stdin as email
+	--update	--> 'new' | 'modify' | 'edit' | 'template' | 'other'
+	--entry		tumbler
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------
+
+Permissions for transcluding----look into adding a query string with
+permissions.
+
+
+Adding comments.
+
+	Adding a new field to struct blogentry
+
+	typdef struct blogentry
+	{
+	  Node       node;
+	  char      *date;
+	  int        number;
+	  char      *title;
+	  char      *class;
+	  char      *author;
+	  size_t     bsize;
+	  void      *body;
+	  int        comments;	/* new field */
+	  BlogEntry *entries;
+	} *BlogEntry;
+
+  Okay, and use the existing infrastructure for the comments.  This means
+that we *can* have comments on comments, but we'll leave that for later. 
+URL space wise, I might want to just limit the comments to individual days
+(I'm not trying for the Talmudic software yet).  So we have:
+
+	/2003/2/14/comments		--illegal (return 404)
+	/2003/2/14.1/comments		--yes, all comments
+
+	/2003/2/14.1/comments/1		-- first comment
+	/2003/2/14.1/comments/1-3	-- first three comments
+
+Hmmm ... maybe ...
+
+	/2003/2/14.1			-- just the entry
+	/2003/2/14.1/			-- entry + return all comments?
+	/2003/2/14.1/1			-- first comment
+	/2003/2/14.1/1-3		-- first three comments
+
+	/2003/2/14.1/1/			-- first comment + all 2l comments
+	/2003/2/14.1/1/1		-- first 2l comment
+	/2003/2/14.1/1/1-3		-- first three 2l comments
+
+I like this idea.  Will have to expand the tumblers to support this, but
+that shouldn't be too difficult.
+
+
+
+
+
+
+
+
+blog stuff:
+
+	<a rel="bookmark" href="...permalink...">...</a>
+
+	from http://www.tantek.com/log/2002/11.html#L20021124t1454
+
+	added
+
+
+
+Talmud---the study
+	Mishna	(text)
+	Gemara (commentaries on text)
+
+
+TODO:
+	Return error upon requests for entries before
+	first, or after current day.
+
+	Fix local link code---if it starts with `/', then
+	it's probably not under journal storage.
+
++	fix internal links for both entries and files
++	done
+
+
+NOTES:
+
+	<date>2000/2/23</date>
+	<time zone="EST">13:44:44</time>
+	<author>Sean Conner</author>
+	<part>1</part>
+	<title>blahblahblah</title>
+	<class>yada yada yada</class>
+	<body>
+		blah blabh labha
+	</body>
+
+	<part>2</part>
+	<title></title>
+	
+
+
+
+	/logs/2000/2/21/extra.html
+
+	/logs/2000/2/21.1/extra.jpg
+	/log/2000/2/21.1
+	/log/2000/2/21.2,4
+
+	/log/2000/2/21,23-5
+
+
+
+
+(mod-blog
+	
+  (webdir	"~www/sites/boston.conman.org/htdocs")
+  (tempdir	"~www/sites/boston.conman.org/journal")
+
+  (name		"The Boston Diaries")
+  (url		"http://boston.conman.org/")
+  (start-date	1999/12/4)
+  (author	"Sean Conner")
+  (email	"sean@conman.org")
+
+  (weblogcom	true)
+
+  (templates
+    (html
+      (template	(+ tempdir "/html/regular/main"))
+      (output	(+ webdir  "/index.html"))
+      (entries	7d)
+      (order	reverse)
+    )
+    (rss
+      (template	(+ tempdir "rss/main"))
+      (output	(+ webdir  "/bostondiaries.rss"))
+      (entries	15)
+      (order	reverse)
+    )
+    (sidebar
+      (template	(+ tempdir "html/tabs/main"))
+      (output	(+ webdir  "/boston.tab.html"))
+      (entries	15)
+      (order	reverse)
+    )
+  )
+)
+
+(email-notification
+  (dir	"~www/sites/boston.conman.org/notify")
+  (list
+    (email		(+ dir "/db/email"))
+    (optin		(+ dir "/db/optin"))
+  )
+  (error
+    (client		(+ dir "/error/400.html"))
+    (server		(+ dir "/error/500.html"))
+  )
+  (page
+    (pending		(+ dir "/html/pending.html"))
+    (subscribed		(+ dir "/html/subscribed.html"))
+    (verified		(+ dir "/html/verified.html"))
+    (~subscribed	(+ dir "/html/not-subscribed.html"))
+    (unsubscribed	(+ dir "/html/unsubscribed.html"))
+  )
+  (from		"sean@conman.org")
+  (reply-to	"tbd-updates@conman.org")
+  (subject	"The Boston Diaries Test Update Notification")
+  (message	(+ dir "/mail/subscribe"))
+  (bug		(+ dir "/mail/bugreport"))
+  (welcome	(+ dir "/mail/welcome"))
+)
+
+(system
+  (cpu	600s)
+  (mem	20m)
+  (core	0)
+)
+

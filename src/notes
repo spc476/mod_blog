@@ -1,0 +1,40 @@
+
+20000427.0000	spc
+
+	oops, I can't really use a struct tm for a request field, as it
+	doesn't have a field for which entry.  For a hack I can use tm_hour
+	to pass back that info temporarily.  God this is turning into a
+	large hack.
+
+20000428.1948	spc
+
+	What to do if the user requests 2000/4/3.8-6 when there are only
+	four entries in 4/3?  Or just the one?  If just the one, return 404,
+	but for a range?  Redirect to a known advanced date is probably the
+	Right Thing.  Yet another thing to keep in mind.
+
+20000831.0036	spc
+
+	Had I made an unwarrented assumption?  Just because I've done stuff
+	like href="2000/3/4.2" doesn't mean I couldn't reference something
+	like href="2000/3/4.2-7".  So now, if the reference is ``onpage,''
+	then we can translate it to:
+
+		href="#2000/3/4.2-7"
+
+	Or should we?  Shouldn't it be:
+
+		href=#2000/3/4.2?
+
+	Assuming we put in <a name=""></a> tags.  But there could be
+	overlap, say onpage is 2000/1/1-15 and inside is reference to
+	2000/1/13-18.  There is overlap but it's not the entire item,
+	so in that case, we shouldn't include an internal anchor link,
+	but a full link.  
+
+	So, given two tumblers, we need to decide if one is inside
+	another.  Interesting problem ... It looks similar to line clipping,
+	if you want to clip one dimentional lines.  It might be prudent
+	to calculate the Julian Day for each entry (make it fractional for
+	the parts) so comparrisons can be done easier.
+
