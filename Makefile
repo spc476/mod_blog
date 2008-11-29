@@ -167,3 +167,6 @@ clean :
 	/bin/rm -rf $(HOSTDIR)/*.o
 	/bin/rm -rf src/*~
 
+tarball:
+	(cd .. ; tar czvf /tmp/boston.tar.gz -X boston/.exclude boston/ )
+

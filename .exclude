@@ -1,0 +1,8 @@
+.git
+.DS_Store
+CVS
+*.o
+*.a
+*~
+build/boston
+
