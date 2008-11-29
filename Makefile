@@ -22,14 +22,10 @@
 ########################################################################
 
 SHELL=/bin/sh
-CGILIB=/home/spc/source/cgi
 HOSTDIR=build
-#CGILIB=../../cgi
 SETUID=chmod 4755
-#SETUID=echo >/dev/null
 
 CC=gcc -Wall -pedantic 
-#CINCL=-I $(CGILIB)/src
 CINCL=
 
 #CFLAGS=-g -ansi -Wall -pedantic -Wtraditional -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
@@ -42,12 +38,11 @@ CINCL=
 CFLAGS=-g $(CINCL)
 #CFLAGS=-g -pg $(CINCL)
 
-#LFLAGS=-lgdbm -L$(CGILIB)/$(HOSTDIR) -lcgi5 
 LFLAGS=-lgdbm -lcgi5 
-#LFLAGS= -L$(CGILIB)/$(HOSTDIR) -lcgi5 
-#LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 -pg
+#LFLAGS= lcgi5 
+#LFLAGS=-ldb -lcgi5 -pg
 # For Solaris, use this line
-#LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 -lsocket -lnsl
+#LFLAGS=-ldb -lcgi5 -lsocket -lnsl
 
 ###################################
 # some notes
