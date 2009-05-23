@@ -95,6 +95,7 @@ struct callback_data
   List       list;
   struct btm last;	/* timestamp of previous entry */
   BlogEntry  entry;	/* current entry being processed */
+  Stream     ad;	/* file containing ad */
 };
 
 #endif

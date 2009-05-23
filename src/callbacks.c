@@ -51,78 +51,69 @@
 
 /*****************************************************************/
 
-static void	cb_blog_script			(Stream,void *);
-static void	cb_blog_url			(Stream,void *);
-static void	cb_blog_name			(Stream,void *);
-static void	cb_blog_adtag			(Stream,void *);
-static void	cb_blog_adtag_entity		(Stream,void *);
-
-static void	cb_date_day			(Stream,void *);
-static void	cb_date_day_url			(Stream,void *);
-static void	cb_date_day_normal		(Stream,void *);
-
-static void	cb_entry			(Stream,void *);
-static void	cb_entry_id			(Stream,void *);
-static void	cb_entry_url			(Stream,void *);
-static void	cb_entry_cond_date		(Stream,void *);
-static void	cb_entry_date			(Stream,void *);
-static void	cb_entry_pubdate		(Stream,void *);
-static void	cb_entry_title			(Stream,void *);
-static void	cb_entry_class			(Stream,void *);
-static void	cb_entry_adtag			(Stream,void *);
-static void	cb_entry_author			(Stream,void *);
-static void	cb_entry_name			(Stream,void *);
-static void	cb_entry_body			(Stream,void *);
-static void	cb_entry_body_entified		(Stream,void *);
-
-static void	cb_cond_hr			(Stream,void *);
-static void	cb_cond_blog_title		(Stream,void *);
-
-static void	cb_rss_pubdate			(Stream,void *);
-static void	cb_rss_url			(Stream,void *);
-static void	cb_rss_item			(Stream,void *);
-static void	cb_rss_item_url			(Stream,void *);
-
-static void	cb_atom_entry			(Stream,void *);
+static void	cb_ad				(Stream,void *);
+static void	cb_ad_content			(Stream,void *);
 static void	cb_atom_categories		(Stream,void *);
 static void	cb_atom_category		(Stream,void *);
-
-static void	cb_navigation_link		(Stream,void *);
-static void     cb_navigation_link_next		(Stream,void *);
-static void     cb_navigation_link_prev		(Stream,void *);
-static void	cb_navigation_current		(Stream,void *);
-static void	cb_navigation_current_url	(Stream,void *);
+static void	cb_atom_entry			(Stream,void *);
+static void	cb_begin_year			(Stream,void *);
+static void	cb_blog_adtag			(Stream,void *);
+static void	cb_blog_adtag_entity		(Stream,void *);
+static void	cb_blog_name			(Stream,void *);
+static void	cb_blog_script			(Stream,void *);
+static void	cb_blog_url			(Stream,void *);
+static void	cb_comments			(Stream,void *);
+static void	cb_comments_body		(Stream,void *);
+static void	cb_comments_check		(Stream,void *);
+static void	cb_comments_filename		(Stream,void *);
+static void	cb_cond_blog_title		(Stream,void *);
+static void	cb_cond_hr			(Stream,void *);
+static void	cb_date_day			(Stream,void *);
+static void	cb_date_day_normal		(Stream,void *);
+static void	cb_date_day_url			(Stream,void *);
+static void	cb_edit				(Stream,void *);
+static void	cb_edit_author			(Stream,void *);
+static void	cb_edit_body			(Stream,void *);
+static void	cb_edit_class			(Stream,void *);
+static void	cb_edit_date			(Stream,void *);
+static void	cb_edit_email			(Stream,void *);
+static void	cb_edit_filter			(Stream,void *);
+static void	cb_edit_title			(Stream,void *);
+static void	cb_entry			(Stream,void *);
+static void	cb_entry_adtag			(Stream,void *);
+static void	cb_entry_author			(Stream,void *);
+static void	cb_entry_body			(Stream,void *);
+static void	cb_entry_body_entified		(Stream,void *);
+static void	cb_entry_class			(Stream,void *);
+static void	cb_entry_cond_date		(Stream,void *);
+static void	cb_entry_date			(Stream,void *);
+static void	cb_entry_id			(Stream,void *);
+static void	cb_entry_name			(Stream,void *);
+static void	cb_entry_pubdate		(Stream,void *);
+static void	cb_entry_title			(Stream,void *);
+static void	cb_entry_url			(Stream,void *);
 static void	cb_navigation_bar		(Stream,void *);
 static void	cb_navigation_bar_next		(Stream,void *);
 static void	cb_navigation_bar_prev		(Stream,void *);
+static void	cb_navigation_current		(Stream,void *);
+static void	cb_navigation_current_url	(Stream,void *);
+static void	cb_navigation_link		(Stream,void *);
 static void	cb_navigation_next_url		(Stream,void *);
 static void	cb_navigation_prev_url		(Stream,void *);
-
-static void	cb_comments			(Stream,void *);
-static void	cb_comments_body		(Stream,void *);
-static void	cb_comments_filename		(Stream,void *);
-static void	cb_comments_check		(Stream,void *);
-
-static void	cb_begin_year			(Stream,void *);
 static void	cb_now_year			(Stream,void *);
-static void     cb_update_time			(Stream,void *);
-static void     cb_update_type			(Stream,void *);
-static void	cb_robots_index			(Stream,void *);
-
-static void	cb_edit				(Stream,void *);
-static void	cb_edit_author			(Stream,void *);
-static void	cb_edit_title			(Stream,void *);
-static void	cb_edit_date			(Stream,void *);
-static void	cb_edit_class			(Stream,void *);
-static void	cb_edit_email			(Stream,void *);
-static void	cb_edit_filter			(Stream,void *);
-static void	cb_edit_body			(Stream,void *);
-
 static void	cb_overview			(Stream,void *);
 static void	cb_overview_date		(Stream,void *);
 static void	cb_overview_list		(Stream,void *);
-
+static void	cb_robots_index			(Stream,void *);
+static void	cb_rss_item			(Stream,void *);
+static void	cb_rss_item_url			(Stream,void *);
+static void	cb_rss_pubdate			(Stream,void *);
+static void	cb_rss_url			(Stream,void *);
 static void	cb_xyzzy			(Stream,void *);
+static void     cb_navigation_link_next		(Stream,void *);
+static void     cb_navigation_link_prev		(Stream,void *);
+static void     cb_update_time			(Stream,void *);
+static void     cb_update_type			(Stream,void *);
 
 static void	print_nav_url		(Stream,struct btm *,int);
 static void	print_nav_name		(Stream,struct btm *,int,char);
@@ -131,82 +122,70 @@ static void	fixup_uri		(BlogEntry,HtmlToken,const char *);
 /************************************************************************/
 
 struct chunk_callback  m_callbacks[] =
-{
-  { "blog.script"		, cb_blog_script		} ,
-  { "blog.url"			, cb_blog_url			} ,
-  { "blog.name"			, cb_blog_name			} ,
+{  
+  { "ad"			, cb_ad				} ,
+  { "ad.content"		, cb_ad_content			} ,
+  { "atom.categories"		, cb_atom_categories		} ,
+  { "atom.category"		, cb_atom_category		} ,
+  { "atom.entry"		, cb_atom_entry			} ,
+  { "begin.year"		, cb_begin_year			} ,
   { "blog.adtag"		, cb_blog_adtag			} ,
   { "blog.adtag.entity"		, cb_blog_adtag_entity		} ,
-
+  { "blog.name"			, cb_blog_name			} ,
+  { "blog.script"		, cb_blog_script		} ,
+  { "blog.url"			, cb_blog_url			} ,
+  { "comments"			, cb_comments			} ,
+  { "comments.body"		, cb_comments_body		} ,
+  { "comments.check"		, cb_comments_check		} ,
+  { "comments.filename"		, cb_comments_filename		} ,
+  { "cond.blog.title"		, cb_cond_blog_title		} ,
+  { "cond.hr"			, cb_cond_hr			} ,
   { "date.day"			, cb_date_day			} ,
-  { "date.day.url"		, cb_date_day_url		} ,
   { "date.day.normal"		, cb_date_day_normal		} ,
-
+  { "date.day.url"		, cb_date_day_url		} ,
+  { "edit"			, cb_edit			} ,
+  { "edit.author"		, cb_edit_author		} ,
+  { "edit.body"			, cb_edit_body			} ,
+  { "edit.class"		, cb_edit_class			} ,
+  { "edit.date"			, cb_edit_date			} ,
+  { "edit.email"		, cb_edit_email			} ,
+  { "edit.filter"		, cb_edit_filter		} ,
+  { "edit.title"		, cb_edit_title			} ,
   { "entry"			, cb_entry			} ,
-  { "entry.id"			, cb_entry_id			} ,
-  { "entry.url"			, cb_entry_url			} ,
-  { "entry.cond.date"		, cb_entry_cond_date		} ,
-  { "entry.date"		, cb_entry_date			} ,
-  { "entry.pubdate"		, cb_entry_pubdate		} ,
-  { "entry.name"		, cb_entry_name			} ,
-  { "entry.title"		, cb_entry_title		} ,
-  { "entry.class"		, cb_entry_class		} ,
   { "entry.adtag"		, cb_entry_adtag		} ,
   { "entry.author"		, cb_entry_author		} ,
   { "entry.body"		, cb_entry_body			} ,
   { "entry.body.entified"	, cb_entry_body_entified	} ,
-  
-  { "comments"			, cb_comments			} ,
-  { "comments.body"		, cb_comments_body		} ,
-  { "comments.filename"		, cb_comments_filename		} ,
-  { "comments.check"		, cb_comments_check		} ,
-  
-  { "cond.hr"			, cb_cond_hr			} ,
-  { "cond.blog.title"		, cb_cond_blog_title		} ,
-
-  { "rss.pubdate"		, cb_rss_pubdate		} ,
-  { "rss.url"			, cb_rss_url			} ,
-  { "rss.item"			, cb_rss_item			} ,
-  { "rss.item.url"		, cb_rss_item_url		} ,
-
-  { "atom.entry"		, cb_atom_entry			} ,
-  { "atom.categories"		, cb_atom_categories		} ,
-  { "atom.category"		, cb_atom_category		} ,
-
-  { "navigation.link"		, cb_navigation_link		} ,
-  { "navigation.link.next"	, cb_navigation_link_next	} ,
-  { "navigation.link.prev"	, cb_navigation_link_prev	} ,
+  { "entry.class"		, cb_entry_class		} ,
+  { "entry.cond.date"		, cb_entry_cond_date		} ,
+  { "entry.date"		, cb_entry_date			} ,
+  { "entry.id"			, cb_entry_id			} ,
+  { "entry.name"		, cb_entry_name			} ,
+  { "entry.pubdate"		, cb_entry_pubdate		} ,
+  { "entry.title"		, cb_entry_title		} ,
+  { "entry.url"			, cb_entry_url			} ,
   { "navigation.bar"		, cb_navigation_bar		} ,
   { "navigation.bar.next"	, cb_navigation_bar_next	} ,
   { "navigation.bar.prev"	, cb_navigation_bar_prev	} ,
-  { "navigation.next.url"	, cb_navigation_next_url	} ,
-  { "navigation.prev.url"	, cb_navigation_prev_url        } ,
   { "navigation.current"	, cb_navigation_current		} ,
   { "navigation.current.url"	, cb_navigation_current_url	} ,
-
-  { "begin.year"		, cb_begin_year			} ,
+  { "navigation.link"		, cb_navigation_link		} ,
+  { "navigation.link.next"	, cb_navigation_link_next	} ,
+  { "navigation.link.prev"	, cb_navigation_link_prev	} ,
+  { "navigation.next.url"	, cb_navigation_next_url	} ,
+  { "navigation.prev.url"	, cb_navigation_prev_url        } ,
   { "now.year"			, cb_now_year			} ,
-  
-  { "update.time"               , cb_update_time                } ,
-  { "update.type"               , cb_update_type                } ,
-  
-  { "robots.index"		, cb_robots_index		} ,
-
-  { "edit"			, cb_edit			} ,
-  { "edit.author"		, cb_edit_author		} ,
-  { "edit.title"		, cb_edit_title			} ,
-  { "edit.date"			, cb_edit_date			} ,
-  { "edit.class"		, cb_edit_class			} ,
-  { "edit.email"		, cb_edit_email			} ,
-  { "edit.filter"		, cb_edit_filter		} ,
-  { "edit.body"			, cb_edit_body			} ,
-
   { "overview"			, cb_overview			} ,
   { "overview.date"		, cb_overview_date		} ,
   { "overview.list"		, cb_overview_list		} ,
-  
+  { "robots.index"		, cb_robots_index		} ,
+  { "rss.item"			, cb_rss_item			} ,
+  { "rss.item.url"		, cb_rss_item_url		} ,
+  { "rss.pubdate"		, cb_rss_pubdate		} ,
+  { "rss.url"			, cb_rss_url			} ,
+  { "update.time"               , cb_update_time                } ,
+  { "update.type"               , cb_update_type                } ,
   { "xyzzy"			, cb_xyzzy			} 
-
 };
 size_t m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
 
@@ -226,6 +205,50 @@ void generic_cb(const char *which,Stream out,void *data)
 }
 
 /*********************************************************************/
+
+static void cb_ad(Stream out,void *data)
+{
+  struct callback_data *cbd = data;
+  char                  fname[FILENAME_LEN];
+  
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  sprintf(
+  	fname,
+  	"%04d/%02d/%02d/%d.ad",
+  	cbd->entry->when.year,
+  	cbd->entry->when.month,
+  	cbd->entry->when.day,
+  	cbd->entry->when.part
+  );
+  
+  cbd->ad = FileStreamRead(fname);
+  if (cbd->ad == NULL) return;
+  generic_cb("ad",out,data);
+  StreamFree(cbd->ad);
+  cbd->ad = NULL;
+}
+
+/**********************************************************************/
+
+static void cb_ad_content(Stream out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  ddt(out     != NULL);
+  ddt(data    != NULL);
+  
+  /*------------------------------------------
+  ; we might also do a generic_cb() here, but
+  ; I would need one that takes a Stream
+  ; object ... just an idea ... 
+  ;-------------------------------------------*/
+  
+  StreamCopy(out,cbd->ad);
+}  
+  
+/*********************************************************************/  
 
 static void cb_blog_script(Stream out,void *data)
 {
