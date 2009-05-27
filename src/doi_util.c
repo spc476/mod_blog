@@ -27,8 +27,8 @@
 #include <cgilib/ddt.h>
 #include <cgilib/mail.h>
 
-#if 1
-#define SENDMAIL	"/usr/sbin/sendmail"
+#ifndef FEATURE_NEW_EMAIL 
+#  define SENDMAIL	"/usr/sbin/sendmail"
 #endif
 
 /**************************************************************************/
