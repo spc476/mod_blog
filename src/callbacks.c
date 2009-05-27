@@ -236,7 +236,7 @@ static void cb_blog_url(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  LineSFormat(out,"$ $","%a/%b",g_baseurl,blog->date);
+  LineSFormat(out,"$ $","%a/%b",c_baseurl,blog->date);
 }
 
 /*************************************************************************/
@@ -333,7 +333,7 @@ static void cb_blog_name(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  LineS(out,g_name);
+  LineS(out,c_name);
 }
 
 /*********************************************************************/
@@ -456,7 +456,7 @@ static void cb_entry_url(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  LineSFormat(out,"$ $ i","%a/%b.%c",g_baseurl,blog->date,blog->curnum + 1);
+  LineSFormat(out,"$ $ i","%a/%b.%c",c_baseurl,blog->date,blog->curnum + 1);
 }
 
 /**********************************************************************/
@@ -585,9 +585,9 @@ static void fixup_uri(BlogDay blog,HtmlToken token,const char *attrib)
     ;-----------------------------------------------------*/
     
     if (gd.f.fullurl)
-      baseurl = g_fullbaseurl;
+      baseurl = c_fullbaseurl;
     else
-      baseurl = g_baseurl;
+      baseurl = c_baseurl;
       
     /*---------------------------------------------------------
     ; all this to reassign the value, without ``knowing'' how
@@ -625,7 +625,7 @@ static void fixup_uri(BlogDay blog,HtmlToken token,const char *attrib)
       
       if (strstr(src->value,"parallel") != NULL)
       {
-        if (strstr(g_scriptname,"parallel") != NULL)
+        if (strstr(c_scriptname,"parallel") != NULL)
 	{
 	  char *ps = strchr(src->value,'/');
 	  if (ps)
@@ -801,7 +801,7 @@ static void cb_rss_url(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  LineSFormat(out,"$","%a/",g_fullbaseurl);
+  LineSFormat(out,"$","%a/",c_fullbaseurl);
 }
 
 /*******************************************************************/
@@ -826,7 +826,7 @@ static void cb_rss_item(Stream out,void *data)
   {
     if (gd.f.reverse)
     {
-      for (i = day->endentry ; (items < g_rssitems) && (i >= day->stentry) ; i--)
+      for (i = day->endentry ; (items < c_rssitems) && (i >= day->stentry) ; i--)
       {
         day->curnum = i;
         BlogEntryRead(day->entries[i]);
@@ -836,7 +836,7 @@ static void cb_rss_item(Stream out,void *data)
     }
     else
     {
-      for (i = day->stentry ; (items < g_rssitems) && (i <= day->endentry) ; i++)
+      for (i = day->stentry ; (items < c_rssitems) && (i <= day->endentry) ; i++)
       {
         day->curnum = i;
 	BlogEntryRead(day->entries[i]);
@@ -856,7 +856,7 @@ static void cb_rss_item_url(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  LineSFormat(out,"$ $ $ i","%a/%b%c.%d",g_fullbaseurl,g_baseurl,blog->date,blog->curnum + 1);
+  LineSFormat(out,"$ $ $ i","%a/%b%c.%d",c_fullbaseurl,c_baseurl,blog->date,blog->curnum + 1);
 }
 
 /********************************************************************/
@@ -880,7 +880,7 @@ static void cb_atom_entry(Stream out,void *data)
   {
     if (gd.f.reverse)
     {
-      for (i = day->endentry ; (items < g_rssitems) && (i >= day->stentry) ; i--)
+      for (i = day->endentry ; (items < c_rssitems) && (i >= day->stentry) ; i--)
       {
         day->curnum = i;
         BlogEntryRead(day->entries[i]);
@@ -890,7 +890,7 @@ static void cb_atom_entry(Stream out,void *data)
     }
     else
     {
-      for (i = day->stentry ; (items < g_rssitems) && (i <= day->endentry) ; i++)
+      for (i = day->stentry ; (items < c_rssitems) && (i <= day->endentry) ; i++)
       {
         day->curnum = i;
         BlogEntryRead(day->entries[i]);
@@ -1067,7 +1067,7 @@ static void print_nav_url(Stream out,struct tm *ptm,int unit)
   date = *ptm;
   tm_to_blog(&date);
 
-  LineSFormat(out,"$","%a/",g_baseurl);  
+  LineSFormat(out,"$","%a/",c_baseurl);  
   switch(unit)
   {
     case YEAR: 
@@ -1130,8 +1130,8 @@ static void cb_update_time(Stream out,void *data)
         gd.updatetime.tm_mday,
         gd.updatetime.tm_hour,
         gd.updatetime.tm_min,
-        g_tzhour,
-        g_tzmin
+        c_tzhour,
+        c_tzmin
   );
 }
 
@@ -1142,7 +1142,7 @@ static void cb_update_type(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  LineS(out,g_updatetype);
+  LineS(out,c_updatetype);
 }
 
 /*******************************************************************/

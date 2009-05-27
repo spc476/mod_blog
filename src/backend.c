@@ -96,7 +96,7 @@ int generate_pages(Request req)
 
   set_time();
 
-  out = FileStreamWrite(g_daypage,FILE_RECREATE);  
+  out = FileStreamWrite(c_daypage,FILE_RECREATE);  
   if (out == NULL) 
   {
     return(ERR_ERR);
@@ -104,30 +104,30 @@ int generate_pages(Request req)
   rc = primary_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
   StreamFree(out);
     
-  if (g_rsstemplates)
+  if (c_rsstemplates)
   {
-    g_templates = g_rsstemplates;
-    out         = FileStreamWrite(g_rssfile,FILE_RECREATE);
+    g_templates = c_rsstemplates;
+    out         = FileStreamWrite(c_rssfile,FILE_RECREATE);
     if (out == NULL)
       return(ERR_ERR);
     rc = rss_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
     StreamFree(out);
   }
 
-  if (g_atomtemplates)
+  if (c_atomtemplates)
   {
-    g_templates = g_atomtemplates;
-    out         = FileStreamWrite(g_atomfile,FILE_RECREATE);
+    g_templates = c_atomtemplates;
+    out         = FileStreamWrite(c_atomfile,FILE_RECREATE);
     if (out == NULL)
       return(ERR_ERR);
     rc = rss_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
     StreamFree(out);
   }
   
-  if (g_tabtemplates)
+  if (c_tabtemplates)
   {
-    g_templates = g_tabtemplates;
-    out         = FileStreamWrite(g_tabfile,FILE_RECREATE);
+    g_templates = c_tabtemplates;
+    out         = FileStreamWrite(c_tabfile,FILE_RECREATE);
     if (out == NULL)
       return(ERR_ERR);
     rc = tab_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
@@ -799,7 +799,7 @@ int primary_page(Stream out,int year,int month,int iday)
   thisday.tm_mday = iday;
   thisday.tm_hour = 1;
   
-  for (ListInit(&listodays) , days = 0 ; days < g_days ; )
+  for (ListInit(&listodays) , days = 0 ; days < c_days ; )
   {
     int rc;
     
@@ -858,7 +858,7 @@ static int rss_page(Stream out,int year, int month, int iday)
 
   tags         = dup_string("");
   gd.f.fullurl = TRUE;
-  gd.f.reverse = g_rssreverse;
+  gd.f.reverse = cf_rssreverse;
     
   tm_init(&thisday);
 
@@ -866,7 +866,7 @@ static int rss_page(Stream out,int year, int month, int iday)
   thisday.tm_mon  = month;
   thisday.tm_mday = iday;
   
-  for (ListInit(&listodays) , items = 0 ; items < g_rssitems ; )
+  for (ListInit(&listodays) , items = 0 ; items < c_rssitems ; )
   {
     int rc;
     
@@ -928,7 +928,7 @@ static int tab_page(Stream out,int year, int month, int iday)
 
   tags         = dup_string("");
   gd.f.fullurl = FALSE;
-  gd.f.reverse = g_tabreverse;
+  gd.f.reverse = cf_tabreverse;
     
   tm_init(&thisday);
 
@@ -936,7 +936,7 @@ static int tab_page(Stream out,int year, int month, int iday)
   thisday.tm_mon  = month;
   thisday.tm_mday = iday;
   
-  for (ListInit(&listodays) , items = 0 ; items < g_rssitems ; )
+  for (ListInit(&listodays) , items = 0 ; items < c_rssitems ; )
   {
     int rc;
     

@@ -42,7 +42,7 @@ int main(int argc,char *argv[])
   Cgi cgi;
   int rc;
   
-  while(g_debug)
+  while(cf_debug)
     ;
 
   MemInit   ();
@@ -76,9 +76,9 @@ int BlogDatesInit(void)
   int     rc;
 
   tm_init(&gd.begin);
-  gd.begin.tm_year = g_styear;
-  gd.begin.tm_mon  = g_stmon;
-  gd.begin.tm_mday = g_stday;
+  gd.begin.tm_year = c_styear;
+  gd.begin.tm_mon  = c_stmon;
+  gd.begin.tm_mday = c_stday;
   gd.begin.tm_hour = 1;
   
   tm_to_tm(&gd.begin);

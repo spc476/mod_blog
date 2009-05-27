@@ -38,49 +38,50 @@
 *******************************************************************/
 
 #ifdef PARALLEL_HACK
-    extern const char   *const g_scriptname;
+    extern const char   *const c_scriptname;
 #endif
-extern const char *const      g_name;
-extern const char *const      g_basedir;
-extern const char *const      g_webdir;
-extern const char *const      g_baseurl;
-extern const char *const      g_fullbaseurl;
+extern const char *const      c_name;
+extern const char *const      c_basedir;
+extern const char *const      c_webdir;
+extern const char *const      c_baseurl;
+extern const char *const      c_fullbaseurl;
+extern const char *const      c_rsstemplates;
+extern const char *const      c_atomtemplates;
+extern const char *const      c_daypage;
+extern const int              c_days;
+extern const char *const      c_rssfile;
+extern const char *const      c_atomfile;
+extern const int              c_rssitems;
+extern const int              cf_rssreverse;
+extern const int              c_styear;
+extern const int              c_stmon;
+extern const int              c_stday;
+extern const char *const      c_author;
+extern const char *const      c_email;
+extern const char *const      c_authorfile;
+extern const char *const      c_updatetype;
+extern const char *const      c_lockfile;
+extern const int              cf_weblogcom;
+extern const char *const      c_weblogcomurl;
+extern const char            *c_emaildb;
+extern const char *const      c_emailsubject;
+extern const char *const      c_emailmsg;
+extern const char *const      c_tabtemplates;
+extern const char *const      c_tabfile;
+extern const int              cf_tabreverse;
+extern const int              c_tzhour;
+extern const int              c_tzmin;
+extern       void           (*c_conversion)(char *,Stream,Stream);
+extern volatile int           cf_debug;
+
 extern const char *           g_templates;	/* work on */
-extern const char *const      g_rsstemplates;
-extern const char *const      g_atomtemplates;
-extern const char *const      g_daypage;
-extern const int              g_days;
-extern const char *const      g_rssfile;
-extern const char *const      g_atomfile;
-extern const int              g_rssitems;
-extern const int              g_rssreverse;
-extern const int              g_styear;
-extern const int              g_stmon;
-extern const int              g_stday;
-extern const char *const      g_author;
-extern const char *const      g_email;
-extern const char *const      g_authorfile;
-extern const char *const      g_updatetype;
-extern const char *const      g_lockfile;
-extern const int              g_weblogcom;
-extern const char *const      g_weblogcomurl;
-extern int                    g_emailupdate;	/* work on */
-extern const char            *g_emaildb;
-extern const char *const      g_emailsubject;
-extern const char *const      g_emailmsg;
-extern const char *const      g_tabtemplates;
-extern const char *const      g_tabfile;
-extern const int              g_tabreverse;
-extern const int              g_tzhour;
-extern const int              g_tzmin;
-extern       void           (*g_conversion)(char *,Stream,Stream);
-extern volatile int           g_debug;
+extern int                    gf_emailupdate;	/* work on */
 extern struct display         gd;		/* work on */
 
 int		GlobalsInit		(char *);
-void		set_g_updatetype	(char *);
-void		set_g_emailupdate	(char *);
-void		set_g_conversion	(char *);
+void		set_c_updatetype	(char *);
+void		set_gf_emailupdate	(char *);
+void		set_c_conversion	(char *);
 
 int		main_cgi_get		(Cgi,int,char *[]);
 int		main_cgi_post		(Cgi,int,char *[]);

@@ -175,9 +175,9 @@ int main_cgi_post(Cgi cgi,int argc,char *argv[])
   
   CgiListMake(cgi);
   
-  set_g_updatetype 	(CgiListGetValue(cgi,"updatetype"));
-  set_g_emailupdate	(CgiListGetValue(cgi,"email"));
-  set_g_conversion 	(CgiListGetValue(cgi,"filter"));
+  set_c_updatetype 	(CgiListGetValue(cgi,"updatetype"));
+  set_gf_emailupdate	(CgiListGetValue(cgi,"email"));
+  set_c_conversion 	(CgiListGetValue(cgi,"filter"));
   set_m_author     	(CgiListGetValue(cgi,"author"),&req);
   set_m_cgi_post_command(CgiListGetValue(cgi,"cmd"),&req);
   
@@ -251,9 +251,9 @@ static int cmd_cgi_post_new(Request req)
   if (rc == ERR_OKAY)
   {
     generate_pages(req);
-    if (g_weblogcom)   notify_weblogcom();
-    if (g_emailupdate) notify_emaillist();
-    D(ddtlog(ddtstream,"$","about to redirect to %a",g_fullbaseurl);)
+    if (cf_weblogcom)   notify_weblogcom();
+    if (gf_emailupdate) notify_emaillist();
+    D(ddtlog(ddtstream,"$","about to redirect to %a",c_fullbaseurl);)
     LineSFormat(
     	req->out,
 	"i $",
@@ -266,7 +266,7 @@ static int cmd_cgi_post_new(Request req)
 	"  <BODY><A HREF='%b'>Go here</A></BODY>\n"
 	"</HTML>\n",
 	HTTP_MOVETEMP,
-	g_fullbaseurl
+	c_fullbaseurl
     );
   }
   else

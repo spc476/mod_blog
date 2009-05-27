@@ -54,7 +54,7 @@ int (BlogInit)(void)
   int rc;
   
   umask(DEFAULT_PERMS);
-  rc = chdir(g_basedir);
+  rc = chdir(c_basedir);
   if (rc != 0)
     return(ERR_ERR);
   

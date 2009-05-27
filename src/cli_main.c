@@ -129,13 +129,13 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_UPDATE:
            req.f.update = TRUE;
-           set_g_updatetype(optarg);
+           set_c_updatetype(optarg);
            break;
       case OPT_ENTRY:
            req.reqtumbler = dup_string(optarg);
            break;
       case OPT_DEBUG:
-           g_debug = TRUE;
+           cf_debug = TRUE;
            break;
       case OPT_REGENERATE:
            req.f.regenerate = TRUE;
@@ -209,8 +209,8 @@ static int cmd_cli_new(Request req)
   if (rc == ERR_OKAY)
   {
     generate_pages(req);  
-    if (g_weblogcom)   notify_weblogcom();
-    if (g_emailupdate) notify_emaillist();
+    if (cf_weblogcom)   notify_weblogcom();
+    if (gf_emailupdate) notify_emaillist();
   }
   
   return(rc);
@@ -328,8 +328,8 @@ static int mailfile_readdata(Request req)
     req->class = dup_string("");
 
   if (req->date   != NULL) req->date = dup_string(req->date);
-  if (email       != NULL) set_g_emailupdate(email);
-  if (filter      != NULL) set_g_conversion(filter);
+  if (email       != NULL) set_gf_emailupdate(email);
+  if (filter      != NULL) set_c_conversion(filter);
 
   PairListFree(&headers);	/* got everything we need, dump this */
   

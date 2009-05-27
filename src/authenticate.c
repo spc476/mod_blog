@@ -53,7 +53,7 @@
     ddt(req         != NULL);
     ddt(req->author != NULL);
     
-    return(strcmp(req->author,g_author) == 0);
+    return(strcmp(req->author,c_author) == 0);
   }
   
 /************************************************************************/
@@ -69,10 +69,10 @@
     ddt(req         != NULL);
     ddt(req->author != NULL);
     
-    if (g_authorfile == NULL)
-      return (strcmp(req->author,g_author) == 0);
+    if (c_authorfile == NULL)
+      return (strcmp(req->author,c_author) == 0);
 
-    list = gdbm_open(g_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
+    list = gdbm_open(c_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
     if (list == NULL)
       return(FALSE);
 
@@ -103,10 +103,10 @@
     ; third field of the value portion returned.
     ;---------------------------------------------------------------*/
 
-    if (g_authorfile == NULL)
-      return (strcmp(req->author,g_author) == 0);
+    if (c_authorfile == NULL)
+      return (strcmp(req->author,c_author) == 0);
 
-    list = dbopen(g_authorfile,O_RDONLY,0644,DB_HASH,NULL);
+    list = dbopen(c_authorfile,O_RDONLY,0644,DB_HASH,NULL);
     if (list == NULL)
       return(FALSE);
 
@@ -227,10 +227,10 @@
     ddt(req         != NULL);
     ddt(req->author != NULL);
     
-    if (g_authorfile == NULL)
-      return(strcmp(req->author,g_author) == 0);
+    if (c_authorfile == NULL)
+      return(strcmp(req->author,c_author) == 0);
     
-    in = FileStreamRead(g_authorfile);
+    in = FileStreamRead(c_authorfile);
     if (in == NULL)
       return(FALSE);
     

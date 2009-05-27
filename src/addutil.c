@@ -84,13 +84,13 @@ int entry_add(Request req)
   
   fix_entry(req);
 
-  if (g_authorfile) lock = BlogLock(g_lockfile);
+  if (c_authorfile) lock = BlogLock(c_lockfile);
   BlogDayRead(&day,&date);
   BlogEntryNew(&entry,req->title,req->class,req->author,req->body,strlen(req->body));
   BlogDayEntryAdd(day,entry);
   BlogDayWrite(day);
   BlogDayFree(&day);
-  if (g_authorfile) BlogUnlock(lock);
+  if (c_authorfile) BlogUnlock(lock);
 
   return(ERR_OKAY);
 }
@@ -121,7 +121,7 @@ void fix_entry(Request req)
   ;----------------*/
   
   in = MemoryStreamRead(req->body,strlen(req->body));
-  (*g_conversion)("body",in,out);
+  (*c_conversion)("body",in,out);
   StreamFree(in);
   MemFree(req->body);
   req->body = StringFromStream(out);
@@ -152,12 +152,12 @@ void notify_weblogcom(void)
   size_t   size;
   size_t   fsize;
 
-  fsize      = 6 + strlen(g_email) + 2 + 1;
+  fsize      = 6 + strlen(c_email) + 2 + 1;
   headers[0] = MemAlloc(fsize);
-  sprintf(headers[0],"From: %s\r\n",g_email);
+  sprintf(headers[0],"From: %s\r\n",c_email);
 
-  name    = UrlEncodeString(g_name);
-  blogurl = UrlEncodeString(g_fullbaseurl);
+  name    = UrlEncodeString(c_name);
+  blogurl = UrlEncodeString(c_fullbaseurl);
 
   size = 5	/* name = */
          + strlen(name)
@@ -169,7 +169,7 @@ void notify_weblogcom(void)
   query = MemAlloc(size);
   sprintf(query,"name=%s&url=%s",name,blogurl);
 
-  UrlNew((URL *)&url,g_weblogcomurl);
+  UrlNew((URL *)&url,c_weblogcomurl);
  
   nfile = MemAlloc(strlen(url->file) + 1 + strlen(query) + 1);
   sprintf(nfile,"%s?%s",url->file,query);
@@ -197,7 +197,7 @@ void notify_emaillist(void)
   datum     key;
   datum     content;
  
-  list = gdbm_open((char *)g_emaildb,DB_BLOCK,GDBM_READER,0,dbcritical);
+  list = gdbm_open((char *)c_emaildb,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
     return;
  
@@ -208,7 +208,7 @@ void notify_emaillist(void)
     content = gdbm_fetch(list,key);
     if (content.dptr != NULL)
     {
-      send_message(g_email,NULL,content.dptr,g_emailsubject,g_emailmsg);
+      send_message(c_email,NULL,content.dptr,c_emailsubject,c_emailmsg);
     }
     key = gdbm_nextkey(list,key);
   }
