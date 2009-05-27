@@ -938,7 +938,7 @@ static void cb_rss_item_url(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  LineSFormat(out,"$","%a/",c_fullbaseurl);
+  LineSFormat(out,"$","%a",c_fullbaseurl);
   print_nav_url(out,&cbd->entry->when,PART);
   
 #if 0  

@@ -72,6 +72,7 @@ Blog (BlogNew)(char *location,char *lockfile)
     return(NULL);
   
   blog           = MemAlloc(sizeof(struct blog));
+  memset(blog,0,sizeof(struct blog));
   blog->lockfile = dup_string(lockfile);
   blog->lock     = 0;
   blog->max      = 100;
@@ -426,8 +427,14 @@ static int blog_cache_day(Blog blog,struct btm *date)
   
   for (i = 0 ; i < blog->idx ; i++)
   {
-    if (!NodeValid(&blog->entries[i]->node))
+    if (
+         (blog->entries[i]->node.ln_Succ == NULL)
+	 && (blog->entries[i]->node.ln_Pred == NULL)
+       )
+    {
+      /*if (!NodeValid(&blog->entries[i]->node))*/
       BlogEntryFree(blog->entries[i]);
+    }
   } 
   
   blog->idx = 0;
