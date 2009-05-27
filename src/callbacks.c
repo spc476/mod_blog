@@ -429,6 +429,13 @@ static void cb_entry(Stream out,void *data)
       ; blog, which is older than X days before.  So we revert 
       ; the fix, and instead, set i to 0.  Really gross hack, but
       ; until I get to the root cause, it will have to do. XXX
+      ;
+      ; Found the cause of this in backend.c:tumbler_page() and
+      ; applied a fix there.  I should probably get around to
+      ; removing the hack, and this comment at some point in the
+      ; future.
+      ;
+      ; I should read my comments more often.
       ;--------------------------------------------------------*/
 
       /*if (i == -1) continue;*/ /* hack for quick fix */
