@@ -196,7 +196,7 @@ static struct fpreturn state_a(Tumbler t,TumblerUnit *ptu,char **pstr)
       next.state = NULL;
       return(next);
     }
-#if FEATURE_MULTI_TUMBLER
+#ifdef FEATURE_MULTI_TUMBLER
     if (*s == ',')
     {
       ListAddTail(&t->units,&tu->node);
@@ -323,7 +323,7 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
     return(next);
   }
   
-#if FEATURE_MULTI_TUMBLER
+#ifdef FEATURE_MULTI_TUMBLER
 
   /*----------------------------------------
   ; for now, skip handling multiple tumblers
@@ -436,7 +436,7 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
     return(next);
   }
   
-#if FEATURE_MULTI_TUMBLER 
+#ifdef FEATURE_MULTI_TUMBLER 
 
   /*----------------------------------
   ; for now, skip handling multiple
@@ -556,7 +556,7 @@ static State state_e(Tumbler t,TumblerUnit *ptu,char **pstr)
     next.state = state_a;
     return(next);
   }
-#if FEATURE_MULTI_TUMBLER
+#ifdef FEATURE_MULTI_TUMBLER
   if (*s == ',')
   {
     ListAddTail(&t->units,&tu->node);

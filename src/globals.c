@@ -161,7 +161,7 @@ int GlobalsInit(char *fspec)
       ; whatever you do, don't use the commented out
       ; code.
       ;--------------------------------------------*/
-#ifdef BROKEN_FULLBASEURL
+#ifdef FIXED_BROKEN_FULLBASEURL
       char *p = strrchr(ppair->value,'/');
       if (p != NULL) *p = '\0';
 #endif

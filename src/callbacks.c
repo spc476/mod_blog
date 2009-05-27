@@ -1165,6 +1165,8 @@ static void cb_update_time(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
+#ifndef FIXED_BROKEN_RAWFMT 
+
   sprintf(
   	buffer,
   	"%04d-%02d-%02dT%02d:%02d:%02d%+03d:%02d",
@@ -1179,8 +1181,9 @@ static void cb_update_time(Stream out,void *data)
   );
 
   LineS(out,buffer);
+
+#else
   
-#if 0  
   /*--------------------------------------------------
   ; until I can fix RawFmt(), the original format
   ; string used was:

@@ -41,7 +41,7 @@ int send_message(
 		  const char *message
 		)
 {
-#ifdef FEATURE_NEW_EMIL
+#ifdef FIXED_BROKEN_EMAIL
   Email email;
 
   email = EmailNew();
