@@ -276,17 +276,6 @@ int (BlogDayRead)(BlogDay *pdat,struct tm *pdate)
   sclass   = efile_open_r("class",pdate);
   sauthors = efile_open_r("authors",pdate);
    
-#if 0
-  if ((stitles == NULL) && (sclass == NULL) && (sauthors == NULL))
-  {
-    /*------------------------------------------------
-    ; same condition as above, really
-    ;------------------------------------------------*/
-
-    return(ERR_OKAY);
-  }
-#endif
-
   /*-------------------------------------------------
   ; Now, we have either both files open, or only one
   ; of the two.  This isn't that critical of an error,

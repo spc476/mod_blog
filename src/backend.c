@@ -1048,11 +1048,6 @@ static char *tag_pick(const char *tag)
     r  = (((double)rand() / (double)RAND_MAX) * (double)num); 
     ddt(r < num);
     pick = fromstring(pool[r]);
-#if 0
-    pick = MemAlloc(pool[r].s + 1);
-    memcpy(pick,pool[r].d,pool[r].s);
-    pick[pool[r].s] = '\0';
-#endif
   }
   else
     pick = dup_string(gd.adtag);
