@@ -22,8 +22,7 @@
 ########################################################################
 
 SHELL=/bin/sh
-#CGILIB=/home/spc/source/cgi
-CGILIB=../../cgi
+CGILIB=/home/spc/source/cgi4
 SETUID=chmod 4755
 #SETUID=echo >/dev/null
 
@@ -55,51 +54,11 @@ LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4
 all:	$(HOSTDIR)/bp		\
 	$(HOSTDIR)/addentry
 
-boston:	$(HOSTDIR)/main.o		\
-	$(HOSTDIR)/cli_main.o		\
-	$(HOSTDIR)/cgi_main.o		\
-	$(HOSTDIR)/authenticate.o	\
-	$(HOSTDIR)/array.o		\
-	$(HOSTDIR)/addutil.o		\
-	$(HOSTDIR)/callbacks.o
-
 ###########################################################################
 #
 # Main programs for mod_blog.
 #
 ###########################################################################
-
-$(HOSTDIR)/boston : $(HOSTDIR)/main.o		\
-		$(HOSTDIR)/cgi_main.o		\
-		$(HOSTDIR)/cli_main.o		\
-		$(HOSTDIR)/authenticate.o	\
-		$(HOSTDIR)/backend.o		\
-		$(HOSTDIR)/blog.o		\
-		$(HOSTDIR)/callbacks.o		\
-		$(HOSTDIR)/chunk.o		\
-		$(HOSTDIR)/conversion.o		\
-		$(HOSTDIR)/doi_util.o		\
-		$(HOSTDIR)/globals.o		\
-		$(HOSTDIR)/system.o		\
-		$(HOSTDIR)/timeutil.o		\
-		$(HOSTDIR)/wbtum.o
-	$(CC) $(CFLAGS) -o $@			\
-		$(HOSTDIR)/main.o		\
-		$(HOSTDIR)/cgi_main.o		\
-		$(HOSTDIR)/cli_main.o		\
-		$(HOSTDIR)/authenticate.o	\
-		$(HOSTDIR)/backend.o		\
-		$(HOSTDIR)/blog.o		\
-		$(HOSTDIR)/callbacks.o		\
-		$(HOSTDIR)/chunk.o		\
-		$(HOSTDIR)/conversion.o		\
-		$(HOSTDIR)/doi_util.o		\
-		$(HOSTDIR)/globals.o		\
-		$(HOSTDIR)/system.o		\
-		$(HOSTDIR)/timeutil.o		\
-		$(HOSTDIR)/wbtum.o		\
-		$(LFLAGS)
-	$(SETUID) $(HOSTDIR)/boston
 
 $(HOSTDIR)/bp : $(HOSTDIR)/bp.o			\
 		$(HOSTDIR)/globals.o		\
@@ -149,27 +108,6 @@ $(HOSTDIR)/wbttest : $(HOSTDIR)/wbttest.o	\
 # Individual files
 #
 ########################################################################
-
-$(HOSTDIR)/main.o : src/main.c
-	$(CC) $(CFLAGS) -c -o $@ src/main.c
-
-$(HOSTDIR)/cli_main.o : src/cli_main.c
-	$(CC) $(CFLAGS) -c -o $@ src/cli_main.c
-
-$(HOSTDIR)/cgi_main.o : src/cgi_main.c
-	$(CC) $(CFLAGS) -c -o $@ src/cgi_main.c
-
-$(HOSTDIR)/authenticate.o : src/authenticate.c
-	$(CC) $(CFLAGS) -c -o $@ src/authenticate.c
-
-$(HOSTDIR)/array.o : src/array.c
-	$(CC) $(CFLAGS) -c -o $@ src/array.c
-
-$(HOSTDIR)/addutil.o : src/addutil.c
-	$(CC) $(CFLAGS) -c -o $@ src/addutil.c
-
-$(HOSTDIR)/callbacks.o : src/callbacks.c
-	$(CC) $(CFLAGS) -c -o $@ src/callbacks.c
 
 $(HOSTDIR)/bp.o : src/bp.c
 	$(CC) $(CFLAGS) -c -o $@ src/bp.c
