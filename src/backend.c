@@ -53,14 +53,14 @@
 
 /*****************************************************************/
 
-static void	   calculate_previous		(struct tm);
-static void	   calculate_next		(struct tm);
+static void	   calculate_previous		(struct btm);
+static void	   calculate_next		(struct btm);
 static const char *mime_type			(char *);
 static int	   display_file			(Stream,Tumbler);
-static int	   rss_page			(Stream,int,int,int);
-static int	   tab_page			(Stream,int,int,int);
-static void        tag_collect			(char **ptag,BlogDay);
+static int	   rss_page			(Stream,struct btm *,int,int);
+static char       *tag_collect			(List *);
 static char	  *tag_pick                     (const char *);
+static void	   free_entries			(List *);
 
 /************************************************************************/
 
@@ -93,16 +93,16 @@ int generate_pages(Request req)
   {
     return(ERR_ERR);
   }
-  rc = primary_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
+  rc = primary_page(out,gd.now.year,gd.now.month,gd.now.day,gd.now.part);
   StreamFree(out);
-    
+  
   if (c_rsstemplates)
   {
     g_templates = c_rsstemplates;
     out         = FileStreamWrite(c_rssfile,FILE_RECREATE);
     if (out == NULL)
       return(ERR_ERR);
-    rc = rss_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
+    rc = rss_page(out,&gd.now,TRUE,cf_rssreverse);
     StreamFree(out);
   }
 
@@ -112,7 +112,7 @@ int generate_pages(Request req)
     out         = FileStreamWrite(c_atomfile,FILE_RECREATE);
     if (out == NULL)
       return(ERR_ERR);
-    rc = rss_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
+    rc = rss_page(out,&gd.now,TRUE,cf_rssreverse);
     StreamFree(out);
   }
   
@@ -122,7 +122,7 @@ int generate_pages(Request req)
     out         = FileStreamWrite(c_tabfile,FILE_RECREATE);
     if (out == NULL)
       return(ERR_ERR);
-    rc = tab_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
+    rc = rss_page(out,&gd.now,FALSE,cf_tabreverse);
     StreamFree(out);
   }
   
@@ -133,19 +133,14 @@ int generate_pages(Request req)
 
 int tumbler_page(Stream out,Tumbler spec)
 {
-  struct tm     thisday;
-  struct tm     start;
-  struct tm     end;
-  TumblerUnit   tu1;
-  TumblerUnit   tu2;
-  int           nu1;
-  int           nu2;
-  List          listodays;
-  BlogDay       blog;
-  long          days;
-  long          tmpdays;
-  char          *tags;
-  void        (*addday) (struct tm *)             = (day_add);
+  struct btm            start;
+  struct btm            end;
+  TumblerUnit           tu1;
+  TumblerUnit           tu2;
+  int                   nu1;
+  int                   nu2;
+  char                 *tags;
+  struct callback_data  cbd;
   
   ddt(out  != NULL);
   ddt(spec != NULL);
@@ -168,12 +163,11 @@ int tumbler_page(Stream out,Tumbler spec)
     return(ERR_OKAY);	/* XXX hack for now */
   }
 
-  ListInit(&listodays);
-  
-  tm_init(&start);
-  tm_init(&end);
+  memset(&cbd,0,sizeof(struct callback_data));
+  ListInit(&cbd.list);
   
   tu1 = (TumblerUnit)ListGetHead(&spec->units);
+  tu2 = (TumblerUnit)NodeNext(&tu1->node);
   
   /*-----------------------------------------------------
   ; validate input tumbler from user.  
@@ -181,39 +175,91 @@ int tumbler_page(Stream out,Tumbler spec)
 
   if (
        (tu1->entry[YEAR]) 
-       && (tu1->entry[YEAR] < (gd.begin.tm_year + 1900))
+       && (tu1->entry[YEAR] < gd.begin.year)
      ) 
     return(1);
-  if (tu1->entry[MONTH] <  0) return(1);
-  if (tu1->entry[MONTH] > 12) return(1);
+  if (tu1->entry[MONTH]  <  0) return(1);
+  if (tu1->entry[MONTH]  > 12) return(1);
   if ((tu1->entry[MONTH] == 0) && (tu1->entry[DAY])) return(1);
-  if (tu1->entry[DAY]   <  0) return(1);
+  if (tu1->entry[DAY]    <  0) return(1);
   if ((tu1->entry[MONTH]) && (tu1->entry[DAY] > max_monthday(tu1->entry[YEAR],tu1->entry[MONTH])))
     return(1);
 
+  if (tu1->type == TUMBLER_RANGE)
+  {
+    TumblerUnit tmp;
+    
+    if (
+         (tu2->entry[YEAR] != 0)
+         && (tu2->entry[YEAR] < gd.begin.year)
+       )
+      return(1);
+    if (tu2->entry[MONTH]  <  0) return(1);
+    if (tu2->entry[MONTH]  > 12) return(1);
+    if ((tu2->entry[MONTH] == 0) && (tu2->entry[DAY])) return(1);
+    if (tu2->entry[DAY]    <  0) return(1);
+    if ((tu2->entry[MONTH]) && (tu2->entry[DAY]   > max_monthday(tu2->entry[YEAR],tu2->entry[MONTH])))
+      return(1);
+      
+    /*--------------------------------------------------
+    ; swap the tumblers if we can---it'll save us a crap
+    ; of work later.
+    ;--------------------------------------------------*/
+    
+    if (tu1->entry[YEAR] > tu2->entry[YEAR])
+    {
+      gd.f.reverse = TRUE;
+      tmp = tu1;
+      tu1 = tu2;
+      tu2 = tmp;
+      tu1->type = TUMBLER_RANGE;
+      tu2->type = TUMBLER_SINGLE;
+    }
+    else if (tu1->entry[MONTH] > tu2->entry[MONTH])
+    {
+      gd.f.reverse = TRUE;
+      tmp = tu1;
+      tu1 = tu2;
+      tu2 = tmp;
+      tu1->type = TUMBLER_RANGE;
+      tu2->type = TUMBLER_SINGLE;
+    }
+    else if (tu1->entry[DAY] > tu2->entry[DAY])
+    {
+      gd.f.reverse = TRUE;
+      tmp = tu1;
+      tu1 = tu2;
+      tu2 = tmp;
+      tu1->type = TUMBLER_RANGE;
+      tu2->type = TUMBLER_SINGLE;
+    }
+    else if (tu1->entry[PART] > tu2->entry[PART])
+    {
+      gd.f.reverse = TRUE;
+      tmp = tu1;
+      tu1 = tu2;
+      tu2 = tmp;
+      tu1->type = TUMBLER_RANGE;
+      tu2->type = TUMBLER_SINGLE;
+    }
+  }
+
   /*--------------------------------------------------------------
-  ; Standard C libray time.h defines certains fields to
-  ; have certain ranges, namely, .tm_year is years since 1900,
-  ; .tm_mon is months since January.  To simplify some of 
-  ; the code, we're going to use unadjusted (real world) 
-  ; values, like the actual year, January is 1, etc.
-  ;
-  ; We'll also use .tm_hour as the part (or entry) since
-  ; it's handy.  Just keep that in mind.  And in this
-  ; case, we can start with 0, so no special check is needed.
+  ; I junked the use of struct tm as it was just too error
+  ; prone.  I defined a struct btm with only the fields I need,
+  ; and with the definitions I required.
   ;
   ; The tumbler code will set unspecified fields to 0.  In this 
   ; case, we want to start with minimum legal values.
   ;------------------------------------------------------------*/
 
-  nu1           = PART;
-  start.tm_year = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , gd.begin.tm_year + 1900 : (nu1 = YEAR  , tu1->entry[YEAR]);
-  start.tm_mon  = (tu1->entry[MONTH] == 0) ? nu1 = YEAR    , 1                      : (nu1 = MONTH , tu1->entry[MONTH]);
-  start.tm_mday = (tu1->entry[DAY]   == 0) ? nu1 = MONTH   , 1                      : (nu1 = DAY   , tu1->entry[DAY]);
-  start.tm_hour = tu1->entry[PART];
-  if (tu1->entry[PART] != 0) nu1 = PART;
+  nu1         = PART;
+  start.year  = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , gd.begin.year : (nu1 = YEAR  , tu1->entry[YEAR]);
+  start.month = (tu1->entry[MONTH] == 0) ? nu1 = YEAR    , 1             : (nu1 = MONTH , tu1->entry[MONTH]);
+  start.day   = (tu1->entry[DAY]   == 0) ? nu1 = MONTH   , 1             : (nu1 = DAY   , tu1->entry[DAY]);
+  start.part  = (tu1->entry[PART]  == 0) ? nu1 = DAY     , 1             : (nu1 = PART  , tu1->entry[PART]);
   
-  if (start.tm_mday > max_monthday(start.tm_year,start.tm_mon))
+  if (start.day > max_monthday(start.year,start.month))
     return(1);				/* invalid day */
 
   /*----------------------------------------------------------
@@ -224,48 +270,30 @@ int tumbler_page(Stream out,Tumbler spec)
   if (tu1->type == TUMBLER_SINGLE)
   {
     gd.f.navigation = TRUE;
-    nu2          = PART;
-    end.tm_year  = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , gd.now.tm_year + 1900 : tu1->entry[YEAR];
-    end.tm_mon   = (tu1->entry[MONTH] == 0) ? nu2 = MONTH , 12 : tu1->entry[MONTH];
-    end.tm_mday  = (tu1->entry[DAY]   == 0) ? nu2 = DAY   , max_monthday(end.tm_year,end.tm_mon) : tu1->entry[DAY];
-    end.tm_hour  = (tu1->entry[PART]  == 0) ? nu2 = PART  , 23 : tu1->entry[PART];
-    gd.navunit    = nu1;
+    nu2        = PART;
+    end.year   = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , gd.now.year                      : tu1->entry[YEAR];
+    end.month  = (tu1->entry[MONTH] == 0) ? nu2 = MONTH , 12                               : tu1->entry[MONTH];
+    end.day    = (tu1->entry[DAY]   == 0) ? nu2 = DAY   , max_monthday(end.year,end.month) : tu1->entry[DAY];
+    end.part   = (tu1->entry[PART]  == 0) ? nu2 = PART  , 23                               : tu1->entry[PART];
+    gd.navunit = nu1;
     
     calculate_previous(start);
     calculate_next(end);
   }
   else
   {
-    tu2 = (TumblerUnit)NodeNext(&tu1->node);
-    
     /*-----------------------------------------------------------
     ; fix the ending date.  In this case, the unspecified fields
     ; will be set to the their maximum legal value.
     ;-----------------------------------------------------------*/
     
-    end.tm_year = (tu2->entry[YEAR]  == 0) ? gd.now.tm_year + 1900 : tu2->entry[YEAR];
-    end.tm_mon  = (tu2->entry[MONTH] == 0) ? 12 : tu2->entry[MONTH];
-    end.tm_mday = (tu2->entry[DAY]   == 0) ? max_monthday(end.tm_year,end.tm_mon) : tu2->entry[DAY];
-    end.tm_hour = (tu2->entry[PART]  == 0) ? 23 : tu2->entry[PART];
-
-    /*-------------------------------------------------------
-    ; validate the second part of the tumbler from the user
-    ;-------------------------------------------------------*/
-    
-    if (
-         (tu2->entry[YEAR] != 0)
-         && (tu2->entry[YEAR] < (gd.begin.tm_year + 1900))
-       )
-      return(1);
-    if (tu2->entry[MONTH] <  0) return(1);
-    if (tu2->entry[MONTH] > 12) return(1);
-    if ((tu2->entry[MONTH] == 0) && (tu2->entry[DAY])) return(1);
-    if (tu2->entry[DAY]   <  0) return(1);
-    if ((tu2->entry[MONTH]) && (tu2->entry[DAY]   > max_monthday(tu2->entry[YEAR],tu2->entry[MONTH])))
-      return(1);
+    end.year  = (tu2->entry[YEAR]  == 0) ? gd.now.year                      : tu2->entry[YEAR];
+    end.month = (tu2->entry[MONTH] == 0) ? 12                               : tu2->entry[MONTH];
+    end.day   = (tu2->entry[DAY]   == 0) ? max_monthday(end.year,end.month) : tu2->entry[DAY];
+    end.part  = (tu2->entry[PART]  == 0) ? 23                               : tu2->entry[PART];
   }
-  
-  if (end.tm_mday > max_monthday(end.tm_year,end.tm_mon))
+
+  if (end.day > max_monthday(end.year,end.month))
     return(1);
 
   /*------------------------------------------------
@@ -274,42 +302,26 @@ int tumbler_page(Stream out,Tumbler spec)
   ; code.
   ;------------------------------------------------*/
   
-  ddt(start.tm_year >= 1);
-  ddt(start.tm_mon  >= 1);
-  ddt(start.tm_mon  <= 12);
-  ddt(start.tm_mday >= 1);
-  ddt(start.tm_mday <= max_monthday(start.tm_year,start.tm_mon));
+  ddt(start.year  >= 1);
+  ddt(start.month >= 1);
+  ddt(start.month <= 12);
+  ddt(start.day   >= 1);
+  ddt(start.day   <= max_monthday(start.year,start.month));
   
-  ddt(end.tm_year >= 1);
-  ddt(end.tm_mon  >= 1);
-  ddt(end.tm_mon  <= 12);
-  ddt(end.tm_mday >= 1);
-  ddt(end.tm_mday <= max_monthday(start.tm_year,start.tm_mon));
+  ddt(end.year  >= 1);
+  ddt(end.month >= 1);
+  ddt(end.month <= 12);
+  ddt(end.day   >= 1);
+  ddt(end.day   <= max_monthday(end.year,end.month));
   
   /*--------------------------------------------------------------
-  ; okay, resume processing ... we now have checked unnormalized
-  ; times.  Normalize, then bound against the starting time of
+  ; okay, resume processing ... bound against the starting time of
   ; the blog, and the current time.
   ;-------------------------------------------------------------*/
   
-  tm_to_tm(&start);
-  tm_to_tm(&end);
-
-  /*--------------------------------------------------
-  ; if we're going in reverse, swap the times, set the
-  ; reverse flag, and change the functions to add nodes
-  ; in the proper direction.  My, we hacky 8-)
-  ;--------------------------------------------------*/
-  
-  if (tm_cmp(&end,&start) < 0)
-  {
-    gd.f.reverse     = TRUE;
-    addday        = (day_sub);
-  }
-  
-  if (tm_cmp(&start,&gd.begin) < 0)
+  if (btm_cmp(&start,&gd.begin) < 0)
     start = gd.begin;
-  if (tm_cmp(&end,&gd.now) > 0)
+  if (btm_cmp(&end,&gd.now) > 0)
     end = gd.now;
   
   /*----------------------------------------------------
@@ -319,338 +331,215 @@ int tumbler_page(Stream out,Tumbler spec)
   ; days as we go ... 
   ;-------------------------------------------------------*/
 
-  tags = dup_string("");	/* an empty string to start out with */
+  /*----------------------------------------------------
+  ; these four lines replaced 65 very confused lines
+  ; of code.
+  ;----------------------------------------------------*/
   
-  for (tmpdays = days = labs(days_between(&end,&start)) + 1 , thisday = start ; days > 0 ; days--)
-  {
-    int rc = BlogDayRead(&blog,&thisday);
-
-    if (rc != ERR_OKAY)
-      continue;
-    
-    /*------------------------------------------------------------
-    ; adjustments for partial days.  The code is ugly because
-    ; of the reverse hacks I've done without really understanding
-    ; how I actually *implemented* the reverse display of entries.
-    ; Funny how I'm the one writting the code and even *I* don't
-    ; fully understand what I'm doing here. 8-)
-    ;-------------------------------------------------------------*/
-    
-    if (days == tmpdays)
-    {
-      if (gd.f.reverse)
-      {
-        if (start.tm_hour <= blog->endentry)
-	  blog->endentry = start.tm_hour - 1;
-      }
-      else
-        blog->stentry = start.tm_hour - 1;
-    }
-
-    if (days == 1)		/* because we *can* specify one day ... */
-    {
-      if (gd.f.reverse)
-        blog->stentry = end.tm_hour - 1;
-      else
-      {
-        if (end.tm_hour <= blog->endentry)
-          blog->endentry = end.tm_hour - 1;
-      }
-    }
-
-    /*----------------------------------------------------
-    ; I have no idea how long ago I wrote this code, but in
-    ; all that time, I never knew that blog->stentry or 
-    ; blog->endentry could become negative.  It didn't seem
-    ; to affect the rest of the code, but with the new adtag
-    ; feature, it became a problem.  This bit o' code ensures
-    ; that they at least remain positive.  
-    ;
-    ; I still don't fully understand what I'm doing here.
-    ;--------------------------------------------------------*/
-
-    if (blog->stentry  < 0) blog->stentry  = 0;
-    if (blog->endentry < 0) blog->endentry = 0;
-    
-    /*------------------------------------------------------
-    ; the rest of this should be pretty easy to understand.
-    ; I hope.
-    ;-------------------------------------------------------*/
-    
-    if (blog->number)
-    {
-      tag_collect(&tags,blog);
-      ListAddTail(&listodays,&blog->node);
-    }
-    else
-      BlogDayFree(&blog);
-
-    (*addday)(&thisday);
-  }
+  if (gd.f.reverse)
+    BlogEntryReadBetweenD(g_blog,&cbd.list,&end,&start);
+  else
+    BlogEntryReadBetweenU(g_blog,&cbd.list,&start,&end);
   
+  tags     = tag_collect(&cbd.list);  
   gd.adtag = tag_pick(tags);
   MemFree(tags);
-  generic_cb("main",out,&listodays);
-  
-  for (
-        blog = (BlogDay)ListRemHead(&listodays);
-        NodeValid(&blog->node);
-        blog = (BlogDay)ListRemHead(&listodays)
-      )
-  {
-    BlogDayFree(&blog);
-  }
+  generic_cb("main",out,&cbd);
+  free_entries(&cbd.list);
 
   return(0);
 }
 
 /******************************************************************/
 
-static void calculate_previous(struct tm start)
+static void calculate_previous(struct btm start)
 {
-  tm_to_tm(&start);
-  
-  tm_init(&gd.previous);
-  gd.previous.tm_mday = 1;
-  gd.previous.tm_hour = 1;
+  gd.previous.year = 0;
+  gd.previous.month = 1;
+  gd.previous.day   = 1;
+  gd.previous.part  = 1;
 
   switch(gd.navunit)
   {
     case YEAR:
-         if (start.tm_year == gd.begin.tm_year)
+         if (start.year == gd.begin.year)
            gd.f.navprev = FALSE;
          else
-           gd.previous.tm_year  = start.tm_year - 1;
+           gd.previous.year = start.year - 1;
          break;
     case MONTH:
          if (
-              (start.tm_year == gd.begin.tm_year) 
-              && (start.tm_mon == gd.begin.tm_mon)
+              (start.year == gd.begin.year) 
+              && (start.month == gd.begin.month)
             )
            gd.f.navprev = FALSE;
          else
          {
-           gd.previous.tm_year  = start.tm_year;
-           gd.previous.tm_mon   = start.tm_mon;
-           month_sub(&gd.previous);
+           gd.previous.year  = start.year;
+           gd.previous.month = start.month;
+           btm_sub_month(&gd.previous);
          }
          break;
     case DAY:
-         if (
-              (start.tm_year == gd.begin.tm_year) 
-              && (start.tm_mon == gd.begin.tm_mon) 
-              && (start.tm_mday == gd.begin.tm_mday)
-            )
+         if (btm_cmp_date(&start,&gd.begin) == 0)
            gd.f.navprev = FALSE;
          else
          {
-           gd.previous.tm_year  = start.tm_year;
-           gd.previous.tm_mon   = start.tm_mon;
-           gd.previous.tm_mday  = start.tm_mday;
-           day_sub(&gd.previous);
+           gd.previous.year  = start.year;
+           gd.previous.month = start.month;
+           gd.previous.day   = start.day;
+           gd.previous.part  = 1;
+           btm_sub_day(&gd.previous);
            
-           while(TRUE)
+           while(btm_cmp(&gd.previous,&gd.begin) > 0)
            {
-             BlogDay day;
-             int     rc;
+             BlogEntry entry;
              
-             mktime(&gd.previous);
-             if (tm_cmp(&gd.previous,&gd.begin) <= 0)
-               break;
-               
-             rc = BlogDayRead(&day,&gd.previous);
-             if (rc != ERR_OKAY)
+             entry = BlogEntryRead(g_blog,&gd.previous);
+             if (entry == NULL)
              {
-               day_sub(&gd.previous);
+               btm_sub_day(&gd.previous);
                continue;
              }
-             if (day->number)
-             {
-               BlogDayFree(&day);
-               return;
-             }
-
-             BlogDayFree(&day);
-             day_sub(&gd.previous);
+             
+             return;
            }
+                      
            gd.f.navprev = FALSE;
          }
          break;
     case PART:
-         if (
-	      (start.tm_year    == gd.begin.tm_year) 
-	      && (start.tm_mon  == gd.begin.tm_mon) 
-	      && (start.tm_mday == gd.begin.tm_mday) 
-	      && (start.tm_hour == gd.begin.tm_hour)
-	    )
+         if (btm_cmp(&start,&gd.begin) == 0)
            gd.f.navprev = FALSE;
          else
          {
-           gd.previous.tm_year  = start.tm_year;
-           gd.previous.tm_mon   = start.tm_mon;
-           gd.previous.tm_mday  = start.tm_mday;
-           gd.previous.tm_hour  = start.tm_hour - 1;
+           gd.previous.year  = start.year;
+           gd.previous.month = start.month;
+           gd.previous.day   = start.day;
+           gd.previous.part  = start.part - 1;
            
-           if (start.tm_hour <= 1)
+           if (start.part == 0)
            {
-             day_sub(&gd.previous);
-             gd.previous.tm_hour = 23;
+             btm_sub_day(&gd.previous);
+             gd.previous.part = 1;
            }
            
-           while(tm_cmp(&gd.previous,&gd.begin) > 0)
+           while(btm_cmp(&gd.previous,&gd.begin) > 0)
            {
-             BlogDay day;
-             int     rc;
-           
-             mktime(&gd.previous);
-             rc = BlogDayRead(&day,&gd.previous);
-             if (rc != ERR_OKAY)
+             BlogEntry entry;
+             
+             entry = BlogEntryRead(g_blog,&gd.previous);
+             if (entry == NULL)
              {
-               day_sub(&gd.previous);
+               btm_sub_day(&gd.previous);
                continue;
              }
-           
-	     if (day->number == 0)
-	     {
-	       day_sub(&gd.previous);
-	       continue;
-	     }
-
-             if (gd.previous.tm_hour > day->number)
-               gd.previous.tm_hour = day->number;
-	     if (gd.previous.tm_hour == 0) gd.previous.tm_hour = 1;
-             BlogDayFree(&day);
-             break;
+             
+             gd.previous.part = g_blog->idx;
+             return;
            }
+           
+           gd.f.navprev = FALSE;
          }
          break;
     default:
          ddt(0);
   }
-  mktime(&gd.previous);
 }
 
 /******************************************************************/
 
-static void calculate_next(struct tm end)
+static void calculate_next(struct btm end)
 {
-  tm_to_tm(&end);
-
-  tm_init(&gd.next);
-  gd.next.tm_mday = 1;
-  gd.next.tm_hour = 1;
+  gd.next.year  = 0;
+  gd.next.month = 1;
+  gd.next.day   = 1;
+  gd.next.part  = 1;
     
   switch(gd.navunit)
   {
     case YEAR:
-         if (end.tm_year == gd.now.tm_year)
+         if (end.year == gd.now.year)
            gd.f.navnext = FALSE;
          else
-           gd.next.tm_year  = end.tm_year + 1;
+           gd.next.year  = end.year + 1;
          break;
     case MONTH:
          if (
-              (end.tm_year == gd.now.tm_year) 
-              && (end.tm_mon == gd.now.tm_mon)
+              (end.year == gd.now.year) 
+              && (end.month == gd.now.month)
             )
            gd.f.navnext = FALSE;
          else
          {
-           gd.next.tm_year  = end.tm_year;
-           gd.next.tm_mon   = end.tm_mon;
-           month_add(&gd.next);
+           gd.next.year  = end.year;
+           gd.next.month = end.month;
+           btm_add_month(&gd.next);
          }
          break;
     case DAY:
-         if (
-              (end.tm_year == gd.now.tm_year) 
-              && (end.tm_mon == gd.now.tm_mon) 
-              && (end.tm_mday == gd.now.tm_mday)
-            )
+         if (btm_cmp_date(&end,&gd.now) == 0)
            gd.f.navnext = FALSE;
          else
          {
-           gd.next.tm_year  = end.tm_year;
-           gd.next.tm_mon   = end.tm_mon;
-           gd.next.tm_mday  = end.tm_mday;
-           day_add(&gd.next);
+           gd.next.year  = end.year;
+           gd.next.month = end.month;
+           gd.next.day   = end.day;
+           gd.next.part  = 1;
+           btm_add_day(&gd.next);
            
-           while(TRUE)
+           while(btm_cmp(&gd.next,&gd.now) < 0)
            {
-             BlogDay day;
-             int     rc;
+             BlogEntry entry;
              
-             mktime(&gd.next);
-             if (tm_cmp(&gd.next,&gd.now) > 0)
-               break;
-             rc = BlogDayRead(&day,&gd.next);
-             if (rc != ERR_OKAY)
+             entry = BlogEntryRead(g_blog,&gd.next);
+             if (entry == NULL)
              {
-               day_add(&gd.next);
+               btm_add_day(&gd.next);
                continue;
              }
-             if (day->number)
-             {
-               BlogDayFree(&day);
-               return;
-             }
-             BlogDayFree(&day);
-             day_add(&gd.next);
+             
+             return;
            }
+           
            gd.f.navnext = FALSE;
          }
          break;
     case PART:
-         if (
-              (end.tm_year == gd.now.tm_year) 
-              && (end.tm_mon == gd.now.tm_mon) 
-              && (end.tm_mday == gd.now.tm_mday) 
-              && (end.tm_hour == gd.now.tm_hour)
-            )
+         if (btm_cmp(&end,&gd.now) == 0)
            gd.f.navnext = FALSE;
 	 else
 	 {
-           gd.next.tm_year  = end.tm_year;
-           gd.next.tm_mon   = end.tm_mon;
-           gd.next.tm_mday  = end.tm_mday;
-           gd.next.tm_hour  = end.tm_hour + 1;
+           gd.next.year  = end.year;
+           gd.next.month = end.month;
+           gd.next.day   = end.day;
+           gd.next.part  = end.part + 1;
          
-           if (end.tm_hour > 23)
+           if (end.part > 23)
            {
-             day_add(&gd.next);
-             gd.next.tm_hour = 1;
+             btm_add_day(&gd.next);
+             gd.next.part = 1;
            }
          
-           while(TRUE)
+           while(btm_cmp(&gd.next,&gd.now) < 0)
            {
-             BlogDay day;
-             int     rc;
-           
-             mktime(&gd.next);
-             if (tm_cmp(&gd.next,&gd.now) >= 0)
-               break;
-             rc = BlogDayRead(&day,&gd.next);
-             if (rc != ERR_OKAY)
+             BlogEntry entry;
+             
+             entry = BlogEntryRead(g_blog,&gd.next);
+             if (entry == NULL)
              {
-               day_add(&gd.next);
+               btm_add_day(&gd.next);
                continue;
              }
-           
-             if (gd.next.tm_hour > day->number)
-             {
-               day_add(&gd.next);
-               gd.next.tm_hour = 1;
-               continue;
-             }
-             BlogDayFree(&day);
-             break;
+             
+             return;
            }
+           gd.f.navnext = FALSE;
 	 }
          break;
     default:
          ddt(0);
   }
-  mktime(&gd.next);
 }
 
 /******************************************************************/
@@ -766,13 +655,14 @@ static int display_file(Stream out,Tumbler spec)
 
 /*****************************************************************/
 
-int primary_page(Stream out,int year,int month,int iday)
+int primary_page(Stream out,int year,int month,int iday,int part)
 {
-  BlogDay   day;
-  struct tm thisday;
-  int       days;
-  List      listodays;
-  char     *tags;
+  BlogEntry             entry;
+  struct btm            thisday;
+  int                   days;
+  char                 *tags;
+  struct callback_data  cbd;
+  int                   added;
   
   ddt(out   != NULL);
   ddt(year  >  0);
@@ -781,244 +671,106 @@ int primary_page(Stream out,int year,int month,int iday)
   ddt(iday  >  0);
   ddt(iday  <= max_monthday(year,month));
 
-  tags         = dup_string("");
   gd.f.fullurl = FALSE;
   gd.f.reverse = TRUE;
     
-  tm_init(&thisday);
-
-  thisday.tm_year = year;
-  thisday.tm_mon  = month;
-  thisday.tm_mday = iday;
-  thisday.tm_hour = 1;
+  thisday.year  = year;
+  thisday.month = month;
+  thisday.day   = iday;
+  thisday.part  = part;
   
-  for (ListInit(&listodays) , days = 0 ; days < c_days ; )
+  memset(&cbd,0,sizeof(struct callback_data));
+  
+  for (ListInit(&cbd.list) , days = 0 , added = FALSE ; days < c_days ; )
   {
-    int rc;
+    if (btm_cmp(&thisday,&gd.begin) < 0) break;
     
-    /*-----------------------------------------------------------------
-    ; There's a bug.  gd.now isn't be initialized properly in all
-    ; code paths.  If it *isn't* initialized properly, then 
-    ;
-    ;	blog --config conf 
-    ;
-    ; works between 00:00:00 and 00:59:59, but
-    ;
-    ;	blog --config conf --regen
-    ;
-    ; fails between 00:00:00 and 00:59:59.  If it *is* initialized
-    ; properly, then both would fail between 00:00:00 and 00:59:59.
-    ;
-    ; This bug is due to the way I use the struct tm.tm_hour field, not
-    ; as an hour per se, but as a entry to use.
-    ;
-    ; This is bad.
-    ;
-    ; I need to think on this.
-    ;-------------------------------------------------------------------*/
-    
-    if (tm_cmp(&thisday,&gd.begin) < 0) break;
-    if (tm_cmp(&thisday,&gd.now)   > 0) break;
-
-    rc = BlogDayRead(&day,&thisday);
-    
-    if (rc != ERR_OKAY)
-      continue;
-    
-    if (day->number)
+    entry = BlogEntryRead(g_blog,&thisday);
+    if (entry)
     {
-      tag_collect(&tags,day);
-      ListAddTail(&listodays,&day->node);
-      days++;
+      ListAddTail(&cbd.list,&entry->node);
+      added = TRUE;
     }
-      else
-        BlogDayFree(&day);
 
-    day_sub(&thisday);
+    thisday.part--;
+    if (thisday.part == 0)
+    {
+      thisday.part = 23;
+      btm_sub_day(&thisday);
+      if (added)
+        days++;
+      added = FALSE;
+    }
   }
-  
+
+  tags = tag_collect(&cbd.list);
   gd.adtag = tag_pick(tags);
   MemFree(tags);
-  generic_cb("main",out,&listodays);
+  generic_cb("main",out,&cbd);
+  free_entries(&cbd.list);
+  
+  return(0);
+}
 
-  for (
-        day = (BlogDay) ListRemHead(&listodays) ; 
-        NodeValid(&day->node) ;
-        day = (BlogDay) ListRemHead(&listodays)
-      )
-  {
-    BlogDayFree(&day);
-  }
+/********************************************************************/
+
+static int rss_page(Stream out,struct btm *when,int fullurl,int reverse)
+{
+  struct btm            thisday;
+  char                 *tags;
+  struct callback_data  cbd;
+  
+  ddt(out   != NULL);
+  ddt(when  != NULL);
+  
+  gd.f.fullurl = fullurl;
+  gd.f.reverse = reverse;
+  thisday      = *when;
+  
+  memset(&cbd,0,sizeof(struct callback_data));
+  
+  ListInit(&cbd.list);
+  if (gd.f.reverse)
+    BlogEntryReadXD(g_blog,&cbd.list,&thisday,c_rssitems);
+  else
+    BlogEntryReadXU(g_blog,&cbd.list,&thisday,c_rssitems);
+
+  tags     = tag_collect(&cbd.list);  
+  gd.adtag = tag_pick(tags);
+  MemFree(tags);
+  generic_cb("main",out,&cbd);
+  free_entries(&cbd.list);
 
   return(0);
 }
 
 /********************************************************************/
 
-static int rss_page(Stream out,int year, int month, int iday)
+static char *tag_collect(List *list)
 {
-  BlogDay    day;
-  struct tm  thisday;
-  int        items;
-  List       listodays;
+  Stream     stags;
+  BlogEntry  entry;
+  char      *comma = "";
   char      *tags;
   
-  ddt(out   != NULL);
-  ddt(year  >  0);
-  ddt(month >  0);
-  ddt(month <  13);
-  ddt(iday  >  0);
-  ddt(iday  <= max_monthday(year,month));
-
-  tags         = dup_string("");
-  gd.f.fullurl = TRUE;
-  gd.f.reverse = cf_rssreverse;
-    
-  tm_init(&thisday);
-
-  thisday.tm_year = year;
-  thisday.tm_mon  = month;
-  thisday.tm_mday = iday;
+  stags = StringStreamWrite();
   
-  for (ListInit(&listodays) , items = 0 ; items < c_rssitems ; )
+  for
+  (
+    entry = (BlogEntry)ListGetHead(list);
+    NodeValid(&entry->node);
+    entry = (BlogEntry)NodeNext(&entry->node)
+  )
   {
-    int rc;
-    
-    if (tm_cmp(&thisday,&gd.begin) < 0) break;
-    if (tm_cmp(&thisday,&gd.now)   > 0) break;
-    
-    rc = BlogDayRead(&day,&thisday);
-    
-    if (rc != ERR_OKAY)
-      return(1);
-    
-    if (day->number)
-    {
-      tag_collect(&tags,day);
-      if (gd.f.reverse)
-        ListAddTail(&listodays,&day->node);
-      else
-        ListAddHead(&listodays,&day->node);
-      items += day->number;
-    }
-      else
-        BlogDayFree(&day);
-
-    day_sub(&thisday);
-  }
-  
-  gd.adtag = tag_pick(tags);
-  MemFree(tags);
-  generic_cb("main",out,&listodays);
-
-  for (
-        day = (BlogDay) ListRemHead(&listodays) ; 
-        NodeValid(&day->node) ;
-        day = (BlogDay) ListRemHead(&listodays)
-      )
-  {
-    BlogDayFree(&day);
-  }
-
-  return(0);
-}
-
-/********************************************************************/
-
-static int tab_page(Stream out,int year, int month, int iday)
-{
-  BlogDay    day;
-  struct tm  thisday;
-  int        items;
-  List       listodays;
-  char      *tags;
-  
-  ddt(out   != NULL);
-  ddt(year  >  0);
-  ddt(month >  0);
-  ddt(month <  13);
-  ddt(iday  >  0);
-  ddt(iday  <= max_monthday(year,month));
-
-  tags         = dup_string("");
-  gd.f.fullurl = FALSE;
-  gd.f.reverse = cf_tabreverse;
-    
-  tm_init(&thisday);
-
-  thisday.tm_year = year;
-  thisday.tm_mon  = month;
-  thisday.tm_mday = iday;
-  
-  for (ListInit(&listodays) , items = 0 ; items < c_rssitems ; )
-  {
-    int rc;
-    
-    if (tm_cmp(&thisday,&gd.begin) < 0) break;
-    if (tm_cmp(&thisday,&gd.now)   > 0) break;
-    
-    rc = BlogDayRead(&day,&thisday);
-    
-    if (rc != ERR_OKAY)
-      continue;
-    
-    if (day->number)
-    {
-      tag_collect(&tags,day);
-      if (gd.f.reverse)
-        ListAddTail(&listodays,&day->node);
-      else
-        ListAddHead(&listodays,&day->node);
-      items += day->number;
-    }
-    else
-      BlogDayFree(&day);
-
-    day_sub(&thisday);
-  }
-  
-  gd.adtag = tag_pick(tags);
-  MemFree(tags);
-  generic_cb("main",out,&listodays);
-
-  for (
-        day = (BlogDay) ListRemHead(&listodays) ; 
-        NodeValid(&day->node) ;
-        day = (BlogDay) ListRemHead(&listodays)
-      )
-  {
-    BlogDayFree(&day);
-  }
-
-  return(0);
-}
-
-/*******************************************************************/
-
-static void tag_collect(char **ptag,BlogDay blog)
-{
-  char   *tag;
-  char   *t;
-  char   *comma = "";
-  size_t  i;
-  
-  ddt(ptag  != NULL);
-  ddt(*ptag != NULL);
-  ddt(blog  != NULL);
-  
-  tag = *ptag;
-  if (*tag != '\0')
+    if (empty_string(entry->class)) continue;
+    LineS(stags,comma);
+    LineS(stags,entry->class);
     comma = ", ";
+  }
   
-  for (i = blog->stentry ; i <= blog->endentry ; i++)
-  {
-    if (empty_string(blog->entries[i]->class)) continue;
-    t = concat_strings(tag,comma,blog->entries[i]->class,(char *)NULL);
-    MemFree(tag);
-    tag   = t;
-    comma = ", ";
-  }  
-  *ptag = tag;
+  tags = StringFromStream(stags);
+  StreamFree(stags);
+  return(tags);
 }
 
 /********************************************************************/
@@ -1057,5 +809,22 @@ static char *tag_pick(const char *tag)
   return(pick);
 }
  
+/******************************************************************/
+
+static void free_entries(List *list)
+{
+  BlogEntry entry;
+  
+  for
+  (
+    entry = (BlogEntry)ListRemHead(list);
+    NodeValid(&entry->node);
+    entry = (BlogEntry)ListRemHead(list)
+  )
+  {
+    BlogEntryFree(entry);
+  }
+}
+
 /******************************************************************/
 

@@ -38,9 +38,12 @@
 #include "conversion.h"
 #include "frontend.h"
 #include "fix.h"
+#include "timeutil.h"
+#include "blog.h"
 
 /***********************************************************/
 
+void	set_time		(void);
 void	set_c_updatetype	(char *);
 void	set_gf_emailupdate	(char *);
 void	set_c_conversion	(char *);
@@ -67,9 +70,6 @@ const char    *c_rssfile;
 const char    *c_atomfile;
 int            c_rssitems     = 15;
 int            cf_rssreverse  = TRUE;
-int            c_styear       = -1;
-int            c_stmon        = -1;
-int            c_stday        = -1;
 const char    *c_author;
 const char    *c_email;
 const char    *c_authorfile;
@@ -87,6 +87,7 @@ void	     (*c_conversion)(char *,Stream,Stream) =  html_conversion;
 const char    *g_templates;
 int            gf_emailupdate = FALSE;
 volatile int   gf_debug       = FALSE;
+Blog           g_blog;
 struct display gd =
 {
   { FALSE , FALSE , FALSE , FALSE , TRUE , TRUE } ,
@@ -107,6 +108,7 @@ int GlobalsInit(char *fspec)
   
   ddt(fspec != NULL);
 
+  set_time();
   ListInit(&headers);
   
 #ifdef PARALLEL_HACK  
@@ -227,9 +229,10 @@ int GlobalsInit(char *fspec)
     {
       char *p = ppair->value;
       
-      c_styear = strtoul(p,&p,10); p++;
-      c_stmon  = strtoul(p,&p,10); p++;
-      c_stday  = strtoul(p,NULL,10);
+      gd.begin.year  = strtoul(p,&p,10); p++;
+      gd.begin.month = strtoul(p,&p,10); p++;
+      gd.begin.day   = strtoul(p,NULL,10);
+      gd.begin.part  = 1;      
     }
     else if (strcmp(ppair->name,"AUTHOR") == 0)
     {
@@ -311,6 +314,10 @@ int GlobalsInit(char *fspec)
   while(gf_debug)
     ;
 
+  g_blog = BlogNew(c_basedir,c_lockfile);
+  if (g_blog == NULL)
+    return(ERR_ERR);
+
   return(ERR_OKAY);
 }
 
@@ -366,3 +373,20 @@ void set_c_conversion(char *value)
 }
 
 /**************************************************************************/
+
+void set_time(void)
+{
+  struct tm *today;
+  
+  gd.tst       = time(NULL);
+  today        = localtime(&gd.tst);
+  gd.stmst     = *today;
+  gd.now.year  = gd.updatetime.year  = today->tm_year + 1900;
+  gd.now.month = gd.updatetime.month = today->tm_mon + 1;
+  gd.now.day   = gd.updatetime.day   = today->tm_mday;
+  gd.now.part  = 1;
+  srand(gd.tst);
+}
+
+/***************************************************************************/
+

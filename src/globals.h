@@ -26,6 +26,8 @@
 #include <cgilib/cgi.h>
 
 #include "frontend.h"
+#include "timeutil.h"
+#include "blog.h"
 
 /*****************************************************************
 *
@@ -72,16 +74,20 @@ extern const int              cf_tabreverse;
 extern const int              c_tzhour;
 extern const int              c_tzmin;
 extern       void           (*c_conversion)(char *,Stream,Stream);
+extern const struct btm       c_start;
+extern const struct btm       c_now;
 
 extern const char *           g_templates;	/* work on */
 extern int                    gf_emailupdate;	/* work on */
 extern volatile int           gf_debug;
+extern Blog                   g_blog;
 extern struct display         gd;		/* work on */
 
 int		GlobalsInit		(char *);
 void		set_c_updatetype	(char *);
 void		set_gf_emailupdate	(char *);
 void		set_c_conversion	(char *);
+void		set_time		(void);
 
 int		main_cgi_head		(Cgi,int,char *[]);
 int		main_cgi_get		(Cgi,int,char *[]);

@@ -179,10 +179,6 @@ int main_cli(int argc,char *argv[])
   if (rc != ERR_OKAY)
     return((*req.error)(&req,HTTP_ISERVERERR,"","could not open cofiguration file %s",config));
   
-  rc = BlogInit();
-  if (rc != ERR_OKAY)
-    return((*req.error)(&req,HTTP_ISERVERERR,"","could not initialize blog"));
-
   rc = BlogDatesInit();
   if (rc != ERR_OKAY)
     return((*req.error)(&req,HTTP_ISERVERERR,"","could not initialize dates"));
@@ -247,9 +243,10 @@ static int cmd_cli_show(Request req)
     if (req->reqtumbler == NULL)
       rc = primary_page(
       		req->out,
-		gd.now.tm_year,
-		gd.now.tm_mon,
-		gd.now.tm_mday
+		gd.now.year,
+		gd.now.month,
+		gd.now.day,
+		gd.now.part
 	);
     else
     {

@@ -655,7 +655,8 @@ static int tumbler_normalize(Tumbler t)
   base    = last = (TumblerUnit)ListGetHead(&t->units);
   if ((base->type == TUMBLER_SINGLE) && (t->pairs == 1)) return(ERR_OKAY);
   current = (TumblerUnit)NodeNext(&last->node);
-  ddt(NodeValid(&current->node));
+
+  /*ddt(NodeValid(&current->node));*/
   
   while(NodeValid(&current->node))
   {

@@ -1,6 +1,6 @@
 /************
 *
-* Copyright 2001 by Sean Conner.  All Rights Reserved.
+* Copyright 2001-2007 by Sean Conner.  All Rights Reserved.
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -130,6 +130,94 @@ void day_sub(struct tm *ptm)
 }
 
 /*************************************************************************/
+
+void btm_add_day(struct btm *d)
+{
+  ddt(d != NULL);
+  
+  d->day ++;
+  if (d->day > max_monthday(d->year,d->month))
+  {
+    d->day = 1;
+    btm_add_month(d);
+  }
+}
+
+/*************************************************************************/
+
+void btm_sub_day(struct btm *d)
+{
+  ddt(d != NULL);
+  d->day--;
+  if (d->day == 0)
+  {
+    btm_sub_month(d);
+    d->day = max_monthday(d->year,d->month);
+  }
+}
+
+/***********************************************************************/
+
+void btm_add_month(struct btm *d)
+{
+  ddt(d != NULL);
+  
+  d->month++;
+  if (d->month == 13)
+  {
+    d->month = 1;
+    d->year++;
+  }
+}
+
+/***********************************************************************/
+
+void btm_sub_month(struct btm *d)
+{
+  ddt(d != NULL);
+  
+  d->month--;
+  if (d->month == 0)
+  {
+    d->month = 12;
+    d->year--;
+  }
+}
+
+/***********************************************************************/
+
+int btm_cmp(const struct btm *d1,const struct btm *d2)
+{
+  int rc;
+  
+  ddt(d1 != NULL);
+  ddt(d2 != NULL);
+  
+  if ((rc = d1->year  - d2->year))  return(rc);
+  if ((rc = d1->month - d2->month)) return(rc);
+  if ((rc = d1->day   - d2->day))   return(rc);
+  if ((rc = d1->part  - d2->part))  return(rc);
+  
+  return(0);
+}
+
+/***********************************************************************/
+
+int btm_cmp_date(const struct btm *d1,const struct btm *d2)
+{
+  int rc;
+  
+  ddt(d1 != NULL);
+  ddt(d2 != NULL);
+  
+  if ((rc = d1->year  - d2->year))  return(rc);
+  if ((rc = d1->month - d2->month)) return(rc);
+  if ((rc = d1->day   - d2->day))   return(rc);
+  
+  return(0);
+}
+
+/***************************************************************************/
 
 void tm_init(struct tm *ptm)
 {

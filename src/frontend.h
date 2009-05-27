@@ -26,6 +26,8 @@
 #include <time.h>
 #include <cgilib/cgi.h>
 #include "wbtum.h"
+#include "timeutil.h"
+#include "blog.h"
 
 typedef struct rflags
 {
@@ -72,18 +74,34 @@ typedef struct dflags
 
 typedef struct display
 {
-  DFlags                 f;
-  int                    navunit;
-  char                  *adtag;
-  Stream                 htmldump;
-  Cgi                    cgi;
-  Request                req;
+  DFlags      f;
+  int         navunit;
+  char       *adtag;
+  Stream      htmldump;
+  Cgi         cgi;
+  Request     req;
+  struct btm  begin;
+  struct btm  now;
+  struct btm  updatetime;
+  struct btm  previous;
+  struct btm  next;
+  time_t      tst;	/* Time_t based Start Time */
+  struct tm   stmst;	/* Struct TM based Start Time */
+#if 0
   struct tm              begin;
   struct tm              now;
   struct tm              updatetime;
   struct tm              previous;
   struct tm              next;
+#endif
 } *Display;
+
+struct callback_data
+{
+  List       list;
+  struct btm last;	/* timestamp of previous entry */
+  BlogEntry  entry;	/* current entry being processed */
+};
 
 #endif
 

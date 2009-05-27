@@ -53,26 +53,36 @@
 
 static void	cb_blog_script			(Stream,void *);
 static void	cb_blog_url			(Stream,void *);
+#if 0
 static void	cb_blog_locallink		(Stream,void *);
 static void	cb_blog_body			(Stream,void *);
 static void	cb_blog_entry_locallinks	(Stream,void *);
 static void	cb_blog_date			(Stream,void *);
 static void	cb_blog_fancy			(Stream,void *);
 static void	cb_blog_normal			(Stream,void *);
+#endif
 static void	cb_blog_name			(Stream,void *);
 static void	cb_blog_adtag			(Stream,void *);
 static void	cb_blog_adtag_entity		(Stream,void *);
 
+static void	cb_date_day			(Stream,void *);
+static void	cb_date_day_url			(Stream,void *);
+static void	cb_date_day_normal		(Stream,void *);
+
 static void	cb_entry			(Stream,void *);
 static void	cb_entry_id			(Stream,void *);
 static void	cb_entry_url			(Stream,void *);
+static void	cb_entry_cond_date		(Stream,void *);
 static void	cb_entry_date			(Stream,void *);
 static void	cb_entry_pubdate		(Stream,void *);
+#if 0
 static void	cb_entry_number			(Stream,void *);
+#endif
 static void	cb_entry_title			(Stream,void *);
 static void	cb_entry_class			(Stream,void *);
 static void	cb_entry_adtag			(Stream,void *);
 static void	cb_entry_author			(Stream,void *);
+static void	cb_entry_name			(Stream,void *);
 static void	cb_entry_body			(Stream,void *);
 static void	cb_entry_body_entified		(Stream,void *);
 
@@ -121,8 +131,9 @@ static void	cb_edit_body			(Stream,void *);
 
 static void	cb_xyzzy			(Stream,void *);
 
-static void	print_nav_url		(Stream,struct tm *,int);
-static void	fixup_uri		(BlogDay,HtmlToken,const char *);
+static void	print_nav_url		(Stream,struct btm *,int);
+static void	print_nav_name		(Stream,struct btm *,int,char);
+static void	fixup_uri		(BlogEntry,HtmlToken,const char *);
 
 /************************************************************************/
 
@@ -130,22 +141,34 @@ struct chunk_callback  m_callbacks[] =
 {
   { "blog.script"		, cb_blog_script		} ,
   { "blog.url"			, cb_blog_url			} ,
+#if 0
   { "blog.locallink"		, cb_blog_locallink		} ,
   { "blog.body"			, cb_blog_body			} ,
   { "blog.entry.locallinks"	, cb_blog_entry_locallinks	} ,
   { "blog.date"			, cb_blog_date			} ,
+#endif
   { "blog.name"			, cb_blog_name			} ,
+#if 0
   { "blog.date.fancy"		, cb_blog_fancy			} ,
   { "blog.date.normal"		, cb_blog_normal		} ,
+#endif
   { "blog.adtag"		, cb_blog_adtag			} ,
   { "blog.adtag.entity"		, cb_blog_adtag_entity		} ,
+
+  { "date.day"			, cb_date_day			} ,
+  { "date.day.url"		, cb_date_day_url		} ,
+  { "date.day.normal"		, cb_date_day_normal		} ,
 
   { "entry"			, cb_entry			} ,
   { "entry.id"			, cb_entry_id			} ,
   { "entry.url"			, cb_entry_url			} ,
+  { "entry.cond.date"		, cb_entry_cond_date		} ,
   { "entry.date"		, cb_entry_date			} ,
   { "entry.pubdate"		, cb_entry_pubdate		} ,
+  { "entry.name"		, cb_entry_name			} ,
+#if 0
   { "entry.number"		, cb_entry_number		} ,
+#endif
   { "entry.title"		, cb_entry_title		} ,
   { "entry.class"		, cb_entry_class		} ,
   { "entry.adtag"		, cb_entry_adtag		} ,
@@ -211,7 +234,6 @@ void generic_cb(const char *which,Stream out,void *data)
   
   ddt(which != NULL);
   ddt(out   != NULL);
-  ddt(data  != NULL);
   
   ChunkNew(&templates,g_templates,m_callbacks,m_cbnum);
   ChunkProcess(templates,which,out,data);
@@ -237,16 +259,17 @@ static void cb_blog_script(Stream out,void *data)
 
 static void cb_blog_url(Stream out,void *data)
 {
-  BlogDay blog = data;
+  struct callback_data *cbd = data;
   
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  LineSFormat(out,"$ $","%a/%b",c_baseurl,blog->date);
+  print_nav_url(out,&cbd->entry->when,DAY);
 }
 
 /*************************************************************************/
 
+#if 0
 static void cb_blog_locallink(Stream out,void *data)
 {
   List    *plist = data;
@@ -264,9 +287,11 @@ static void cb_blog_locallink(Stream out,void *data)
     generic_cb("blog.locallink",out,day);
   }
 }
+#endif
 
 /**********************************************************************/
 
+#if 0
 static void cb_blog_body(Stream out,void *data)
 {
   List    *plist = data;
@@ -290,9 +315,11 @@ static void cb_blog_body(Stream out,void *data)
     generic_cb("blog.body",out,day);
   }
 }
+#endif
 
 /*********************************************************************/
 
+#if 0
 static void cb_blog_entry_locallinks(Stream out,void *data)
 {
   BlogDay blog = data;
@@ -318,21 +345,24 @@ static void cb_blog_entry_locallinks(Stream out,void *data)
     }
   }
 }
+#endif
 
 /********************************************************************/
-
+#if 0
 static void cb_blog_date(Stream out,void *data)
 {
-  BlogDay blog = data;
+  struct callback_data *cbd = data;
   
   ddt(out  != NULL);
   ddt(data != NULL);
   
+  
+  
   LineS(out,blog->date);
 }
+#endif
 
 /********************************************************************/
-
 
 static void cb_blog_name(Stream out,void *data)
 {
@@ -344,6 +374,7 @@ static void cb_blog_name(Stream out,void *data)
 
 /*********************************************************************/
 
+#if 0
 static void cb_blog_fancy(Stream out,void *data)
 {
   BlogDay    blog = data;
@@ -365,9 +396,10 @@ static void cb_blog_fancy(Stream out,void *data)
   
   LineSFormat(out,"$ i $","%a the %b<sup>%c</sup>",dayname,day.tm_mday,nth(day.tm_mday));
 }
+#endif
 
 /************************************************************************/
-
+#if 0
 static void cb_blog_normal(Stream out,void *data)
 {
   BlogDay    blog = data;
@@ -389,6 +421,7 @@ static void cb_blog_normal(Stream out,void *data)
   strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&day);
   LineS(out,buffer);
 }
+#endif
 
 /***********************************************************************/
 
@@ -397,7 +430,6 @@ static void cb_blog_adtag(Stream out,void *data)
   char *tag;
 
   ddt(out  != NULL);
-  ddt(data != NULL);
 
   tag = UrlEncodeString(gd.adtag);
   LineS(out,tag);
@@ -423,97 +455,79 @@ static void cb_blog_adtag_entity(Stream out,void *data)
 
 static void cb_entry(Stream out,void *data)
 {
-  BlogDay blog = data;
-  int            i;
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
   
   ddt(out  != NULL);
-  ddt(data != NULL);
 
-  if (gd.f.reverse)
+  if (data == NULL)
   {
-    for (i = blog->endentry ; i >= blog->stentry ; i--)
-    {
-      blog->curnum = i;
-      BlogEntryRead(blog->entries[i]);
-      generic_cb("entry",out,blog);
-    }
+    if (gd.htmldump)
+      StreamCopy(out,gd.htmldump);
+    return;
   }
-  else
-  {
-    for (i = blog->stentry ; i <= blog->endentry ; i++)
-    {
-      /*-------------------------------------------------------
-      ; okay, blog->stentry can be -1 at this point because if
-      ; certain conditions (:670-start.tm_hour can be 0), so, to
-      ; avoid an error, I just simply continued, which doesn't print
-      ; the entry if that's the only entry for the last day of the 
-      ; blog, which is older than X days before.  So we revert 
-      ; the fix, and instead, set i to 0.  Really gross hack, but
-      ; until I get to the root cause, it will have to do. XXX
-      ;
-      ; Found the cause of this in backend.c:tumbler_page() and
-      ; applied a fix there.  I should probably get around to
-      ; removing the hack, and this comment at some point in the
-      ; future.
-      ;
-      ; I should read my comments more often.
-      ;--------------------------------------------------------*/
 
-      /*if (i == -1) continue;*/ /* hack for quick fix */
-      if (i == -1) i = 0;
-      blog->curnum = i;
-      BlogEntryRead(blog->entries[i]);
-      generic_cb("entry",out,blog);
-    }
+  for
+  (
+    entry = (BlogEntry)ListRemHead(&cbd->list);
+    NodeValid(&entry->node);
+    entry = (BlogEntry)ListRemHead(&cbd->list)
+  )
+  {
+    cbd->entry = entry;
+    generic_cb("entry",out,data);
+    cbd->last = entry->when;
+    BlogEntryFree(entry);
   }
+  
+  cbd->entry = NULL;
 }
 
 /**********************************************************************/
 
 static void cb_entry_url(Stream out,void *data)
 {
-  BlogDay blog = data;
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
   
   ddt(out  != NULL);
   ddt(data != NULL);
-  
-  LineSFormat(out,"$ $ i","%a/%b.%c",c_baseurl,blog->date,blog->curnum + 1);
+
+  entry = cbd->entry;
+  print_nav_url(out,&entry->when,PART);
 }
 
 /**********************************************************************/
 
 static void cb_entry_id(Stream out,void *data)
 {
-  BlogDay  blog = data;
-  char     output[BUFSIZ];
-  char    *p;
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
   
   ddt(out  != NULL);
   ddt(data != NULL);
-  
-  sprintf(output,"%s",blog->date);
-  for (p = output ; *p ; p++)
-    if (*p == '/') *p = '-';
-  LineS(out,output);
+
+  entry = cbd->entry;
+  print_nav_name(out,&entry->when,DAY,'-');
 }
 
 /**********************************************************************/
 
 static void cb_entry_date(Stream out,void *data)
 {
-  BlogDay blog = data;
+  struct callback_data *cbd = data;
   
   ddt(out  != NULL);
   ddt(data != NULL);
-  
-  LineS(out,blog->date);
+
+  print_nav_url(out,&cbd->entry->when,DAY);  
 }
 
 /*********************************************************************/
 
 static void cb_entry_pubdate(Stream out,void *data)
 {
-  BlogDay    blog = data;
+  struct callback_data *cbd = data;
   BlogEntry  entry;
   time_t     ts;
   struct tm *ptm;
@@ -522,7 +536,7 @@ static void cb_entry_pubdate(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  entry = blog->entries[blog->curnum];
+  entry = cbd->entry;
   ts    = entry->timestamp;
   ptm   = localtime(&ts);
   
@@ -544,6 +558,7 @@ static void cb_entry_pubdate(Stream out,void *data)
 
 /********************************************************************/
 
+#if 0
 static void cb_entry_number(Stream out,void *data)
 {
   BlogDay blog = data;
@@ -553,29 +568,30 @@ static void cb_entry_number(Stream out,void *data)
   
   LineSFormat(out,"i","%a",blog->curnum + 1);
 }
+#endif
 
 /**********************************************************************/
 
 static void cb_entry_title(Stream out,void *data)
 {
-  BlogDay blog = data;
-  
+  struct callback_data *cbd = data;
+    
   ddt(out  != NULL);
   ddt(data != NULL);
-  
-  LineS(out,blog->entries[blog->curnum]->title);
+
+  LineS(out,cbd->entry->title);  
 }
 
 /***********************************************************************/
 
 static void cb_entry_class(Stream out,void *data)
 {
-  BlogDay blog = data;
+  struct callback_data *cbd = data;
   
   ddt(out  != NULL);
   ddt(data != NULL);
-  
-  LineS(out,blog->entries[blog->curnum]->class);
+
+  LineS(out,cbd->entry->class);  
 }
 
 /***********************************************************************/
@@ -592,17 +608,17 @@ static void cb_entry_adtag(Stream out,void *data)
 
 static void cb_entry_author(Stream out,void *data)
 {
-  BlogDay blog = data;
+  struct callback_data *cbd = data;
   
   ddt(out  != NULL);
   ddt(data != NULL);
-  
-  LineS(out,blog->entries[blog->curnum]->author);
+
+  LineS(out,cbd->entry->author);  
 }
 
 /*************************************************************************/
 
-static void fixup_uri(BlogDay blog,HtmlToken token,const char *attrib)
+static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
 {
   struct pair *src;
   struct pair *np;
@@ -684,10 +700,26 @@ static void fixup_uri(BlogDay blog,HtmlToken token,const char *attrib)
 	  sprintf(buffer,"%s/%s",baseurl,src->value);
       }
       else
-        sprintf(buffer,"%s/%s/%s",baseurl,blog->date,src->value);
+	sprintf(
+		buffer,
+		"%s/%04d/%02d/%02d/%s",
+		baseurl,
+		entry->when.year,
+		entry->when.month,
+		entry->when.day,
+		src->value
+	);
     }
 #else
-      sprintf(buffer,"%s/%s/%s",baseurl,blog->date,src->value);
+      sprintf(
+      	buffer,
+	"%s/%04d/%02d/%02d/%s",
+	baseurl,
+	entry->when.year,
+	entry->when.month,
+	entry->when.day,
+	src->value
+      );
 #endif
 
     np = PairCreate(attrib,buffer);
@@ -701,18 +733,18 @@ static void fixup_uri(BlogDay blog,HtmlToken token,const char *attrib)
 
 static void cb_entry_body(Stream out,void *data)
 {
-  Stream    in;
-  HtmlToken token;
-  BlogDay   blog = data;
-  BlogEntry entry;
-  int       rc;
-  int       t;
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
+  Stream                in;
+  HtmlToken             token;
+  int                   rc;
+  int                   t;
   
   ddt(out  != NULL);
   ddt(data != NULL);
 
-  entry = blog->entries[blog->curnum];
-  in    = MemoryStreamRead(entry->body,entry->bsize);
+  entry = cbd->entry;
+  in    = MemoryStreamRead(entry->body,strlen(entry->body));
   rc    = HtmlParseNew(&token,in);
   
   if (rc != ERR_OKAY)
@@ -730,37 +762,37 @@ static void cb_entry_body(Stream out,void *data)
       ;----------------------------------------------*/
       
       if (strcmp(HtmlParseValue(token),"A") == 0)
-        fixup_uri(blog,token,"HREF");
+        fixup_uri(entry,token,"HREF");
       else if (strcmp(HtmlParseValue(token),"BLOCKQUOTE") == 0)
-        fixup_uri(blog,token,"CITE");
+        fixup_uri(entry,token,"CITE");
       else if (strcmp(HtmlParseValue(token),"IMG") == 0)
       {
-        fixup_uri(blog,token,"SRC");
-        fixup_uri(blog,token,"LONGDESC");
-        fixup_uri(blog,token,"USEMAP");
+        fixup_uri(entry,token,"SRC");
+        fixup_uri(entry,token,"LONGDESC");
+        fixup_uri(entry,token,"USEMAP");
       }
       else if (strcmp(HtmlParseValue(token),"Q") == 0)
-        fixup_uri(blog,token,"CITE");
+        fixup_uri(entry,token,"CITE");
       else if (strcmp(HtmlParseValue(token),"INS") == 0)
-        fixup_uri(blog,token,"CITE");
+        fixup_uri(entry,token,"CITE");
       else if (strcmp(HtmlParseValue(token),"DEL") == 0)
-        fixup_uri(blog,token,"CITE");
+        fixup_uri(entry,token,"CITE");
       else if (strcmp(HtmlParseValue(token),"FORM") == 0)
-        fixup_uri(blog,token,"ACTION");
+        fixup_uri(entry,token,"ACTION");
       else if (strcmp(HtmlParseValue(token),"INPUT") == 0)
       {
-        fixup_uri(blog,token,"SRC");
-        fixup_uri(blog,token,"USEMAP");
+        fixup_uri(entry,token,"SRC");
+        fixup_uri(entry,token,"USEMAP");
       }
       else if (strcmp(HtmlParseValue(token),"AREA") == 0)
-        fixup_uri(blog,token,"HREF");
+        fixup_uri(entry,token,"HREF");
       else if (strcmp(HtmlParseValue(token),"OBJECT") == 0)
       {
-        fixup_uri(blog,token,"CLASSID");
-        fixup_uri(blog,token,"CODEBASE");
-        fixup_uri(blog,token,"DATA");
-        fixup_uri(blog,token,"ARCHIVE");
-        fixup_uri(blog,token,"USEMAP");
+        fixup_uri(entry,token,"CLASSID");
+        fixup_uri(entry,token,"CODEBASE");
+        fixup_uri(entry,token,"DATA");
+        fixup_uri(entry,token,"ARCHIVE");
+        fixup_uri(entry,token,"USEMAP");
       }
       
       /*-----------------------------------------------------
@@ -770,15 +802,15 @@ static void cb_entry_body(Stream out,void *data)
       
 #if 0
       else if (strcmp(HtmlParseValue(token),"LINK") == 0)
-        fixup_uri(blog,token,"HREF");
+        fixup_uri(entry,token,"HREF");
       else if (strcmp(HtmlParseValue(token),"BASE") == 0)
-        fixup_uri(blog,token,"HREF");
+        fixup_uri(entry,token,"HREF");
       else if (strcmp(HtmlParseValue(token),"HEAD") == 0)
-        fixup_uri(blog,token,"PROFILE");
+        fixup_uri(entry,token,"PROFILE");
       else if (strcmp(HtmlParseValue(token),"SCRIPT") == 0)
       {
-        fixup_uri(blog,token,"SRC");
-        fixup_uri(blog,token,"FOR");
+        fixup_uri(entry,token,"SRC");
+        fixup_uri(entry,token,"FOR");
       }
 #endif
       HtmlParsePrintTag(token,out);
@@ -809,7 +841,8 @@ static void cb_entry_body_entified(Stream out,void *data)
 
 static void cb_cond_hr(Stream out,void *data)
 {
-  BlogDay blog = data;
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
   
   ddt(out  != NULL);
   ddt(data != NULL);
@@ -817,14 +850,10 @@ static void cb_cond_hr(Stream out,void *data)
   if (gd.f.navigation && (gd.navunit == PART))
     return;
 
-  if (gd.f.reverse)
+  entry = cbd->entry;
+  if (btm_cmp_date(&entry->when,&cbd->last) == 0)
   {
-    if (blog->curnum != blog->number - 1)
-      LineS(out,"<hr class=\"next\">");
-  }
-  else
-  {
-    if (blog->curnum)
+    if (entry->when.part != cbd->last.part)
       LineS(out,"<hr class=\"next\">");
   }
 }
@@ -833,20 +862,19 @@ static void cb_cond_hr(Stream out,void *data)
 
 static void cb_cond_blog_title(Stream out,void *data)
 {
-  List    *plist = data;
-  BlogDay  blog;
+  List *plist = data;
+  BlogEntry     entry;
   
-  ddt(out != NULL);
-  ddt(data != NULL);
+  ddt(out  != NULL);
   
   if (gd.navunit == PART)
   {
-    blog = (BlogDay)ListGetHead(plist);
+    entry = (BlogEntry)ListGetHead(plist);
     LineSFormat(
     	out,
     	"$",
     	"%a - ",
-    	blog->entries[blog->stentry]->title
+    	entry->title
     );
   }
 }
@@ -855,15 +883,13 @@ static void cb_cond_blog_title(Stream out,void *data)
 
 static void cb_rss_pubdate(Stream out,void *data)
 {
-  time_t     now;
   struct tm *ptm;
   char       buffer[BUFSIZ];
   
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  now = time(NULL);
-  ptm = gmtime(&now);
+  ptm = gmtime(&gd.tst);
   strftime(buffer,BUFSIZ,"%a, %d %b %Y %H:%M:%S GMT",ptm);
   LineS(out,buffer);
 }
@@ -873,7 +899,6 @@ static void cb_rss_pubdate(Stream out,void *data)
 static void cb_rss_url(Stream out,void *data)
 {
   ddt(out  != NULL);
-  ddt(data != NULL);
   
   LineSFormat(out,"$","%a/",c_fullbaseurl);
 }
@@ -882,111 +907,85 @@ static void cb_rss_url(Stream out,void *data)
 
 static void cb_rss_item(Stream out,void *data)
 {
-  List    *plist = data;
-  BlogDay  day;
-  int      i;
-  int      items;
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
   
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  items = 0;
-  
-  for (
-        day = (BlogDay)ListGetHead(plist) ;
-        NodeValid(&day->node);
-        day = (BlogDay)NodeNext(&day->node)
-      )
+  for
+  (
+    entry = (BlogEntry)ListRemHead(&cbd->list);
+    NodeValid(&entry->node);
+    entry = (BlogEntry)ListRemHead(&cbd->list)
+  )
   {
-    if (gd.f.reverse)
-    {
-      for (i = day->endentry ; (items < c_rssitems) && (i >= day->stentry) ; i--)
-      {
-        day->curnum = i;
-        BlogEntryRead(day->entries[i]);
-        generic_cb("item",out,day);
-        items++;
-      }
-    }
-    else
-    {
-      for (i = day->stentry ; (items < c_rssitems) && (i <= day->endentry) ; i++)
-      {
-        day->curnum = i;
-	BlogEntryRead(day->entries[i]);
-        generic_cb("item",out,day);
-        items++;
-      }
-    }
+    cbd->entry = entry;
+    generic_cb("item",out,data);
+    cbd->last = entry->when;
+    BlogEntryFree(entry);
   }
+  
+  cbd->entry = NULL;
 }
 
 /******************************************************************/
 
 static void cb_rss_item_url(Stream out,void *data)
 {
-  BlogDay blog = data;
+  struct callback_data *cbd = data;
   
   ddt(out  != NULL);
   ddt(data != NULL);
   
+  LineSFormat(out,"$","%a/",c_fullbaseurl);
+  print_nav_url(out,&cbd->entry->when,PART);
+  
+#if 0  
   LineSFormat(out,"$ $ $ i","%a/%b%c.%d",c_fullbaseurl,c_baseurl,blog->date,blog->curnum + 1);
+#endif
 }
 
 /********************************************************************/
 
 static void cb_atom_entry(Stream out,void *data)
 {
-  List    *plist = data;
-  BlogDay  day;
-  int      i;
-  int      items;
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
   
   ddt(out  != NULL);
   ddt(data != NULL);
-
-  items = 0;
-  for (
-        day = (BlogDay)ListGetHead(plist) ;
-        NodeValid(&day->node);
-        day = (BlogDay)NodeNext(&day->node)
-      )
+  
+  for
+  (
+    entry = (BlogEntry)ListRemHead(&cbd->list);
+    NodeValid(&entry->node);
+    entry = (BlogEntry)ListRemHead(&cbd->list)
+  )
   {
-    if (gd.f.reverse)
-    {
-      for (i = day->endentry ; (items < c_rssitems) && (i >= day->stentry) ; i--)
-      {
-        day->curnum = i;
-        BlogEntryRead(day->entries[i]);
-        generic_cb("entry",out,day);
-        items++;
-      }
-    }
-    else
-    {
-      for (i = day->stentry ; (items < c_rssitems) && (i <= day->endentry) ; i++)
-      {
-        day->curnum = i;
-        BlogEntryRead(day->entries[i]);
-        generic_cb("entry",out,day);
-        items++;
-      }
-    }
+    cbd->entry = entry;
+    generic_cb("entry",out,data);
+    cbd->last = entry->when;
+    BlogEntryFree(entry);
   }
+  
+  cbd->entry = NULL;
 }
 
 /************************************************************************/
 
 static void cb_atom_categories(Stream out,void *data)
 {
-  BlogDay  day;
+  struct callback_data *cbd = data;
   String  *cats;
   char    *tag;
   size_t   i;
   size_t   num;
 
-  day  = data;
-  cats = tag_split(&num,day->entries[day->curnum]->class);
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  cats = tag_split(&num,cbd->entry->class);
 
   for (i = 0 ; i < num ; i++)
   {
@@ -1018,7 +1017,6 @@ static void cb_atom_category(Stream out,void *data)
 static void cb_navigation_link(Stream out,void *data)
 {
   ddt(out  != NULL);
-  ddt(data != NULL);
   
   if (gd.f.navigation == FALSE) return;
   generic_cb("navigation.link",out,data);
@@ -1051,7 +1049,6 @@ static void cb_navigation_link_prev(Stream out,void *data)
 static void cb_navigation_bar(Stream out,void *data)
 {
   ddt(out  != NULL);
-  ddt(data != NULL);
   
   if (gd.f.navigation == FALSE) return;
   generic_cb("navigation.bar",out,data);
@@ -1084,7 +1081,6 @@ static void cb_navigation_bar_prev(Stream out,void *data)
 static void cb_navigation_current(Stream out,void *data)
 {
   ddt(out  != NULL);
-  ddt(data != NULL);
   
   if (gd.navunit != INDEX) return;
   generic_cb("navigation.current",out,data);
@@ -1094,7 +1090,7 @@ static void cb_navigation_current(Stream out,void *data)
 
 static void cb_navigation_next_url(Stream out,void *data)
 {
-  struct tm tmp;
+  struct btm tmp;
 
   ddt(out  != NULL);
   ddt(data != NULL);
@@ -1107,7 +1103,7 @@ static void cb_navigation_next_url(Stream out,void *data)
 
 static void cb_navigation_prev_url(Stream out,void *data)
 {
-  struct tm tmp;
+  struct btm tmp;
 
   ddt(out  != NULL);
   ddt(data != NULL);
@@ -1120,10 +1116,9 @@ static void cb_navigation_prev_url(Stream out,void *data)
 
 static void cb_navigation_current_url(Stream out,void *data)
 {
-  struct tm tmp;
+  struct btm tmp;
 
   ddt(out  != NULL);
-  ddt(data != NULL);
   
   tmp = gd.now;
   print_nav_url(out,&tmp,MONTH);
@@ -1131,44 +1126,48 @@ static void cb_navigation_current_url(Stream out,void *data)
 
 /*********************************************************************/
 
-static void print_nav_url(Stream out,struct tm *ptm,int unit)
+static void print_nav_url(Stream out,struct btm *date,int unit)
 {
-  struct tm date;
-  
   ddt(out  != NULL);
-  ddt(ptm  != NULL);
+  ddt(date != NULL);
   
-  date = *ptm;
-  tm_to_blog(&date);
+  LineSFormat(out,"$","%a/",c_baseurl);
+  print_nav_name(out,date,unit,'/');
+}
 
-  LineSFormat(out,"$","%a/",c_baseurl);  
+/*******************************************************************/
+
+static void print_nav_name(Stream out,struct btm *date,int unit,char sep)
+{
+  ddt(out  != NULL);
+  ddt(date != NULL);
+
   switch(unit)
   {
     case YEAR: 
-         LineSFormat(out,"i4","%a",date.tm_year);
+         LineSFormat(out,"i4","%a",date->year);
          break;
     case MONTH:
-         LineSFormat(out,"i4 i2r0","%a/%b",date.tm_year,date.tm_mon);
+         LineSFormat(out,"c i4 i2r0","%b%a%c",sep,date->year,date->month);
          break;
     case DAY:  
-         LineSFormat(out,"i4 i2r0 i2r0","%a/%b/%c",date.tm_year,date.tm_mon,date.tm_mday);
+         LineSFormat(out,"c i4 i2r0 i2r0","%b%a%c%a%d",sep,date->year,date->month,date->day);
          break;
     case PART:
-         LineSFormat(out,"i4 i2r0 i2r0 i","%a/%b/%c.%d",date.tm_year,date.tm_mon,date.tm_mday,date.tm_hour);
+         LineSFormat(out,"c i4 i2r0 i2r0 i","%b%a%c%a%d.%e",sep,date->year,date->month,date->day,date->part);
          break;
     default:
          ddt(0);
   }
 }
 
-/*******************************************************************/
-
+/********************************************************************/
+ 
 static void cb_begin_year(Stream out,void *data)
 {
   ddt(out  != NULL);
-  ddt(data != NULL);
   
-  LineSFormat(out,"i4","%a",gd.begin.tm_year + 1900);
+  LineSFormat(out,"i4","%a",gd.begin.year);
 }
 
 /*******************************************************************/
@@ -1176,9 +1175,8 @@ static void cb_begin_year(Stream out,void *data)
 static void cb_now_year(Stream out,void *data)
 {
   ddt(out  != NULL);
-  ddt(data != NULL);
-  
-  LineSFormat(out,"i4","%a",gd.now.tm_year + 1900);
+ 
+  LineSFormat(out,"i4","%a",gd.now.year); 
 }
 
 /*******************************************************************/
@@ -1188,19 +1186,18 @@ static void cb_update_time(Stream out,void *data)
   char buffer[BUFSIZ];
   
   ddt(out  != NULL);
-  ddt(data != NULL);
   
 #ifndef FIXED_BROKEN_RAWFMT 
 
   sprintf(
   	buffer,
   	"%04d-%02d-%02dT%02d:%02d:%02d%+03d:%02d",
-  	gd.updatetime.tm_year + 1900,
-	gd.updatetime.tm_mon  + 1,
-	gd.updatetime.tm_mday,
-	gd.updatetime.tm_hour,
-	gd.updatetime.tm_min,
-	gd.updatetime.tm_sec,
+  	gd.stmst.tm_year + 1900,
+  	gd.stmst.tm_mon  + 1,
+  	gd.stmst.tm_mday,
+	gd.stmst.tm_hour,
+	gd.stmst.tm_min,
+	gd.stmst.tm_sec,
 	c_tzhour,
 	c_tzmin
   );
@@ -1247,7 +1244,6 @@ static void cb_update_type(Stream out,void *data)
 static void cb_robots_index(Stream out,void *data)
 {
   ddt(out  != NULL);
-  ddt(data != NULL);
   
   if ((gd.navunit == PART) || (gd.navunit == INDEX))
     LineS(out,"index");
@@ -1272,14 +1268,21 @@ static void cb_comments(Stream out,void *data)
 
 static void cb_comments_body(Stream out,void *data)
 {
-  BlogDay  blog = data;
+  struct callback_data *cbd = data;
   Stream   in;
   char     fname[FILENAME_LEN];
   
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  sprintf(fname,"%s/%d.comments",blog->date,blog->curnum + 1);
+  sprintf(
+  	fname,
+  	"%04d/%02d/%02d/%d.comments",
+  	cbd->entry->when.year,
+  	cbd->entry->when.month,
+  	cbd->entry->when.day,
+  	cbd->entry->when.part
+  );
   
   in = FileStreamRead(fname);
   if (in == NULL) return;
@@ -1291,27 +1294,43 @@ static void cb_comments_body(Stream out,void *data)
 
 static void cb_comments_filename(Stream out,void *data)
 {
-  BlogDay blog = data;
+  struct callback_data *cbd = data;
   
   ddt(out  != NULL);
   ddt(data != NULL);
-  
-  LineSFormat(out,"$ i","%a/%b.comments",blog->date,blog->curnum + 1);
+
+  LineSFormat(
+  	out,
+  	"i4 i2r0 i2r0 i",
+  	"%a/%b/%c/%d.comments",
+  	cbd->entry->when.year,
+  	cbd->entry->when.month,
+  	cbd->entry->when.day,
+  	cbd->entry->when.part
+  );
 }
 
 /*******************************************************************/
 
 static void cb_comments_check(Stream out,void *data)
 {
-  BlogDay     blog = data;
+  struct callback_data *cbd = data;
   struct stat status;
   char        fname[BUFSIZ];
   int         rc;
   
   ddt(out  != NULL);
   ddt(data != NULL);
-  
-  sprintf(fname,"%s/%d.comments",blog->date,blog->curnum + 1);
+
+  sprintf(
+  	fname,
+  	"%04d/%02d/%02d/%d.comments",
+  	cbd->entry->when.year,
+  	cbd->entry->when.month,
+  	cbd->entry->when.day,
+  	cbd->entry->when.part
+  );
+    
   rc = stat(fname,&status);
   if (rc == -1)
     LineS(out,"No ");
@@ -1324,7 +1343,6 @@ static void cb_comments_check(Stream out,void *data)
 static void cb_edit(Stream out,void *data)
 {
   ddt(out  != NULL);
-  ddt(data != NULL);
   
   if (gd.f.edit == 0) return;
   generic_cb("edit",out,data);
@@ -1429,4 +1447,86 @@ static void cb_xyzzy(Stream out,void *data)
 }
 
 /********************************************************************/
+
+static void cb_date_day(Stream out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
+  
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  entry = cbd->entry;
+  print_nav_name(out,&entry->when,DAY,'-');
+}
+
+/*************************************************************************/
+
+static void cb_date_day_url(Stream out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
+  
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  entry = cbd->entry;
+  print_nav_url(out,&entry->when,DAY);
+}
+
+/********************************************************************/
+
+static void cb_date_day_normal(Stream out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
+  struct tm             day;
+  char                  buffer[BUFSIZ];
+  
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  tm_init(&day);
+  entry       = cbd->entry;
+  day.tm_year = entry->when.year - 1900;
+  day.tm_mon  = entry->when.month - 1;
+  day.tm_mday = entry->when.day;
+  
+  mktime(&day);
+  
+  strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&day);
+  LineS(out,buffer);
+}
+
+/**********************************************************************/
+
+static void cb_entry_cond_date(Stream out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
+  
+  ddt(out  != NULL);
+  ddt(data != NULL);
+
+  entry = cbd->entry;  
+  
+  if (btm_cmp_date(&entry->when,&cbd->last) != 0)
+    generic_cb("entry.cond.date",out,data);
+}
+
+/**********************************************************************/
+
+static void cb_entry_name(Stream out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
+  
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  entry = cbd->entry;
+  print_nav_name(out,&entry->when,PART,'-');
+}
+
+/***********************************************************************/
 

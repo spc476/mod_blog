@@ -352,6 +352,8 @@ static int cmd_cgi_post_new(Request req)
 
 static int cmd_cgi_post_show(Request req)
 {
+#if 0
+	/* XXX */
   List      listofdays;
   BlogDay   day;
   BlogEntry entry;
@@ -402,7 +404,7 @@ static int cmd_cgi_post_show(Request req)
   generic_cb("main",req->out,&listofdays);
   
   BlogDayFree(&day);
-  
+#endif 
   return(0);  
 }
 
@@ -514,7 +516,6 @@ static int cgi_init(Cgi cgi,Request req)
       return(rc);
   }
   
-  BlogInit();
   BlogDatesInit();
   return(ERR_OKAY);
 }

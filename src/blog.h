@@ -28,34 +28,65 @@
 #include <cgilib/nodelist.h>
 #include <cgilib/errors.h>
 
+#include "timeutil.h"
+
 /*******************************************************************/
 
+typedef struct blog
+{
+  char             *lockfile;
+  int               lock;
+  struct btm        cache;
+  size_t            max;
+  size_t            idx;
+  struct blogentry *entries[100];
+} *Blog;
+  
 typedef struct blogentry
 {
   Node        node;
+  Blog        blog;
   time_t      timestamp;
-  char       *date;
-  int         number;
-  const char *title;
-  const char *class;
-  const char *author;
-  size_t      bsize;
-  void       *body;
+  struct btm  when;
+  char       *title;
+  char       *class;
+  char       *author;
+  char       *body;
 } *BlogEntry;
 
+#if 0
 typedef struct blogday
 {
   Node       node;
   char      *date;
   struct tm  tm_date;
   int        number;
+  List       lentries;
   int        curnum;		/* hack to avoid making a structure */
   int        stentry;		/* hack to avoid making a structure (inclusive) */
   int        endentry;		/* hack to avoid making a structure (inclusive) */
   BlogEntry  entries[100];	/* hack I know ... get Mark's varray stuff */
 } *BlogDay;
+#endif
 
 /*********************************************************************/
+
+Blog		(BlogNew)		(char *,char *);
+int		(BlogLock)		(Blog);
+int		(BlogUnlock)		(Blog);
+int		(BlogFree)		(Blog);
+
+BlogEntry	(BlogEntryNew)		(Blog);
+BlogEntry	(BlogEntryRead)		(Blog,struct btm *);
+void		(BlogEntryReadBetweenU)	(Blog,List *,struct btm *,struct btm *);
+void		(BlogEntryReadBetweenD)	(Blog,List *,struct btm *,struct btm *);
+void		(BlogEntryReadXD)	(Blog,List *,struct btm *,size_t);
+void		(BlogEntryReadXU)	(Blog,List *,struct btm *,size_t);
+int		(BlogEntryWrite)	(BlogEntry);
+int		(BlogEntryFree)		(BlogEntry);
+
+
+#if 0
 
 int		(BlogInit)		(void);
 int		(BlogLock)		(const char *);
@@ -66,11 +97,15 @@ int		(BlogDayEntryAdd)	(BlogDay,BlogEntry);
 int		(BlogDayEntryRemove)	(BlogDay,int);
 int		(BlogDayFree)		(BlogDay *);
 
+
+
 int		(BlogEntryNew)		(BlogEntry *,const char *,const char *,const char *,void *,size_t);
 int		(BlogEntryRead)		(BlogEntry);
 int		(BlogEntryWrite)	(BlogEntry);
 int		(BlogEntryFlush)	(BlogEntry);
 int		(BlogEntryFree)		(BlogEntry *);
+
+#endif
 
 /**********************************************************************/
 

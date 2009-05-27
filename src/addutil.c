@@ -52,6 +52,8 @@
 
 int entry_add(Request req)
 {
+#if 0
+	/* XXX */
   struct tm date;
   BlogDay   day;
   BlogEntry entry;
@@ -93,6 +95,7 @@ int entry_add(Request req)
   BlogDayWrite(day);
   BlogDayFree(&day);
   if (c_authorfile) BlogUnlock(lock);
+#endif
 
   return(ERR_OKAY);
 }

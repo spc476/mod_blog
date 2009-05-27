@@ -49,8 +49,6 @@ int main(int argc,char *argv[])
   DdtInit   ();
   StreamInit();
 
-  srand(time(NULL));
-
   if (CgiNew(&cgi,NULL) == ERR_OKAY)
   {
     gd.cgi = cgi;
@@ -75,56 +73,25 @@ int main(int argc,char *argv[])
 
 int BlogDatesInit(void)
 {
-  BlogDay day;
-  int     rc;
-
-  tm_init(&gd.begin);
-  gd.begin.tm_year = c_styear;
-  gd.begin.tm_mon  = c_stmon;
-  gd.begin.tm_mday = c_stday;
-  gd.begin.tm_hour = 1;
-  
-  tm_to_tm(&gd.begin);
-  set_time();
+  BlogEntry entry;
   
   while(TRUE)
   {
-    if (tm_cmp(&gd.now,&gd.begin) < 0)
+    if (btm_cmp_date(&gd.now,&gd.begin) < 0)
       return(ERR_OKAY);	/* XXX - this may not be an error */
     
-    rc = BlogDayRead(&day,&gd.now);
-    if (rc != ERR_OKAY)
+    entry = BlogEntryRead(g_blog,&gd.now);
+    if (entry == NULL)
     {
-      day_sub(&gd.now);
+      btm_sub_day(&gd.now);
       continue;
     }
-    
-    if (day->number == 0)
-    {
-      BlogDayFree(&day);
-      day_sub(&gd.now);
-      continue;
-    }
-    
-    gd.now.tm_hour = day->number;
-    if (gd.now.tm_hour == 0) gd.now.tm_hour = 1;
-    BlogDayFree(&day);
+
     break;
   }
+  gd.now.part = g_blog->idx;
   return(ERR_OKAY);
 }
-
-/***********************************************************************/
-
-void set_time(void)
-{
-  time_t     t;
-  struct tm *today;
   
-  t      = time(NULL);
-  today  = localtime(&t);
-  gd.now = gd.updatetime = *today;
-}
-
 /***********************************************************************/
 
