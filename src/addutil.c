@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <unistd.h>
 #include <gdbm.h>
 
 #include <cgilib/memory.h>
@@ -108,6 +109,7 @@ int entry_add(Request req)
   ; Just so you know.
   ;-------------------------------------------------------*/
 
+  sleep(1);	/* just to make sure time advances */
   set_time();
   
   return(ERR_OKAY);
