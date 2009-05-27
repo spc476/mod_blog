@@ -1079,10 +1079,17 @@ static void cb_update_time(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
+  /*--------------------------------------------------
+  ; until I can fix RawFmt(), the original format
+  ; string used was:
+  ;
+  ;	"i4 i2.2l0 i2.2l0 i2.2l0 i2.2l0 i i2.2l0",
+  ;--------------------------------------------------*/
+
   LineSFormat(
   	out,
-  	"i4 i2.2l0 i2.2l0 i2.2l0 i2.2l0 i3.3l0 i2.2l0",
-  	"%a-%b-%cT%d:%e-%f:%g",
+  	"i4 i2.2l0 i2.2l0 i2.2l0 i2.2l0 i i2.2l0",
+  	"%a-%b-%cT%d:%e%f:%g",
         gd.updatetime.tm_year + 1900,
         gd.updatetime.tm_mon  + 1,
         gd.updatetime.tm_mday,
