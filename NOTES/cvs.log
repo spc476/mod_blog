@@ -1,0 +1,1747 @@
+---------------------
+PatchSet 1 
+Date: 2004/12/03 06:40:00
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Initial revision
+
+Members: 
+	.cvsignore:INITIAL->1.1 
+	LICENSE:INITIAL->1.1 
+	makefile:INITIAL->1.1 
+	notes:INITIAL->1.1 
+	notes.conf:INITIAL->1.1 
+	src/addentry.c:INITIAL->1.1 
+	src/array.c:INITIAL->1.1 
+	src/array.h:INITIAL->1.1 
+	src/blog.c:INITIAL->1.1 
+	src/blog.h:INITIAL->1.1 
+	src/bp.c:INITIAL->1.1 
+	src/chunk.c:INITIAL->1.1 
+	src/chunk.h:INITIAL->1.1 
+	src/conf.h:INITIAL->1.1 
+	src/conversion.c:INITIAL->1.1 
+	src/conversion.h:INITIAL->1.1 
+	src/doi_util.c:INITIAL->1.1 
+	src/doi_util.h:INITIAL->1.1 
+	src/globals.c:INITIAL->1.1 
+	src/globals.h:INITIAL->1.1 
+	src/notes:INITIAL->1.1 
+	src/system.c:INITIAL->1.1 
+	src/system.h:INITIAL->1.1 
+	src/timeutil.c:INITIAL->1.1 
+	src/timeutil.h:INITIAL->1.1 
+	src/wbttest.c:INITIAL->1.1 
+	src/wbtum.c:INITIAL->1.1 
+	src/wbtum.h:INITIAL->1.1 
+
+---------------------
+PatchSet 2 
+Date: 2004/12/03 06:40:00
+Author: spc
+Branch: vendor
+Ancestor branch: HEAD
+Tag: start 
+Log:
+Imported Version 1.0
+
+Members: 
+	.cvsignore:1.1->1.1.1.1 
+	LICENSE:1.1->1.1.1.1 
+	makefile:1.1->1.1.1.1 
+	notes:1.1->1.1.1.1 
+	notes.conf:1.1->1.1.1.1 
+	src/addentry.c:1.1->1.1.1.1 
+	src/array.c:1.1->1.1.1.1 
+	src/array.h:1.1->1.1.1.1 
+	src/blog.c:1.1->1.1.1.1 
+	src/blog.h:1.1->1.1.1.1 
+	src/bp.c:1.1->1.1.1.1 
+	src/chunk.c:1.1->1.1.1.1 
+	src/chunk.h:1.1->1.1.1.1 
+	src/conf.h:1.1->1.1.1.1 
+	src/conversion.c:1.1->1.1.1.1 
+	src/conversion.h:1.1->1.1.1.1 
+	src/doi_util.c:1.1->1.1.1.1 
+	src/doi_util.h:1.1->1.1.1.1 
+	src/globals.c:1.1->1.1.1.1 
+	src/globals.h:1.1->1.1.1.1 
+	src/notes:1.1->1.1.1.1 
+	src/system.c:1.1->1.1.1.1 
+	src/system.h:1.1->1.1.1.1 
+	src/timeutil.c:1.1->1.1.1.1 
+	src/timeutil.h:1.1->1.1.1.1 
+	src/wbttest.c:1.1->1.1.1.1 
+	src/wbtum.c:1.1->1.1.1.1 
+	src/wbtum.h:1.1->1.1.1.1 
+
+---------------------
+PatchSet 3 
+Date: 2004/12/05 06:48:05
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added a g_debug variable that if debug mode is selected, the process will
+"hang", allowing one to attach a debugger to the running process for
+debugging purposes.
+
+Members: 
+	src/addentry.c:1.1->1.2 
+	src/bp.c:1.1->1.2 
+	src/globals.c:1.1->1.2 
+	src/globals.h:1.1->1.2 
+
+---------------------
+PatchSet 4 
+Date: 2005/01/21 07:37:29
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added support for <IFRAME>, even though it isn't HTML 4.01 strict
+
+Members: 
+	.cvsignore:1.1->1.2 
+	src/conversion.c:1.1->1.2 
+
+---------------------
+PatchSet 5 
+Date: 2005/07/13 22:19:45
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added input filters to support plain text input, mixed input, or full HTML
+input.  Works through the web, need to add support for this via email.
+
+Members: 
+	src/conversion.c:1.2->1.3 
+
+---------------------
+PatchSet 6 
+Date: 2005/07/14 07:25:07
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added some notes about integrating bp.c and addentry.c
+
+Members: 
+	notes:1.1->1.2 
+
+---------------------
+PatchSet 7 
+Date: 2005/07/27 06:11:09
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Notes about how to invoke the program---options and CGI parameters and
+stuff.
+
+Members: 
+	notes:1.2->1.3 
+
+---------------------
+PatchSet 8 
+Date: 2005/07/27 06:11:29
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added this file to eventually merge bp.c with addentry.c
+
+Members: 
+	src/frontend.c:INITIAL->1.1 
+
+---------------------
+PatchSet 9 
+Date: 2005/07/29 22:02:21
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Major refactoring work going on, trying to merge bp.c with addentry.c so
+that I can get a preview mode when using the web interface to addentry.c
+
+Members: 
+	notes:1.3->1.4 
+	src/authenticate.c:INITIAL->1.1 
+	src/backend.c:INITIAL->1.1 
+	src/cgi_main.c:INITIAL->1.1 
+	src/cli_main.c:INITIAL->1.1 
+	src/frontend.c:1.1->1.2 
+	src/frontend.h:INITIAL->1.1 
+	src/globals.c:1.2->1.3 
+	src/globals.h:1.2->1.3 
+	src/main.c:INITIAL->1.1 
+
+---------------------
+PatchSet 10 
+Date: 2005/07/30 03:03:15
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+More refactoring stuff.
+
+Members: 
+	makefile:1.1->1.2 
+	src/authenticate.c:1.1->1.2 
+	src/backend.c:1.1->1.2 
+	src/callbacks.c:INITIAL->1.1 
+	src/cgi_main.c:1.1->1.2 
+	src/cli_main.c:1.1->1.2 
+	src/frontend.h:1.1->1.2 
+	src/globals.c:1.3->1.4 
+	src/globals.h:1.3->1.4 
+	src/main.c:1.1->1.2 
+
+---------------------
+PatchSet 11 
+Date: 2005/08/15 02:51:37
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Just making sure this is updated.
+
+Members: 
+	makefile:1.2->1.3 
+	src/addutil.c:INITIAL->1.1 
+	src/authenticate.c:1.2->1.3 
+	src/blog.h:1.1->1.2 
+	src/callbacks.c:1.1->1.2 
+	src/cgi_main.c:1.2->1.3 
+	src/cli_main.c:1.2->1.3 
+	src/fix.h:INITIAL->1.1 
+	src/frontend.h:1.2->1.3 
+	src/globals.c:1.4->1.5 
+	src/globals.h:1.4->1.5 
+
+---------------------
+PatchSet 12 
+Date: 2005/09/19 05:51:46
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Making sure everything is in before going to the next level
+
+Members: 
+	makefile:1.3->1.4 
+	src/addentry.c:1.2->1.3 
+	src/addutil.c:1.1->1.2 
+	src/array.c:1.1->1.2 
+	src/authenticate.c:1.3->1.4 
+	src/backend.c:1.2->1.3 
+	src/blog.c:1.1->1.2 
+	src/blog.h:1.2->1.3 
+	src/bp.c:1.2->1.3 
+	src/callbacks.c:1.2->1.3 
+	src/cgi_main.c:1.3->1.4 
+	src/chunk.c:1.1->1.2 
+	src/cli_main.c:1.3->1.4 
+	src/conf.h:1.1->1.2 
+	src/conversion.c:1.3->1.4 
+	src/conversion.h:1.1->1.2 
+	src/doi_util.c:1.1->1.2 
+	src/fix.h:1.1->1.2 
+	src/frontend.c:1.2->1.3 
+	src/frontend.h:1.3->1.4 
+	src/globals.c:1.5->1.6 
+	src/globals.h:1.5->1.6 
+	src/main.c:1.2->1.3 
+	src/system.c:1.1->1.2 
+	src/system.h:1.1->1.2 
+	src/timeutil.c:1.1->1.2 
+	src/wbttest.c:1.1->1.2 
+	src/wbtum.c:1.1->1.2 
+	src/wbtum.h:1.1->1.2 
+
+---------------------
+PatchSet 13 
+Date: 2005/09/19 05:59:10
+Author: spc
+Branch: boston-1_9
+Tag: (none) 
+Log:
+Making sure we have a good ending point for 1.9
+
+Members: 
+	.cvsignore:1.1.1.1->1.1.1.1.2.1 
+	makefile:1.1.1.1->1.1.1.1.2.1 
+
+---------------------
+PatchSet 14 
+Date: 2005/09/19 06:01:43
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Updating to 2.0 of mod_blog
+
+Members: 
+	.cvsignore:1.2->1.3 
+
+---------------------
+PatchSet 15 
+Date: 2005/09/19 06:02:13
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+New makefile
+
+Members: 
+	makefile:1.4->1.5 
+
+---------------------
+PatchSet 16 
+Date: 2005/09/19 06:03:31
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Removed extraneous headerfiles
+
+Members: 
+	src/array.h:1.1->1.2(DEAD) 
+
+---------------------
+PatchSet 17 
+Date: 2005/09/19 06:05:05
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Removed extraneous C files
+
+Members: 
+	src/addentry.c:1.3->1.4(DEAD) 
+	src/array.c:1.2->1.3(DEAD) 
+	src/bp.c:1.3->1.4(DEAD) 
+	src/frontend.c:1.3->1.4(DEAD) 
+	src/wbttest.c:1.2->1.3(DEAD) 
+
+---------------------
+PatchSet 18 
+Date: 2005/09/19 06:05:27
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+All new files.
+
+Members: 
+	src/addutil.c:1.2->1.3 
+	src/authenticate.c:1.4->1.5 
+	src/backend.c:1.3->1.4 
+	src/blog.c:1.2->1.3 
+	src/blog.h:1.3->1.4 
+	src/callbacks.c:1.3->1.4 
+	src/cgi_main.c:1.4->1.5 
+	src/chunk.c:1.2->1.3 
+	src/chunk.h:1.1->1.2 
+	src/cli_main.c:1.4->1.5 
+	src/conf.h:1.2->1.3 
+	src/conversion.c:1.4->1.5 
+	src/conversion.h:1.2->1.3 
+	src/doi_util.c:1.2->1.3 
+	src/fix.h:1.2->1.3 
+	src/frontend.h:1.4->1.5 
+	src/globals.c:1.6->1.7 
+	src/globals.h:1.6->1.7 
+	src/main.c:1.3->1.4 
+	src/system.c:1.2->1.3 
+	src/system.h:1.2->1.3 
+	src/timeutil.c:1.2->1.3 
+	src/timeutil.h:1.1->1.2 
+	src/wbtum.c:1.2->1.3 
+	src/wbtum.h:1.2->1.3 
+
+---------------------
+PatchSet 19 
+Date: 2005/09/19 06:08:13
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Final integration into 2.0
+
+Members: 
+	makefile:1.5->1.6 
+
+---------------------
+PatchSet 20 
+Date: 2005/09/21 19:47:29
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added a TODO file.
+
+Members: 
+	TODO:INITIAL->1.1 
+
+---------------------
+PatchSet 21 
+Date: 2006/01/26 22:51:46
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added some files to the .cvsignore file.
+
+Members: 
+	.cvsignore:1.3->1.4 
+
+---------------------
+PatchSet 22 
+Date: 2006/01/26 22:52:00
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added some files to the .cvsignore file ...
+
+Members: 
+	src/cgi_main.c:1.5->1.6 
+
+---------------------
+PatchSet 23 
+Date: 2006/01/26 22:58:50
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed a typo ... how it got in there, I have no idea
+
+Members: 
+	src/cgi_main.c:1.6->1.7 
+
+---------------------
+PatchSet 24 
+Date: 2006/01/29 04:56:35
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed a display bug in print_nav_url() ... what was I thinking when I
+rewrote that?
+
+Members: 
+	src/callbacks.c:1.4->1.5 
+
+---------------------
+PatchSet 25 
+Date: 2006/01/31 18:41:54
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed a display/link generating bug in void_fixup_uri()
+
+Members: 
+	makefile:1.6->1.7 
+	src/callbacks.c:1.5->1.6 
+
+---------------------
+PatchSet 26 
+Date: 2006/01/31 18:58:08
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Reverted the last change, but did manage to isolate what's causing the
+bug.  Need to fix later.
+
+Members: 
+	src/callbacks.c:1.6->1.7 
+
+---------------------
+PatchSet 27 
+Date: 2006/01/31 20:35:15
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+See the large comment in addutil.c:entry_add() about this bug.  Basically,
+the newly added entry was considered being "in the future" and thus,
+not being displayed.
+
+Members: 
+	src/addutil.c:1.3->1.4 
+	src/fix.h:1.3->1.4 
+	src/main.c:1.4->1.5 
+
+---------------------
+PatchSet 28 
+Date: 2006/01/31 20:35:44
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added local machine here at work to the .cvs_ignore file.
+
+Members: 
+	.cvsignore:1.4->1.5 
+
+---------------------
+PatchSet 29 
+Date: 2006/02/01 22:14:02
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Changed a format string in update_time() because of a bug in
+cgilib/RawDoFmt().
+
+Members: 
+	src/callbacks.c:1.7->1.8 
+
+---------------------
+PatchSet 30 
+Date: 2006/02/01 22:24:07
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed makefile to work on all my dev. systems
+
+Members: 
+	TODO:1.1->1.2 
+	makefile:1.7->1.8 
+
+---------------------
+PatchSet 31 
+Date: 2006/02/01 22:24:35
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Timezones can be negative, so don't use strtoul(), instead, use
+strtol() to parse.
+
+Members: 
+	src/globals.c:1.7->1.8 
+
+---------------------
+PatchSet 32 
+Date: 2006/02/02 05:42:37
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added the "Amazon Afilliate Program Feature".
+
+Basically, this collects all the class tags from all the entries that are
+being displayed, and picks one at random.  You can then have it displayed
+as part of a URL to Amazon (or any other ad type program that can accept
+keywords/tags/catagories/etc).
+
+Members: 
+	src/backend.c:1.4->1.5 
+	src/blog.h:1.4->1.5 
+	src/callbacks.c:1.8->1.9 
+	src/frontend.h:1.5->1.6 
+	src/globals.c:1.8->1.9 
+	src/main.c:1.5->1.6 
+
+---------------------
+PatchSet 33 
+Date: 2006/02/03 07:03:10
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Okay, fixed some show stopping bugs with the new feature.  Bug one, an
+enpty tag.  CORE DUMP!  Bug two, the last tag would be ignored, and if
+there was only one tag, it was effectively an empty tag.  CORE DUMP!
+
+Things seem to be working now.
+
+Members: 
+	src/backend.c:1.5->1.6 
+
+---------------------
+PatchSet 34 
+Date: 2006/02/03 07:24:14
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+A *really stupid bug* in tag_split---I was allocating X *bytes*, not X
+*pointers*!  Arg!
+
+Members: 
+	src/backend.c:1.6->1.7 
+
+---------------------
+PatchSet 35 
+Date: 2006/02/04 05:33:10
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added a call to sleep in entry_add().  Just added an entry tonight and
+*nothing* showed up---had to do a --regen.  I wonder if I have some wierd
+race condition.  We'll see ...
+
+Members: 
+	src/addutil.c:1.4->1.5 
+
+---------------------
+PatchSet 36 
+Date: 2006/02/04 07:03:54
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+In tumbler_page(), blog->stentry and blog->endentry could end up negative.
+It didn't seem to affect the code prior to the adtag feature, but well,
+it affects the code now (mainly the adtag feature).
+
+Members: 
+	src/backend.c:1.7->1.8 
+
+---------------------
+PatchSet 37 
+Date: 2006/02/04 07:09:04
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+moved the call to set_time from addutil.c:entry_add() to
+backend.c:generate_pages(), as that's closer temporally (is that
+the time related word?) to when we need it than in entry_add().
+
+Hopefully, the call to sleep() won't be necessary then.
+
+Members: 
+	src/addutil.c:1.5->1.6 
+	src/backend.c:1.8->1.9 
+
+---------------------
+PatchSet 38 
+Date: 2006/02/04 09:28:18
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Just commiting some comments.
+
+Members: 
+	src/callbacks.c:1.9->1.10 
+
+---------------------
+PatchSet 39 
+Date: 2006/02/08 03:46:42
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Okay, those globals that are read only were renamed to have a leading
+"c_" instead of a "g_"---and the flags were renamed to have either a
+"cf_" or a "gf_" depending.
+
+Members: 
+	src/addutil.c:1.6->1.7 
+	src/authenticate.c:1.5->1.6 
+	src/backend.c:1.9->1.10 
+	src/blog.c:1.3->1.4 
+	src/callbacks.c:1.10->1.11 
+	src/cgi_main.c:1.7->1.8 
+	src/cli_main.c:1.5->1.6 
+	src/globals.c:1.9->1.10 
+	src/globals.h:1.7->1.8 
+	src/main.c:1.6->1.7 
+
+---------------------
+PatchSet 40 
+Date: 2006/02/08 03:50:35
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Realized that cf_debug should in fact be gf_debug, since it isn't
+declared as const, but as volatile, which is as far removed from
+const as one can get.
+
+Members: 
+	src/cli_main.c:1.6->1.7 
+	src/globals.c:1.10->1.11 
+	src/globals.h:1.8->1.9 
+	src/main.c:1.7->1.8 
+
+---------------------
+PatchSet 41 
+Date: 2006/02/09 00:43:01
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed Atom support.  Still not fully done, but what's there now works.
+Also, pulled tag_split() from backend.c as it's useful for the Atom
+stuff, and made fromstring(), to convert my style strings to C
+strings.
+
+Members: 
+	makefile:1.8->1.9 
+	src/backend.c:1.10->1.11 
+	src/callbacks.c:1.11->1.12 
+
+---------------------
+PatchSet 42 
+Date: 2006/02/09 00:43:53
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Oops.  Forgot to add blogutil.[ch] to the repository.
+
+Members: 
+	src/blogutil.c:INITIAL->1.1 
+	src/blogutil.h:INITIAL->1.1 
+
+---------------------
+PatchSet 43 
+Date: 2006/02/11 05:42:39
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Just commenting a possible bug in the code.
+
+Members: 
+	src/backend.c:1.11->1.12 
+
+---------------------
+PatchSet 44 
+Date: 2006/02/11 05:58:27
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Actually found the bug, and documented it.  Read the comment.
+
+Members: 
+	src/backend.c:1.12->1.13 
+
+---------------------
+PatchSet 45 
+Date: 2006/02/16 01:59:16
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Changed from an "nph-" CGI script to a plain CGI script.  I actually *read*
+(gasp) the CGI spec, and found out that I was supposed to send out a
+"Status:" header.  It works under Apache 1.3, and now my program should
+work properly under Apache 2.0 (or at least, avoid triggering a bug in
+Apache 2.0).
+
+Members: 
+	src/backend.c:1.13->1.14 
+	src/cgi_main.c:1.8->1.9 
+
+---------------------
+PatchSet 46 
+Date: 2006/02/22 04:58:46
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added code so that we can display other HTML files related to the site
+through the template system, oh, like, the about pages, and the rather
+spare reference section.
+
+Members: 
+	src/cgi_main.c:1.9->1.10 
+
+---------------------
+PatchSet 47 
+Date: 2006/03/20 21:59:17
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Changed it so that robots can index the main page, or an individual entry.
+This should probably help Google Ads with the main index page.
+
+Members: 
+	src/callbacks.c:1.12->1.13 
+
+---------------------
+PatchSet 48 
+Date: 2006/03/24 20:17:06
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+There's a dipslay bug whereby two tags, separated by white space will
+be mashed together, from:
+
+	<A> <B>
+
+to
+
+	<A><B>
+
+This, as it turns out, is almost always *not* the thing to do.  I've
+removed the offending piece of code.
+
+Members: 
+	src/conversion.c:1.5->1.6 
+
+---------------------
+PatchSet 49 
+Date: 2006/03/31 20:38:24
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Either it'll work, or it'll be a big failure.  I'm flying blind here,
+preparing for April Fool 2006.  Basically, I added a feature to force
+notify everybody on the email list.  This is for 4/1/2006 when the blog
+will auto-update at midnight.  I hope this works.  No testing before hand.
+
+Woot!
+
+Members: 
+	src/cli_main.c:1.7->1.8 
+
+---------------------
+PatchSet 50 
+Date: 2006/04/19 20:12:05
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Commented out a line that I think causes the midnight display bug.
+
+Members: 
+	src/timeutil.c:1.3->1.4 
+
+---------------------
+PatchSet 51 
+Date: 2006/08/01 19:33:47
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added blog.adtag.entity to the template processing.
+
+Members: 
+	src/callbacks.c:1.13->1.14 
+
+---------------------
+PatchSet 52 
+Date: 2006/08/01 21:48:01
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Finished up the Atom support.  It wasn't that hard actually.
+
+Members: 
+	src/blog.c:1.4->1.5 
+	src/blog.h:1.5->1.6 
+	src/callbacks.c:1.14->1.15 
+
+---------------------
+PatchSet 53 
+Date: 2006/08/05 01:35:20
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added a To: field to the email sent out.
+
+Members: 
+	.cvsignore:1.5->1.6 
+	TODO:1.2->1.3 
+	src/doi_util.c:1.3->1.4 
+
+---------------------
+PatchSet 54 
+Date: 2006/09/06 21:55:57
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed the display error routines to use the templates.  I still need to
+do the following:
+
+	1)	remove the display error routines in backend.c and
+		and use function pointer in the request structure.
+
+	2)	Specify the location of the error documents in the
+		configuration file.
+
+Members: 
+	src/backend.c:1.14->1.15 
+	src/cgi_main.c:1.10->1.11 
+
+---------------------
+PatchSet 55 
+Date: 2006/09/06 22:11:23
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Got rid of display_error() as it was redundant with the function
+cgi_error() in cgi_main.c.
+
+Members: 
+	src/backend.c:1.15->1.16 
+
+---------------------
+PatchSet 56 
+Date: 2006/09/06 22:17:12
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Cleaned up cgi_error() to remove code no longer used.
+
+Members: 
+	src/cgi_main.c:1.11->1.12 
+
+---------------------
+PatchSet 57 
+Date: 2006/09/15 03:23:16
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Needed to support custom status responses when outputting files.  So added
+to the codebase.
+
+Members: 
+	src/cgi_main.c:1.12->1.13 
+
+---------------------
+PatchSet 58 
+Date: 2006/09/15 03:43:27
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+It helps to actually *send* the proper status code ...
+
+Members: 
+	src/cgi_main.c:1.13->1.14 
+
+---------------------
+PatchSet 59 
+Date: 2006/09/15 03:58:12
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added get_remote_user() function to check both for REMOTE_USER and
+REDIRECT_REMOTE_USER as Apache 2.0.48 has defined both and will use one
+or the other depending upon certain conditions.
+
+Members: 
+	src/authenticate.c:1.6->1.7 
+	src/callbacks.c:1.15->1.16 
+	src/cgi_main.c:1.14->1.15 
+	src/fix.h:1.4->1.5 
+
+---------------------
+PatchSet 60 
+Date: 2006/09/15 20:04:33
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Typo in fix.h
+
+Members: 
+	src/fix.h:1.5->1.6 
+	src/main.c:1.8->1.9 
+
+---------------------
+PatchSet 61 
+Date: 2007/03/15 23:13:17
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Changed send_message() to use the new Email subsystem from CGILIB
+
+Members: 
+	.cvsignore:1.6->1.7 
+	makefile:1.9->1.10 
+	src/doi_util.c:1.4->1.5 
+
+---------------------
+PatchSet 62 
+Date: 2007/05/03 20:05:37
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Temporarily reverted the email notification to the old code for further
+testing.
+
+Members: 
+	src/doi_util.c:1.5->1.6 
+
+---------------------
+PatchSet 63 
+Date: 2007/05/03 20:43:34
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Marked certain code commented out as features, and make it compile time
+selectable instead of having to change "#if 0" to "#if 1".
+
+Also, added a bit more code to detect canonical urls.
+
+Members: 
+	TODO:1.3->1.4 
+	notes:1.4->1.5 
+	src/conf.h:1.3->1.4 
+	src/wbtum.c:1.3->1.4 
+
+---------------------
+PatchSet 64 
+Date: 2007/05/03 20:44:20
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Removed code no longer used.
+
+Members: 
+	src/backend.c:1.16->1.17 
+	src/blog.c:1.5->1.6 
+
+---------------------
+PatchSet 65 
+Date: 2007/05/03 20:49:16
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Marked conditionally compiled code with a meaningful identifier.
+
+Members: 
+	src/doi_util.c:1.6->1.7 
+
+---------------------
+PatchSet 66 
+Date: 2007/05/03 20:52:35
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Indicated some unused code with BROKEN_FULLBASEURL.
+
+Members: 
+	src/globals.c:1.11->1.12 
+
+---------------------
+PatchSet 67 
+Date: 2007/05/03 20:53:47
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Oops, forgot some other conditionally compiled code.
+
+Members: 
+	src/doi_util.c:1.7->1.8 
+
+---------------------
+PatchSet 68 
+Date: 2007/05/03 20:54:31
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Wrong #if construct used.  Fixed.
+
+Members: 
+	src/doi_util.c:1.8->1.9 
+
+---------------------
+PatchSet 69 
+Date: 2007/05/03 20:55:11
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Removed code no longer used.
+
+Members: 
+	src/timeutil.c:1.4->1.5 
+
+---------------------
+PatchSet 70 
+Date: 2007/05/03 21:03:30
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed up conditional compilation.
+
+Members: 
+	src/callbacks.c:1.16->1.17 
+	src/conf.h:1.4->1.5 
+	src/doi_util.c:1.9->1.10 
+	src/globals.c:1.12->1.13 
+	src/wbtum.c:1.4->1.5 
+
+---------------------
+PatchSet 71 
+Date: 2007/05/03 21:51:19
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed code to compile under Mac OSX.
+
+Members: 
+	makefile:1.10->1.11 
+	src/addutil.c:1.7->1.8 
+	src/conf.h:1.5->1.6 
+	src/system.c:1.3->1.4 
+
+---------------------
+PatchSet 72 
+Date: 2007/05/03 22:27:49
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed the broken email notification code.
+
+Members: 
+	src/conf.h:1.6->1.7 
+	src/doi_util.c:1.10->1.11 
+
+---------------------
+PatchSet 73 
+Date: 2007/05/04 20:50:07
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Modifed notify_emaillist() to send the email instead of calling
+send_message().  If it works, send_messag() (and in fact, the entirety of
+doi_util.[ch] file(s)) will be removed.
+
+Members: 
+	makefile:1.11->1.12 
+	src/addutil.c:1.8->1.9 
+
+---------------------
+PatchSet 74 
+Date: 2007/05/04 20:52:45
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed a typo.
+
+Members: 
+	src/addutil.c:1.9->1.10 
+
+---------------------
+PatchSet 75 
+Date: 2007/05/04 21:56:42
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Removed dead code.
+
+Members: 
+	makefile:1.12->1.13 
+	src/addutil.c:1.10->1.11 
+
+---------------------
+PatchSet 76 
+Date: 2007/05/04 21:59:31
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Removed dead files.
+
+Members: 
+	src/doi_util.c:1.11->1.12(DEAD) 
+	src/doi_util.h:1.1->1.2(DEAD) 
+
+---------------------
+PatchSet 77 
+Date: 2007/05/04 22:03:25
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Removed FIXED_BROKEN_EMAIL as it's now fixed.
+
+Members: 
+	src/conf.h:1.7->1.8 
+
+---------------------
+PatchSet 78 
+Date: 2007/05/20 04:38:50
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added "video/quicktime" MIME type.
+
+Members: 
+	src/backend.c:1.17->1.18 
+
+---------------------
+PatchSet 79 
+Date: 2007/07/11 23:32:33
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Since the template code was moved to the library, remove references to it
+from this codebase.
+
+Members: 
+	makefile:1.13->1.14 
+	src/backend.c:1.18->1.19 
+	src/callbacks.c:1.17->1.18 
+	src/chunk.c:1.3->1.4(DEAD) 
+	src/chunk.h:1.2->1.3(DEAD) 
+	src/conf.h:1.8->1.9 
+
+---------------------
+PatchSet 80 
+Date: 2007/07/11 23:33:35
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Cleaned up the makefile of references to programs no longer compiled.
+
+Members: 
+	makefile:1.14->1.15 
+
+---------------------
+PatchSet 81 
+Date: 2007/07/11 23:35:44
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Cleaned up file of stuff no longer here, but in the CGILIB codebase.
+
+Members: 
+	src/conf.h:1.9->1.10 
+
+---------------------
+PatchSet 82 
+Date: 2007/08/06 05:13:00
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added cb_cond_blog_title, to conditionally print the title of the blog entry
+if it's the only entry being displayed.  The template call,
+%{cond.blog.title}%, is really meant for the <TITLE> tag of the page,
+as a search engine optimization.
+
+Members: 
+	src/callbacks.c:1.18->1.19 
+
+---------------------
+PatchSet 83 
+Date: 2007/08/06 05:16:01
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Updated TODO list.
+
+Members: 
+	TODO:1.4->1.5 
+
+---------------------
+PatchSet 84 
+Date: 2007/08/06 06:59:56
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Okay, got redirection working on single tumblers.  Basically, if the tumbler
+given isn't canonical (and it's a single tumbler), we redirect to the actual
+canonical tumbler.
+
+Members: 
+	src/cgi_main.c:1.15->1.16 
+	src/cli_main.c:1.8->1.9 
+	src/conf.h:1.10->1.11 
+	src/wbtum.c:1.5->1.6 
+	src/wbtum.h:1.3->1.4 
+
+---------------------
+PatchSet 85 
+Date: 2007/08/08 03:53:08
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Made next/previous link canonical.
+
+Members: 
+	src/callbacks.c:1.19->1.20 
+
+---------------------
+PatchSet 86 
+Date: 2007/08/13 07:06:12
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added rudementary support for the HEAD method---basically, I say it's not
+allowed.
+
+Members: 
+	src/cgi_main.c:1.16->1.17 
+	src/globals.h:1.9->1.10 
+	src/main.c:1.9->1.10 
+
+---------------------
+PatchSet 87 
+Date: 2007/08/21 00:48:10
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed the display bug that was not properly displaying the proper title
+on single entries.
+
+Members: 
+	src/callbacks.c:1.20->1.21 
+
+---------------------
+PatchSet 88 
+Date: 2007/08/24 22:12:25
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Oops--fixed a bug where I might try to close a NULL stream.
+
+Members: 
+	src/cgi_main.c:1.17->1.18 
+
+---------------------
+PatchSet 89 
+Date: 2007/08/24 22:15:04
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Another fix to the redirect display bug---this time, I found out I needed
+to flush the output stream before exiting.
+
+Members: 
+	src/cgi_main.c:1.18->1.19 
+
+---------------------
+PatchSet 90 
+Date: 2007/08/26 08:28:17
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Something changed.
+
+Basically, under Apache 2x, I need to flush the output before I exit, else
+a lot of crap starts breaking.  I wonder what's up with that?  Did Pavan
+upgrade my server?  Hmm ...
+
+Members: 
+	src/backend.c:1.19->1.20 
+	src/callbacks.c:1.21->1.22 
+	src/cgi_main.c:1.19->1.20 
+	src/main.c:1.10->1.11 
+
+---------------------
+PatchSet 91 
+Date: 2007/08/27 01:30:47
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+This is horribly broken.  I'm going to have to rewrite it.  sigh.
+
+Members: 
+	src/globals.c:1.13->1.14 
+	src/timeutil.c:1.5->1.6 
+
+---------------------
+PatchSet 92 
+Date: 2007/08/27 14:59:52
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Heh.
+
+Members: 
+	makefile:1.15->1.16 
+
+---------------------
+PatchSet 93 
+Date: 2007/08/27 15:01:02
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Basically, I rewrote the core blogging engine over the past twelve hours.
+I still have yet to support adding new entries via the engine, but until
+I get *that* fixed, I can add them manually.
+
+And yes, I completely rewrote the blogging module.
+
+Members: 
+	src/addutil.c:1.11->1.12 
+	src/backend.c:1.20->1.21 
+	src/blog.c:1.6->1.7 
+	src/blog.h:1.6->1.7 
+	src/callbacks.c:1.22->1.23 
+	src/cgi_main.c:1.20->1.21 
+	src/cli_main.c:1.9->1.10 
+	src/fix.h:1.6->1.7 
+	src/frontend.h:1.6->1.7 
+	src/globals.c:1.14->1.15 
+	src/globals.h:1.10->1.11 
+	src/main.c:1.11->1.12 
+	src/timeutil.c:1.6->1.7 
+	src/timeutil.h:1.2->1.3 
+	src/wbtum.c:1.6->1.7 
+
+---------------------
+PatchSet 94 
+Date: 2007/08/27 15:19:21
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Oh, gave a default value for the lock file.
+
+Members: 
+	src/globals.c:1.15->1.16 
+
+---------------------
+PatchSet 95 
+Date: 2007/08/27 15:20:12
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed a display bug where the same entry would be displayed over and over
+again.
+
+Members: 
+	src/blog.c:1.7->1.8 
+
+---------------------
+PatchSet 96 
+Date: 2007/08/27 16:03:55
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Quick fix to a seg fault.
+
+Members: 
+	TODO:1.5->1.6 
+	src/blog.c:1.8->1.9 
+	src/callbacks.c:1.23->1.24 
+
+---------------------
+PatchSet 97 
+Date: 2007/08/27 18:04:01
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Did I fix the navigation bug?  Only a live test will show for sure.
+
+Members: 
+	src/backend.c:1.21->1.22 
+	src/timeutil.c:1.7->1.8 
+	src/timeutil.h:1.3->1.4 
+
+---------------------
+PatchSet 98 
+Date: 2007/08/27 18:29:04
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Think I finally got these navigation bugs under wrap.
+
+Members: 
+	src/backend.c:1.22->1.23 
+
+---------------------
+PatchSet 99 
+Date: 2007/08/27 18:37:02
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+No, really!  I got the navigation working!  I swear!
+
+Members: 
+	src/backend.c:1.23->1.24 
+
+---------------------
+PatchSet 100 
+Date: 2007/08/27 21:20:05
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fix yet another bug.  This time in set_time().  do not set gd.now.part.
+
+Members: 
+	src/globals.c:1.16->1.17 
+
+---------------------
+PatchSet 101 
+Date: 2007/08/28 22:41:51
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added some notes to the TODO about a new feature.
+
+Members: 
+	TODO:1.6->1.7 
+
+---------------------
+PatchSet 102 
+Date: 2007/08/28 22:46:08
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Just a bit more about the idea.
+
+Members: 
+	TODO:1.7->1.8 
+
+---------------------
+PatchSet 103 
+Date: 2007/08/29 00:46:31
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Added BlogEntryWrite().
+
+Members: 
+	src/blog.c:1.9->1.10 
+
+---------------------
+PatchSet 104 
+Date: 2007/08/29 01:02:57
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Need to test, but added the code to add new entries to the blog.
+
+Members: 
+	src/addutil.c:1.12->1.13 
+
+---------------------
+PatchSet 105 
+Date: 2007/08/29 04:17:23
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed a few timing bugs when adding a new entry.
+
+Members: 
+	src/addutil.c:1.13->1.14 
+	src/backend.c:1.24->1.25 
+	src/globals.c:1.17->1.18 
+	src/main.c:1.12->1.13 
+
+---------------------
+PatchSet 106 
+Date: 2007/08/29 04:45:20
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Code clean up for the new release.
+
+Members: 
+	src/backend.c:1.25->1.26 
+	src/blog.c:1.10->1.11 
+	src/blog.h:1.7->1.8 
+	src/callbacks.c:1.24->1.25 
+	src/cgi_main.c:1.21->1.22 
+	src/main.c:1.13->1.14 
+	src/timeutil.c:1.8->1.9 
+	src/timeutil.h:1.4->1.5 
+
+---------------------
+PatchSet 107 
+Date: 2007/08/29 04:47:38
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Final code cleanup
+
+Members: 
+	makefile:1.16->1.17 
+	src/frontend.h:1.7->1.8 
+
+---------------------
+PatchSet 108 
+Date: 2007/08/29 20:43:53
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Somre more notes
+
+Members: 
+	TODO:1.8->1.9 
+
+---------------------
+PatchSet 109 
+Date: 2007/08/31 06:43:06
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Finally fixed the generate_pages() bug when adding a new entry would not
+cause the new generated pages to have the new entry.
+
+Members: 
+	src/addutil.c:1.14->1.15 
+	src/main.c:1.14->1.15 
+
+---------------------
+PatchSet 110 
+Date: 2007/09/09 23:36:26
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Removed some code not used.
+
+Members: 
+	src/cgi_main.c:1.22->1.23 
+
+---------------------
+PatchSet 111 
+Date: 2007/11/01 23:32:02
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Since I moved the CGILIB, modified the makefile.
+
+Members: 
+	makefile:1.17->1.18 
+
+---------------------
+PatchSet 112 
+Date: 2007/11/01 23:32:21
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed some compilation errors due to moving the CGILIB header files.
+
+Members: 
+	src/callbacks.c:1.25->1.26 
+	src/cgi_main.c:1.23->1.24 
+	src/fix.h:1.7->1.8 
+	src/frontend.h:1.8->1.9 
+	src/globals.c:1.18->1.19 
+	src/globals.h:1.11->1.12 
+
+---------------------
+PatchSet 113 
+Date: 2008/02/28 07:25:58
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Forgot to initialize entry in cmd_cgi_post_show().
+
+Members: 
+	src/cgi_main.c:1.24->1.25 
+
+---------------------
+PatchSet 114 
+Date: 2008/02/28 08:11:43
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed another segfault, this time in cmd_cgi_post_show().
+
+Members: 
+	src/cgi_main.c:1.25->1.26 
+
+---------------------
+PatchSet 115 
+Date: 2008/02/28 09:50:21
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Probably fixed a few more bugs, but realized it it's most likely an Apache
+bug dealing with Authentication and ErrorDocument directives.
+
+Members: 
+	src/cgi_main.c:1.26->1.27 
+	src/globals.c:1.19->1.20 
+
+---------------------
+PatchSet 116 
+Date: 2008/03/13 02:16:03
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Fixed fixup_uri() to handle local fragments correctly.
+
+Members: 
+	src/callbacks.c:1.26->1.27 
+
+---------------------
+PatchSet 117 
+Date: 2008/03/13 08:05:47
+Author: spc
+Branch: HEAD
+Tag: (none) 
+Log:
+Hmm ... that's odd ... I wonder how the email notification ever worked
+then, with it set to FALSE.  Oh, never mind.  I see now ... sigh.
+
+Members: 
+	src/globals.c:1.20->1.21 
+
