@@ -54,11 +54,7 @@ struct nested_params
 
 /**********************************************************************/
 
-static void	copy_buffer		(Buffer,Buffer);
-
-static void	mixed_handle_tag	(struct nested_params *);
-static void	mixed_handle_string	(struct nested_params *);
-
+static void	text_conversion_backend	(char *,Buffer,Buffer,int);
 static void	html_handle_tag		(struct nested_params *);
 static void	check_for_uri		(struct nested_params *,const char *);
 static void	entify_char		(char *,size_t,char *,char,const char *);
@@ -72,19 +68,14 @@ static void	handle_period		(Buffer,Buffer);
 
 /**********************************************************************/
 
-void conversion(char *fname,Buffer in,Buffer out)
+void text_conversion(char *fname,Buffer in,Buffer output)
 {
-  ddt(fname != NULL);
-  ddt(in    != NULL);
-  ddt(out   != NULL);
-
-  ddt(0);  
-  html_conversion(fname,in,out);
+  text_conversion_backend(fname,in,output,TRUE);
 }
 
 /**********************************************************************/
 
-void text_conversion(char *fname,Buffer in,Buffer output)
+static void text_conversion_backend(char *fname,Buffer in,Buffer output,int entities)
 {
   Buffer linebuf;
   Buffer tmp;
@@ -128,9 +119,8 @@ void text_conversion(char *fname,Buffer in,Buffer output)
       BufferWrite(output,"<P>",&wsize);
       
       ddtlog(ddtstream,"","about to copy line");
-      copy_buffer(output,tmp);
+      BufferCopy(output,tmp);
 
-      
       wsize = 5;
       BufferWrite(output,"</P>\n",&wsize);
       
@@ -153,9 +143,23 @@ void text_conversion(char *fname,Buffer in,Buffer output)
       MemoryBuffer(&intmp,buffer,size);
       BufferIOCtl(intmp,CM_SETSIZE,size);
       LineBuffer(&lintmp,intmp);
-      buff_conversion(lintmp,tmp,QUOTE_SMART);
-      size = 1;
-      BufferWrite(tmp," ",&size);
+      if (entities)
+      {
+	Buffer filter;
+
+	EntityOutBuffer(&filter,tmp);
+	BufferIOCtl(filter,CE_NOAMP);
+	buff_conversion(lintmp,filter,QUOTE_SMART);
+	size = 1;
+	BufferWrite(filter," ",&size);
+	BufferFree(&filter);
+      }
+      else
+      {
+	buff_conversion(lintmp,tmp,QUOTE_SMART);
+	size = 1;
+	BufferWrite(tmp," ",&size);
+      }
       BufferFree(&lintmp);
       BufferFree(&intmp);
     }
@@ -170,7 +174,7 @@ void text_conversion(char *fname,Buffer in,Buffer output)
     BufferSeek(tmp,&seek,SEEK_START);
     wsize = 3;
     BufferWrite(output,"<P>",&wsize);
-    copy_buffer(output,tmp);
+    BufferCopy(output,tmp);
     wsize = 5;
     BufferWrite(output,"</P>\n",&wsize);
   }
@@ -181,67 +185,20 @@ void text_conversion(char *fname,Buffer in,Buffer output)
 
 /***********************************************************************/
 
-static void copy_buffer(Buffer dest,Buffer src)
-{
-  size_t size;
-  char   buffer[BUFSIZ];
-
-  do
-  {
-    size = BUFSIZ;
-    BufferRead(src,buffer,&size);
-    if (size)
-      BufferWrite(dest,buffer,&size);
-  } while(size);
-}
-
-/*************************************************************************/
-
 void mixed_conversion(char *fname,Buffer in,Buffer out)
 {
-  struct nested_params local;
-  int                  t;
-  size_t               size;
+  Buffer tmp;
+  long   loc;
   
   ddt(fname != NULL);
   ddt(in    != NULL);
   ddt(out   != NULL);
   
-  local.fname      = fname;
-  local.in         = in;
-  local.out        = out;
-  local.p          = TRUE;
-  local.pre        = FALSE;
-  local.blockquote = FALSE;
-  local.list       = FALSE;
-  
-  size = 3;
-  BufferWrite(out,"<P>",&size);
-  LineBuffer(&local.linput,in);
-  HtmlParseNew(&local.token,local.linput);
-  
-  while((t = HtmlParseNext(local.token)) != T_EOF)
-  {
-    if (t == T_TAG)
-      mixed_handle_tag(&local);
-    else if (t == T_COMMENT)
-      html_handle_comment(&local);
-    else if (t == T_STRING)
-      mixed_handle_string(&local);
-  }
-  
-  HtmlParseFree(&local.token);
-  BufferFree(&local.linput);
-}
-
-/*************************************************************************/
-
-static void mixed_handle_tag(struct nested_params *local)
-{
-}
-
-static void mixed_handle_string(struct nested_params *local)
-{
+  DynamicBuffer(&tmp);
+  text_conversion_backend(fname,in,tmp,FALSE);
+  loc = 0;
+  BufferSeek(tmp,&loc,SEEK_START);
+  html_conversion(fname,tmp,out);
 }
 
 /*************************************************************************/
@@ -386,14 +343,6 @@ static void html_handle_tag(struct nested_params *local)
     check_for_uri(local,"SRC");
     check_for_uri(local,"FOR");
   }
-
-  /*---------------------------------------------
-  ; this isn't strict HTML 4.01, but its use did
-  ; come up once ... oops.
-  ;---------------------------------------------*/
-
-  else if (strcmp(HtmlParseValue(local->token),"IFRAME") == 0)
-    check_for_uri(local,"SRC");
   else
   {
     if (!local->blockquote)
@@ -524,29 +473,6 @@ static void html_handle_string(struct nested_params *local)
   
   if (*text == '\0') return;
 
-#if 0
-
-  /*---------------------------------------------------------------
-  ; I forgot why I'm doing this, and I think at one point I took 
-  ; this out, but it broke something else, so I added it back ... 
-  ; I think I may want to just remove this entirely and fix it some
-  ; other way ... later ... 
-  ;----------------------------------------------------------------*/
-
-  if (
-       (local->blockquote) 
-       && (!local->p) 
-       && (!local->pre) 
-       && (!local->list)
-       && (!empty_string(text))
-     )
-  {
-    BufferFormatWrite(local->out,"","\n\n<P>");
-    local->p = TRUE;
-  }
-
-#endif
-
   if (!local->pre)
   {
     Buffer tin;
@@ -607,9 +533,6 @@ void buff_conversion(Buffer in,Buffer out,int quotetype)
       case '\'': handle_quote(in,out); break;
       case '-':  handle_dash(in,out); break;
       case '.':  handle_period(in,out); break;
-      case '<':  BufferFormatWrite(out,"","&lt;"); break;
-      case '>':  BufferFormatWrite(out,"","&gt;"); break;
-      case '"':  BufferFormatWrite(out,"","&quot;"); break;
       case '\0': ddt(0);
       default:
            s = 1;
