@@ -103,7 +103,7 @@ static void set_m_cgi_get_command(char *value,Request req)
 /***********************************************************************/
 
 static int cmd_cgi_get_new(Request req)
-
+{
   List days;
 
   ddt(req != NULL);
