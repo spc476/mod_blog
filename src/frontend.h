@@ -87,13 +87,6 @@ typedef struct display
   struct btm  next;
   time_t      tst;	/* Time_t based Start Time */
   struct tm   stmst;	/* Struct TM based Start Time */
-#if 0
-  struct tm              begin;
-  struct tm              now;
-  struct tm              updatetime;
-  struct tm              previous;
-  struct tm              next;
-#endif
 } *Display;
 
 struct callback_data
