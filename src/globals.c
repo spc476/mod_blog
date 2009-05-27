@@ -154,7 +154,14 @@ int GlobalsInit(char *fspec)
     }
     else if (strcmp(ppair->name,"FULLBASEURL") == 0)
     {
-#if 0
+      /*--------------------------------------------
+      ; FullBaseURL cannot end in a '/' or else bad
+      ; things happen.  We don't check for it, and I
+      ; forgot why, because it wasn't commented, but 
+      ; whatever you do, don't use the commented out
+      ; code.
+      ;--------------------------------------------*/
+#ifdef BROKEN_FULLBASEURL
       char *p = strrchr(ppair->value,'/');
       if (p != NULL) *p = '\0';
 #endif
