@@ -61,6 +61,7 @@ static void	cb_blog_fancy			(Stream,void *);
 static void	cb_blog_normal			(Stream,void *);
 static void	cb_blog_name			(Stream,void *);
 static void	cb_blog_adtag			(Stream,void *);
+static void	cb_blog_adtag_entity		(Stream,void *);
 
 static void	cb_entry			(Stream,void *);
 static void	cb_entry_id			(Stream,void *);
@@ -135,6 +136,7 @@ struct chunk_callback  m_callbacks[] =
   { "blog.date.fancy"		, cb_blog_fancy			} ,
   { "blog.date.normal"		, cb_blog_normal		} ,
   { "blog.adtag"		, cb_blog_adtag			} ,
+  { "blog.adtag.entity"		, cb_blog_adtag_entity		} ,
 
   { "entry"			, cb_entry			} ,
   { "entry.id"			, cb_entry_id			} ,
@@ -400,6 +402,20 @@ static void cb_blog_adtag(Stream out,void *data)
 }
 
 /*********************************************************************/
+
+static void cb_blog_adtag_entity(Stream out,void *data)
+{
+  Stream entityout;
+
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  entityout = EntityStreamWrite(out);
+  LineS(entityout,gd.adtag);
+  StreamFree(entityout);
+}
+
+/********************************************************************/
 
 static void cb_entry(Stream out,void *data)
 {
