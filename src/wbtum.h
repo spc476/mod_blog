@@ -24,7 +24,7 @@
 #ifndef WBTUM_H
 #define WBTUM_H
 
-#include <cgi/nodelist.h>
+#include <cgil/nodelist.h>
 
 /**********************************************************************/
 

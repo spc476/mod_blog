@@ -26,9 +26,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cgi/ddt.h>
-#include <cgi/memory.h>
-#include <cgi/util.h>
+#include <cgil/ddt.h>
+#include <cgil/memory.h>
+#include <cgil/util.h>
 
 #include "conf.h"
 #include "chunk.h"

@@ -30,11 +30,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <cgi/ddt.h>
-#include <cgi/buffer.h>
-#include <cgi/errors.h>
-#include <cgi/memory.h>
-#include <cgi/util.h>
+#include <cgil/ddt.h>
+#include <cgil/buffer.h>
+#include <cgil/errors.h>
+#include <cgil/memory.h>
+#include <cgil/util.h>
 
 #include "conf.h"
 #include "blog.h"

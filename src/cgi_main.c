@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cgi/memory.h>
-#include <cgi/buffer.h>
-#include <cgi/errors.h>
-#include <cgi/ddt.h>
-#include <cgi/clean.h>
-#include <cgi/cgi.h>
-#include <cgi/util.h>
+#include <cgil/memory.h>
+#include <cgil/buffer.h>
+#include <cgil/errors.h>
+#include <cgil/ddt.h>
+#include <cgil/clean.h>
+#include <cgil/cgi.h>
+#include <cgil/util.h>
 
 #include "conf.h"
 #include "globals.h"

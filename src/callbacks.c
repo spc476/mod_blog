@@ -31,13 +31,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <cgi/memory.h>
-#include <cgi/ddt.h>
-#include <cgi/htmltok.h>
-#include <cgi/buffer.h>
-#include <cgi/clean.h>
-#include <cgi/util.h>
-#include <cgi/cgi.h>
+#include <cgil/memory.h>
+#include <cgil/ddt.h>
+#include <cgil/htmltok.h>
+#include <cgil/buffer.h>
+#include <cgil/clean.h>
+#include <cgil/util.h>
+#include <cgil/cgi.h>
 
 #include "conf.h"
 #include "blog.h"

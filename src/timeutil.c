@@ -25,7 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <cgi/ddt.h>
+#include <cgil/ddt.h>
 
 #include "timeutil.h"
 

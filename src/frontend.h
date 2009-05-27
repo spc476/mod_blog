@@ -2,7 +2,7 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
-#include <cgi/cgi.h>
+#include <cgil/cgi.h>
 #include "wbtum.h"
 
 typedef struct rflags

@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <cgi/memory.h>
-#include <cgi/buffer.h>
-#include <cgi/ddt.h>
-#include <cgi/clean.h>
-#include <cgi/cgi.h>
+#include <cgil/memory.h>
+#include <cgil/buffer.h>
+#include <cgil/ddt.h>
+#include <cgil/clean.h>
+#include <cgil/cgi.h>
 
 #include "conf.h"
 #include "globals.h"

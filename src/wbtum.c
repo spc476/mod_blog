@@ -25,12 +25,12 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-#include <cgi/memory.h>
-#include <cgi/ddt.h>
-#include <cgi/nodelist.h>
-#include <cgi/errors.h>
-#include <cgi/types.h>
-#include <cgi/util.h>
+#include <cgil/memory.h>
+#include <cgil/ddt.h>
+#include <cgil/nodelist.h>
+#include <cgil/errors.h>
+#include <cgil/types.h>
+#include <cgil/util.h>
 
 #include "wbtum.h"
 

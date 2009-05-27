@@ -2,10 +2,10 @@
 #ifndef FIX_H
 #define FIX_H
 
-#include <cgi/errors.h>
+#include <cgil/errors.h>
 #include "chunk.h"
 
-#define NEW	1
+#undef NEW	1
 #define CBBODY		(ERR_APP + 4)
 #define DB_BLOCK	1024
 

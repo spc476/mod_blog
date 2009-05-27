@@ -26,8 +26,8 @@
 
 #include <time.h>
 
-#include <cgi/nodelist.h>
-#include <cgi/errors.h>
+#include <cgil/nodelist.h>
+#include <cgil/errors.h>
 
 /*******************************************************************/
 

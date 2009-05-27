@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <cgi/ddt.h>
+#include <cgil/ddt.h>
 
 #define SENDMAIL	"/usr/sbin/sendmail"
 

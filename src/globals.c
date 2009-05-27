@@ -27,11 +27,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <cgi/ddt.h>
-#include <cgi/memory.h>
-#include <cgi/buffer.h>
-#include <cgi/util.h>
-#include <cgi/pair.h>
+#include <cgil/ddt.h>
+#include <cgil/memory.h>
+#include <cgil/buffer.h>
+#include <cgil/util.h>
+#include <cgil/pair.h>
 
 #include "conf.h"
 #include "system.h"

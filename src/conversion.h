@@ -24,7 +24,7 @@
 #ifndef CONVERSION_H
 #define CONVERSION_H
 
-#include <cgi/buffer.h>
+#include <cgil/buffer.h>
 
 #define QUOTE_DUMB	0
 #define QUOTE_SMART	1

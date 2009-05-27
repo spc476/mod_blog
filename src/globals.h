@@ -24,7 +24,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <cgi/cgi.h>
+#include <cgil/cgi.h>
 
 #include "frontend.h"
 

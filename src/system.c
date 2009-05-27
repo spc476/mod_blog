@@ -21,8 +21,10 @@
 *
 ******************************************************************/
 
-#ifndef __unix__
+#if 0
+#if !defined(__unix__) || !defined(__MACH__)
 #  error This code is Unix specific.  You have been warned.
+#endif
 #endif
 
 #include <stdlib.h>
@@ -33,8 +35,8 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
-#include <cgi/pair.h>
-#include <cgi/ddt.h>
+#include <cgil/pair.h>
+#include <cgil/ddt.h>
 
 /*******************************************************************/
 

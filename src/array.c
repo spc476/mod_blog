@@ -24,9 +24,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <cgi/ddt.h>
-#include <cgi/memory.h>
-#include <cgi/errors.h>
+#include <cgil/ddt.h>
+#include <cgil/memory.h>
+#include <cgil/errors.h>
 
 #include "array.h"
 

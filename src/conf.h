@@ -25,8 +25,8 @@
 #define CONF_H
 
 #include <limits.h>
-#include <cgi/pair.h>
-#include <cgi/errors.h>
+#include <cgil/pair.h>
+#include <cgil/errors.h>
 
 /*****************************************************************
 *
