@@ -69,6 +69,7 @@ extern const int           g_tzhour;
 extern const int           g_tzmin;
 extern const char *const   g_backend;
 extern       void        (*g_conversion)(char *,Buffer,Buffer);
+extern volatile int        g_debug;
 
 int		GlobalsInit		(char *);
 

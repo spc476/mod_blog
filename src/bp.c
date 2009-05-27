@@ -217,7 +217,10 @@ int main(int argc,char *argv[])
   BufferInit();
   DdtInit();
   CleanInit();
-  
+
+  while(g_debug)	/* possibly pause so we can attach a debugger 	*/
+    ;			/* to the running process			*/
+
   if (CgiNew(&cgi,NULL) == ERR_OKAY)
     return(cgi_main(cgi,argc,argv));
   else

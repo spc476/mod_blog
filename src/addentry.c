@@ -103,6 +103,9 @@ int main(int argc,char *argv[])
   DdtInit();
   CleanInit();
 
+  while(g_debug)	/* possibly pause so we can attach a debugger 	*/
+    ;			/* to the running process			*/
+
   if (argc == 1) 
   {
     fprintf(stderr,"usage: %s config [entry]\n",argv[0]);

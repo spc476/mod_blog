@@ -43,38 +43,39 @@
   const char *g_scriptname;
 #endif
 
-const char  *g_name;
-const char  *g_basedir;
-const char  *g_webdir;
-const char  *g_baseurl;
-const char  *g_fullbaseurl;
-const char  *g_templates;
-const char  *g_rsstemplates;
-const char  *g_tabtemplates;
-const char  *g_tabfile;
-int          g_tabreverse   = TRUE;
-const char  *g_daypage;
-int          g_days         = -1;
-const char  *g_rssfile;
-int          g_rssitems     = 15;
-int          g_rssreverse   = TRUE;
-int          g_styear       = -1;
-int          g_stmon        = -1;
-int          g_stday        = -1;
-const char  *g_author;
-const char  *g_email;
-const char  *g_authorfile;
-const char  *g_lockfile;
-int          g_weblogcom    = FALSE;
-const char  *g_weblogcomurl = "http://newhome.weblogs.com/pingSiteForm";
-int          g_emailupdate  = FALSE;
-char        *g_emaildb;
-const char  *g_emailsubject;
-const char  *g_emailmsg;
-int          g_tzhour       = -5;	/* Eastern */
-int          g_tzmin        =  0;
-const char  *g_backend;
-void	   (*g_conversion)(char *,Buffer,Buffer)  =  html_conversion;
+const char    *g_name;
+const char    *g_basedir;
+const char    *g_webdir;
+const char    *g_baseurl;
+const char    *g_fullbaseurl;
+const char    *g_templates;
+const char    *g_rsstemplates;
+const char    *g_tabtemplates;
+const char    *g_tabfile;
+int            g_tabreverse   = TRUE;
+const char    *g_daypage;
+int            g_days         = -1;
+const char    *g_rssfile;
+int            g_rssitems     = 15;
+int            g_rssreverse   = TRUE;
+int            g_styear       = -1;
+int            g_stmon        = -1;
+int            g_stday        = -1;
+const char    *g_author;
+const char    *g_email;
+const char    *g_authorfile;
+const char    *g_lockfile;
+int            g_weblogcom    = FALSE;
+const char    *g_weblogcomurl = "http://newhome.weblogs.com/pingSiteForm";
+int            g_emailupdate  = FALSE;
+char          *g_emaildb;
+const char    *g_emailsubject;
+const char    *g_emailmsg;
+int            g_tzhour       = -5;	/* Eastern */
+int            g_tzmin        =  0;
+const char    *g_backend;
+void	     (*g_conversion)(char *,Buffer,Buffer)  =  html_conversion;
+volatile int   g_debug        = FALSE;
 
 /****************************************************/
 
@@ -267,6 +268,11 @@ int GlobalsInit(char *fspec)
         g_conversion = html_conversion;
       else if (strcmp(ppair->value,"mixed") == 0)
         g_conversion = mixed_conversion;
+    }
+    else if (strcmp(ppair->name,"DEBUG") == 0)
+    {
+      if (strcmp(ppair->value,"true") == 0)
+        g_debug = TRUE;
     }
     else if (strncmp(ppair->name,"_SYSTEM",7) == 0)
     {
