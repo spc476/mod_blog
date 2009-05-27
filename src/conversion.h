@@ -1,4 +1,3 @@
-
 /*********************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -24,19 +23,17 @@
 #ifndef CONVERSION_H
 #define CONVERSION_H
 
-#include <cgil/buffer.h>
+#include <cgilib/stream.h>
 
 #define QUOTE_DUMB	0
 #define QUOTE_SMART	1
 
 /******************************************************************/
 
-void		conversion		(char *,Buffer,Buffer);
+void		text_conversion		(char *,Stream,Stream);
+void		mixed_conversion	(char *,Stream,Stream);
+void		html_conversion		(char *,Stream,Stream);
 
-void		text_conversion		(char *,Buffer,Buffer);
-void		mixed_conversion	(char *,Buffer,Buffer);
-void		html_conversion		(char *,Buffer,Buffer);
-
-void		buff_conversion		(Buffer,Buffer,int);
+void		buff_conversion		(Stream,Stream,int);
 
 #endif

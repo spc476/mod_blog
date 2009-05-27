@@ -1,13 +1,33 @@
+/************************************************************************
+*
+* Copyright 2005 by Sean Conner.  All Rights Reserved.
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*
+* Comments, questions and criticisms can be sent to: sean@conman.org
+*
+*************************************************************************/
 
 #include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
 
-#include <cgil/memory.h>
-#include <cgil/buffer.h>
-#include <cgil/ddt.h>
-#include <cgil/clean.h>
-#include <cgil/cgi.h>
+#include <cgilib/memory.h>
+#include <cgilib/ddt.h>
+#include <cgilib/stream.h>
+#include <cgilib/cgi.h>
 
 #include "conf.h"
 #include "globals.h"
@@ -21,13 +41,17 @@ int main(int argc,char *argv[])
   Cgi cgi;
   int rc;
   
+  while(g_debug)
+    ;
+
   MemInit   ();
-  BufferInit();
   DdtInit   ();
-  CleanInit ();
+  StreamInit();
 
   if (CgiNew(&cgi,NULL) == ERR_OKAY)
   {
+    gd.cgi = cgi;
+
     switch(CgiMethod(cgi))
     {
       case GET:  rc = main_cgi_get (cgi,argc,argv); break;
@@ -43,60 +67,50 @@ int main(int argc,char *argv[])
 
 /***********************************************************************/
 
-static struct tm m_begin;
-static struct tm m_now;
-static struct tm m_updatetime;
-
-void BlogDatesInit(void)
+int BlogDatesInit(void)
 {
   time_t     t;
   struct tm *today;
   BlogDay    day;
   int        rc;
 
-  BlogInit();
-
-  tm_init(&m_begin);
-  m_begin.tm_year = g_styear;
-  m_begin.tm_mon  = g_stmon;
-  m_begin.tm_mday = g_stday;
-  m_begin.tm_hour = 1;
+  tm_init(&gd.begin);
+  gd.begin.tm_year = g_styear;
+  gd.begin.tm_mon  = g_stmon;
+  gd.begin.tm_mday = g_stday;
+  gd.begin.tm_hour = 1;
   
-  tm_to_tm(&m_begin);
+  tm_to_tm(&gd.begin);
   
   t     = time(NULL);
   today = localtime(&t);
-  m_now = m_updatetime = *today;
+  gd.now = gd.updatetime = *today;
 
   while(TRUE)
   {
-    if (tm_cmp(&m_now,&m_begin) < 0)
-    {
-      ErrorPush(AppErr,1,APPERR_BLOGINIT,"");
-      ErrorLog();
-      exit(EXIT_FAILURE);
-    }
+    if (tm_cmp(&gd.now,&gd.begin) < 0)
+      return(ERR_ERR);	/* XXX - this may not be an error */
     
-    rc = BlogDayRead(&day,&m_now);
+    rc = BlogDayRead(&day,&gd.now);
     if (rc != ERR_OKAY)
     {
-      ErrorClear();
-      day_sub(&m_now);
+      day_sub(&gd.now);
       continue;
     }
     
     if (day->number == 0)
     {
       BlogDayFree(&day);
-      day_sub(&m_now);
+      day_sub(&gd.now);
       continue;
     }
     
-    m_now.tm_hour = day->number;
-    if (m_now.tm_hour == 0) m_now.tm_hour = 1;
+    gd.now.tm_hour = day->number;
+    if (gd.now.tm_hour == 0) gd.now.tm_hour = 1;
     BlogDayFree(&day);
     break;
   }
+  return(ERR_OKAY);
 }
 
 /***********************************************************************/

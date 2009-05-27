@@ -1,4 +1,3 @@
-
 /*********************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -26,20 +25,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cgil/ddt.h>
-#include <cgil/memory.h>
-#include <cgil/util.h>
+#include <cgilib/ddt.h>
+#include <cgilib/memory.h>
+#include <cgilib/util.h>
 
 #include "conf.h"
 #include "chunk.h"
 
 /**********************************************************************/
 
-static void chunk_readcallback(FILE *fpin,char *buff,size_t size)
+static void chunk_readcallback(Stream in,char *buff,size_t size)
 {
   int c;
   
-  ddt(fpin != NULL);
+  ddt(in   != NULL);
   ddt(buff != NULL);
   ddt(size >  0);
   
@@ -47,14 +46,14 @@ static void chunk_readcallback(FILE *fpin,char *buff,size_t size)
   
   while(size)
   {
-    c = fgetc(fpin);
-    if (c == EOF) return;
+    c = StreamRead(in);
+    if (c == IEOF) return;
     
     if (c == '}')
     {
-      c = fgetc(fpin);
-      if (c == EOF) return;
-      if (c == '%') return;
+      c = StreamRead(in);
+      if (c == IEOF) return;
+      if (c == '%')  return;
       *buff++ = '}';
     }
     
@@ -68,7 +67,7 @@ static void chunk_readcallback(FILE *fpin,char *buff,size_t size)
 /**************************************************************************/
 
 static void chunk_docallback(
-                              FILE                  *fpout,
+                              Stream                 out,
                               char                  *cmd,
                               struct chunk_callback *pcc,
                               size_t                 scc,
@@ -77,7 +76,7 @@ static void chunk_docallback(
 {
   int i;
 
-  ddt(fpout != NULL);
+  ddt(out   != NULL);
   ddt(cmd   != NULL);
   ddt(pcc   != NULL);
   ddt(scc   >  0);
@@ -86,18 +85,18 @@ static void chunk_docallback(
   {
     if (strcmp(cmd,pcc[i].name) == 0)
     {
-      (*pcc[i].callback)(fpout,data);
+      (*pcc[i].callback)(out,data);
       return;
     }
   }
-  fprintf(fpout,"%%{processing error - can't find [%s] }%%",cmd);
+  LineSFormat(out,"$","%%{processing error - can't find [%a] }%%",cmd);
 }
 
 /************************************************************************/
 
 static void chunk_handle(
-                          FILE                  *fpin,
-                          FILE                  *fpout,
+			  Stream                 in,
+			  Stream                 out,
                           struct chunk_callback *pcc,
                           size_t                 scc,
                           void                  *data
@@ -107,16 +106,16 @@ static void chunk_handle(
   char *cmd;
   char *p;
   
-  ddt(fpin  != NULL);
-  ddt(fpout != NULL);
+  ddt(in    != NULL);
+  ddt(out   != NULL);
   ddt(pcc   != NULL);
   ddt(scc   >  0);
   
-  chunk_readcallback(fpin,cmdbuf,BUFSIZ);
+  chunk_readcallback(in,cmdbuf,BUFSIZ);
   
   for (p = cmdbuf ; (cmd = strtok(p," \t\v\r\n")) != NULL ; p = NULL )
   {
-    chunk_docallback(fpout,cmd,pcc,scc,data);
+    chunk_docallback(out,cmd,pcc,scc,data);
   }
 }
 
@@ -142,41 +141,41 @@ int (ChunkNew)(Chunk *pch,const char *cname,struct chunk_callback *pcc,size_t sc
 
 /***********************************************************************/
 
-int (ChunkProcess)(Chunk chunk,const char *name,FILE *fpout,void *data)
+int (ChunkProcess)(Chunk chunk,const char *name,Stream out,void *data)
 {
-  char  fname[FILENAME_LEN];
-  FILE *fpin;
-  int   c;
+  char   fname[FILENAME_LEN];
+  Stream in;
+  int    c;
 
   ddt(chunk != NULL);
   ddt(name  != NULL);
-  ddt(fpout != NULL);
+  ddt(out   != NULL);
     
   sprintf(fname,"%s/%s",chunk->name,name);
-  fpin = fopen(fname,"r");
-  if (fpin == NULL)
-    return(ErrorPush(AppErr,CHUNKPROCESS,CHUNKERR_OPEN,"$/$",chunk->name,name));
+  
+  in = FileStreamRead(fname);
+  if (in == NULL)
+    return(ERR_ERR);
 
-  while(1)
+  while(!StreamEOF(in))
   {
-    c = fgetc(fpin);
+    c = StreamRead(in);
+    if (c == IEOF) break;
     if (c == '%')
     {
-      c = fgetc(fpin);
+      c = StreamRead(in);
       if (c == '{')
       {
-        chunk_handle(fpin,fpout,chunk->cb,chunk->cbsize,data);
+        chunk_handle(in,out,chunk->cb,chunk->cbsize,data);
         continue;
       }
 
-      fputc('%',fpout);
+      StreamWrite(out,'%');
     }
-    
-    if (c == EOF) break;
-    fputc(c,fpout);
+    StreamWrite(out,c);    
   }
-  
-  fclose(fpin);
+
+  StreamFree(in);  
   return(ERR_OKAY);
 }
 
@@ -186,8 +185,8 @@ int (ChunkFree)(Chunk chunk)
 {
   ddt(chunk != NULL);
   
-  MemFree(chunk->name,strlen(chunk->name) + 1);
-  MemFree(chunk,sizeof(struct chunk));
+  MemFree(chunk->name);
+  MemFree(chunk);
   return(ERR_OKAY);
 }
 

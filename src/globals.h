@@ -1,4 +1,3 @@
-
 /**************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -24,7 +23,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <cgil/cgi.h>
+#include <cgilib/cgi.h>
 
 #include "frontend.h"
 
@@ -46,11 +45,13 @@ extern const char *const      g_basedir;
 extern const char *const      g_webdir;
 extern const char *const      g_baseurl;
 extern const char *const      g_fullbaseurl;
-extern const char *           g_templates;		/* work on */
+extern const char *           g_templates;	/* work on */
 extern const char *const      g_rsstemplates;
+extern const char *const      g_atomtemplates;
 extern const char *const      g_daypage;
 extern const int              g_days;
 extern const char *const      g_rssfile;
+extern const char *const      g_atomfile;
 extern const int              g_rssitems;
 extern const int              g_rssreverse;
 extern const int              g_styear;
@@ -72,10 +73,9 @@ extern const char *const      g_tabfile;
 extern const int              g_tabreverse;
 extern const int              g_tzhour;
 extern const int              g_tzmin;
-extern const char *const      g_backend;
-extern       void           (*g_conversion)(char *,Buffer,Buffer);
+extern       void           (*g_conversion)(char *,Stream,Stream);
 extern volatile int           g_debug;
-extern const struct display   gd;
+extern struct display         gd;		/* work on */
 
 int		GlobalsInit		(char *);
 void		set_g_updatetype	(char *);

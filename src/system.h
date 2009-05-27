@@ -1,4 +1,3 @@
-
 /**************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -24,7 +23,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include <cgil/pair.h>
+#include <cgilib/pair.h>
 
 int		SystemLimit		(struct pair *);
 

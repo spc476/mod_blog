@@ -1,4 +1,3 @@
-
 /***************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -27,11 +26,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <cgil/ddt.h>
-#include <cgil/memory.h>
-#include <cgil/buffer.h>
-#include <cgil/util.h>
-#include <cgil/pair.h>
+#include <cgilib/ddt.h>
+#include <cgilib/memory.h>
+#include <cgilib/stream.h>
+#include <cgilib/rfc822.h>
+#include <cgilib/util.h>
+#include <cgilib/pair.h>
 
 #include "conf.h"
 #include "system.h"
@@ -58,12 +58,14 @@ const char    *g_baseurl;
 const char    *g_fullbaseurl;
 const char    *g_templates;
 const char    *g_rsstemplates;
+const char    *g_atomtemplates;
 const char    *g_tabtemplates;
 const char    *g_tabfile;
 int            g_tabreverse   = TRUE;
 const char    *g_daypage;
 int            g_days         = -1;
 const char    *g_rssfile;
+const char    *g_atomfile;
 int            g_rssitems     = 15;
 int            g_rssreverse   = TRUE;
 int            g_styear       = -1;
@@ -82,33 +84,29 @@ const char    *g_emailsubject;
 const char    *g_emailmsg;
 int            g_tzhour       = -5;	/* Eastern */
 int            g_tzmin        =  0;
-const char    *g_backend;
-void	     (*g_conversion)(char *,Buffer,Buffer)  =  html_conversion;
+void	     (*g_conversion)(char *,Stream,Stream) =  html_conversion;
 volatile int   g_debug        = FALSE;
-
-#ifdef NEW
-  struct display gd =
-  {
-    m_callbacks,
-    CALLBACKS,
-    { FALSE , FALSE , FALSE , FALSE , TRUE , TRUE } ,
-    INDEX,
-    NULL
-  };
-#endif
+struct display gd =
+{
+  { FALSE , FALSE , FALSE , FALSE , TRUE , TRUE } ,
+  INDEX,
+  NULL
+};
 
 /****************************************************/
 
 int GlobalsInit(char *fspec)
 {
-  char   *cfs;
-  char   *ext;
-  int     rc;
-  Buffer  input;
-  Buffer  linput;
+  Stream       input;
+  List         headers;
+  char        *cfs;
+  char        *ext;
+  struct pair *ppair;
   
   ddt(fspec != NULL);
 
+  ListInit(&headers);
+  
 #ifdef PARALLEL_HACK  
   g_scriptname = dup_string(fspec);
 #endif
@@ -120,36 +118,24 @@ int GlobalsInit(char *fspec)
   {
     ext = strstr(cfs,".cgi");
     if (ext == NULL)
-      return(ErrorPush(AppErr,GLOBALINIT,APPERR_CONF,"$",fspec));
+      return(ERR_ERR);
     ext[2] = 'n';
     ext[3] = 'f';
   }
 
-  rc = FileBuffer(&input,cfs,MODE_READ);
-  if (rc != ERR_OKAY)
-    return(ErrorPush(AppErr,GLOBALINIT,APPERR_CONFOPEN,"$",cfs));
-
-  rc = LineBuffer(&linput,input);
-  if (rc != ERR_OKAY)
-    return(ErrorPush(AppErr,GLOBALINIT,APPERR_CONFOPEN,"$",cfs));
+  input = FileStreamRead(cfs);
+  if (input == NULL)
+    return(ERR_ERR);
     
-  while(TRUE)
+  RFC822HeadersRead(input,&headers);
+
+  for
+  (
+    ppair = PairListFirst(&headers);
+    NodeValid(&ppair->node);
+    ppair = (struct pair *)NodeNext(&ppair->node)
+  )
   {
-    char         buffer[BUFSIZ];
-    size_t       size;
-    char        *pt;
-    struct pair *ppair;
-
-    size = sizeof(buffer);
-    LineRead822(linput,buffer,&size);
-    if ((size == 0) || (empty_string(buffer))) break;
-    
-    pt           = buffer;
-    ppair        = PairNew(&pt,':','\0');
-    ppair->name  = up_string(trim_space(ppair->name));
-    if (!empty_string(ppair->value))
-      ppair->value = trim_space(ppair->value);
-    
     if (strcmp(ppair->name,"BASEDIR") == 0)
     {
       g_basedir = dup_string(ppair->value);
@@ -166,8 +152,10 @@ int GlobalsInit(char *fspec)
     }
     else if (strcmp(ppair->name,"FULLBASEURL") == 0)
     {
+#if 0
       char *p = strrchr(ppair->value,'/');
       if (p != NULL) *p = '\0';
+#endif
       g_fullbaseurl = dup_string(ppair->value);
     }
     else if (strcmp(ppair->name,"TEMPLATES") == 0)
@@ -199,6 +187,14 @@ int GlobalsInit(char *fspec)
         g_rssreverse = TRUE;
       else
         g_rssreverse = FALSE;
+    }
+    else if (strcmp(ppair->name,"ATOMTEMPLATES") == 0)
+    {
+      g_atomtemplates = dup_string(ppair->value);
+    }
+    else if (strcmp(ppair->name,"ATOMFILE") == 0)
+    {
+      g_atomfile = dup_string(ppair->value);
     }
     else if (strcmp(ppair->name,"TABFILE") == 0)
     {
@@ -276,10 +272,6 @@ int GlobalsInit(char *fspec)
       p++;	/* skip `:' */
       g_tzmin  = strtoul(p,NULL,10);
     }
-    else if (strcmp(ppair->name,"BACKEND") == 0)
-    {
-      g_backend = dup_string(ppair->value);
-    }
     else if (strcmp(ppair->name,"CONVERSION") == 0)
     {
       set_g_conversion(ppair->value);
@@ -297,13 +289,11 @@ int GlobalsInit(char *fspec)
     {
       /* just here to ensure comments are available */
     }
-    
-    PairFree(ppair);
   }
-  
-  BufferFree(&linput);
-  BufferFree(&input);
-  MemFree(cfs,strlen(cfs) + 1);
+
+  PairListFree(&headers);
+  StreamFree(input);
+  MemFree(cfs);
   return(ERR_OKAY);
 }
 

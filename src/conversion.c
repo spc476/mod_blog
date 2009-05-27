@@ -1,4 +1,3 @@
-
 /*********************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -25,15 +24,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <cgil/memory.h>
-#include <cgil/buffer.h>
-#include <cgil/ddt.h>
-#include <cgil/clean.h>
-#include <cgil/pair.h>
-#include <cgil/nodelist.h>
-#include <cgil/errors.h>
-#include <cgil/util.h>
-#include <cgil/htmltok.h>
+#include <cgilib/memory.h>
+#include <cgilib/ddt.h>
+#include <cgilib/stream.h>
+#include <cgilib/pair.h>
+#include <cgilib/nodelist.h>
+#include <cgilib/errors.h>
+#include <cgilib/types.h>
+#include <cgilib/util.h>
+#include <cgilib/htmltok.h>
 
 #include "conversion.h"
 
@@ -42,9 +41,8 @@
 struct nested_params
 {
   char        *fname;
-  Buffer       in;
-  Buffer       out;
-  Buffer       linput;
+  Stream       in;
+  Stream       out;
   HtmlToken    token;
   int          p;
   int          pre;
@@ -54,156 +52,113 @@ struct nested_params
 
 /**********************************************************************/
 
-static void	text_conversion_backend	(char *,Buffer,Buffer,int);
+static void	text_conversion_backend	(char *,Stream,Stream,int);
 static void	html_handle_tag		(struct nested_params *);
 static void	check_for_uri		(struct nested_params *,const char *);
 static void	entify_char		(char *,size_t,char *,char,const char *);
-static void	print_tag		(struct nested_params *);
 static void	html_handle_string	(struct nested_params *);
 static void	html_handle_comment	(struct nested_params *);
-static void	handle_backquote	(Buffer,Buffer);
-static void	handle_quote		(Buffer,Buffer);
-static void	handle_dash		(Buffer,Buffer);
-static void	handle_period		(Buffer,Buffer);
+static void	handle_backquote	(Stream,Stream);
+static void	handle_quote		(Stream,Stream);
+static void	handle_dash		(Stream,Stream);
+static void	handle_period		(Stream,Stream);
 
 /**********************************************************************/
 
-void text_conversion(char *fname,Buffer in,Buffer output)
+void text_conversion(char *fname,Stream in,Stream out)
 {
-  text_conversion_backend(fname,in,output,TRUE);
+  ddt(fname != NULL);
+  ddt(in    != NULL);
+  ddt(out   != NULL);
+
+  text_conversion_backend(fname,in,out,TRUE);
 }
 
 /**********************************************************************/
 
-static void text_conversion_backend(char *fname,Buffer in,Buffer output,int entities)
+static void text_conversion_backend(char *fname,Stream in,Stream out,int entities)
 {
-  Buffer linebuf;
-  Buffer tmp;
-  char   buffer[BUFSIZ];
-  size_t size;
-  int    rc;
-  
-  ddt(fname  != NULL);
-  ddt(in     != NULL);
-  ddt(output != NULL);
+  Stream  tmpout;
+  char   *line;
+  char   *newline;
 
-  rc = DynamicBuffer(&tmp);
-  if (rc != ERR_OKAY)
-    return;
-      
-  rc = LineBuffer(&linebuf,in);
-  if (rc != ERR_OKAY)
-  {
-    BufferFree(&tmp);
-    return;
-  }
-  
-  while(!BufferEOF(linebuf))
-  {
-    size = BUFSIZ;
-    LineRead(linebuf,buffer,&size);
-    
-    ddtlog(ddtstream,"$","read: %a",buffer);
-    
-    if ((size == 0) || (empty_string(buffer)))
-    {
-      size_t wsize;
-      long   seek;
-      
-      if (BufferSize(tmp) == 0) continue;
-
-      seek = 0;
-      BufferSeek(tmp,&seek,SEEK_START);
-      
-      wsize = 3;
-      BufferWrite(output,"<P>",&wsize);
-      
-      ddtlog(ddtstream,"","about to copy line");
-      BufferCopy(output,tmp);
-
-      wsize = 5;
-      BufferWrite(output,"</P>\n",&wsize);
-      
-      BufferFree(&tmp);
-      DynamicBuffer(&tmp);
-    }
-    else
-    {
-      Buffer intmp;
-      Buffer lintmp;
-
-      /*--------------------------------------------------------
-      ; XXX
-      ; Okay, for smart quotes, we may need to keep some state
-      ; because a starting quote may be on one line, and the 
-      ; ending quote on another line, so we'll need to keep track
-      ; of some state across lines.  Have to think about this ...
-      ;-------------------------------------------------------------*/
-            
-      MemoryBuffer(&intmp,buffer,size);
-      BufferIOCtl(intmp,CM_SETSIZE,size);
-      LineBuffer(&lintmp,intmp);
-      if (entities)
-      {
-	Buffer filter;
-
-	EntityOutBuffer(&filter,tmp);
-	BufferIOCtl(filter,CE_NOAMP);
-	buff_conversion(lintmp,filter,QUOTE_SMART);
-	size = 1;
-	BufferWrite(filter," ",&size);
-	BufferFree(&filter);
-      }
-      else
-      {
-	buff_conversion(lintmp,tmp,QUOTE_SMART);
-	size = 1;
-	BufferWrite(tmp," ",&size);
-      }
-      BufferFree(&lintmp);
-      BufferFree(&intmp);
-    }
-  }
-
-  if (BufferSize(tmp))
-  {
-    size_t wsize;
-    long   seek;
-
-    seek = 0;
-    BufferSeek(tmp,&seek,SEEK_START);
-    wsize = 3;
-    BufferWrite(output,"<P>",&wsize);
-    BufferCopy(output,tmp);
-    wsize = 5;
-    BufferWrite(output,"</P>\n",&wsize);
-  }
-  
-  BufferFree(&linebuf);
-  BufferFree(&tmp);
-}
-
-/***********************************************************************/
-
-void mixed_conversion(char *fname,Buffer in,Buffer out)
-{
-  Buffer tmp;
-  long   loc;
-  
   ddt(fname != NULL);
   ddt(in    != NULL);
   ddt(out   != NULL);
   
-  DynamicBuffer(&tmp);
-  text_conversion_backend(fname,in,tmp,FALSE);
-  loc = 0;
-  BufferSeek(tmp,&loc,SEEK_START);
-  html_conversion(fname,tmp,out);
+  tmpout = StringStreamWrite();
+
+  while(!StreamEOF(in))
+  {
+    line = LineSRead(in);
+
+    if (empty_string(line))
+    {
+      newline = StringFromStream(tmpout);
+      if (!empty_string(newline))
+        LineSFormat(out,"$","<p>%a</p>\n",newline);
+      MemFree(newline);
+      StreamFlush(tmpout);
+    }
+    else
+    {
+      Stream tmpin;
+      Stream filter;
+      
+      tmpin = MemoryStreamRead(line,strlen(line));
+  
+      if (entities)
+      {
+        filter = EntityStreamRead(tmpin,ENTITY_NOAMP);
+        buff_conversion(filter,tmpout,QUOTE_SMART);
+        StreamFree(filter);
+      }
+      else
+        buff_conversion(tmpin,tmpout,QUOTE_SMART);
+  
+      StreamWrite(tmpout,' ');
+      StreamFree(tmpin);
+    }
+    
+    MemFree(line);
+  }
+  
+  newline = StringFromStream(tmpout);
+  if (!empty_string(newline))
+    LineSFormat(out,"$","<p>%a</p>\n",newline);
+  
+  MemFree(newline);
+  StreamFree(tmpout);
 }
+  
+/***********************************************************************/
+
+void mixed_conversion(char *fname,Stream in,Stream out)
+{
+  Stream  tmp;
+  char   *line;
+
+  ddt(fname != NULL);
+  ddt(in    != NULL);
+  ddt(out   != NULL);
+  
+  tmp = StringStreamWrite();
+  text_conversion_backend(fname,in,tmp,FALSE);
+  
+  line = StringFromStream(tmp);
+  StreamFree(tmp);
+  
+  tmp = MemoryStreamRead(line,strlen(line));
+  html_conversion(fname,tmp,out);
+  
+  StreamFree(tmp);
+  MemFree(line);
+}
+
 
 /*************************************************************************/
 
-void html_conversion(char *fname,Buffer in,Buffer out)
+void html_conversion(char *fname,Stream in,Stream out)
 {
   struct nested_params local;
   int                  t;
@@ -220,8 +175,7 @@ void html_conversion(char *fname,Buffer in,Buffer out)
   local.blockquote = FALSE;
   local.list       = FALSE;
   
-  LineBuffer(&local.linput,in);
-  HtmlParseNew(&local.token,local.linput);
+  HtmlParseNew(&local.token,local.in);
   
   while((t = HtmlParseNext(local.token)) != T_EOF)
   {
@@ -234,7 +188,6 @@ void html_conversion(char *fname,Buffer in,Buffer out)
   }
   
   HtmlParseFree(&local.token);
-  BufferFree(&local.linput);
 }
 
 /**********************************************************************/
@@ -348,8 +301,8 @@ static void html_handle_tag(struct nested_params *local)
     if (!local->blockquote)
       local->p = FALSE;
   }
-      
-  print_tag(local);
+  
+  HtmlParsePrintTag(local->token,local->out);
 }
 
 /************************************************************************/
@@ -414,100 +367,39 @@ static void entify_char(char *d,size_t ds,char *s,char e,const char *entity)
 
 /**************************************************************************/
       
-static void print_tag(struct nested_params *local)
-{
-  struct pair *pp;
-  char         tvalue[BUFSIZ];
-  
-  ddt(local != NULL);
-  
-  BufferFormatWrite(local->out,"$","<%a",HtmlParseValue(local->token));
-  for (
-        pp = HtmlParseFirstOption(local->token);
-        NodeValid(&pp->node);
-        pp = (struct pair *)NodeNext(&pp->node)
-      )
-  {
-    char *sq;
-    char *dq;
-    char  q;
-    char *value = pp->value;
-    
-    sq = strchr(value,'\'');
-    dq = strchr(value,'"');
-    
-    if (dq == NULL) 
-      q = '"';
-    else if ((sq == NULL) && (dq != NULL))
-      q = '\'';
-    else
-    {
-      entify_char(tvalue,BUFSIZ,value,'"',"&quot;");
-      value = tvalue;
-      q     = '"';
-    }
-    
-    if ((pp->name) && (!empty_string(pp->name)))
-      BufferFormatWrite(local->out,"$"," %a",pp->name);
-    if ((pp->value) && (!empty_string(pp->value)))
-      BufferFormatWrite(local->out,"c $","=%a%b%a",q,pp->value);
-    else
-      BufferFormatWrite(local->out,"c","=%a%a",q);
-  }
-  
-  {
-    char c   = '>';
-    size_t s = 1;
-    
-    BufferWrite(local->out,&c,&s);
-  }
-}
-
-/**************************************************************************/
-
 static void html_handle_string(struct nested_params *local)
 {
-  char *text = HtmlParseValue(local->token);
+  Stream  in;
+  char   *text = HtmlParseValue(local->token);
   
   ddt(local != NULL);
-  
-  if (*text == '\0') return;
+
+  if (empty_string(text)) return;
 
   if (!local->pre)
   {
-    Buffer tin;
-    Buffer tlin;
-
-    MemoryBuffer(&tin,text,strlen(text));
-    BufferIOCtl(tin,CM_SETSIZE,strlen(text));
-    LineBuffer(&tlin,tin);
-    buff_conversion(tlin,local->out,QUOTE_DUMB);
-    BufferFree(&tlin);
-    BufferFree(&tin);
+    in = MemoryStreamRead(text,strlen(text));
+    buff_conversion(in,local->out,QUOTE_DUMB);
+    StreamFree(in);
   }
   else
-  {
-    BufferFormatWrite(local->out,"$","%a",text);
-  }
+    LineS(local->out,text);
 }
 
 /************************************************************************/
 
 static void html_handle_comment(struct nested_params *local)
 {
-  char *text = HtmlParseValue(local->token);
-  
   ddt(local != NULL);
   
-  BufferFormatWrite(local->out,"$","<!%a>",text);
+  LineSFormat(local->out,"$","<!%a>",HtmlParseValue(local->token));
 }
 
 /**************************************************************************/
 
-void buff_conversion(Buffer in,Buffer out,int quotetype)
+void buff_conversion(Stream in,Stream out,int quotetype)
 {
   char   c;
-  size_t s;
   
   ddt(in  != NULL);
   ddt(out != NULL);
@@ -524,155 +416,137 @@ void buff_conversion(Buffer in,Buffer out,int quotetype)
   ; Okay, use QUOTE_SMART and QUOTE_DUMB when I get back to this.
   ;---------------------------------------------------------------*/
     
-  while(!BufferEOF(in))
+  while(!StreamEOF(in))
   {
-    LineReadC(in,&c);
+    c = StreamRead(in);
     switch(c)
     {
+      case IEOF: break;
       case '`':  handle_backquote(in,out); break;
       case '\'': handle_quote(in,out); break;
       case '-':  handle_dash(in,out); break;
       case '.':  handle_period(in,out); break;
       case '\0': ddt(0);
-      default:
-           s = 1;
-           BufferWrite(out,&c,&s);
-           break;
+      default:   StreamWrite(out,c); break;
     }
   }
 }
 
 /*****************************************************************/
 
-static void handle_backquote(Buffer input,Buffer output)
+static void handle_backquote(Stream input,Stream output)
 {
   char   c;
-  char   co = '`';
-  size_t s;
 
   ddt(input  != NULL);
   ddt(output != NULL);  
 
-  if (LineEOF(input))
+  if (StreamEOF(input))
   {
-    s = 1;
-    BufferWrite(output,&co,&s);
+    StreamWrite(output,'`');
     return;
   }
 
-  LineReadC(input,&c);
+  c = StreamRead(input);
   if (c == '`')
-    BufferFormatWrite(output,"","&#8220;");
+    LineS(output,"&#8220;");
   else
   {
-    s = 1;
-    BufferWrite(output,&co,&s);
-    LineUnReadC(input,c);
+    StreamWrite(output,'`');
+    StreamUnRead(input,c);
   }
 }
 
 /********************************************************************/
 
-static void handle_quote(Buffer input,Buffer output)
+static void handle_quote(Stream input,Stream output)
 {
   char   c;
-  char   co = '\'';
-  size_t s;
   
   ddt(input  != NULL);
   ddt(output != NULL);
   
-  if (LineEOF(input))
+  if (StreamEOF(input))
   {
-    s = 1;
-    BufferWrite(output,&co,&s);
+    StreamWrite(output,'\'');
     return;
   }
 
-  LineReadC(input,&c);
+  c = StreamRead(input);
   if (c == '\'')
-    BufferFormatWrite(output,"","&#8221;");
+    LineS(output,"&#8221;");
   else
   {
-    s = 1;
-    BufferWrite(output,&co,&s);
-    LineUnReadC(input,c);
+    StreamWrite(output,'\'');
+    StreamUnRead(input,c);
   }
 }
 
 /**********************************************************************/
 
-static void handle_dash(Buffer input,Buffer output)
+static void handle_dash(Stream input,Stream output)
 {
   char   c;
-  char   co = '-';
-  size_t s;
     
   ddt(input  != NULL);
   ddt(output != NULL);
   
-  if (LineEOF(input))
+  if (StreamEOF(input))
   {
-    s = 1;
-    BufferWrite(output,&co,&s);
+    StreamWrite(output,'-');
     return;
   }
 
-  LineReadC(input,&c);
+  c = StreamRead(input);
   if (c == '-')
   {
-    LineReadC(input,&c);
+    c = StreamRead(input);
     if (c == '-')
-      BufferFormatWrite(output,"","&#8212;");
+      LineS(output,"&#8212;");
     else
     {
-      BufferFormatWrite(output,"","&#8211;");
-      LineUnReadC(input,c);
+      LineS(output,"&#8211;");
+      StreamUnRead(input,c);
     }
   }
   else
   {
-    s = 1;
-    BufferWrite(output,&co,&s);
-    LineUnReadC(input,c);
+    StreamWrite(output,'-');
+    StreamUnRead(input,c);
   }
 }
 
 /********************************************************************/
 
-static void handle_period(Buffer input,Buffer output)
+static void handle_period(Stream input,Stream output)
 {
   char   c;
-  char   co = '.';
-  size_t s;
   
   ddt(input  != NULL);
   ddt(output != NULL);
   
-  if (LineEOF(input))
+  if (StreamEOF(input))
   {
-    s = 1;
-    BufferWrite(output,&co,&s);
+    StreamWrite(output,'.');
     return;
   }
 
-  LineReadC(input,&c);
+  c = StreamRead(input);
   if (c == '.')
   {
-    LineReadC(input,&c);
+    c = StreamRead(input);
     if (c == '.')
-      BufferFormatWrite(output,"","&#8230;");
+      LineS(output,"&#8230;");
     else
     {
-      BufferFormatWrite(output,"","&#8229;");
-      LineUnReadC(input,c);
+      LineS(output,"&#8229;");
+      StreamUnRead(input,c);
     }
   }
   else
   {
-    s = 1;
-    BufferWrite(output,&co,&s);
-    LineUnReadC(input,c);
+    StreamWrite(output,'.');
+    StreamUnRead(input,c);
   }
 }
 

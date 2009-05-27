@@ -1,4 +1,3 @@
-
 /***********************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -33,235 +32,87 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <cgil/memory.h>
-#include <cgil/ddt.h>
-#include <cgil/htmltok.h>
-#include <cgil/buffer.h>
-#include <cgil/clean.h>
-#include <cgil/util.h>
-#include <cgil/cgi.h>
+#include <cgilib/memory.h>
+#include <cgilib/ddt.h>
+#include <cgilib/htmltok.h>
+#include <cgilib/util.h>
+#include <cgilib/stream.h>
+#include <cgilib/cgi.h>
 
 #include "conf.h"
 #include "blog.h"
 #include "timeutil.h"
 #include "chunk.h"
 #include "wbtum.h"
+#include "frontend.h"
+#include "fix.h"
 #include "globals.h"
 
 #define max(a,b)	((a) > (b)) ? (a) : (b)
 
 /*****************************************************************/
 
-static int	   cgi_main			(Cgi,int,char **);
-static int	   cli_main			(int,char **);
-static int         generate_pages		(void);
-static void	   BlogDatesInit		(void);
-
-static int	   tumbler_page			(FILE *,Tumbler);
 static void	   calculate_previous		(struct tm);
 static void	   calculate_next		(struct tm);
 static const char *mime_type			(char *);
-static int	   display_file			(Tumbler);
-static int	   primary_page			(FILE *,int,int,int);
-static int	   rss_page			(FILE *,int,int,int);
-static int	   tab_page			(FILE *,int,int,int);
-static void	   display_error		(int);
-
-static void	   generic_cb			(const char *,FILE *,void *);
-static void	   cb_blog_url			(FILE *,void *);
-static void	   cb_blog_locallink		(FILE *,void *);
-static void	   cb_blog_body			(FILE *,void *);
-static void	   cb_blog_entry_locallinks	(FILE *,void *);
-static void	   cb_blog_date			(FILE *,void *);
-static void	   cb_blog_fancy		(FILE *,void *);
-static void	   cb_blog_normal		(FILE *,void *);
-static void	   cb_blog_name			(FILE *,void *);
-
-static void	   cb_entry			(FILE *,void *);
-static void	   cb_entry_id			(FILE *,void *);
-static void	   cb_entry_url			(FILE *,void *);
-static void	   cb_entry_date		(FILE *,void *);
-static void	   cb_entry_number		(FILE *,void *);
-static void	   cb_entry_title		(FILE *,void *);
-static void	   cb_entry_class		(FILE *,void *);
-static void	   cb_entry_author		(FILE *,void *);
-static void	   cb_entry_body		(FILE *,void *);
-static void	   cb_cond_hr			(FILE *,void *);
-
-static void	   cb_rss_pubdate		(FILE *,void *);
-static void	   cb_rss_url			(FILE *,void *);
-static void	   cb_item			(FILE *,void *);
-static void	   cb_item_url			(FILE *,void *);
-
-static void	   cb_navigation_link		(FILE *,void *);
-static void        cb_navigation_link_next	(FILE *,void *);
-static void        cb_navigation_link_prev	(FILE *,void *);
-static void	   cb_navigation_current	(FILE *,void *);
-static void	   cb_navigation_current_url	(FILE *,void *);
-static void	   cb_navigation_bar		(FILE *,void *);
-static void	   cb_navigation_bar_next	(FILE *,void *);
-static void	   cb_navigation_bar_prev	(FILE *,void *);
-static void	   cb_navigation_next_url	(FILE *,void *);
-static void	   cb_navigation_prev_url	(FILE *,void *);
-
-static void	   cb_comments			(FILE *,void *);
-static void	   cb_comments_body		(FILE *,void *);
-static void	   cb_comments_filename		(FILE *,void *);
-static void	   cb_comments_check		(FILE *,void *);
-
-static void	   cb_begin_year		(FILE *,void *);
-static void	   cb_now_year			(FILE *,void *);
-static void        cb_update_time               (FILE *,void *);
-static void        cb_update_type               (FILE *,void *);
-static void	   cb_robots_index		(FILE *,void *);
-
-#if 0
-static void	   cb_calendar			(FILE *,void *);
-static void	   cb_calendar_header		(FILE *,void *);
-static void	   cb_calendar_days		(FILE *,void *);
-static void	   cb_calendar_row		(FILE *,void *);
-static void	   cb_calendar_item		(FILE *,void *);
-#endif
-
-static void	   print_nav_url		(FILE *,struct tm *,int);
-static void	   fixup_uri			(BlogDay,HtmlToken,const char *);
+static int	   display_file			(Stream,Tumbler);
+static int	   rss_page			(Stream,int,int,int);
+static int	   tab_page			(Stream,int,int,int);
+static void	   display_error		(Stream,int);
 
 /************************************************************************/
 
-static struct chunk_callback  m_callbacks[] =
+int generate_pages(Request req)
 {
-  { "blog.url"			, cb_blog_url			} ,
-  { "blog.locallink"		, cb_blog_locallink		} ,
-  { "blog.body"			, cb_blog_body			} ,
-  { "blog.entry.locallinks"	, cb_blog_entry_locallinks	} ,
-  { "blog.date"			, cb_blog_date			} ,
-  { "blog.name"			, cb_blog_name			} ,
-  { "blog.date.fancy"		, cb_blog_fancy			} ,
-  { "blog.date.normal"		, cb_blog_normal		} ,
-
-  { "entry"			, cb_entry			} ,
-  { "entry.id"			, cb_entry_id			} ,
-  { "entry.url"			, cb_entry_url			} ,
-  { "entry.date"		, cb_entry_date			} ,
-  { "entry.number"		, cb_entry_number		} ,
-  { "entry.title"		, cb_entry_title		} ,
-  { "entry.class"		, cb_entry_class		} ,
-  { "entry.author"		, cb_entry_author		} ,
-  { "entry.body"		, cb_entry_body			} ,
-  
-  { "comments"			, cb_comments			} ,
-  { "comments.body"		, cb_comments_body		} ,
-  { "comments.filename"		, cb_comments_filename		} ,
-  { "comments.check"		, cb_comments_check		} ,
-  
-  { "cond.hr"			, cb_cond_hr			} ,
-
-  { "rss.pubdate"		, cb_rss_pubdate		} ,
-  { "rss.url"			, cb_rss_url			} ,
-  { "item"			, cb_item			} ,
-  { "item.url"			, cb_item_url			} ,
-  
-  { "navigation.link"		, cb_navigation_link		} ,
-  { "navigation.link.next"	, cb_navigation_link_next	} ,
-  { "navigation.link.prev"	, cb_navigation_link_prev	} ,
-  { "navigation.bar"		, cb_navigation_bar		} ,
-  { "navigation.bar.next"	, cb_navigation_bar_next	} ,
-  { "navigation.bar.prev"	, cb_navigation_bar_prev	} ,
-  { "navigation.next.url"	, cb_navigation_next_url	} ,
-  { "navigation.prev.url"	, cb_navigation_prev_url        } ,
-  { "navigation.current"	, cb_navigation_current		} ,
-  { "navigation.current.url"	, cb_navigation_current_url	} ,
-
-#if 0
-  { "calendar"			, cb_calendar			} ,
-  { "calendar.header"		, cb_calendar_header		} ,
-  { "calendar.days"		, cb_calendar_days		} ,
-  { "calendar.row"		, cb_calendar_row		} ,
-  { "calendar.item"		, cb_calendar_item		} ,
-#endif
-
-  { "begin.year"		, cb_begin_year			} ,
-  { "now.year"			, cb_now_year			} ,
-  
-  { "update.time"               , cb_update_time                } ,
-  { "update.type"               , cb_update_type                } ,
-  
-  { "robots.index"		, cb_robots_index		} ,
-  
-  { NULL			, NULL				} 
-};
-
-#define CALLBACKS	((sizeof(m_callbacks) / sizeof(struct chunk_callback)) - 1)
-
-/*************************************************************************/
-
-void init_display(Display d)
-{
-  assert(d != NULL);
-
-  memset(d,0,sizeof(struct display));
-  d->callbacks = m_callbacks;
-  d->numcb     = CALLBACKS;
-  d->navunit   = INDEX;
-  d->f.navprev = TRUE;
-  d->f.navnext = TRUE;
-}
-
-/**************************************************************************/
-
-static int generate_pages(Request req,Display d)
-{
-  FILE *rssf;
-  int   rc = 0;
+  Stream out;
+  int    rc = 0;
 
   ddt(req != NULL);
-  ddt(d   != NULL);
-  
-  rssf = fopen(g_daypage,"w");
-  if (rssf == NULL) 
+
+  out = FileStreamWrite(g_daypage,FILE_RECREATE);  
+  if (out == NULL) 
   {
-    ErrorPush(AppErr,APPERR_GENPAGE,APPERR_GENPAGE,"$",g_daypage);
-    ErrorLog();
-    return(1);
+    return(ERR_ERR);
   }
-  
-  rc = primary_page(rssf,m_now.tm_year,m_now.tm_mon,m_now.tm_mday);
-  fclose(rssf);
+  rc = primary_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
+  StreamFree(out);
     
   if (g_rsstemplates)
   {
     g_templates = g_rsstemplates;
-    rssf = fopen(g_rssfile,"w");
-    if (rssf == NULL)
-    {
-      ErrorPush(AppErr,APPERR_GENPAGE,APPERR_GENPAGE,"$",g_rssfile);
-      ErrorLog();
-      return(1);
-    }
-    rc = rss_page(rssf,m_now.tm_year,m_now.tm_mon,m_now.tm_mday);
-    fclose(rssf);
+    out         = FileStreamWrite(g_rssfile,FILE_RECREATE);
+    if (out == NULL)
+      return(ERR_ERR);
+    rc = rss_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
+    StreamFree(out);
   }
 
+  if (g_atomtemplates)
+  {
+    g_templates = g_atomtemplates;
+    out         = FileStreamWrite(g_atomfile,FILE_RECREATE);
+    if (out == NULL)
+      return(ERR_ERR);
+    rc = rss_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
+    StreamFree(out);
+  }
+  
   if (g_tabtemplates)
   {
     g_templates = g_tabtemplates;
-    rssf = fopen(g_tabfile,"w");
-    if (rssf == NULL)
-    {
-      ErrorPush(AppErr,APPERR_GENPAGE,APPERR_GENPAGE,"$",g_tabtemplates);
-      ErrorLog();
-      return(1);
-    }
-    
-    rc = tab_page(rssf,m_now.tm_year,m_now.tm_mon,m_now.tm_mday);
-    fclose(rssf);
+    out         = FileStreamWrite(g_tabfile,FILE_RECREATE);
+    if (out == NULL)
+      return(ERR_ERR);
+    rc = tab_page(out,gd.now.tm_year,gd.now.tm_mon,gd.now.tm_mday);
+    StreamFree(out);
   }
+  
   return(rc);
 }
 
 /******************************************************************/
 
-static int tumbler_page(FILE *fpout,Tumbler spec)
+int tumbler_page(Stream out,Tumbler spec)
 {
   struct tm     thisday;
   struct tm     start;
@@ -276,43 +127,27 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
   long          tmpdays;
   void        (*addday) (struct tm *)             = (day_add);
   
-  ddt(fpout != NULL);
-  ddt(spec  != NULL);
+  ddt(out  != NULL);
+  ddt(spec != NULL);
   
-  m_fullurl = FALSE;
+  gd.f.fullurl = FALSE;
   
   /*---------------------------------------------------------
   ; easy checks first.  Get these out of the way ... 
   ;---------------------------------------------------------*/
   
   if (spec->flags.error)
-  {
-    if (m_cgi)
-      display_error(404);
-    else
-      fprintf(stderr,"404 not found\n");
-      
-    return(1);
-  }
+    return(HTTP_NOTFOUND);
   
   if (spec->flags.redirect)
-  {
-    if (m_cgi)
-      display_error(501);
-    else
-      fprintf(stderr,"redirect, work out later\n");
-      
-    return(0);
-  }
+    return(HTTP_NOTIMP);
   
   if (spec->flags.file)
   {
-    return(display_file(spec));
+    display_file(out,spec);
+    return(HTTP_CONTINUE);	/* XXX hack for now */
   }
 
-  if (m_cgi)
-    printf("HTTP/1.0 200\r\nContent-Type: text/html\r\n\r\n");
-      
   ListInit(&listodays);
   
   tm_init(&start);
@@ -326,7 +161,7 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
 
   if (
        (tu1->entry[YEAR]) 
-       && (tu1->entry[YEAR] < (m_begin.tm_year + 1900))
+       && (tu1->entry[YEAR] < (gd.begin.tm_year + 1900))
      ) 
     return(1);
   if (tu1->entry[MONTH] <  0) return(1);
@@ -352,7 +187,7 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
   ;------------------------------------------------------------*/
 
   nu1           = PART;
-  start.tm_year = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , m_begin.tm_year + 1900 : (nu1 = YEAR  , tu1->entry[YEAR]);
+  start.tm_year = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , gd.begin.tm_year + 1900 : (nu1 = YEAR  , tu1->entry[YEAR]);
   start.tm_mon  = (tu1->entry[MONTH] == 0) ? nu1 = YEAR    , 1                      : (nu1 = MONTH , tu1->entry[MONTH]);
   start.tm_mday = (tu1->entry[DAY]   == 0) ? nu1 = MONTH   , 1                      : (nu1 = DAY   , tu1->entry[DAY]);
   start.tm_hour = tu1->entry[PART];
@@ -368,13 +203,13 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
   
   if (tu1->type == TUMBLER_SINGLE)
   {
-    m_navigation = TRUE;
+    gd.f.navigation = TRUE;
     nu2          = PART;
-    end.tm_year  = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , m_now.tm_year + 1900 : tu1->entry[YEAR];
+    end.tm_year  = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , gd.now.tm_year + 1900 : tu1->entry[YEAR];
     end.tm_mon   = (tu1->entry[MONTH] == 0) ? nu2 = MONTH , 12 : tu1->entry[MONTH];
     end.tm_mday  = (tu1->entry[DAY]   == 0) ? nu2 = DAY   , max_monthday(end.tm_year,end.tm_mon) : tu1->entry[DAY];
     end.tm_hour  = (tu1->entry[PART]  == 0) ? nu2 = PART  , 23 : tu1->entry[PART];
-    m_navunit    = nu1;
+    gd.navunit    = nu1;
     
     calculate_previous(start);
     calculate_next(end);
@@ -388,7 +223,7 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
     ; will be set to the their maximum legal value.
     ;-----------------------------------------------------------*/
     
-    end.tm_year = (tu2->entry[YEAR]  == 0) ? m_now.tm_year + 1900 : tu2->entry[YEAR];
+    end.tm_year = (tu2->entry[YEAR]  == 0) ? gd.now.tm_year + 1900 : tu2->entry[YEAR];
     end.tm_mon  = (tu2->entry[MONTH] == 0) ? 12 : tu2->entry[MONTH];
     end.tm_mday = (tu2->entry[DAY]   == 0) ? max_monthday(end.tm_year,end.tm_mon) : tu2->entry[DAY];
     end.tm_hour = (tu2->entry[PART]  == 0) ? 23 : tu2->entry[PART];
@@ -399,7 +234,7 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
     
     if (
          (tu2->entry[YEAR] != 0)
-         && (tu2->entry[YEAR] < (m_begin.tm_year + 1900))
+         && (tu2->entry[YEAR] < (gd.begin.tm_year + 1900))
        )
       return(1);
     if (tu2->entry[MONTH] <  0) return(1);
@@ -448,14 +283,14 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
   
   if (tm_cmp(&end,&start) < 0)
   {
-    m_reverse     = TRUE;
+    gd.f.reverse     = TRUE;
     addday        = (day_sub);
   }
   
-  if (tm_cmp(&start,&m_begin) < 0)
-    start = m_begin;
-  if (tm_cmp(&end,&m_now) > 0)
-    end = m_now;
+  if (tm_cmp(&start,&gd.begin) < 0)
+    start = gd.begin;
+  if (tm_cmp(&end,&gd.now) > 0)
+    end = gd.now;
   
   /*----------------------------------------------------
   ; From here on out, it's pretty straight forward.
@@ -469,10 +304,7 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
     int rc = BlogDayRead(&blog,&thisday);
 
     if (rc != ERR_OKAY)
-    {
-      ErrorClear();
       continue;
-    }
     
     /*------------------------------------------------------------
     ; adjustments for partial days.  The code is ugly because
@@ -484,7 +316,7 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
     
     if (days == tmpdays)
     {
-      if (m_reverse)
+      if (gd.f.reverse)
       {
         if (start.tm_hour <= blog->endentry)
 	  blog->endentry = start.tm_hour - 1;
@@ -495,7 +327,7 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
 
     if (days == 1)		/* because we *can* specify one day ... */
     {
-      if (m_reverse)
+      if (gd.f.reverse)
         blog->stentry = end.tm_hour - 1;
       else
       {
@@ -517,7 +349,7 @@ static int tumbler_page(FILE *fpout,Tumbler spec)
     (*addday)(&thisday);
   }
   
-  generic_cb("main",fpout,&listodays);
+  generic_cb("main",out,&listodays);
   
   for (
         blog = (BlogDay)ListRemHead(&listodays);
@@ -537,59 +369,58 @@ static void calculate_previous(struct tm start)
 {
   tm_to_tm(&start);
   
-  tm_init(&m_previous);
-  m_previous.tm_mday = 1;
-  m_previous.tm_hour = 1;
+  tm_init(&gd.previous);
+  gd.previous.tm_mday = 1;
+  gd.previous.tm_hour = 1;
 
-  switch(m_navunit)
+  switch(gd.navunit)
   {
     case YEAR:
-         if (start.tm_year == m_begin.tm_year)
-           m_navprev = FALSE;
+         if (start.tm_year == gd.begin.tm_year)
+           gd.f.navprev = FALSE;
          else
-           m_previous.tm_year  = start.tm_year - 1;
+           gd.previous.tm_year  = start.tm_year - 1;
          break;
     case MONTH:
          if (
-              (start.tm_year == m_begin.tm_year) 
-              && (start.tm_mon == m_begin.tm_mon)
+              (start.tm_year == gd.begin.tm_year) 
+              && (start.tm_mon == gd.begin.tm_mon)
             )
-           m_navprev = FALSE;
+           gd.f.navprev = FALSE;
          else
          {
-           m_previous.tm_year  = start.tm_year;
-           m_previous.tm_mon   = start.tm_mon;
-           month_sub(&m_previous);
+           gd.previous.tm_year  = start.tm_year;
+           gd.previous.tm_mon   = start.tm_mon;
+           month_sub(&gd.previous);
          }
          break;
     case DAY:
          if (
-              (start.tm_year == m_begin.tm_year) 
-              && (start.tm_mon == m_begin.tm_mon) 
-              && (start.tm_mday == m_begin.tm_mday)
+              (start.tm_year == gd.begin.tm_year) 
+              && (start.tm_mon == gd.begin.tm_mon) 
+              && (start.tm_mday == gd.begin.tm_mday)
             )
-           m_navprev = FALSE;
+           gd.f.navprev = FALSE;
          else
          {
-           m_previous.tm_year  = start.tm_year;
-           m_previous.tm_mon   = start.tm_mon;
-           m_previous.tm_mday  = start.tm_mday;
-           day_sub(&m_previous);
+           gd.previous.tm_year  = start.tm_year;
+           gd.previous.tm_mon   = start.tm_mon;
+           gd.previous.tm_mday  = start.tm_mday;
+           day_sub(&gd.previous);
            
            while(TRUE)
            {
              BlogDay day;
              int     rc;
              
-             mktime(&m_previous);
-             if (tm_cmp(&m_previous,&m_begin) <= 0)
+             mktime(&gd.previous);
+             if (tm_cmp(&gd.previous,&gd.begin) <= 0)
                break;
                
-             rc = BlogDayRead(&day,&m_previous);
+             rc = BlogDayRead(&day,&gd.previous);
              if (rc != ERR_OKAY)
              {
-               ErrorClear();
-               day_sub(&m_previous);
+               day_sub(&gd.previous);
                continue;
              }
              if (day->number)
@@ -599,55 +430,54 @@ static void calculate_previous(struct tm start)
              }
 
              BlogDayFree(&day);
-             day_sub(&m_previous);
+             day_sub(&gd.previous);
            }
-           m_navprev = FALSE;
+           gd.f.navprev = FALSE;
          }
          break;
     case PART:
          if (
-	      (start.tm_year    == m_begin.tm_year) 
-	      && (start.tm_mon  == m_begin.tm_mon) 
-	      && (start.tm_mday == m_begin.tm_mday) 
-	      && (start.tm_hour == m_begin.tm_hour)
+	      (start.tm_year    == gd.begin.tm_year) 
+	      && (start.tm_mon  == gd.begin.tm_mon) 
+	      && (start.tm_mday == gd.begin.tm_mday) 
+	      && (start.tm_hour == gd.begin.tm_hour)
 	    )
-           m_navprev = FALSE;
+           gd.f.navprev = FALSE;
          else
          {
-           m_previous.tm_year  = start.tm_year;
-           m_previous.tm_mon   = start.tm_mon;
-           m_previous.tm_mday  = start.tm_mday;
-           m_previous.tm_hour  = start.tm_hour - 1;
+           gd.previous.tm_year  = start.tm_year;
+           gd.previous.tm_mon   = start.tm_mon;
+           gd.previous.tm_mday  = start.tm_mday;
+           gd.previous.tm_hour  = start.tm_hour - 1;
            
            if (start.tm_hour <= 1)
            {
-             day_sub(&m_previous);
-             m_previous.tm_hour = 23;
+             day_sub(&gd.previous);
+             gd.previous.tm_hour = 23;
            }
            
-           while(tm_cmp(&m_previous,&m_begin) > 0)
+           while(tm_cmp(&gd.previous,&gd.begin) > 0)
            {
              BlogDay day;
              int     rc;
            
-             mktime(&m_previous);
-             rc = BlogDayRead(&day,&m_previous);
+             mktime(&gd.previous);
+             rc = BlogDayRead(&day,&gd.previous);
              if (rc != ERR_OKAY)
              {
-               ErrorClear();
-               day_sub(&m_previous);
+               day_sub(&gd.previous);
                continue;
              }
            
 	     if (day->number == 0)
 	     {
-	       day_sub(&m_previous);
+	       day_sub(&gd.previous);
 	       continue;
 	     }
 
-             if (m_previous.tm_hour > day->number)
-               m_previous.tm_hour = day->number;
-	     if (m_previous.tm_hour == 0) m_previous.tm_hour = 1;
+             if (gd.previous.tm_hour > day->number)
+               gd.previous.tm_hour = day->number;
+	     if (gd.previous.tm_hour == 0) gd.previous.tm_hour = 1;
              BlogDayFree(&day);
              break;
            }
@@ -656,7 +486,7 @@ static void calculate_previous(struct tm start)
     default:
          ddt(0);
   }
-  mktime(&m_previous);
+  mktime(&gd.previous);
 }
 
 /******************************************************************/
@@ -665,58 +495,57 @@ static void calculate_next(struct tm end)
 {
   tm_to_tm(&end);
 
-  tm_init(&m_next);
-  m_next.tm_mday = 1;
-  m_next.tm_hour = 1;
+  tm_init(&gd.next);
+  gd.next.tm_mday = 1;
+  gd.next.tm_hour = 1;
     
-  switch(m_navunit)
+  switch(gd.navunit)
   {
     case YEAR:
-         if (end.tm_year == m_now.tm_year)
-           m_navnext = FALSE;
+         if (end.tm_year == gd.now.tm_year)
+           gd.f.navnext = FALSE;
          else
-           m_next.tm_year  = end.tm_year + 1;
+           gd.next.tm_year  = end.tm_year + 1;
          break;
     case MONTH:
          if (
-              (end.tm_year == m_now.tm_year) 
-              && (end.tm_mon == m_now.tm_mon)
+              (end.tm_year == gd.now.tm_year) 
+              && (end.tm_mon == gd.now.tm_mon)
             )
-           m_navnext = FALSE;
+           gd.f.navnext = FALSE;
          else
          {
-           m_next.tm_year  = end.tm_year;
-           m_next.tm_mon   = end.tm_mon;
-           month_add(&m_next);
+           gd.next.tm_year  = end.tm_year;
+           gd.next.tm_mon   = end.tm_mon;
+           month_add(&gd.next);
          }
          break;
     case DAY:
          if (
-              (end.tm_year == m_now.tm_year) 
-              && (end.tm_mon == m_now.tm_mon) 
-              && (end.tm_mday == m_now.tm_mday)
+              (end.tm_year == gd.now.tm_year) 
+              && (end.tm_mon == gd.now.tm_mon) 
+              && (end.tm_mday == gd.now.tm_mday)
             )
-           m_navnext = FALSE;
+           gd.f.navnext = FALSE;
          else
          {
-           m_next.tm_year  = end.tm_year;
-           m_next.tm_mon   = end.tm_mon;
-           m_next.tm_mday  = end.tm_mday;
-           day_add(&m_next);
+           gd.next.tm_year  = end.tm_year;
+           gd.next.tm_mon   = end.tm_mon;
+           gd.next.tm_mday  = end.tm_mday;
+           day_add(&gd.next);
            
            while(TRUE)
            {
              BlogDay day;
              int     rc;
              
-             mktime(&m_next);
-             if (tm_cmp(&m_next,&m_now) > 0)
+             mktime(&gd.next);
+             if (tm_cmp(&gd.next,&gd.now) > 0)
                break;
-             rc = BlogDayRead(&day,&m_next);
+             rc = BlogDayRead(&day,&gd.next);
              if (rc != ERR_OKAY)
              {
-               ErrorClear();
-               day_add(&m_next);
+               day_add(&gd.next);
                continue;
              }
              if (day->number)
@@ -725,30 +554,30 @@ static void calculate_next(struct tm end)
                return;
              }
              BlogDayFree(&day);
-             day_add(&m_next);
+             day_add(&gd.next);
            }
-           m_navnext = FALSE;
+           gd.f.navnext = FALSE;
          }
          break;
     case PART:
          if (
-              (end.tm_year == m_now.tm_year) 
-              && (end.tm_mon == m_now.tm_mon) 
-              && (end.tm_mday == m_now.tm_mday) 
-              && (end.tm_hour == m_now.tm_hour)
+              (end.tm_year == gd.now.tm_year) 
+              && (end.tm_mon == gd.now.tm_mon) 
+              && (end.tm_mday == gd.now.tm_mday) 
+              && (end.tm_hour == gd.now.tm_hour)
             )
-           m_navnext = FALSE;
+           gd.f.navnext = FALSE;
 	 else
 	 {
-           m_next.tm_year  = end.tm_year;
-           m_next.tm_mon   = end.tm_mon;
-           m_next.tm_mday  = end.tm_mday;
-           m_next.tm_hour  = end.tm_hour + 1;
+           gd.next.tm_year  = end.tm_year;
+           gd.next.tm_mon   = end.tm_mon;
+           gd.next.tm_mday  = end.tm_mday;
+           gd.next.tm_hour  = end.tm_hour + 1;
          
            if (end.tm_hour > 23)
            {
-             day_add(&m_next);
-             m_next.tm_hour = 1;
+             day_add(&gd.next);
+             gd.next.tm_hour = 1;
            }
          
            while(TRUE)
@@ -756,21 +585,20 @@ static void calculate_next(struct tm end)
              BlogDay day;
              int     rc;
            
-             mktime(&m_next);
-             if (tm_cmp(&m_next,&m_now) >= 0)
+             mktime(&gd.next);
+             if (tm_cmp(&gd.next,&gd.now) >= 0)
                break;
-             rc = BlogDayRead(&day,&m_next);
+             rc = BlogDayRead(&day,&gd.next);
              if (rc != ERR_OKAY)
              {
-               ErrorClear();
-               day_add(&m_next);
+               day_add(&gd.next);
                continue;
              }
            
-             if (m_next.tm_hour > day->number)
+             if (gd.next.tm_hour > day->number)
              {
-               day_add(&m_next);
-               m_next.tm_hour = 1;
+               day_add(&gd.next);
+               gd.next.tm_hour = 1;
                continue;
              }
              BlogDayFree(&day);
@@ -781,7 +609,7 @@ static void calculate_next(struct tm end)
     default:
          ddt(0);
   }
-  mktime(&m_next);
+  mktime(&gd.next);
 }
 
 /******************************************************************/
@@ -817,11 +645,12 @@ static const char *mime_type(char *filename)
 
 /******************************************************************/
 
-static int display_file(Tumbler spec)
+static int display_file(Stream out,Tumbler spec)
 {
   TumblerUnit tu;
   char        fname[FILENAME_MAX];
   
+  ddt(out  != NULL);
   ddt(spec != NULL);
 
   tu = (TumblerUnit)ListGetHead(&spec->units);
@@ -835,30 +664,29 @@ static int display_file(Tumbler spec)
            tu->file
          );
          
-  if (m_cgi)
+  if (gd.cgi)
   {
     struct stat  status;
-    FILE        *fp;
+    Stream       in;
     const char  *type;
-    char         buffer[BUFSIZ];
     int          rc;
     
     rc = stat(fname,&status);
     if (rc == -1) 
     {
       if (errno == ENOENT)
-        display_error(404);
+        display_error(out,404);
       else if (errno == EACCES)
-        display_error(403);
+        display_error(out,403);
       else
-        display_error(500);
+        display_error(out,500);
       return(1);
     }
-    
-    fp = fopen(fname,"rb");
-    if (fp == NULL)
+
+    in = FileStreamRead(fname);    
+    if (in == NULL)
     {
-      display_error(404);
+      display_error(out,404);
       return(1);
     }
     
@@ -866,61 +694,53 @@ static int display_file(Tumbler spec)
 
     if (strcmp(type,"text/x-html") == 0)
     {
-      m_htmldump = fp;
-      printf("HTTP/1.0 200\r\nContent-Type: text/html\r\n\r\n");
-      generic_cb("main",stdout,NULL);
+      gd.htmldump = in;
+      LineS(out,"HTTP/1.0 200 Okay\r\nContent-type: text/html\r\n\r\n");
+      generic_cb("main",out,NULL);
     }
     else
     {
-      printf(
-              "HTTP/1.0 200\r\n"
-              "Content-Type: %s\r\n"
-  	      "Content-length: %lu\r\n\r\n",
-	      type,
-	      (unsigned long)status.st_size
+      LineSFormat(
+      		out,
+      		"$ L",
+                "HTTP/1.0 200 Okay\r\n"
+                "Content-type: %a\r\n"
+  	        "Content-length: %b\r\n"
+		"\r\n",
+	        type,
+	        (unsigned long)status.st_size
 	    );
     
-      while(1)
-      {
-        size_t s;
-      
-        s = fread(buffer,sizeof(char),BUFSIZ,fp);
-        if (s == 0) break;
-        fwrite(buffer,sizeof(char),s,stdout);
-      }
+      StreamCopy(out,in);
     }
-    
-    fclose(fp);
+    StreamFree(in);    
   }
   else
   {
-    printf("File to open: %s\n",fname);
+    LineSFormat(out,"$","File to open: %a\n",fname);
   }
   return(ERR_OKAY);
 }
 
 /*****************************************************************/
 
-static int primary_page(FILE *fpout,int year,int month,int iday)
+int primary_page(Stream out,int year,int month,int iday)
 {
   BlogDay   day;
   struct tm thisday;
   int       days;
   List      listodays;
   
-  ddt(fpout != NULL);
+  ddt(out   != NULL);
   ddt(year  >  0);
   ddt(month >  0);
   ddt(month <  13);
   ddt(iday  >  0);
   ddt(iday  <= max_monthday(year,month));
 
-  m_fullurl = FALSE;
-  
-  if (m_cgi)
-    printf("HTTP/1.0 200\r\nContent-Type: text/html\r\n\r\n");
-  
-  m_reverse = TRUE;
+  gd.f.fullurl = FALSE;
+ 
+  gd.f.reverse = TRUE;
     
   tm_init(&thisday);
 
@@ -933,17 +753,13 @@ static int primary_page(FILE *fpout,int year,int month,int iday)
   {
     int rc;
     
-    if (tm_cmp(&thisday,&m_begin) < 0) break;
-    if (tm_cmp(&thisday,&m_now)   > 0) break;
+    if (tm_cmp(&thisday,&gd.begin) < 0) break;
+    if (tm_cmp(&thisday,&gd.now)   > 0) break;
 
     rc = BlogDayRead(&day,&thisday);
     
     if (rc != ERR_OKAY)
-    {
-      ErrorLog();
-      ErrorClear();
       continue;
-    }
     
     if (day->number)
     {
@@ -956,7 +772,7 @@ static int primary_page(FILE *fpout,int year,int month,int iday)
     day_sub(&thisday);
   }
   
-  generic_cb("main",fpout,&listodays);
+  generic_cb("main",out,&listodays);
 
   for (
         day = (BlogDay) ListRemHead(&listodays) ; 
@@ -972,22 +788,22 @@ static int primary_page(FILE *fpout,int year,int month,int iday)
 
 /********************************************************************/
 
-static int rss_page(FILE *fpout,int year, int month, int iday)
+static int rss_page(Stream out,int year, int month, int iday)
 {
   BlogDay   day;
   struct tm thisday;
   int       items;
   List      listodays;
   
-  ddt(fpout != NULL);
+  ddt(out   != NULL);
   ddt(year  >  0);
   ddt(month >  0);
   ddt(month <  13);
   ddt(iday  >  0);
   ddt(iday  <= max_monthday(year,month));
 
-  m_fullurl = TRUE;
-  m_reverse = g_rssreverse;
+  gd.f.fullurl = TRUE;
+  gd.f.reverse = g_rssreverse;
     
   tm_init(&thisday);
 
@@ -999,22 +815,17 @@ static int rss_page(FILE *fpout,int year, int month, int iday)
   {
     int rc;
     
-    if (tm_cmp(&thisday,&m_begin) < 0) break;
-    if (tm_cmp(&thisday,&m_now)   > 0) break;
+    if (tm_cmp(&thisday,&gd.begin) < 0) break;
+    if (tm_cmp(&thisday,&gd.now)   > 0) break;
     
     rc = BlogDayRead(&day,&thisday);
     
     if (rc != ERR_OKAY)
-    {
-      ErrorLog();
-      ErrorClear();
       return(1);
-      continue;			/* what was I thinking? */
-    }
     
     if (day->number)
     {
-      if (m_reverse)
+      if (gd.f.reverse)
         ListAddTail(&listodays,&day->node);
       else
         ListAddHead(&listodays,&day->node);
@@ -1026,7 +837,7 @@ static int rss_page(FILE *fpout,int year, int month, int iday)
     day_sub(&thisday);
   }
   
-  generic_cb("main",fpout,&listodays);
+  generic_cb("main",out,&listodays);
 
   for (
         day = (BlogDay) ListRemHead(&listodays) ; 
@@ -1042,22 +853,22 @@ static int rss_page(FILE *fpout,int year, int month, int iday)
 
 /********************************************************************/
 
-static int tab_page(FILE *fpout,int year, int month, int iday)
+static int tab_page(Stream out,int year, int month, int iday)
 {
   BlogDay   day;
   struct tm thisday;
   int       items;
   List      listodays;
   
-  ddt(fpout != NULL);
+  ddt(out   != NULL);
   ddt(year  >  0);
   ddt(month >  0);
   ddt(month <  13);
   ddt(iday  >  0);
   ddt(iday  <= max_monthday(year,month));
 
-  m_fullurl = FALSE;
-  m_reverse = g_tabreverse;
+  gd.f.fullurl = FALSE;
+  gd.f.reverse = g_tabreverse;
     
   tm_init(&thisday);
 
@@ -1069,21 +880,17 @@ static int tab_page(FILE *fpout,int year, int month, int iday)
   {
     int rc;
     
-    if (tm_cmp(&thisday,&m_begin) < 0) break;
-    if (tm_cmp(&thisday,&m_now)   > 0) break;
+    if (tm_cmp(&thisday,&gd.begin) < 0) break;
+    if (tm_cmp(&thisday,&gd.now)   > 0) break;
     
     rc = BlogDayRead(&day,&thisday);
     
     if (rc != ERR_OKAY)
-    {
-      ErrorLog();
-      ErrorClear();
       continue;
-    }
     
     if (day->number)
     {
-      if (m_reverse)
+      if (gd.f.reverse)
         ListAddTail(&listodays,&day->node);
       else
         ListAddHead(&listodays,&day->node);
@@ -1095,7 +902,7 @@ static int tab_page(FILE *fpout,int year, int month, int iday)
     day_sub(&thisday);
   }
   
-  generic_cb("main",fpout,&listodays);
+  generic_cb("main",out,&listodays);
 
   for (
         day = (BlogDay) ListRemHead(&listodays) ; 
@@ -1111,25 +918,24 @@ static int tab_page(FILE *fpout,int year, int month, int iday)
 
 /*******************************************************************/
 
-static void display_error(int err)
+static void display_error(Stream out,int err)
 {
-  fprintf(
-           stdout,
-           "HTTP/1.0 %d\r\n"
-           "Content-type: text/html\r\n"
-           "\r\n"
-           "<html>\r\n"
-           "<head>\r\n"
-           "<title>Error %d</title>\r\n"
-           "</head>\r\n"
-           "<body>\r\n"
-           "<h1>Error %d</h1>\r\n"
-           "</body>\r\n"
-           "</html>\r\n"
-           "\r\n",
-           err,
-           err,
-           err
+  LineSFormat(
+  	out,
+  	"i",
+        "HTTP/1.0 %a Error\r\n"
+        "Content-type: text/html\r\n"
+        "\r\n"
+        "<html>\n"
+        "<head>\n"
+        "<title>Error %a</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "<h1>Error %a</h1>\n"
+        "</body>\n"
+        "</html>\n"
+        "\n",
+        err
          );
 }
 

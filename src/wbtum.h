@@ -1,4 +1,3 @@
-
 /*********************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -24,7 +23,7 @@
 #ifndef WBTUM_H
 #define WBTUM_H
 
-#include <cgil/nodelist.h>
+#include <cgilib/nodelist.h>
 
 /**********************************************************************/
 

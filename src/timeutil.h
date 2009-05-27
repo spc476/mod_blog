@@ -1,4 +1,3 @@
-
 /********************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -26,7 +25,7 @@
 
 #include <time.h>
 
-const char		*const nth		(unsigned long);
+const char	*const nth	(unsigned long);
 int		 max_monthday	(int,int);
 void		 month_add	(struct tm *);
 void		 day_add	(struct tm *);

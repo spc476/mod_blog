@@ -1,15 +1,34 @@
+/************************************************************************
+*
+* Copyright 2005 by Sean Conner.  All Rights Reserved.
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*
+* Comments, questions and criticisms can be sent to: sean@conman.org
+*
+*************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include <cgil/memory.h>
-#include <cgil/buffer.h>
-#include <cgil/ddt.h>
-#include <cgil/clean.h>
-#include <cgil/errors.h>
-#include <cgil/cgi.h>
-#include <cgil/util.h>
+#include <cgilib/memory.h>
+#include <cgilib/ddt.h>
+#include <cgilib/errors.h>
+#include <cgilib/cgi.h>
+#include <cgilib/util.h>
+#include <cgilib/stream.h>
 
 #include "conf.h"
 #include "globals.h"
@@ -27,7 +46,19 @@
 
 /*************************************************************************/
 
-#ifdef USE_GDBM
+#if defined(USE_NONE)
+
+  int authenticate_author(Request req)
+  {
+    ddt(req         != NULL);
+    ddt(req->author != NULL);
+    
+    return(strcmp(req->author,g_author) == 0);
+  }
+  
+/************************************************************************/
+    
+#elif defined(USE_GDBM)
 
   int authenticate_author(Request req)
   {
@@ -108,7 +139,7 @@
         p = strchr(p,':');
         if (p == NULL)
         {
-          MemFree(tmp,key.size + 1);
+          MemFree(tmp);
           return(TRUE);
         }
         p++;
@@ -134,7 +165,7 @@
       ;------------------------------------------------------*/
  
       m_author = dup_string(p);
-      MemFree(tmp,key.size + 1);
+      MemFree(tmp);
     }
 
     return(TRUE);
@@ -144,69 +175,86 @@
 
 #elif defined (USE_HTPASSWD)
 
-  static size_t breakline(char **dest,size_t dsize,FILE *fpin)
+  static size_t breakline(char **dest,size_t dsize,Stream in)
   {
-    static char buffer[BUFSIZ];	/* non-thread-safe! */
-    char        *p;
-    char        *nl;
-    size_t       cnt;
+    char  **tmp;
+    char   *line;
+    char   *p;
+    char   *colon;
+    size_t  cnt;
     
-    p = fgets(buffer,sizeof(buffer),fpin);
-    if (p == NULL) return(0);
-
-    nl = strchr(buffer,'\n');	/* remove trailing newline */
-    if (nl) *nl = '\0';
-
-    for (cnt = 0 ; cnt < dsize ; cnt++)
+    line = LineSRead(in);
+    if (empty_string(line))
     {
-      dest[cnt] = p;
-      p = strchr(p,':');
-      if (p == NULL) return(cnt + 1);
-      *p++ = '\0';
+      MemFree(line);
+      return(0);
     }
-    return(cnt);
-  }
 
+    tmp = MemAlloc(sizeof(char *) * dsize);
+    p   = line;
+    cnt = 0;
+    
+    do
+    {
+      tmp[cnt] = p;
+      colon    = strchr(p,':');
+      if (colon != NULL)
+      {
+        *colon = '\0';
+        p      = colon + 1;
+      }
+      cnt++;
+    } while ((colon != NULL) && (cnt < dsize));
+    
+    dsize = cnt;
+    
+    for (cnt = 0 ; cnt < dsize ; cnt++)
+      dest[cnt] = dup_string(tmp[cnt]);
+ 
+    MemFree(tmp);
+    MemFree(line);
+    return(dsize);
+  }
+  
   /*------------------------------------------------------*/
 
   int authenticate_author(Request req)
   {
-    FILE   *fpin;
-    char   *lines[10];	/* 10 fields max */
+    Stream  in;
+    char   *lines[10];
     size_t  cnt;
-
+    
     ddt(req         != NULL);
     ddt(req->author != NULL);
     
     if (g_authorfile == NULL)
-      return (strcmp(req->author,g_author) == 0);
- 
-    fpin = fopen(g_authorfile,"r");
-    if (fpin == NULL)
+      return(strcmp(req->author,g_author) == 0);
+    
+    in = FileStreamRead(g_authorfile);
+    if (in == NULL)
       return(FALSE);
- 
-    while((cnt = breakline(lines,10,fpin)))
+    
+    while((cnt = breakline(lines,10,in)))
     {
       if (strcmp(req->author,lines[0]) == 0)
       {
-        /*--------------------------------------------------
-        ; A potential memory leak---see the comment above in 
+        /*----------------------------------------------
+        ; A potential memory leak---see the comment above in
         ; the USE_DB version of this routine
-        ;---------------------------------------------------*/
+        ;----------------------------------------------------*/
         
         if (cnt >= 3)
         {
           req->name   = req->author;
           req->author = dup_string(lines[2]);
-
-          fclose(fpin);
+          StreamFree(in);
           return(TRUE);
         }
       }
-      fclose(fpin);
-      return(FALSE);
     }
-    return(TRUE);
+
+    StreamFree(in);
+    return(FALSE);
   }
 
 #endif

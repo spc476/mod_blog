@@ -1,4 +1,3 @@
-
 /**************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -21,10 +20,8 @@
 *
 ******************************************************************/
 
-#if 0
-#if !defined(__unix__) || !defined(__MACH__)
+#ifndef __unix__
 #  error This code is Unix specific.  You have been warned.
-#endif
 #endif
 
 #include <stdlib.h>
@@ -34,9 +31,11 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
+#include <signal.h>
 
-#include <cgil/pair.h>
-#include <cgil/ddt.h>
+#include <cgilib/pair.h>
+#include <cgilib/ddt.h>
+#include <cgilib/util.h>
 
 /*******************************************************************/
 
@@ -95,6 +94,22 @@ int SystemLimit(struct pair *data)
       return(1);
     else
       return(0);
+  }
+  else if (strcmp(data->name,"_SYSTEM-IGNORE") == 0)
+  {
+    struct sigaction act;
+    struct sigaction oact;
+    int              sig;
+
+    act.sa_handler = SIG_IGN;
+    sigemptyset(&act.sa_mask);
+    up_string(data->value);
+    if (strcmp(data->value,"SIGTERM") == 0)
+      sig = SIGTERM;
+    else
+      return(0);
+
+    return(sigaction(sig,&act,&oact));
   }
   else
     return(0);  

@@ -1,4 +1,3 @@
-
 /***************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -30,15 +29,23 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <cgil/ddt.h>
-#include <cgil/buffer.h>
-#include <cgil/errors.h>
-#include <cgil/memory.h>
-#include <cgil/util.h>
+#include <cgilib/ddt.h>
+#include <cgilib/errors.h>
+#include <cgilib/memory.h>
+#include <cgilib/util.h>
 
 #include "conf.h"
 #include "blog.h"
 #include "globals.h"
+
+/**********************************************************************/
+
+static char	*filename_from_date	(char *,const char *,size_t,struct tm *);
+static int	 date_check		(struct tm *);
+static int	 date_checkcreate	(struct tm *);
+static Stream	 efile_open_r		(const char *,struct tm *);
+static Stream	 efile_open_sw		(const char *,const char *);
+static Stream	 efile_open_iw		(int,const char *);
 
 /***********************************************************************/
 
@@ -49,10 +56,7 @@ int (BlogInit)(void)
   umask(DEFAULT_PERMS);
   rc = chdir(g_basedir);
   if (rc != 0)
-  {
-    ErrorPush(KernErr,KERNCHDIR,errno,"$",g_basedir);
-    return(ErrorPush(AppErr,BLOGINIT,errno,""));
-  }
+    return(ERR_ERR);
   
   return(ERR_OKAY);
 }
@@ -76,7 +80,14 @@ int (BlogLock)(const char *lf)
   lockdata.l_len    = 0;
   
   rc = fcntl(fh,F_SETLKW,&lockdata);
-  return (rc == 0);
+
+  if (rc < 0)
+  {
+    close(fh);
+    return(-1);
+  }
+
+  return (fh);
 }
 
 /***********************************************************************/
@@ -88,8 +99,8 @@ int (BlogUnlock)(int lock)
   
   ddt(lock > 0);
   
-  lockdata.l_type = F_UNLCK;
-  lockdata.l_start = 0;
+  lockdata.l_type   = F_UNLCK;
+  lockdata.l_start  = 0;
   lockdata.l_whence = SEEK_SET;
   lockdata.l_len    = 0;
   
@@ -105,6 +116,26 @@ int (BlogUnlock)(int lock)
 
 /***********************************************************************/
 
+static char *filename_from_date(char *out,const char *name,size_t size,struct tm *date)
+{
+  ddt(out  != NULL);
+  ddt(name != NULL);
+  ddt(size >  0);
+  ddt(date != NULL);
+  
+  sprintf(
+  	out,
+  	"%04d/%02d/%02d/%s",
+  	date->tm_year + 1900,
+  	date->tm_mon  + 1,
+  	date->tm_mday,
+  	name
+  );
+  return(out);
+}
+
+/***********************************************************************/
+
 static int date_check(struct tm *date)
 {
   int         rc;
@@ -113,8 +144,6 @@ static int date_check(struct tm *date)
   
   strftime(tname,FILENAME_LEN,"%Y/%m/%d",date);
   rc = stat(tname,&status);
-  if (rc != 0)
-    ErrorPush(KernErr,KERNSTAT,errno,"$",tname);
   return(rc);
 }
 
@@ -133,10 +162,10 @@ static int date_checkcreate(struct tm *date)
   if (rc != 0)
   {
     if (errno != ENOENT) 
-      return(ErrorPush(KernErr,KERNACCESS,errno,"$",tname));
+      return(ERR_ERR);
     rc = mkdir(tname,0777);
     if (rc != 0)
-      return(ErrorPush(KernErr,KERNMKDIR,errno,"$",tname));
+      return(ERR_ERR);
   }
   
   strftime(tname,FILENAME_LEN,"%Y/%m",date);
@@ -144,10 +173,10 @@ static int date_checkcreate(struct tm *date)
   if (rc != 0)
   {
     if (errno != ENOENT)
-      return(ErrorPush(KernErr,KERNACCESS,errno,"$",tname));
+      return(ERR_ERR);
     rc = mkdir(tname,0777);
     if (rc != 0)
-      return(ErrorPush(KernErr,KERNMKDIR,errno,"$",tname));
+      return(ERR_ERR);
   }
   
   strftime(tname,FILENAME_LEN,"%Y/%m/%d",date);
@@ -155,59 +184,53 @@ static int date_checkcreate(struct tm *date)
   if (rc != 0)
   {
     if (errno != ENOENT)
-      return(ErrorPush(KernErr,KERNACCESS,errno,"$",tname));
+      return(ERR_ERR);
     rc = mkdir(tname,0777);
     if (rc != 0)
-      return(ErrorPush(KernErr,KERNACCESS,errno,"$",tname));
+      return(ERR_ERR);
   }
   return(ERR_OKAY);
 }
 
 /************************************************************************/
 
-static FILE *efile_open(const char *name,const char *mode,struct tm *date)
+static Stream efile_open_r(const char *name,struct tm *date)
 {
-  char  buffer[FILENAME_MAX];
-  
+  Stream in;
+  char   buffer[FILENAME_MAX];
+ 
   ddt(name != NULL);
-  ddt(mode != NULL);
   ddt(date != NULL);
-  
-  sprintf(
-           buffer,
-           "%4d/%02d/%02d/%s",
-           date->tm_year + 1900,
-           date->tm_mon + 1,
-           date->tm_mday,
-           name
-         );
-  return(fopen(buffer,mode));
+ 
+  filename_from_date(buffer,name,FILENAME_MAX,date);
+  in = FileStreamRead(buffer);
+  if (in == NULL)
+    in = StreamNewRead();
+  return(in);
 }
 
 /************************************************************************/
 
-static FILE *efile_open_s(const char *name,const char *mode,char *date)
+static Stream efile_open_sw(const char *name,const char *date)
 {
-  char  buffer[FILENAME_MAX];
+  char buffer[FILENAME_MAX];
   
   ddt(name != NULL);
-  ddt(mode != NULL);
   ddt(date != NULL);
   
   sprintf(buffer,"%s/%s",date,name);
-  return(fopen(buffer,mode));
+  return(FileStreamWrite(buffer,FILE_CREATE));
 }
-/************************************************************************/
 
-static FILE *efile_open_i(int num,const char *mode,const char *date)
+/*************************************************************************/
+
+static Stream efile_open_iw(int num,const char *date)
 {
-  char  buffer[FILENAME_MAX];
+  char buffer[FILENAME_MAX];
   
-  ddt(mode != NULL);
   ddt(date != NULL);
-  
   sprintf(buffer,"%s/%d",date,num);
-  return(fopen(buffer,mode));
+  return(FileStreamWrite(buffer,FILE_CREATE));
 }
 
 /**************************************************************************/
@@ -217,9 +240,9 @@ int (BlogDayRead)(BlogDay *pdat,struct tm *pdate)
   char       date[FILENAME_LEN];
   BlogDay    dat;
   BlogEntry  entry;
-  FILE      *fptitles;
-  FILE      *fpclass;
-  FILE      *fpauthors;
+  Stream     stitles;
+  Stream     sclass;
+  Stream     sauthors;
   char      *title;
   char      *class;
   char      *author;
@@ -228,6 +251,7 @@ int (BlogDayRead)(BlogDay *pdat,struct tm *pdate)
   ddt(pdate != NULL);
   
   strftime(date,FILENAME_LEN,"%Y/%m/%d",pdate);
+
   dat           = MemAlloc(sizeof(struct blogday));
   dat->number   = 0;
   dat->curnum   = 0;
@@ -245,115 +269,88 @@ int (BlogDayRead)(BlogDay *pdat,struct tm *pdate)
     ; LogDay.  Only later, when we attempt to actually create the
     ; entry will an error be returned.
     ;------------------------------------------------------------*/
-    ErrorLog();  
-    ErrorClear();
     return(ERR_OKAY);
   }
-    
-  fptitles  = efile_open("titles","r",pdate);
-  fpclass   = efile_open("class","r",pdate);
-  fpauthors = efile_open("authors","r",pdate);
-  
-  if ((fptitles == NULL) && (fpclass == NULL) && (fpauthors == NULL))
+
+  stitles  = efile_open_r("titles",pdate);
+  sclass   = efile_open_r("class",pdate);
+  sauthors = efile_open_r("authors",pdate);
+   
+#if 0
+  if ((stitles == NULL) && (sclass == NULL) && (sauthors == NULL))
   {
     /*------------------------------------------------
     ; same condition as above, really
     ;------------------------------------------------*/
-    
+
     return(ERR_OKAY);
   }
-  
+#endif
+
   /*-------------------------------------------------
   ; Now, we have either both files open, or only one
   ; of the two.  This isn't that critical of an error,
   ; but for the sake of mistakes, we'll press on.
   ;--------------------------------------------------*/
   
-  while((fptitles != NULL) || (fpclass != NULL) || (fpauthors != NULL))
+  while(!StreamEOF(stitles) || !StreamEOF(sclass) || !StreamEOF(sauthors))
   {
-    char buffer[BUFSIZ];
-    
-    if (fptitles)
-    {
-      memset(buffer,0,sizeof(buffer));
-      if (fgets(buffer,BUFSIZ,fptitles) == NULL)
-      {
-        fclose(fptitles);
-        fptitles = NULL;
-      }
-      title = dup_string(remove_ctrl(buffer));
-    }
+    if (!StreamEOF(stitles))
+      title = LineSRead(stitles);
     else
       title = dup_string("");
-    
-    if (fpclass)
-    {
-      memset(buffer,0,sizeof(buffer));
-      if (fgets(buffer,BUFSIZ,fpclass) == NULL)
-      {
-        fclose(fpclass);
-        fpclass = NULL;
-      }
-      class = dup_string(remove_ctrl(buffer));
-    }
+      
+    if (!StreamEOF(sclass))
+      class = LineSRead(sclass);
     else
       class = dup_string("");
-
-    if (fpauthors)
-    {
-      memset(buffer,0,sizeof(buffer));
-      if (fgets(buffer,BUFSIZ,fpauthors) == NULL)
-      {
-        fclose(fpauthors);
-        fpauthors = NULL;
-      }
-      author = dup_string(remove_ctrl(buffer));
-    }
+    
+    if (!StreamEOF(sauthors))
+      author = LineSRead(sauthors);
     else
-      author = dup_string(g_author);
-      
-    if ((fptitles == NULL) && (fpclass == NULL) && (fpauthors == NULL)) break;      
+      author = dup_string("");
+    
     BlogEntryNew(&entry,title,class,author,NULL,0);
     BlogDayEntryAdd(dat,entry);
   }
-
-  if (fpauthors) fclose(fpauthors);  
-  if (fpclass)   fclose(fpclass);
-  if (fptitles)  fclose(fptitles);
+  
+  StreamFree(sauthors);
+  StreamFree(sclass);
+  StreamFree(stitles);
   return(ERR_OKAY);
 }
-    
+
 /*********************************************************************/    
 
 int (BlogDayWrite)(BlogDay day)
 {
-  FILE      *fptitles;
-  FILE      *fpclass;
-  FILE      *fpauthors;
-  BlogEntry  entry;
-  int        i;
-  int        rc;
-
-  if (date_checkcreate(&day->tm_date))
-    return(ErrorPush(AppErr,BLOGDAYWRITE,APPERR_OPEN,"$",day->date));
+  Stream    stitles;
+  Stream    sclass;
+  Stream    sauthors;
+  BlogEntry entry;
+  int       i;
+  int       rc;
   
-  fptitles = efile_open_s("titles","w",day->date);
-  if (fptitles == NULL)
-    return(ErrorPush(AppErr,BLOGDAYWRITE,APPERR_OPEN,"$ $",day->date,"titles"));
+  if (date_checkcreate(&day->tm_date))
+    return(ERR_ERR);
+  
+  stitles = efile_open_sw("titles",day->date);
+  if (stitles == NULL)
+    return(ERR_ERR);
     
-  fpclass  = efile_open_s("class","w",day->date);
-  if (fpclass == NULL)
+  sclass  = efile_open_sw("class",day->date);
+  if (sclass == NULL)
   {
-    fclose(fptitles);
-    return(ErrorPush(AppErr,BLOGDAYWRITE,APPERR_OPEN,"$ $",day->date,"class"));
+    StreamFree(stitles);
+    return(ERR_ERR);
   }
   
-  fpauthors = efile_open_s("authors","w",day->date);
-  if (fpauthors == NULL)
+  sauthors = efile_open_sw("authors",day->date);
+  if (sauthors == NULL)
   {
-    fclose(fpclass);
-    fclose(fptitles);
-    return(ErrorPush(AppErr,BLOGDAYWRITE,APPERR_OPEN,"$ $",day->date,"authors"));
+    StreamFree(sclass);
+    StreamFree(stitles);
+    return(ERR_ERR);
   }
   
   for (i = 0 ; i < day->number ; i++)
@@ -364,19 +361,20 @@ int (BlogDayWrite)(BlogDay day)
       rc = BlogEntryWrite(entry);
       if (rc != ERR_OKAY)
       {
-        fclose(fptitles);
-        fclose(fpclass);
-        return(ErrorPush(AppErr,BLOGDAYWRITE,APPERR_WRITE,""));
+        StreamFree(sauthors);
+        StreamFree(sclass);
+        StreamFree(stitles);
+        return(ERR_ERR);
       }
     }
-    fprintf(fptitles,"%s\n",entry->title);
-    fprintf(fpclass,"%s\n",entry->class);
-    fprintf(fpauthors,"%s\n",entry->author);
+    LineSFormat(stitles, "$","%a\n",entry->title);
+    LineSFormat(sclass,  "$","%a\n",entry->class);
+    LineSFormat(sauthors,"$","%a\n",entry->author);
   }
-  
-  fclose(fpauthors);
-  fclose(fpclass);
-  fclose(fptitles);
+
+  StreamFree(sauthors);
+  StreamFree(sclass);
+  StreamFree(stitles);  
   return(ERR_OKAY);
 }
 
@@ -394,8 +392,8 @@ int (BlogDayFree)(BlogDay *pdb)
   for (i = 0 ; i < day->number ; i++)
     BlogEntryFree(&day->entries[i]);
   
-  MemFree(day->date,strlen(day->date) + 1);
-  MemFree(day,sizeof(struct blogday));
+  MemFree(day->date);
+  MemFree(day);
   *pdb = NULL;
   return(ERR_OKAY);
 }
@@ -443,32 +441,30 @@ int (BlogEntryRead)(BlogEntry entry)
 {
   struct stat status;
   int         rc;
+  Stream      in;
   char        fname[FILENAME_LEN];
-  Buffer      file;
   size_t      size;
   
   sprintf(fname,"%s/%d",entry->date,entry->number);
   rc = stat(fname,&status);
   if (rc != 0)
-  {
-    ErrorPush(KernErr,KERNSTAT,errno,"$",fname);
-    return(ErrorPush(AppErr,BLOGENTRYREAD,errno,"$",fname));
-  }
+    return(ERR_ERR);
   
   entry->body = MemAlloc(status.st_size + 1);
   memset(entry->body,0,status.st_size + 1);
-  rc = FileBuffer(&file,fname,MODE_READ);
-  if (rc != ERR_OKAY)
-    return(ErrorPush(AppErr,BLOGENTRYREAD,rc,"$",fname));
-    
-  size = status.st_size;
-  rc = BufferRead(file,entry->body,&size);
-  if (rc != ERR_OKAY)
-    return(ErrorPush(AppErr,BLOGENTRYREAD,rc,"$",fname));
+  in = FileStreamRead(fname);
+  if (in == NULL)
+  {
+    MemFree(entry->body);
+    return(ERR_ERR);
+  }
+
+  for ( size = 0 ; size < status.st_size ; size++)
+    ((char *)entry->body)[size] = StreamRead(in);
   
   ((char *)entry->body)[size] = '\0';
   entry->bsize = size;
-  BufferFree(&file);
+  StreamFree(in);
   return(ERR_OKAY);
 }
 
@@ -476,20 +472,19 @@ int (BlogEntryRead)(BlogEntry entry)
 
 int (BlogEntryWrite)(BlogEntry entry)
 {
-  FILE   *fp;
-  size_t  size;
+  Stream out;
+  size_t size;
   
   ddt(entry != NULL);
   
-  fp = efile_open_i(entry->number,"w",entry->date);
-  if (fp == NULL)
-    return(ErrorPush(AppErr,BLOGENTRYWRITE,APPERR_OPEN,"$ i",entry->date,entry->number));
+  out = efile_open_iw(entry->number,entry->date);
+  if (out == NULL)
+    return(ERR_ERR);
   
-  size = fwrite(entry->body,sizeof(char),entry->bsize,fp);
-  if (size != entry->bsize)
-    return(ErrorPush(AppErr,BLOGENTRYWRITE,APPERR_WRITE,"$ i",entry->date,entry->number));
-    
-  fclose(fp);
+  for (size = 0 ; size < entry->bsize ; size++)
+    StreamWrite(out,((char *)entry->body)[size]);
+
+  StreamFree(out);    
   return(ERR_OKAY);
 }
 
@@ -514,12 +509,12 @@ int (BlogEntryFree)(BlogEntry *pentry)
 
   entry = *pentry;
   
-  MemFree(entry->date,  strlen(entry->date) + 1);
-  MemFree(entry->title, strlen(entry->title) + 1);
-  MemFree(entry->class, strlen(entry->class) + 1);
-  MemFree(entry->author,strlen(entry->author) + 1);
-  MemFree(entry->body,  entry->bsize);
-  MemFree(entry,        sizeof(struct blogentry));
+  if (entry->date)   MemFree(entry->date);
+  if (entry->title)  MemFree((char *)entry->title);
+  if (entry->class)  MemFree((char *)entry->class);
+  if (entry->author) MemFree((char *)entry->author);
+  if (entry->body)   MemFree(entry->body);
+  MemFree(entry);
   *pentry = NULL;
   return(ERR_OKAY);
 }

@@ -1,4 +1,3 @@
-
 /*********************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -28,16 +27,15 @@
 
 #include <gdbm.h>
 
-#include <cgil/memory.h>
-#include <cgil/buffer.h>
-#include <cgil/ddt.h>
-#include <cgil/clean.h>
-#include <cgil/errors.h>
-#include <cgil/nodelist.h>
-#include <cgil/htmltok.h>
-#include <cgil/util.h>
-#include <cgil/pair.h>
-#include <cgil/cgi.h>
+#include <cgilib/memory.h>
+#include <cgilib/ddt.h>
+#include <cgilib/stream.h>
+#include <cgilib/errors.h>
+#include <cgilib/nodelist.h>
+#include <cgilib/htmltok.h>
+#include <cgilib/util.h>
+#include <cgilib/pair.h>
+#include <cgilib/cgi.h>
 
 #include "conf.h"
 #include "blog.h"
@@ -48,110 +46,96 @@
 #include "globals.h"
 #include "fix.h"
 
-/***********************************************************************/
+/*********************************************************************/
 
-void fix_entry(Request req)
+int entry_add(Request req)
 {
-  Buffer in;
-  Buffer lin;
-  Buffer out;
-  char   tmpbuf[65536UL];
-  int    rc;
- 
-  ddt(req != NULL);
+  struct tm date;
+  BlogDay   day;
+  BlogEntry entry;
+  int       lock;
   
-  memset(tmpbuf,0,sizeof(tmpbuf));
-  rc = MemoryBuffer(&out,tmpbuf,sizeof(tmpbuf));
-  rc = MemoryBuffer(&in,req->title,strlen(req->title));
-  BufferIOCtl(in,CM_SETSIZE,strlen(req->title));
-  LineBuffer(&lin,in);
-  buff_conversion(lin,out,QUOTE_SMART);
+  ddt(req != NULL);
+    
+  if ((req->date == NULL) || (empty_string(req->date)))
+  {
+    time_t t;
+    struct tm *now;
+    
+    t = time(NULL);
+    now = localtime(&t);
+    date = *now;
+  }
+  else
+  {
+    char *p;
+    
+    date.tm_sec   = 0;
+    date.tm_min   = 0;
+    date.tm_hour  = 1;
+    date.tm_wday  = 0;
+    date.tm_yday  = 0;
+    date.tm_isdst = -1;
+    date.tm_year  = strtoul(req->date,&p,10); p++;
+    date.tm_mon   = strtoul(p,&p,10); p++;
+    date.tm_mday  = strtoul(p,NULL,10);
+    tm_to_tm(&date);
+  }
+  
+  fix_entry(req);
 
-  BufferFree(&lin);
-  BufferFree(&in); 
-  BufferFree(&out);
- 
-  MemFree(req->title,strlen(req->title) + 1);
-  req->title = dup_string(tmpbuf);
-
-  memset(tmpbuf,0,sizeof(tmpbuf));
-  rc = MemoryBuffer(&out,tmpbuf,sizeof(tmpbuf));
-  rc = MemoryBuffer(&in,req->body,strlen(req->body));
-  BufferIOCtl(in,CM_SETSIZE,strlen(req->body));
- 
-  (*g_conversion)("body",in,out);
-
-  BufferFree(&in); 
-  BufferFree(&out);
- 
-  MemFree(req->body,strlen(req->body) + 1);
-  req->body = dup_string(tmpbuf);
+  if (g_authorfile) lock = BlogLock(g_lockfile);
+  BlogDayRead(&day,&date);
+  BlogEntryNew(&entry,req->title,req->class,req->author,req->body,strlen(req->body));
+  BlogDayEntryAdd(day,entry);
+  BlogDayWrite(day);
+  BlogDayFree(&day);
+  if (g_authorfile) BlogUnlock(lock);
+  
+  return(ERR_OKAY);
 }
 
 /************************************************************************/
 
-void collect_body(Buffer output,Buffer input)
+void fix_entry(Request req)
 {
-  HtmlToken token;
-  int       rc;
-  int       t;
-
-  ddt(output != NULL);
-  ddt(input  != NULL);
- 
-  rc = HtmlParseNew(&token,input);
-  if (rc != ERR_OKAY)
-  {
-    ErrorPush(AppErr,CBBODY,rc,"");
-    ErrorLog();
-    ErrorClear();
-    return;
-  }
- 
-  while((t = HtmlParseNext(token)) != T_EOF)
-  {
-    if (t == T_TAG)
-    {
-      struct pair *pp;
- 
-      if (strcmp(HtmlParseValue(token),"/HTML") == 0) break;
-      if (strcmp(HtmlParseValue(token),"/BODY") == 0) break;
-      BufferFormatWrite(output,"$","<%a",HtmlParseValue(token));
-      for (
-            pp = HtmlParseFirstOption(token);
-            NodeValid(&pp->node);
-            pp = (struct pair *)NodeNext(&pp->node)
-          )
-      {
-        if (pp->name && !empty_string(pp->name))
-          BufferFormatWrite(output,"$"," %a",pp->name);
-        if (pp->value && !empty_string(pp->value))
-          BufferFormatWrite(output,"$","=\"%a\"",pp->value);
-      }
-      BufferFormatWrite(output,"",">");
-    }
-    else if (t == T_STRING)
-    {
-      size_t s = strlen(HtmlParseValue(token));
-      BufferWrite(output,HtmlParseValue(token),&s);
-    }
-    else if (t == T_COMMENT)
-    {
-      BufferFormatWrite(output,"$","<!%a>",HtmlParseValue(token));
-    }
-  }
-
-  HtmlParseFree(&token);    
+  Stream in;
+  Stream out;
+  
+  out = StringStreamWrite();
+  
+  /*-------------------
+  ; convert the title
+  ;--------------------*/
+  
+  in  = MemoryStreamRead(req->title,strlen(req->title));
+  buff_conversion(in,out,QUOTE_SMART);
+  StreamFree(in);
+  MemFree(req->title);
+  req->title = StringFromStream(out);
+  
+  StreamFlush(out);
+  
+  /*--------------
+  ; convert body
+  ;----------------*/
+  
+  in = MemoryStreamRead(req->body,strlen(req->body));
+  (*g_conversion)("body",in,out);
+  StreamFree(in);
+  MemFree(req->body);
+  req->body = StringFromStream(out);
+  
+  StreamFree(out);
 }
 
-/***********************************************************************/
+/************************************************************************/
 
 static char *headers[] = 
 {
   "",
-  "User-agent: mod_blog/R13 (addentry-1.22 http://boston.conman.org/about)\r\n",
-  "Accept: text/html\r\n",
-  "\r\n",
+  "User-agent: mod_blog/R14 (addentry-2.0 http://boston.conman.org/about)",
+  "Accept: text/html",
   NULL
 };
 
@@ -164,10 +148,9 @@ void notify_weblogcom(void)
   char    *blogurl;
   char    *nfile;
   int      rc;
-  char     buffer[BUFSIZ];
+  int      c;
   size_t   size;
   size_t   fsize;
-  int      fh;
 
   fsize      = 6 + strlen(g_email) + 2 + 1;
   headers[0] = MemAlloc(fsize);
@@ -190,24 +173,20 @@ void notify_weblogcom(void)
  
   nfile = MemAlloc(strlen(url->file) + 1 + strlen(query) + 1);
   sprintf(nfile,"%s?%s",url->file,query);
-  MemFree(url->file,strlen(url->file) + 1);
-  MemFree(query,size);
+  MemFree(url->file);
+  MemFree(query);
   url->file = nfile;
  
   rc = HttpOpen(&conn,GET,url,(const char **)headers);
   if (rc != ERR_OKAY)
-  {
-    ErrorClear();
     return;
-  }
- 
-  BufferIOCtl(HttpBuffer(conn),CF_HANDLE,&fh);
- 
-  while(read(fh,buffer,sizeof(buffer)) > 0)
-    ;
+
+  while(!StreamEOF(HttpStreamRead(conn)))
+    c = StreamRead(HttpStreamRead(conn));
+  
   HttpClose(&conn);
   UrlFree((URL *)&url);
-  MemFree(headers[0],fsize);
+  MemFree(headers[0]);
 }
 
 /*************************************************************************/

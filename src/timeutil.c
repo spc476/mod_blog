@@ -1,4 +1,3 @@
-
 /************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -25,7 +24,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <cgil/ddt.h>
+#include <cgilib/ddt.h>
 
 #include "timeutil.h"
 

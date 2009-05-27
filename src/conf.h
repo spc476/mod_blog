@@ -1,4 +1,3 @@
-
 /**************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -25,8 +24,8 @@
 #define CONF_H
 
 #include <limits.h>
-#include <cgil/pair.h>
-#include <cgil/errors.h>
+#include <cgilib/pair.h>
+#include <cgilib/errors.h>
 
 /*****************************************************************
 *
@@ -68,11 +67,13 @@
 
 /*-----------------------------------------------------------------------
 ; Define one of the following:
+;	USE_NONE	- only the author listed in the config can post
 ;	USE_GDBM	- use the GNU Database manipulation routines
 ;	USE_DB		- use the Berkeley Database manipulation routines
 ;	USE_HTPASSWD	- use the Apache htpassword format file
 ;--------------------------------------------------------------------------*/
 
+#undef USE_NONE
 #undef USE_GDBM
 #undef USE_DB
 #define USE_HTPASSWD
@@ -84,42 +85,11 @@
 *
 *********************************************************************/
 
-#define AppErr		"BOS"
-
 #ifdef _POSIX_PATH_MAX
 #  define FILENAME_LEN	_POSIX_PATH_MAX
 #else
 #  define FILENAME_LEN 255
 #endif
-
-#define BLOGINIT		(ERR_APP + 0)
-#define BLOGDAYREAD		(ERR_APP + 1)
-#define BLOGDAYWRITE		(ERR_APP + 2)
-#define BLOGENTRYADD		(ERR_APP + 3)
-#define BLOGENTRYREAD		(ERR_APP + 4)
-#define BLOGENTRYWRITE		(ERR_APP + 5)
-
-#define APPERR_OPEN		(ERR_APP + 1)
-#define APPERR_WRITE		(ERR_APP + 2)
-#define APPERR_CONF		(ERR_APP + 3)
-#define APPERR_CONFOPEN		(ERR_APP + 4)
-#define APPERR_BLOGINIT		(ERR_APP + 5)
-#define APPERR_GENPAGE		(ERR_APP + 6)
-#define APPERR_NOBACKEND	(ERR_APP + 7)
-
-#define CHUNKPROCESS		(ERR_APP + 6)
-#define CHUNKERR_OPEN		(ERR_APP + 3)
-
-#define GLOBALINIT		(ERR_APP + 10)
-
-#define DISPLAYENTRYSTRING	(ERR_APP + 10)
-
-#define REQUESTERR_BADDAY	(ERR_APP + 10)
-#define REQUESTERR_BADMONTH	(ERR_APP + 11)
-#define REQUESTERR_BADYEAR	(ERR_APP + 12)
-#define REQUESTERR_UNITS	(ERR_APP + 13)
-
-#define ADDENTRY_MAIN		(ERR_APP + 14)
 
 #endif
 

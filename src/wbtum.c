@@ -1,4 +1,3 @@
-
 /*************************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -25,12 +24,12 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-#include <cgil/memory.h>
-#include <cgil/ddt.h>
-#include <cgil/nodelist.h>
-#include <cgil/errors.h>
-#include <cgil/types.h>
-#include <cgil/util.h>
+#include <cgilib/memory.h>
+#include <cgilib/ddt.h>
+#include <cgilib/nodelist.h>
+#include <cgilib/errors.h>
+#include <cgilib/types.h>
+#include <cgilib/util.h>
 
 #include "wbtum.h"
 
@@ -79,7 +78,7 @@ int (TumblerNew)(Tumbler *pt,char **pstr)
   if (t->flags.error)
   {
     TumblerFree(&t);
-    return(ERR_NOMEMORY);
+    return(ERR_ERR);
   }
   
   *pt = t;
@@ -104,10 +103,10 @@ int (TumblerFree)(Tumbler *pt)
         tu = (TumblerUnit)ListRemHead(&t->units)
       )
   {
-    if (tu->file) MemFree(tu->file,strlen(tu->file) + 1);
-    MemFree(tu,sizeof(struct tumunit));
+    if (tu->file) MemFree(tu->file);
+    MemFree(tu);
   }
-  MemFree(t,sizeof(struct tumbler));
+  MemFree(t);
   *pt = NULL;
   return(ERR_OKAY);
 }
@@ -570,8 +569,8 @@ static int tumbler_normalize(Tumbler t)
     {
       ddt(base != last);		/* make sure we do good testing */
       NodeRemove(&current->node);
-      if (current->file) MemFree(current->file,strlen(current->file) + 1);
-      MemFree(current,sizeof(struct tumunit));
+      if (current->file) MemFree(current->file);
+      MemFree(current);
       t->flags.redirect = TRUE;
       current = last;
     }

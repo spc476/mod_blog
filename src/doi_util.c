@@ -21,9 +21,10 @@
 *****************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
-#include <cgil/ddt.h>
+#include <cgilib/ddt.h>
 
 #define SENDMAIL	"/usr/sbin/sendmail"
 

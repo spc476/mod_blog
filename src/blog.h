@@ -1,4 +1,3 @@
-
 /*******************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -26,8 +25,8 @@
 
 #include <time.h>
 
-#include <cgil/nodelist.h>
-#include <cgil/errors.h>
+#include <cgilib/nodelist.h>
+#include <cgilib/errors.h>
 
 /*******************************************************************/
 

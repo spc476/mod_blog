@@ -1,3 +1,24 @@
+/************************************************************************
+*
+* Copyright 2005 by Sean Conner.  All Rights Reserved.
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*
+* Comments, questions and criticisms can be sent to: sean@conman.org
+*
+*************************************************************************/
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -5,13 +26,16 @@
 
 #include <getopt.h>
 
-#include <cgil/memory.h>
-#include <cgil/buffer.h>
-#include <cgil/ddt.h>
-#include <cgil/clean.h>
-#include <cgil/errors.h>
-#include <cgil/cgi.h>
-#include <cgil/util.h>
+#include <cgilib/memory.h>
+#include <cgilib/ddt.h>
+#include <cgilib/stream.h>
+#include <cgilib/pair.h>
+#include <cgilib/errors.h>
+#include <cgilib/htmltok.h>
+#include <cgilib/rfc822.h>
+#include <cgilib/http.h>
+#include <cgilib/cgi.h>
+#include <cgilib/util.h>
 
 #include "conf.h"
 #include "globals.h"
@@ -20,12 +44,6 @@
 #include "timeutil.h"
 #include "wbtum.h"
 #include "fix.h"
-
-#define MAILSETUPDATA	(ERR_APP + 1)
-#define SETUPERR_INPUT	(ERR_APP + 2)
-#define FILESETUPDATA	(ERR_APP + 3)
-#define SETUPERR_AUTH	(ERR_APP + 4)
-#define SETUPERR_MEMORY	(ERR_APP + 5)
 
 enum
 {
@@ -44,13 +62,13 @@ enum
 
 /*******************************************************************/
 
-int		cmd_cli_new		(Request);
-int		cmd_cli_show		(Request);
-void		get_cli_command		(Request,char *);
+static int	cmd_cli_new		(Request);
+static int	cmd_cli_show		(Request);
+static void	get_cli_command		(Request,char *);
 static int	mail_setup_data		(Request);
-static int	file_setup_data		(Request);
 static int	mailfile_readdata	(Request);
-int		cli_error		(Request,char *, ... );
+static void	collect_body		(Stream,Stream);
+static int	cli_error		(Request,int,char *,char *, ... );
 
 /*************************************************************************/
 
@@ -75,18 +93,16 @@ static const struct option coptions[] =
 int main_cli(int argc,char *argv[])
 {
   struct request  req;
-  char           *config;
+  char           *config = NULL;
   int             rc;
   
   memset(&req,0,sizeof(struct request));
 
   req.command    = cmd_cli_show;
   req.error      = cli_error;
-  req.fpin       = stdin;
-  req.fpout      = stdout;
-
-  StdinBuffer (&req.bin);
-  StdoutBuffer(&req.bout);
+  req.in         = StdinStream;
+  req.out        = StdoutStream;
+  gd.req         = &req;
   
   while(1)
   {
@@ -102,6 +118,7 @@ int main_cli(int argc,char *argv[])
            config = optarg;
            break;
       case OPT_FILE:
+           req.in = FileStreamRead(optarg);
            req.f.filein = TRUE;
            break;
       case OPT_EMAIL:
@@ -128,22 +145,40 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_HELP:
       default:
-           return ((*req.error)(&req,"%s - unknown option or help",argv[0]));
+           LineSFormat(
+	   	StderrStream,
+		"$",
+		"usage: %a --options... \n"
+		"\t--config file\n"
+		"\t--regenerate | --regen\n"
+		"\t--cmd ('new' | 'show')\n"
+		"\t--file file\n"
+		"\t--email\n"
+		"\t--update ('new' | 'modify' | 'template' | 'other')\n"
+		"\t--entry <tumbler>\n"
+		"\t--stdin\n"
+		"\t--help\n"
+		"\t--debug\n",
+		argv[0]
+	      );
+	    return(EXIT_FAILURE);
     }
   }
 
   if (config == NULL)
-    return((*req.error)(&req,"no configuration file specified"));
+    return((*req.error)(&req,HTTP_ISERVERERR,"","no configuration file specified"));
   
   rc = GlobalsInit(config);
   if (rc != ERR_OKAY)
-  {
-    ErrorLog();
-    return((*req.error)(&req,"could not open cofiguration file %s",config));
-  }
+    return((*req.error)(&req,HTTP_ISERVERERR,"","could not open cofiguration file %s",config));
   
-  BlogInit();
-  BlogDatesInit();
+  rc = BlogInit();
+  if (rc != ERR_OKAY)
+    return((*req.error)(&req,HTTP_ISERVERERR,"","could not initialize blog"));
+
+  rc = BlogDatesInit();
+  if (rc != ERR_OKAY)
+    return((*req.error)(&req,HTTP_ISERVERERR,"","could not initialize dates"));
   
   rc = (*req.command)(&req);
   return(rc);  
@@ -151,12 +186,12 @@ int main_cli(int argc,char *argv[])
 
 /************************************************************************/
 
-int cmd_cli_new(Request req)
+static int cmd_cli_new(Request req)
 {
   int rc;
   
   ddt(req         != NULL);
-  ddt(req.f.cgiin == FALSE);
+  ddt(req->f.cgiin == FALSE);
 
   /*-------------------------------------------------
   ; req.f.stdin and req.f.filein may be uneeded
@@ -165,17 +200,12 @@ int cmd_cli_new(Request req)
   if (req->f.emailin)
     rc = mail_setup_data(req);
   else
-    rc = file_setup_data(req);
+    rc = mailfile_readdata(req);
   
   if (rc != ERR_OKAY)
-  {
-    ErrorLog();
-    ErrorClear();
     return(EXIT_FAILURE);
-  }
 
   rc = entry_add(req);
-
   if (rc == ERR_OKAY)
   {
     generate_pages(req);  
@@ -188,80 +218,33 @@ int cmd_cli_new(Request req)
 
 /****************************************************************************/
 
-int entry_add(Request req)
-{
-  struct tm date;
-  BlogDay   day;
-  BlogEntry entry;
-  int       lock;
-  
-  ddt(req != NULL);
-    
-  if ((req->date == NULL) || (empty_string(req->date)))
-  {
-    time_t t;
-    struct tm *now;
-    
-    t = time(NULL);
-    now = localtime(&t);
-    date = *now;
-  }
-  else
-  {
-    char *p;
-    
-    date.tm_sec   = 0;
-    date.tm_min   = 0;
-    date.tm_hour  = 1;
-    date.tm_wday  = 0;
-    date.tm_yday  = 0;
-    date.tm_isdst = -1;
-    date.tm_year  = strtoul(req->date,&p,10); p++;
-    date.tm_mon   = strtoul(p,&p,10); p++;
-    date.tm_mday  = strtoul(p,NULL,10);
-    tm_to_tm(&date);
-  }
-  
-  fix_entry(req);
-
-  if (g_authorfile) lock = BlogLock(g_lockfile);
-  BlogDayRead(&day,&date);
-  BlogEntryNew(&entry,req->title,req->class,req->author,req->body,strlen(req->body));
-  BlogDayEntryAdd(day,entry);
-  BlogDayWrite(day);
-  BlogDayFree(&day);
-  if (g_authorfile) BlogUnlock(lock);
-  
-  return(ERR_OKAY);
-}
-
-/************************************************************************/
-
-int cmd_cli_show(Request req)
+static int cmd_cli_show(Request req)
 {
   int rc;
   
-  ddt(req           != NULL);
-  ddt(req.f.stdin   == FALSE);
-  ddt(req.f.emailin == FALSE);
-  ddt(req.f.filein  == FALSE);
-  ddt(req.f.update  == FALSE);
+  ddt(req            != NULL);
+  ddt(req->f.emailin == FALSE);
+  ddt(req->f.filein  == FALSE);
+  ddt(req->f.update  == FALSE);
 
   if (req->f.regenerate)
     rc = generate_pages(req);  
   else
   {
     if (req->reqtumbler == NULL)
-    {
-      /* ??? */
-    }
+      rc = primary_page(
+      		req->out,
+		gd.now.tm_year,
+		gd.now.tm_mon,
+		gd.now.tm_mday
+	);
     else
     {
       rc = TumblerNew(&req->tumbler,&req->reqtumbler);
       if (rc == ERR_OKAY)
-        rc = tumbler_page(req->fpout,req->tumbler);
+        rc = tumbler_page(req->out,req->tumbler);
       else
-        rc = (*req->error)(req,"tumbler error---nothing found");
+        rc = (*req->error)(req,HTTP_NOTFOUND,"","tumbler error---nothing found");
     }
   }
 
@@ -270,17 +253,18 @@ int cmd_cli_show(Request req)
 
 /********************************************************************/
 
-void get_cli_command(Request req,char *value)
+static void get_cli_command(Request req,char *value)
 {
   ddt(req != NULL);
 
-  if (value == NULL) return;
-  if (empty_string(value)) return;
+  if (emptynull_string(value)) return;
   up_string(value);
   
   if (strcmp(value,"NEW") == 0)
     req->command = cmd_cli_new;
   else if (strcmp(value,"SHOW") == 0)
+    req->command = cmd_cli_show;
+  else if (strcmp(value,"PREVIEW") == 0)
     req->command = cmd_cli_show;
 }
 
@@ -288,125 +272,122 @@ void get_cli_command(Request req,char *value)
 
 static int mail_setup_data(Request req)
 {
-  int    rc;
-  size_t size;
-  char   data[BUFSIZ];
+  List  headers;
+  char *line;
   
-  ddt(req != NULL);
-  ddt(req.f.emailin == TRUE);
+  ddt(req            != NULL);
+  ddt(req->f.emailin == TRUE);
+
+  ListInit(&headers);
   
-  rc = LineBuffer(&req->lbin,req->bin);
-  if (rc != ERR_OKAY)
-    return(ErrorPush(AppErr,MAILSETUPDATA,SETUPERR_INPUT,""));
-  
-  size = BUFSIZ;
-  LineRead(req->lbin,data,&size);	/* skip Unix 'From ' line */
+  line = LineSRead(req->in);		/* skip Unix 'From ' line */
+  MemFree(line);  
   
   /*----------------------------------------------
   ; skip the header section for now---just ignore it
   ;-------------------------------------------------*/
-  
-  do
-  {
-    size = BUFSIZ;
-    LineRead822(req->lbin,data,&size);
-  } while ((size != 0) && (!empty_string(data)));
-  
+
+  RFC822HeadersRead(req->in,&headers);
+  PairListFree(&headers);
+
   return(mailfile_readdata(req));
 }
-
-/*******************************************************************/
-
-static int file_setup_data(Request req)
-{
-  int rc;
   
-  rc = LineBuffer(&req->lbin,req->bin);
-  if (rc != ERR_OKAY)
-    return(ErrorPush(AppErr,FILESETUPDATA,SETUPERR_INPUT,""));
-  
-  return(mailfile_readdata(req));
-}
-
 /*******************************************************************/
 
 static int mailfile_readdata(Request req)
 {
-  char         data       [BUFSIZ];
-  char         megabuffer [65536UL];
-  char        *pt;
-  struct pair *ppair;
-  size_t       size;
-  Buffer       output;
-  int          rc;
+  Stream  output;
+  List    headers;
+  char   *email;
+  char   *filter;
 
-  ddt(req      != NULL);
-  ddt(req.lbin != NULL);
+  ddt(req     != NULL);
+  ddt(req->in != NULL);
+
+  ListInit(&headers);
+  RFC822HeadersRead(req->in,&headers);
+
+  req->author = PairListGetValue(&headers,"AUTHOR");
+  req->title  = PairListGetValue(&headers,"TITLE");
+  req->class  = PairListGetValue(&headers,"CLASS");
+  req->date   = PairListGetValue(&headers,"DATE");
+  email       = PairListGetValue(&headers,"EMAIL");
+  filter      = PairListGetValue(&headers,"FILTER");
   
-  memset(megabuffer,0,sizeof(megabuffer));
- 
-  /*--------------------------------------------
-  ; now read the user supplied header
-  ;--------------------------------------------*/
+  if (req->author != NULL) req->author = dup_string(req->author);
 
-  while(TRUE)
-  {
-    size = BUFSIZ;
-    LineRead822(req->lbin,data,&size);
+  if (req->title  != NULL) 
+    req->title  = dup_string(req->title);
+  else
+    req->title = dup_string("");
 
-    /*------------------------------------
-    ; break this up, it might not be working
-    ; correctly ... 
-    ;------------------------------------*/
+  if (req->class  != NULL) 
+    req->class  = dup_string(req->class);
+  else
+    req->class = dup_string("");
 
-    if (size == 0) break;
-    if (empty_string(data)) break;
+  if (req->date   != NULL) req->date = dup_string(req->date);
+  if (email       != NULL) set_g_emailupdate(email);
+  if (filter      != NULL) set_g_conversion(filter);
 
-    pt           = data;
-    ppair        = PairNew(&pt,':','\0');
-    ppair->name  = up_string(trim_space(ppair->name));
-    ppair->value = trim_space(ppair->value);
-
-    if (strcmp(ppair->name,"AUTHOR") == 0)
-      req->author = dup_string(ppair->value);
-    else if (strcmp(ppair->name,"TITLE") == 0)
-      req->title = dup_string(ppair->value);
-    else if (strcmp(ppair->name,"SUBJECT") == 0)
-      req->title = dup_string(ppair->value);
-    else if (strcmp(ppair->name,"CLASS") == 0)
-      req->class = dup_string(ppair->value);
-    else if (strcmp(ppair->name,"DATE") == 0)
-      req->date = dup_string(ppair->value);
-    else if (strcmp(ppair->name,"EMAIL") == 0)
-      set_g_emailupdate(ppair->value);
-    else if (strcmp(ppair->name,"FILTER") == 0)
-      set_g_conversion(ppair->value);      
-    PairFree(ppair);
-  }
-
+  PairListFree(&headers);	/* got everything we need, dump this */
+  
   if (authenticate_author(req) == FALSE)
   {
-    BufferFree(&req->lbin);
-    BufferFree(&req->bin);
-    return(ErrorPush(AppErr,MAILSETUPDATA,SETUPERR_AUTH,""));
+    StreamFree(req->in);
+    return(ERR_ERR);
   }
-
-  rc = MemoryBuffer(&output,megabuffer,sizeof(megabuffer));
-  if (rc != ERR_OKAY)
-    return(ErrorPush(AppErr,MAILSETUPDATA,SETUPERR_MEMORY,""));
-
-  collect_body(output,req->lbin);
-  BufferFree(&output);
-  req->body = dup_string(megabuffer);
-
+  
+  output = StringStreamWrite();
+  collect_body(output,req->in);
+  req->origbody = StringFromStream(output);
+  req->body     = dup_string(req->origbody);
+  StreamFree(output);
   return(ERR_OKAY);
 }
 
 /***************************************************************************/
 
-int cli_error(Request req,char *msg, ... )
+static void collect_body(Stream output,Stream input)
 {
-  return(ERR_OKAY);
+  HtmlToken token;
+  int       rc;
+  int       t;
+  
+  rc = HtmlParseNew(&token,input);
+  if (rc != ERR_OKAY)
+    return;
+  
+  while((t = HtmlParseNext(token)) != T_EOF)
+  {
+    if (t == T_TAG)
+    {
+      if (strcmp(HtmlParseValue(token),"/HTML") == 0) break;
+      if (strcmp(HtmlParseValue(token),"/BODY") == 0) break;
+      HtmlParsePrintTag(token,output);
+    }
+    else if (t == T_STRING)
+      LineS(output,HtmlParseValue(token));
+    else if (t == T_COMMENT)
+      LineSFormat(output,"$","<!%a>",HtmlParseValue(token));
+  }
+
+  HtmlParseFree(&token);
+}
+
+/***********************************************************************/
+
+static int cli_error(Request req,int level,char *format,char *msg, ... )
+{
+  va_list args;
+  
+  va_start(args,msg);
+  LineSFormat(StderrStream,"i3.3","Error %a: ",level);
+  LineSFormatv(StderrStream,format,msg,args);
+  StreamWrite(StderrStream,'\n');
+  va_end(args);
+  return(ERR_ERR);
 }
 
 /**************************************************************************/

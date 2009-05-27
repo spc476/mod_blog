@@ -1,8 +1,30 @@
+/************************************************************************
+*
+* Copyright 2005 by Sean Conner.  All Rights Reserved.
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*
+* Comments, questions and criticisms can be sent to: sean@conman.org
+*
+*************************************************************************/
 
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
-#include <cgil/cgi.h>
+#include <time.h>
+#include <cgilib/cgi.h>
 #include "wbtum.h"
 
 typedef struct rflags
@@ -19,21 +41,19 @@ typedef struct rflags
 typedef struct request
 {
   int     (*command)(struct request *);
-  int     (*error)  (struct request *,char *, ... );
+  int     (*error)  (struct request *,int,char *,char *, ... );
   RFlags    f;
   Cgi       cgi;
-  Buffer    bin;
-  Buffer    lbin;
-  Buffer    bout;
-  Buffer    lbout;
-  FILE     *fpin;
-  FILE     *fpout;
+  Stream    in;
+  Stream    out;
   char     *update;
+  char     *origauthor;
   char     *author;
   char     *name;
   char     *title;
   char     *class;
   char     *date;
+  char     *origbody;
   char     *body;
   char     *reqtumbler;
   Tumbler  tumbler;
@@ -47,15 +67,16 @@ typedef struct dflags
   unsigned int navigation : 1;
   unsigned int navprev    : 1;
   unsigned int navnext    : 1;
+  unsigned int edit       : 1;
 } DFlags;
 
 typedef struct display
 {
-  struct chunk_callback *callbacks;
-  size_t                 numcb;
   DFlags                 f;
   int                    navunit;
-  FILE                  *htmldump;
+  Stream                 htmldump;
+  Cgi                    cgi;
+  Request                req;
   struct tm              begin;
   struct tm              now;
   struct tm              updatetime;

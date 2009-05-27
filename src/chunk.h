@@ -1,4 +1,3 @@
-
 /****************************************************************
 *
 * Copyright 2001 by Sean Conner.  All Rights Reserved.
@@ -24,14 +23,14 @@
 #ifndef BLOG_CHUNK
 #define BLOG_CHUNK
 
-#include <stdio.h>
+#include <cgilib/stream.h>
 
 /*********************************************************************/
 
 struct chunk_callback
 {
   const char *const name;
-  void (*callback)(FILE *fp,void *);
+  void (*callback)(Stream,void *);
 };
 
 typedef struct chunk
@@ -44,7 +43,7 @@ typedef struct chunk
 /*********************************************************************/
 
 int	 (ChunkNew)		(Chunk *,const char *,struct chunk_callback *,size_t);
-int	 (ChunkProcess)		(Chunk,const char *,FILE *,void *);
+int	 (ChunkProcess)		(Chunk,const char *,Stream,void *);
 int	 (ChunkFree)		(Chunk);
 
 #endif
