@@ -230,7 +230,7 @@ void notify_emaillist(void)
     if (content.dptr != NULL)
     {
       email->to = content.dptr;
-      SendEmail(email);
+      EmailSend(email);
 #if 0
       send_message(c_email,NULL,content.dptr,c_emailsubject,c_emailmsg);
 #endif
