@@ -58,6 +58,22 @@ static int	cgi_error		(Request,int,char *,char *, ... );
 
 /*************************************************************************/
 
+int main_cgi_head(Cgi cgi,int argc,char *argv[])
+{
+  struct request req;
+  int            rc;
+  
+  ddt(cgi != NULL);
+  
+  rc = cgi_init(cgi,&req);
+  if (rc != ERR_OKAY)
+    return((*req.error)(&req,HTTP_ISERVERERR,"","cgi_init() failed"));
+  
+  return((*req.error)(&req,HTTP_METHODNOTALLOWED,"","","HEAD method not supported"));
+}
+
+/**********************************************************************/
+
 int main_cgi_get(Cgi cgi,int argc,char *argv[])
 {
   struct request  req;

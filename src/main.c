@@ -59,6 +59,7 @@ int main(int argc,char *argv[])
     {
       case GET:  rc = main_cgi_get (cgi,argc,argv); break;
       case POST: rc = main_cgi_post(cgi,argc,argv); break;
+      case HEAD: rc = main_cgi_head(cgi,argc,argv); break;
       default:   rc = EXIT_FAILURE;
     }
   }

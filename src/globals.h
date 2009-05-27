@@ -83,6 +83,7 @@ void		set_c_updatetype	(char *);
 void		set_gf_emailupdate	(char *);
 void		set_c_conversion	(char *);
 
+int		main_cgi_head		(Cgi,int,char *[]);
 int		main_cgi_get		(Cgi,int,char *[]);
 int		main_cgi_post		(Cgi,int,char *[]);
 int		main_cli		(int,char *[]);
