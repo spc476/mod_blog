@@ -119,17 +119,24 @@ static int cmd_cgi_get_new(Request req)
 
 static int cmd_cgi_get_show(Request req)
 {
-  int rc;
+  char *status;
+  int   rc;
   
   ddt(req != NULL);
   
+  status = CgiListGetValue(req->cgi,"status");
+  if (emptynull_string(status))
+    status = dup_string("200");
+  
   if ((empty_string(req->reqtumbler)) || (strcmp(req->reqtumbler,"/") == 0))
   {
-    LineS(
+    LineSFormat(
     	req->out,
-	"Status: 200\r\n"
+    	"$",
+	"Status: %a\r\n"
     	"Content-type: text/html\r\n"
-    	"\r\n"
+    	"\r\n",
+    	status
     );
     rc = generate_pages(req);
   }
@@ -140,7 +147,13 @@ static int cmd_cgi_get_show(Request req)
     if (rc == ERR_OKAY)
     {
       if (req->tumbler->flags.file == FALSE)
-        LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
+        LineSFormat(
+        	req->out,
+        	"$",
+        	"Status: %a\r\n"
+        	"Content-type: text/html\r\n\r\n",
+        	status
+        );
       rc = tumbler_page(req->out,req->tumbler);
     }
     else
@@ -156,12 +169,14 @@ static int cmd_cgi_get_show(Request req)
       else
       {
         gd.htmldump = in;
-        LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
+        LineSFormat(req->out,"$","Status: 200\r\nContent-type: text/html\r\n\r\n",status);
         generic_cb("main",req->out,NULL);
         rc = 0;
       }
     }
   }
+  
+  MemFree(status);
   return(rc);
 }
 
