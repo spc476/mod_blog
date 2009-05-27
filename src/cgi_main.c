@@ -169,7 +169,7 @@ static int cmd_cgi_get_show(Request req)
       else
       {
         gd.htmldump = in;
-        LineSFormat(req->out,"$","Status: 200\r\nContent-type: text/html\r\n\r\n",status);
+        LineSFormat(req->out,"$","Status: %a\r\nContent-type: text/html\r\n\r\n",status);
         generic_cb("main",req->out,NULL);
         rc = 0;
       }
