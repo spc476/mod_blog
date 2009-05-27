@@ -181,7 +181,6 @@ static int cmd_cgi_get_show(Request req)
         	c_fullbaseurl,
         	tum
         );
-	/*StreamFlush(req->out);*/
         MemFree(tum);
 	MemFree(status);
 	return(ERR_OKAY);
