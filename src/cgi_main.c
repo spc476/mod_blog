@@ -410,38 +410,7 @@ static int cgi_error(Request req,int level,char *format,char *msg, ... )
   }
 
   StreamFree(in);
-
-#if 0
-  va_list args;
-
-  ddt(req    != NULL);
-  ddt(format != NULL);
-  ddt(msg    != NULL);
-  
-  va_start(args,msg);
-  LineSFormat(
-        req->out,
-	"i",
-	"Status: %a\r\n"
-	"Content-type: text/html\r\n"
-	"\r\n"
-	"<HTML>\n"
-	"<HEAD>\n"
-	"  <TITLE>There was an error</TITLE>\n"
-	"</HEAD>\n"
-	"<BODY>\n"
-	"<H1>Error %a</H1>\n"
-	"<P>",
-	level
-    );
-
-  LineSFormatv(req->out,format,msg,args);
-  LineS(req->out,"</P>\n</BODY>\n</HTML>\n");
-  va_end(args);
-#endif
-
   return(ERR_OKAY);
-
 }
 
 /**********************************************************************/
