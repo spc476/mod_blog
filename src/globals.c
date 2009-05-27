@@ -307,6 +307,10 @@ int GlobalsInit(char *fspec)
   PairListFree(&headers);
   StreamFree(input);
   MemFree(cfs);
+
+  while(gf_debug)
+    ;
+
   return(ERR_OKAY);
 }
 

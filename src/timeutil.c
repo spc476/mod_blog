@@ -167,6 +167,14 @@ void tm_to_tm(struct tm *ptm)
   ptm->tm_year -= 1900;
   ptm->tm_mon--;
   mktime(ptm);
+
+  /*-------------------------------------------------------
+  ; think I finally tracked down a bug here.  mktime() takes
+  ; into account Daylight Saving Time, so if it is in effect,
+  ; we need to back-adjust for it.  Sigh.
+  ;-------------------------------------------------------*/
+
+  if (ptm->tm_isdst) ptm->tm_hour--;
 }
 
 /**************************************************************************/
