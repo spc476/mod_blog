@@ -42,7 +42,7 @@
 
 static void	 date_to_dir		(char *,struct btm *);
 static void	 date_to_filename	(char *,struct btm *,const char *);
-static void	 date_to_part		(char *,struct btm *);
+static void	 date_to_part		(char *,struct btm *,int);
 static Stream	 open_file_r		(const char *,struct btm *);
 static int	 date_check		(struct btm *);
 static int	 blog_cache_day		(Blog,struct btm *);
@@ -372,12 +372,13 @@ static void date_to_filename(char *tname,struct btm *date,const char *file)
 
 /**********************************************************************/
 
-static void date_to_part(char *tname,struct btm *date)
+static void date_to_part(char *tname,struct btm *date,int p)
 {
   ddt(tname != NULL);
   ddt(date  != NULL);
+  ddt(p     >  0);
   
-  sprintf(tname,"%04d/%02d/%02d/%d",date->year,date->month,date->day,date->part);
+  sprintf(tname,"%04d/%02d/%02d/%d",date->year,date->month,date->day,p);
 }
 
 /*********************************************************************/
@@ -460,7 +461,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
     else
       entry->author = dup_string("");
       
-    date_to_part(pname,date);
+    date_to_part(pname,date,blog->idx + 1);
     
     {
       Stream      sinbody;
