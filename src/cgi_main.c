@@ -144,7 +144,23 @@ static int cmd_cgi_get_show(Request req)
       rc = tumbler_page(req->out,req->tumbler);
     }
     else
-      rc = (*req->error)(req,HTTP_BADREQ,"","bad request");
+    {
+      Stream  in;
+      char   *file;
+      
+      file = spc_getenv("PATH_TRANSLATED");
+      in   = FileStreamRead(file);
+      MemFree(file);
+      if (in == NULL)
+        rc = (*req->error)(req,HTTP_BADREQ,"","bad request");
+      else
+      {
+        gd.htmldump = in;
+        LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
+        generic_cb("main",req->out,NULL);
+        rc = 0;
+      }
+    }
   }
   return(rc);
 }
