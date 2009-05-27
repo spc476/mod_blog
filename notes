@@ -46,19 +46,29 @@ GET:
 
 POST:
 	email	= 'yes'  | 'no'
-	filter	= 'text' | 'mixed' | 'html'
+	filter	= 'text' | 'mixed'  | 'html'
+	update  = 'new'  | 'modify' | 'edit' | 'template' | 'other'
 	author	= string || $REMOTE_USER
 	title	= string
 	class	= string
 	date	= string
 	body	= string
+	cmd	= 'post' | 'preview' | 'edit'
+
+
+PUT:
+
+DELETE:
+
+
 CLI:
 	--config	filespec
+	--cmd		'new' | 'edit' | 'delete' | --> 'show' 
 	--file		input
 	--stdin		read from stdin
 	--email		read from stdin as email
-	--update	'new' | 'modify' | 'template' | 'other'
-	--spec		tumbler
+	--update	--> 'new' | 'modify' | 'edit' | 'template' | 'other'
+	--entry		tumbler
 
 
 
