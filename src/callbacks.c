@@ -565,13 +565,20 @@ static void fixup_uri(BlogDay blog,HtmlToken token,const char *attrib)
     ; we then add one, otherwise, don't.
     ;--------------------------------------------------*/
 
-    /*if (src->value[0] == '/')*/
-
-    if (src->value[ strlen(src->value) - 1] == '/')
+    /*---------------------------------------------------------
+    ; XXX - Okay, isolated the bug.  If baseurl ends in a '/', and
+    ; src->value does not start with a '/', we end up with
+    ; a double '//'.  We need to make sure we canonicalize
+    ; all partial urls to either end in a '/', or not end in a
+    ; '/'.
+    ;----------------------------------------------------------*/
+    
+    if (src->value[0] == '/')
       sprintf(buffer,"%s%s",baseurl,src->value);
     else if (isdigit(src->value[0]))
       sprintf(buffer,"%s/%s",baseurl,src->value);
     else
+    
 #ifdef PARALLEL_HACK
     {
       /*-----------------------------------------------------------
