@@ -59,7 +59,46 @@ LFLAGS=-lgdbm -L$(CGILIB)/$(HOSTDIR) -lcgi5
 
 all: $(HOSTDIR)/boston
 
-$(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
+$(HOSTDIR)/blog : $(HOSTDIR)/test_main.o	\
+		$(HOSTDIR)/blog.o		\
+		$(HOSTDIR)/authenticate.o	\
+		$(HOSTDIR)/conversion.o		\
+		$(HOSTDIR)/globals.o		\
+		$(HOSTDIR)/timeutil.o		\
+		$(HOSTDIR)/wbtum.o		\
+		$(HOSTDIR)/blogutil.o		\
+		$(HOSTDIR)/system.o
+	$(CC) $(CFLAGS) -o $@			\
+		$(HOSTDIR)/test_main.o		\
+		$(HOSTDIR)/blog.o		\
+		$(HOSTDIR)/authenticate.o	\
+		$(HOSTDIR)/conversion.o		\
+		$(HOSTDIR)/globals.o		\
+		$(HOSTDIR)/timeutil.o		\
+		$(HOSTDIR)/wbtum.o		\
+		$(HOSTDIR)/blogutil.o		\
+		$(HOSTDIR)/system.o		\
+		$(LFLAGS) 
+
+working: $(HOSTDIR)/blog.o	\
+		$(HOSTDIR)/authenticate.o	\
+		$(HOSTDIR)/conversion.o		\
+		$(HOSTDIR)/globals.o		\
+		$(HOSTDIR)/timeutil.o		\
+		$(HOSTDIR)/main.o		\
+		$(HOSTDIR)/wbtum.o		\
+		$(HOSTDIR)/cli_main.o		\
+		$(HOSTDIR)/cgi_main.o		\
+		$(HOSTDIR)/backend.o		\
+		$(HOSTDIR)/blogutil.o		\
+		$(HOSTDIR)/system.o
+
+work: $(HOSTDIR)/addutil.o	\
+		$(HOSTDIR)/callbacks.o		\
+
+#all: $(HOSTDIR)/boston
+
+$(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/authenticate.o	\
 		$(HOSTDIR)/blog.o		\
 		$(HOSTDIR)/callbacks.o		\
@@ -96,6 +135,9 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 # Individual files
 #
 ########################################################################
+
+$(HOSTDIR)/test_main.o : src/test_main.c
+	$(CC) $(CFLAGS) -c -o $@ src/test_main.c
 
 $(HOSTDIR)/main.o : src/main.c
 	$(CC) $(CFLAGS) -c -o $@ src/main.c
