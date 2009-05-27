@@ -560,7 +560,14 @@ static void fixup_uri(BlogDay blog,HtmlToken token,const char *attrib)
     ; call or something?
     ;-------------------------------------------------------------*/
 
-    if (src->value[0] == '/')
+    /*---------------------------------------------------
+    ; check to see if baseurl ends in a '/', and if not, 
+    ; we then add one, otherwise, don't.
+    ;--------------------------------------------------*/
+
+    /*if (src->value[0] == '/')*/
+
+    if (src->value[ strlen(src->value) - 1] == '/')
       sprintf(buffer,"%s%s",baseurl,src->value);
     else if (isdigit(src->value[0]))
       sprintf(buffer,"%s/%s",baseurl,src->value);
