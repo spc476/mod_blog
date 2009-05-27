@@ -23,6 +23,7 @@
 
 SHELL=/bin/sh
 CGILIB=/home/spc/source/cgi
+HOSTDIR=build
 #CGILIB=../../cgi
 SETUID=chmod 4755
 #SETUID=echo >/dev/null
@@ -163,6 +164,9 @@ $(HOSTDIR)/blogutil.o : src/blogutil.c src/blogutil.h
 #######################################################################
 
 clean :
-	/bin/rm $(HOSTDIR)/*.o
-	/bin/rm src/*~
+	/bin/rm -rf $(HOSTDIR)/*.o
+	/bin/rm -rf src/*~
+
+tarball:
+	(cd .. ; tar czvf /tmp/boston.tar.gz -X boston/.exclude boston/ )
 
