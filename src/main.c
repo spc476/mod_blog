@@ -42,7 +42,7 @@ int main(int argc,char *argv[])
   Cgi cgi;
   int rc;
   
-  while(cf_debug)
+  while(gf_debug)
     ;
 
   MemInit   ();

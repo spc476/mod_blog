@@ -83,10 +83,10 @@ const char    *c_emailmsg;
 int            c_tzhour       = -5;	/* Eastern */
 int            c_tzmin        =  0;
 void	     (*c_conversion)(char *,Stream,Stream) =  html_conversion;
-volatile int   cf_debug       = FALSE;
 
 const char    *g_templates;
 int            gf_emailupdate = FALSE;
+volatile int   gf_debug       = FALSE;
 struct display gd =
 {
   { FALSE , FALSE , FALSE , FALSE , TRUE , TRUE } ,
@@ -285,7 +285,7 @@ int GlobalsInit(char *fspec)
     else if (strcmp(ppair->name,"DEBUG") == 0)
     {
       if (strcmp(ppair->value,"true") == 0)
-        cf_debug = TRUE;
+        gf_debug = TRUE;
     }
     else if (strncmp(ppair->name,"_SYSTEM",7) == 0)
     {

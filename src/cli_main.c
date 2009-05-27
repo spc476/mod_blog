@@ -135,7 +135,7 @@ int main_cli(int argc,char *argv[])
            req.reqtumbler = dup_string(optarg);
            break;
       case OPT_DEBUG:
-           cf_debug = TRUE;
+           gf_debug = TRUE;
            break;
       case OPT_REGENERATE:
            req.f.regenerate = TRUE;

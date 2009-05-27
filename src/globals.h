@@ -72,10 +72,10 @@ extern const int              cf_tabreverse;
 extern const int              c_tzhour;
 extern const int              c_tzmin;
 extern       void           (*c_conversion)(char *,Stream,Stream);
-extern volatile int           cf_debug;
 
 extern const char *           g_templates;	/* work on */
 extern int                    gf_emailupdate;	/* work on */
+extern volatile int           gf_debug;
 extern struct display         gd;		/* work on */
 
 int		GlobalsInit		(char *);
