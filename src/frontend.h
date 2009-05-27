@@ -74,6 +74,7 @@ typedef struct display
 {
   DFlags                 f;
   int                    navunit;
+  char                  *adtag;
   Stream                 htmldump;
   Cgi                    cgi;
   Request                req;

@@ -49,8 +49,8 @@ typedef struct blogday
   struct tm  tm_date;
   int        number;
   int        curnum;		/* hack to avoid making a structure */
-  int        stentry;		/* hack to avoid making a structure */
-  int        endentry;		/* hack to avoid making a structure */
+  int        stentry;		/* hack to avoid making a structure (inclusive) */
+  int        endentry;		/* hack to avoid making a structure (inclusive) */
   BlogEntry  entries[100];	/* hack I know ... get Mark's varray stuff */
 } *BlogDay;
 

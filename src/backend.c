@@ -50,6 +50,12 @@
 
 #define max(a,b)	((a) > (b)) ? (a) : (b)
 
+typedef struct mystring
+{
+  size_t      s;
+  const char *d;
+} String;
+
 /*****************************************************************/
 
 static void	   calculate_previous		(struct tm);
@@ -59,6 +65,9 @@ static int	   display_file			(Stream,Tumbler);
 static int	   rss_page			(Stream,int,int,int);
 static int	   tab_page			(Stream,int,int,int);
 static void	   display_error		(Stream,int);
+static void        tag_collect			(char **ptag,BlogDay);
+static char	  *tag_pick                     (const char *);
+static String 	  *tag_split			(size_t *,const char *);
 
 /************************************************************************/
 
@@ -125,6 +134,7 @@ int tumbler_page(Stream out,Tumbler spec)
   BlogDay       blog;
   long          days;
   long          tmpdays;
+  char          *tags;
   void        (*addday) (struct tm *)             = (day_add);
   
   ddt(out  != NULL);
@@ -299,6 +309,8 @@ int tumbler_page(Stream out,Tumbler spec)
   ; days as we go ... 
   ;-------------------------------------------------------*/
 
+  tags = dup_string("");	/* an empty string to start out with */
+  
   for (tmpdays = days = labs(days_between(&end,&start)) + 1 , thisday = start ; days > 0 ; days--)
   {
     int rc = BlogDayRead(&blog,&thisday);
@@ -341,14 +353,19 @@ int tumbler_page(Stream out,Tumbler spec)
     ; I hope.
     ;-------------------------------------------------------*/
     
-    if (blog->number) 
+    if (blog->number)
+    {
+      tag_collect(&tags,blog);
       ListAddTail(&listodays,&blog->node);
+    }
     else
       BlogDayFree(&blog);
 
     (*addday)(&thisday);
   }
   
+  gd.adtag = tag_pick(tags);
+  MemFree(tags);
   generic_cb("main",out,&listodays);
   
   for (
@@ -730,6 +747,7 @@ int primary_page(Stream out,int year,int month,int iday)
   struct tm thisday;
   int       days;
   List      listodays;
+  char     *tags;
   
   ddt(out   != NULL);
   ddt(year  >  0);
@@ -738,8 +756,8 @@ int primary_page(Stream out,int year,int month,int iday)
   ddt(iday  >  0);
   ddt(iday  <= max_monthday(year,month));
 
+  tags         = dup_string("");
   gd.f.fullurl = FALSE;
- 
   gd.f.reverse = TRUE;
     
   tm_init(&thisday);
@@ -763,6 +781,7 @@ int primary_page(Stream out,int year,int month,int iday)
     
     if (day->number)
     {
+      tag_collect(&tags,day);
       ListAddTail(&listodays,&day->node);
       days++;
     }
@@ -772,6 +791,8 @@ int primary_page(Stream out,int year,int month,int iday)
     day_sub(&thisday);
   }
   
+  gd.adtag = tag_pick(tags);
+  MemFree(tags);
   generic_cb("main",out,&listodays);
 
   for (
@@ -790,10 +811,11 @@ int primary_page(Stream out,int year,int month,int iday)
 
 static int rss_page(Stream out,int year, int month, int iday)
 {
-  BlogDay   day;
-  struct tm thisday;
-  int       items;
-  List      listodays;
+  BlogDay    day;
+  struct tm  thisday;
+  int        items;
+  List       listodays;
+  char      *tags;
   
   ddt(out   != NULL);
   ddt(year  >  0);
@@ -802,6 +824,7 @@ static int rss_page(Stream out,int year, int month, int iday)
   ddt(iday  >  0);
   ddt(iday  <= max_monthday(year,month));
 
+  tags         = dup_string("");
   gd.f.fullurl = TRUE;
   gd.f.reverse = g_rssreverse;
     
@@ -825,6 +848,7 @@ static int rss_page(Stream out,int year, int month, int iday)
     
     if (day->number)
     {
+      tag_collect(&tags,day);
       if (gd.f.reverse)
         ListAddTail(&listodays,&day->node);
       else
@@ -837,6 +861,8 @@ static int rss_page(Stream out,int year, int month, int iday)
     day_sub(&thisday);
   }
   
+  gd.adtag = tag_pick(tags);
+  MemFree(tags);
   generic_cb("main",out,&listodays);
 
   for (
@@ -855,10 +881,11 @@ static int rss_page(Stream out,int year, int month, int iday)
 
 static int tab_page(Stream out,int year, int month, int iday)
 {
-  BlogDay   day;
-  struct tm thisday;
-  int       items;
-  List      listodays;
+  BlogDay    day;
+  struct tm  thisday;
+  int        items;
+  List       listodays;
+  char      *tags;
   
   ddt(out   != NULL);
   ddt(year  >  0);
@@ -867,6 +894,7 @@ static int tab_page(Stream out,int year, int month, int iday)
   ddt(iday  >  0);
   ddt(iday  <= max_monthday(year,month));
 
+  tags         = dup_string("");
   gd.f.fullurl = FALSE;
   gd.f.reverse = g_tabreverse;
     
@@ -890,6 +918,7 @@ static int tab_page(Stream out,int year, int month, int iday)
     
     if (day->number)
     {
+      tag_collect(&tags,day);
       if (gd.f.reverse)
         ListAddTail(&listodays,&day->node);
       else
@@ -902,6 +931,8 @@ static int tab_page(Stream out,int year, int month, int iday)
     day_sub(&thisday);
   }
   
+  gd.adtag = tag_pick(tags);
+  MemFree(tags);
   generic_cb("main",out,&listodays);
 
   for (
@@ -940,4 +971,93 @@ static void display_error(Stream out,int err)
 }
 
 /*******************************************************************/
+
+static void tag_collect(char **ptag,BlogDay blog)
+{
+  char   *tag;
+  char   *t;
+  char   *comma = "";
+  size_t  i;
+  
+  ddt(ptag  != NULL);
+  ddt(*ptag != NULL);
+  ddt(blog  != NULL);
+  
+  tag = *ptag;
+  if (*tag != '\0')
+    comma = ", ";
+  
+  for (i = blog->stentry ; i <= blog->endentry ; i++)
+  {
+    if (empty_string(blog->entries[i]->class)) continue;
+    t = concat_strings(tag,comma,blog->entries[i]->class,(char *)NULL);
+    MemFree(tag);
+    tag   = t;
+    comma = ", ";
+  }  
+  *ptag = tag;
+}
+
+/********************************************************************/
+
+static char *tag_pick(const char *tag)
+{
+  String *pool;
+  size_t  num;
+  size_t  r;
+  char   *pick;
+  
+  ddt(tag != NULL);
+  
+  pool = tag_split(&num,tag);
+  r    = (((double)rand() / (double)RAND_MAX) * (double)num); 
+  ddt(r < num);
+  
+  pick = MemAlloc(pool[r].s + 1);
+  memcpy(pick,pool[r].d,pool[r].s);
+  pick[pool[r].s] = '\0';
+  
+  MemFree(pool);
+  return(pick);
+}
+  
+/******************************************************************/
+
+static String *tag_split(size_t *pnum,const char *tag)
+{
+  size_t      num  = 0;
+  size_t      max  = 0;
+  String     *pool = NULL;
+  const char *p;
+  
+  ddt(pnum != NULL);
+  ddt(tag  != NULL);
+  
+  while(*tag)
+  {
+    if (num == max)
+    {
+      max += 1024;
+      pool = MemResize(pool,max);
+    }
+    
+    for (p = tag ; (*p) && (*p != ',') ; p++)
+      ;
+    if (*p == '\0')
+      break;
+    pool[num].d   = tag;
+    pool[num++].s = p - tag;
+    
+    if (*p == '\0')
+      break;
+    for (p++ ; (*p) && isspace(*p) ; p++)
+      ;
+    tag = p;
+  }
+  
+  *pnum = num;
+  return(pool);
+}
+
+/*********************************************************************/
 

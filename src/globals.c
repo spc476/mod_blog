@@ -90,6 +90,7 @@ struct display gd =
 {
   { FALSE , FALSE , FALSE , FALSE , TRUE , TRUE } ,
   INDEX,
+  "programming",	/* default tag for advertising */
   NULL
 };
 
@@ -275,6 +276,10 @@ int GlobalsInit(char *fspec)
     else if (strcmp(ppair->name,"CONVERSION") == 0)
     {
       set_g_conversion(ppair->value);
+    }
+    else if (strcmp(ppair->name,"ADTAG") == 0)
+    {
+      gd.adtag = dup_string(ppair->value);
     }
     else if (strcmp(ppair->name,"DEBUG") == 0)
     {

@@ -59,6 +59,7 @@ static void	cb_blog_date			(Stream,void *);
 static void	cb_blog_fancy			(Stream,void *);
 static void	cb_blog_normal			(Stream,void *);
 static void	cb_blog_name			(Stream,void *);
+static void	cb_blog_adtag			(Stream,void *);
 
 static void	cb_entry			(Stream,void *);
 static void	cb_entry_id			(Stream,void *);
@@ -68,6 +69,7 @@ static void	cb_entry_pubdate		(Stream,void *);
 static void	cb_entry_number			(Stream,void *);
 static void	cb_entry_title			(Stream,void *);
 static void	cb_entry_class			(Stream,void *);
+static void	cb_entry_adtag			(Stream,void *);
 static void	cb_entry_author			(Stream,void *);
 static void	cb_entry_body			(Stream,void *);
 static void	cb_entry_body_entified		(Stream,void *);
@@ -131,6 +133,7 @@ struct chunk_callback  m_callbacks[] =
   { "blog.name"			, cb_blog_name			} ,
   { "blog.date.fancy"		, cb_blog_fancy			} ,
   { "blog.date.normal"		, cb_blog_normal		} ,
+  { "blog.adtag"		, cb_blog_adtag			} ,
 
   { "entry"			, cb_entry			} ,
   { "entry.id"			, cb_entry_id			} ,
@@ -140,6 +143,7 @@ struct chunk_callback  m_callbacks[] =
   { "entry.number"		, cb_entry_number		} ,
   { "entry.title"		, cb_entry_title		} ,
   { "entry.class"		, cb_entry_class		} ,
+  { "entry.adtag"		, cb_entry_adtag		} ,
   { "entry.author"		, cb_entry_author		} ,
   { "entry.body"		, cb_entry_body			} ,
   { "entry.body.entified"	, cb_entry_body_entified	} ,
@@ -382,6 +386,20 @@ static void cb_blog_normal(Stream out,void *data)
 
 /***********************************************************************/
 
+static void cb_blog_adtag(Stream out,void *data)
+{
+  char *tag;
+
+  ddt(out  != NULL);
+  ddt(data != NULL);
+
+  tag = UrlEncodeString(gd.adtag);
+  LineS(out,tag);
+  MemFree(tag);
+}
+
+/*********************************************************************/
+
 static void cb_entry(Stream out,void *data)
 {
   BlogDay blog = data;
@@ -507,6 +525,16 @@ static void cb_entry_class(Stream out,void *data)
 }
 
 /***********************************************************************/
+
+static void cb_entry_adtag(Stream out,void *data)
+{
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  LineS(out,"Soon young Skywalker.  Soon.");
+}
+
+/**********************************************************************/
 
 static void cb_entry_author(Stream out,void *data)
 {

@@ -49,6 +49,8 @@ int main(int argc,char *argv[])
   DdtInit   ();
   StreamInit();
 
+  srand(time(NULL));
+
   if (CgiNew(&cgi,NULL) == ERR_OKAY)
   {
     gd.cgi = cgi;
