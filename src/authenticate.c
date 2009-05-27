@@ -46,6 +46,34 @@
 
 /*************************************************************************/
 
+char *get_remote_user(void)
+{
+  char *name;
+
+  /*-------------------------------------------------------
+  ; A change in Apache 2.0.48:
+  ;	Remember an authenticated user during internal redirects if the
+  ;	redirection target is not access protected and pass it
+  ;	to scripts using the REDIRECT_REMOTE_USER environment variable.
+  ;	PR 10678, 11602
+  ;
+  ; Because of the way I'm doing this, this is affecting me, so I need
+  ; to check both REMOTE_USER and REDIRECT_REMOTE_USER.
+  ;------------------------------------------------------*/
+  
+  name = getenv("REMOTE_USER");
+  if (name == NULL)
+  {
+    name = getenv("REDIRECT_REMOTE_USER");
+    if (name == NULL)
+      return(dup_string(""));
+  }
+  
+  return(dup_string(name));
+}
+
+/************************************************************************/
+
 #if defined(USE_NONE)
 
   int authenticate_author(Request req)

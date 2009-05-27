@@ -1315,7 +1315,7 @@ static void cb_edit_author(Stream out,void *data)
     LineS(out,gd.req->origauthor);
   else
   {
-    name = spc_getenv("REMOTE_USER");
+    name = get_remote_user();
     LineS(out,name);
     MemFree(name);
   }

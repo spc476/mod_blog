@@ -31,18 +31,19 @@
 extern struct chunk_callback m_callbacks[];
 extern size_t                m_cbnum;
 
-void	set_time			(void);
-int	authenticate_author		(Request);
-int	generate_pages			(Request);
-void	notify_weblogcom		(void);
-void	notify_emaillist		(void);
-int	primary_page			(Stream,int,int,int);
-int	tumbler_page			(Stream,Tumbler);
-int	BlogDatesInit			(void);
-int	entry_add			(Request);
-void	fix_entry			(Request);
-void	generic_cb			(const char *,Stream,void *);
-void	dbcritical			(char *);
+void	 set_time			(void);
+char	*get_remote_user			(void);
+int	 authenticate_author		(Request);
+int	 generate_pages			(Request);
+void	 notify_weblogcom		(void);
+void	 notify_emaillist		(void);
+int	 primary_page			(Stream,int,int,int);
+int	 tumbler_page			(Stream,Tumbler);
+int	 BlogDatesInit			(void);
+int	 entry_add			(Request);
+void	 fix_entry			(Request);
+void	 generic_cb			(const char *,Stream,void *);
+void	 dbcritical			(char *);
 
 #endif
 

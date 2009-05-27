@@ -263,7 +263,7 @@ static void set_m_author(char *value,Request req)
   ddt(req != NULL);
   
   if (emptynull_string(value))
-    req->author = spc_getenv("REMOTE_USER");
+    req->author = get_remote_user();
   else
     req->author = dup_string(value);
     
