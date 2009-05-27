@@ -27,7 +27,7 @@
 #include <cgilib/ddt.h>
 #include <cgilib/mail.h>
 
-#if 0
+#if 1
 #define SENDMAIL	"/usr/sbin/sendmail"
 #endif
 
@@ -41,21 +41,31 @@ int send_message(
 		  const char *message
 		)
 {
+#if 0
   Email email;
 
-  email          = EmailNew();
+  email = EmailNew();
+
+  MemFree(email->from);
+  MemFree(email->to);
+  MemFree(email->subject);
+
   email->from    = from;
   email->to      = to;
   email->subject = subject;
 
-  if (replyto) email->replyto = replyto;
+  if (replyto)
+  {
+    MemFree(email->replyto);
+    email->replyto = replyto;
+  }
 
   LineS(email->body,message);
   EmailSend(email);
   EmailFree(email);
   return(0);
 
-#if 0
+#else
 
   FILE      *fpin;
   FILE      *fpout;
