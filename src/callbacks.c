@@ -846,7 +846,7 @@ static void cb_cond_blog_title(Stream out,void *data)
     	out,
     	"$",
     	"%a - ",
-    	blog->entries[blog->curnum]->title
+    	blog->entries[blog->stentry]->title
     );
   }
 }
