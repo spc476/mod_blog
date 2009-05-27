@@ -49,8 +49,6 @@
 #include "globals.h"
 #include "blogutil.h"
 
-#define max(a,b)	((a) > (b)) ? (a) : (b)
-
 /*****************************************************************/
 
 static void	   calculate_previous		(struct btm);

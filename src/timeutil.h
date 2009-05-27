@@ -35,12 +35,7 @@ struct btm
 
 /***********************************************************/
 
-const char	*const nth	(unsigned long);
 int		 max_monthday	(int,int);
-void		 month_add	(struct tm *);
-void		 day_add	(struct tm *);
-void		 month_sub	(struct tm *);
-void		 day_sub	(struct tm *);
 void		 btm_add_day	(struct btm *);
 void		 btm_sub_part	(struct btm *);
 void		 btm_sub_day	(struct btm *);
@@ -49,11 +44,6 @@ void		 btm_sub_month	(struct btm *);
 int		 btm_cmp	(const struct btm *,const struct btm *);
 int		 btm_cmp_date	(const struct btm *,const struct btm *);
 void		 tm_init	(struct tm *);
-int		 tm_cmp		(struct tm *,struct tm *);
-void             tm_to_tm       (struct tm *);
-void             tm_to_blog     (struct tm *);
-void		 tm_fromstring	(struct tm *,char *);
-long		 days_between	(struct tm *,struct tm *);
 
 #endif
 

@@ -352,59 +352,40 @@ static int cmd_cgi_post_new(Request req)
 
 static int cmd_cgi_post_show(Request req)
 {
-#if 0
-	/* XXX */
-  List      listofdays;
-  BlogDay   day;
-  BlogEntry entry;
-  struct tm date;
+  struct callback_data cbd;
+  BlogEntry            entry;
+  char                *p;
+  
+  /*----------------------------------------------------
+  ; this routine is a mixture between entry_add() and
+  ; tumbler_page().  Perhaps some refactoring is in order
+  ; at some point.
+  ;-------------------------------------------------------*/
 
-  ddt(req != NULL);
-  
-  gd.f.edit = TRUE;
-  
-  ListInit(&listofdays);
+  memset(&cbd,0,sizeof(struct callback_data));
+  ListInit(&cbd.list);
   
   if (emptynull_string(req->date))
-  {
-    time_t     t;
-    struct tm *now;
-    
-    t    = time(NULL);
-    now  = localtime(&t);
-    date = *now;
-  }
+    entry->when = gd.updatetime;
   else
   {
-    char *p;
-    date.tm_sec   =  0;
-    date.tm_min   =  0;
-    date.tm_hour  =  1;
-    date.tm_wday  =  0;
-    date.tm_yday  =  0;
-    date.tm_isdst = -1;
-    date.tm_year  = strtoul(req->date,&p,10); p++;
-    date.tm_mon   = strtoul(p,&p,10); p++;
-    date.tm_mday  = strtoul(p,NULL,10);
-    tm_to_tm(&date);
+    entry->when.year  = strtoul(req->date,&p,10); p++;
+    entry->when.month = strtoul(p,        &p,10); p++;
+    entry->when.day   = strtoul(p,        &p,10);
   }
   
-  fix_entry(req);
+  entry->when.part = 1;	/* doesn't matter what this is */
+  entry->timestamp = gd.tst;
+  entry->title     = req->title;
+  entry->class     = req->class;
+  entry->author    = req->author;
+  entry->body      = req->body;
   
-  BlogDayRead(&day,&gd.now);
-  BlogEntryNew(&entry,req->title,req->class,req->author,req->body,strlen(req->body));
-  BlogDayEntryAdd(day,entry);
-  
-  ListAddTail(&listofdays,&day->node);
-  
-  day->stentry = day->endentry;
-  
+  ListAddTail(&cbd.list,&entry->node);
   LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
+  generic_cb("main",req->out,&cbd);
+  BlogEntryFree(entry);
   
-  generic_cb("main",req->out,&listofdays);
-  
-  BlogDayFree(&day);
-#endif 
   return(0);  
 }
 

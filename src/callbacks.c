@@ -53,14 +53,6 @@
 
 static void	cb_blog_script			(Stream,void *);
 static void	cb_blog_url			(Stream,void *);
-#if 0
-static void	cb_blog_locallink		(Stream,void *);
-static void	cb_blog_body			(Stream,void *);
-static void	cb_blog_entry_locallinks	(Stream,void *);
-static void	cb_blog_date			(Stream,void *);
-static void	cb_blog_fancy			(Stream,void *);
-static void	cb_blog_normal			(Stream,void *);
-#endif
 static void	cb_blog_name			(Stream,void *);
 static void	cb_blog_adtag			(Stream,void *);
 static void	cb_blog_adtag_entity		(Stream,void *);
@@ -75,9 +67,6 @@ static void	cb_entry_url			(Stream,void *);
 static void	cb_entry_cond_date		(Stream,void *);
 static void	cb_entry_date			(Stream,void *);
 static void	cb_entry_pubdate		(Stream,void *);
-#if 0
-static void	cb_entry_number			(Stream,void *);
-#endif
 static void	cb_entry_title			(Stream,void *);
 static void	cb_entry_class			(Stream,void *);
 static void	cb_entry_adtag			(Stream,void *);
@@ -141,17 +130,7 @@ struct chunk_callback  m_callbacks[] =
 {
   { "blog.script"		, cb_blog_script		} ,
   { "blog.url"			, cb_blog_url			} ,
-#if 0
-  { "blog.locallink"		, cb_blog_locallink		} ,
-  { "blog.body"			, cb_blog_body			} ,
-  { "blog.entry.locallinks"	, cb_blog_entry_locallinks	} ,
-  { "blog.date"			, cb_blog_date			} ,
-#endif
   { "blog.name"			, cb_blog_name			} ,
-#if 0
-  { "blog.date.fancy"		, cb_blog_fancy			} ,
-  { "blog.date.normal"		, cb_blog_normal		} ,
-#endif
   { "blog.adtag"		, cb_blog_adtag			} ,
   { "blog.adtag.entity"		, cb_blog_adtag_entity		} ,
 
@@ -166,9 +145,6 @@ struct chunk_callback  m_callbacks[] =
   { "entry.date"		, cb_entry_date			} ,
   { "entry.pubdate"		, cb_entry_pubdate		} ,
   { "entry.name"		, cb_entry_name			} ,
-#if 0
-  { "entry.number"		, cb_entry_number		} ,
-#endif
   { "entry.title"		, cb_entry_title		} ,
   { "entry.class"		, cb_entry_class		} ,
   { "entry.adtag"		, cb_entry_adtag		} ,
@@ -269,101 +245,6 @@ static void cb_blog_url(Stream out,void *data)
 
 /*************************************************************************/
 
-#if 0
-static void cb_blog_locallink(Stream out,void *data)
-{
-  List    *plist = data;
-  BlogDay  day;
-  
-  ddt(out  != NULL);
-  ddt(data != NULL);
-
-  for (
-        day = (BlogDay)ListGetHead(plist);
-        NodeValid(&day->node);
-        day = (BlogDay)NodeNext(&day->node)
-      )
-  {
-    generic_cb("blog.locallink",out,day);
-  }
-}
-#endif
-
-/**********************************************************************/
-
-#if 0
-static void cb_blog_body(Stream out,void *data)
-{
-  List    *plist = data;
-  BlogDay  day;
-  
-  ddt(out  != NULL);
-  ddt(data != NULL);
-
-  if (gd.htmldump)
-  {
-    StreamCopy(out,gd.htmldump);
-    return;
-  }
-    
-  for (
-        day = (BlogDay)ListGetHead(plist);
-        NodeValid(&day->node);
-        day = (BlogDay)NodeNext(&day->node)
-      )
-  {
-    generic_cb("blog.body",out,day);
-  }
-}
-#endif
-
-/*********************************************************************/
-
-#if 0
-static void cb_blog_entry_locallinks(Stream out,void *data)
-{
-  BlogDay blog = data;
-  int            i;
-  
-  ddt(out  != NULL);
-  ddt(data != NULL);
-  
-  if (gd.f.reverse)
-  {
-    for (i = blog->endentry ; i >= blog->stentry ; i--)
-    {
-      blog->curnum = i;
-      generic_cb("blog.entry.locallinks",out,data);
-    }
-  }
-  else
-  {
-    for (i = blog->stentry ; i <= blog->endentry ; i++)
-    {
-      blog->curnum = i; 
-      generic_cb("blog.entry.locallinks",out,data);
-    }
-  }
-}
-#endif
-
-/********************************************************************/
-#if 0
-static void cb_blog_date(Stream out,void *data)
-{
-  struct callback_data *cbd = data;
-  
-  ddt(out  != NULL);
-  ddt(data != NULL);
-  
-  
-  
-  LineS(out,blog->date);
-}
-#endif
-
-/********************************************************************/
-
 static void cb_blog_name(Stream out,void *data)
 {
   ddt(out  != NULL);
@@ -373,57 +254,6 @@ static void cb_blog_name(Stream out,void *data)
 }
 
 /*********************************************************************/
-
-#if 0
-static void cb_blog_fancy(Stream out,void *data)
-{
-  BlogDay    blog = data;
-  struct tm  day;
-  char      *p;
-  char       dayname[BUFSIZ];
-  
-  ddt(out  != NULL);
-  ddt(data != NULL);
-  
-  tm_init(&day);
-  
-  day.tm_year = strtoul(blog->date,&p,10) - 1900 ; p++;
-  day.tm_mon  = strtoul(p,&p,10) - 1;              p++;
-  day.tm_mday = strtoul(p,&p,10);
-  
-  mktime(&day);
-  strftime(dayname,BUFSIZ,"%A",&day); /* all that just to get the day name */
-  
-  LineSFormat(out,"$ i $","%a the %b<sup>%c</sup>",dayname,day.tm_mday,nth(day.tm_mday));
-}
-#endif
-
-/************************************************************************/
-#if 0
-static void cb_blog_normal(Stream out,void *data)
-{
-  BlogDay    blog = data;
-  struct tm  day;
-  char       buffer[BUFSIZ];
-  char      *p;
-  
-  ddt(out  != NULL);
-  ddt(data != NULL);
-
-  tm_init(&day);
-
-  day.tm_year = strtoul(blog->date,&p,10) - 1900 ; p++;
-  day.tm_mon  = strtoul(p,&p,10) - 1;              p++;
-  day.tm_mday = strtoul(p,&p,10);
-
-  mktime(&day);
-  
-  strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&day);
-  LineS(out,buffer);
-}
-#endif
-
-/***********************************************************************/
 
 static void cb_blog_adtag(Stream out,void *data)
 {
@@ -557,20 +387,6 @@ static void cb_entry_pubdate(Stream out,void *data)
 }
 
 /********************************************************************/
-
-#if 0
-static void cb_entry_number(Stream out,void *data)
-{
-  BlogDay blog = data;
-  
-  ddt(out  != NULL);
-  ddt(data != NULL);
-  
-  LineSFormat(out,"i","%a",blog->curnum + 1);
-}
-#endif
-
-/**********************************************************************/
 
 static void cb_entry_title(Stream out,void *data)
 {
@@ -940,10 +756,6 @@ static void cb_rss_item_url(Stream out,void *data)
   
   LineSFormat(out,"$","%a",c_fullbaseurl);
   print_nav_url(out,&cbd->entry->when,PART);
-  
-#if 0  
-  LineSFormat(out,"$ $ $ i","%a/%b%c.%d",c_fullbaseurl,c_baseurl,blog->date,blog->curnum + 1);
-#endif
 }
 
 /********************************************************************/

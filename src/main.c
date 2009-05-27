@@ -73,7 +73,7 @@ int main(int argc,char *argv[])
 
 int BlogDatesInit(void)
 {
-  BlogEntry entry;
+  BlogEntry  entry;
   struct tm *today;
   
   gd.tst       = time(NULL);
@@ -82,6 +82,7 @@ int BlogDatesInit(void)
   gd.now.year  = gd.updatetime.year  = today->tm_year + 1900;
   gd.now.month = gd.updatetime.month = today->tm_mon + 1;
   gd.now.day   = gd.updatetime.day   = today->tm_mday;
+  gd.now.part  = gd.updatetime.part  = 0;
   srand(gd.tst);
 
   while(TRUE)

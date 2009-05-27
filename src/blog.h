@@ -54,21 +54,6 @@ typedef struct blogentry
   char       *body;
 } *BlogEntry;
 
-#if 0
-typedef struct blogday
-{
-  Node       node;
-  char      *date;
-  struct tm  tm_date;
-  int        number;
-  List       lentries;
-  int        curnum;		/* hack to avoid making a structure */
-  int        stentry;		/* hack to avoid making a structure (inclusive) */
-  int        endentry;		/* hack to avoid making a structure (inclusive) */
-  BlogEntry  entries[100];	/* hack I know ... get Mark's varray stuff */
-} *BlogDay;
-#endif
-
 /*********************************************************************/
 
 Blog		(BlogNew)		(char *,char *);
@@ -85,28 +70,7 @@ void		(BlogEntryReadXU)	(Blog,List *,struct btm *,size_t);
 int		(BlogEntryWrite)	(BlogEntry);
 int		(BlogEntryFree)		(BlogEntry);
 
-
-#if 0
-
-int		(BlogInit)		(void);
-int		(BlogLock)		(const char *);
-int		(BlogUnlock)		(int);
-int		(BlogDayRead)		(BlogDay *,struct tm *);
-int		(BlogDayWrite)		(BlogDay);
-int		(BlogDayEntryAdd)	(BlogDay,BlogEntry);
-int		(BlogDayEntryRemove)	(BlogDay,int);
-int		(BlogDayFree)		(BlogDay *);
-
-
-
-int		(BlogEntryNew)		(BlogEntry *,const char *,const char *,const char *,void *,size_t);
-int		(BlogEntryRead)		(BlogEntry);
-int		(BlogEntryWrite)	(BlogEntry);
-int		(BlogEntryFlush)	(BlogEntry);
-int		(BlogEntryFree)		(BlogEntry *);
-
-#endif
-
 /**********************************************************************/
 
 #endif
+
