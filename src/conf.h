@@ -103,20 +103,5 @@
 #undef  FIXED_BROKEN_FULLBASEURL
 #undef  FIXED_BROKEN_RAWFMT
 
-/*********************************************************************
-*
-* Non-settable paramters (read:  you best know what you are doing 
-* before changing these).  
-*
-*********************************************************************/
-
-#if 0
-#ifdef _POSIX_PATH_MAX
-#  define FILENAME_LEN	_POSIX_PATH_MAX
-#else
-#  define FILENAME_LEN 255
-#endif
-#endif
-
 #endif
 
