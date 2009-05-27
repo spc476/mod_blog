@@ -47,14 +47,9 @@
 #include "frontend.h"
 #include "fix.h"
 #include "globals.h"
+#include "blogutil.h"
 
 #define max(a,b)	((a) > (b)) ? (a) : (b)
-
-typedef struct mystring
-{
-  size_t      s;
-  const char *d;
-} String;
 
 /*****************************************************************/
 
@@ -67,7 +62,6 @@ static int	   tab_page			(Stream,int,int,int);
 static void	   display_error		(Stream,int);
 static void        tag_collect			(char **ptag,BlogDay);
 static char	  *tag_pick                     (const char *);
-static String 	  *tag_split			(size_t *,const char *);
 
 /************************************************************************/
 
@@ -1057,9 +1051,12 @@ static char *tag_pick(const char *tag)
   {
     r  = (((double)rand() / (double)RAND_MAX) * (double)num); 
     ddt(r < num);
+    pick = fromstring(pool[r]);
+#if 0
     pick = MemAlloc(pool[r].s + 1);
     memcpy(pick,pool[r].d,pool[r].s);
     pick[pool[r].s] = '\0';
+#endif
   }
   else
     pick = dup_string(gd.adtag);
@@ -1069,42 +1066,4 @@ static char *tag_pick(const char *tag)
 }
  
 /******************************************************************/
-
-static String *tag_split(size_t *pnum,const char *tag)
-{
-  size_t      num  = 0;
-  size_t      max  = 0;
-  String     *pool = NULL;
-  const char *p;
-  
-  ddt(pnum != NULL);
-  ddt(tag  != NULL);
-  
-  while(*tag)
-  {
-    if (num == max)
-    {
-      max += 1024;
-      pool = MemResize(pool,max * sizeof(String));
-    }
-    
-    for (p = tag ; (*p) && (*p != ',') ; p++)
-      ;
-    if (p == tag) break;
-
-    pool[num].d   = tag;
-    pool[num++].s = p - tag;
-    
-    if (*p == '\0')
-      break;
-    for (p++ ; (*p) && isspace(*p) ; p++)
-      ;
-    tag = p;
-  }
-  
-  *pnum = num;
-  return(pool);
-}
-
-/*********************************************************************/
 

@@ -31,6 +31,7 @@ CINCL=-I $(CGILIB)/src
 
 #CFLAGS=-g -ansi -Wall -pedantic -Wtraditional -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
 #CFLAGS=-DSCREAM -O4 -fomit-frame-pointer  $(CINCL)
+#CFLAGS=-O3 -fomit-frame-pointer  -DSCREAM $(CINCL)
 #CFLAGS=-O3 -fomit-frame-pointer  $(CINCL)
 #CFLAGS=-pg -g -DSCREAM -DNOSTATS -O4 $(CINCL)
 #CFLAGS=-g -DDDT $(CINCL)
@@ -70,6 +71,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/timeutil.o		\
 		$(HOSTDIR)/wbtum.o		\
 		$(HOSTDIR)/backend.o		\
+		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/system.o
 	$(CC) $(CFLAGS) -o $@			\
 		$(HOSTDIR)/addutil.o		\
@@ -86,6 +88,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/timeutil.o		\
 		$(HOSTDIR)/wbtum.o		\
 		$(HOSTDIR)/backend.o		\
+		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/system.o		\
 		$(LFLAGS) -lgdbm
 	$(SETUID) $(HOSTDIR)/boston
@@ -201,6 +204,9 @@ $(HOSTDIR)/doi_util.o : src/doi_util.c src/doi_util.h
 
 $(HOSTDIR)/system.o : src/system.c 
 	$(CC) $(CFLAGS) -c -o $@ src/system.c
+
+$(HOSTDIR)/blogutil.o : src/blogutil.c src/blogutil.h
+	$(CC) $(CFLAGS) -c -o $@ src/blogutil.c
 
 #######################################################################
 #

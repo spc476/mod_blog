@@ -45,6 +45,7 @@
 #include "globals.h"
 #include "frontend.h"
 #include "fix.h"
+#include "blogutil.h"
 
 #define max(a,b)	((a) > (b)) ? (a) : (b)
 
@@ -905,28 +906,23 @@ static void cb_atom_entry(Stream out,void *data)
 
 static void cb_atom_catagories(Stream out,void *data)
 {
-  const char *class;
-  char       *cat;
-  char       *p;
-  BlogDay     day;
-  
-  ddt(out  != NULL);
-  ddt(data != NULL);
-  
-  day   = data;
-  class = day->entries[day->curnum]->class;
+  BlogDay  day;
+  String  *cats;
+  char    *tag;
+  size_t   i;
+  size_t   num;
 
-  while(*class != '\0')
+  day  = data;
+  cats = tag_split(&num,day->entries[day->curnum]->class);
+
+  for (i = 0 ; i < num ; i++)
   {
-    p = strchr(class,',');
-    if (p == NULL)
-      p = &cat[strlen(class)];
-      
-    cat = trim_space(dup_stringn(class,p - class - 1));
-    generic_cb("catagories",out,cat);
-    MemFree(cat);
-    class = p;
+    tag = fromstring(cats[i]);
+    generic_cb("catagories",out,tag);
+    MemFree(tag);
   }
+
+  MemFree(cats);
 }
 
 /************************************************************************/
