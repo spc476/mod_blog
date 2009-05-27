@@ -670,6 +670,7 @@ static const char *mime_type(char *filename)
     { ".txt"		, "text/plain"	},
     { ".css"		, "text/css"	},
     { ".mp4"		, "video/mp4"	},
+    { ".mov"		, "video/quicktime" },
     { NULL		, NULL		}
   };
   
