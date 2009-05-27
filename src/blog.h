@@ -33,6 +33,7 @@
 typedef struct blogentry
 {
   Node        node;
+  time_t      timestamp;
   char       *date;
   int         number;
   const char *title;

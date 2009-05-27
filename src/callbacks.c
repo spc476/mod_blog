@@ -83,8 +83,8 @@ static void	cb_rss_item			(Stream,void *);
 static void	cb_rss_item_url			(Stream,void *);
 
 static void	cb_atom_entry			(Stream,void *);
-static void	cb_atom_catagories		(Stream,void *);
-static void	cb_atom_catagory		(Stream,void *);
+static void	cb_atom_categories		(Stream,void *);
+static void	cb_atom_category		(Stream,void *);
 
 static void	cb_navigation_link		(Stream,void *);
 static void     cb_navigation_link_next		(Stream,void *);
@@ -164,8 +164,8 @@ struct chunk_callback  m_callbacks[] =
   { "rss.item.url"		, cb_rss_item_url		} ,
 
   { "atom.entry"		, cb_atom_entry			} ,
-  { "atom.catagories"		, cb_atom_catagories		} ,
-  { "atom.catagory"		, cb_atom_catagory		} ,
+  { "atom.categories"		, cb_atom_categories		} ,
+  { "atom.category"		, cb_atom_category		} ,
 
   { "navigation.link"		, cb_navigation_link		} ,
   { "navigation.link.next"	, cb_navigation_link_next	} ,
@@ -411,6 +411,7 @@ static void cb_blog_adtag_entity(Stream out,void *data)
   ddt(data != NULL);
   
   entityout = EntityStreamWrite(out);
+  if (entityout == NULL) return;
   LineS(entityout,gd.adtag);
   StreamFree(entityout);
 }
@@ -487,9 +488,9 @@ static void cb_entry_id(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  sprintf(output,"%s.%d",blog->date,blog->curnum + 1);
+  sprintf(output,"%s",blog->date);
   for (p = output ; *p ; p++)
-    if (*p == '/') *p = '.';
+    if (*p == '/') *p = '-';
   LineS(out,output);
 }
 
@@ -509,7 +510,33 @@ static void cb_entry_date(Stream out,void *data)
 
 static void cb_entry_pubdate(Stream out,void *data)
 {
-  /* XXX */
+  BlogDay    blog = data;
+  BlogEntry  entry;
+  time_t     ts;
+  struct tm *ptm;
+  char       buffer[BUFSIZ];
+  
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  entry = blog->entries[blog->curnum];
+  ts    = entry->timestamp;
+  ptm   = localtime(&ts);
+  
+  sprintf(
+  	buffer,
+  	"%04d-%02d-%02dT%02d:%02d:%02d%+03d:%02d",
+  	ptm->tm_year + 1900,
+  	ptm->tm_mon + 1,
+  	ptm->tm_mday,
+  	ptm->tm_hour,
+  	ptm->tm_min,
+  	ptm->tm_sec,
+  	c_tzhour,
+  	c_tzmin
+  );
+
+  LineS(out,buffer);
 }
 
 /********************************************************************/
@@ -767,7 +794,12 @@ static void cb_entry_body(Stream out,void *data)
 
 static void cb_entry_body_entified(Stream out,void *data)
 {
-  /* XXX */
+  Stream eout;
+  
+  eout = EntityStreamWrite(out);
+  if (eout == NULL) return;
+  cb_entry_body(eout,data);
+  StreamFree(eout);  
 }
 
 /*********************************************************************/
@@ -920,7 +952,7 @@ static void cb_atom_entry(Stream out,void *data)
 
 /************************************************************************/
 
-static void cb_atom_catagories(Stream out,void *data)
+static void cb_atom_categories(Stream out,void *data)
 {
   BlogDay  day;
   String  *cats;
@@ -934,7 +966,7 @@ static void cb_atom_catagories(Stream out,void *data)
   for (i = 0 ; i < num ; i++)
   {
     tag = fromstring(cats[i]);
-    generic_cb("catagories",out,tag);
+    generic_cb("categories",out,tag);
     MemFree(tag);
   }
 
@@ -943,12 +975,17 @@ static void cb_atom_catagories(Stream out,void *data)
 
 /************************************************************************/
 
-static void cb_atom_catagory(Stream out,void *data)
+static void cb_atom_category(Stream out,void *data)
 {
+  Stream eout;
+  
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  LineS(out,data);
+  eout = EntityStreamWrite(out);
+  if (eout == NULL) return;
+  LineS(eout,data);
+  StreamFree(eout);
 }
 
 /****************************************************************/
@@ -1123,16 +1160,34 @@ static void cb_now_year(Stream out,void *data)
 
 static void cb_update_time(Stream out,void *data)
 {
+  char buffer[BUFSIZ];
+  
   ddt(out  != NULL);
   ddt(data != NULL);
   
+  sprintf(
+  	buffer,
+  	"%04d-%02d-%02dT%02d:%02d:%02d%+03d:%02d",
+  	gd.updatetime.tm_year + 1900,
+	gd.updatetime.tm_mon  + 1,
+	gd.updatetime.tm_mday,
+	gd.updatetime.tm_hour,
+	gd.updatetime.tm_min,
+	gd.updatetime.tm_sec,
+	c_tzhour,
+	c_tzmin
+  );
+
+  LineS(out,buffer);
+  
+#if 0  
   /*--------------------------------------------------
   ; until I can fix RawFmt(), the original format
   ; string used was:
   ;
   ;	"i4 i2.2l0 i2.2l0 i2.2l0 i2.2l0 i i2.2l0",
   ;--------------------------------------------------*/
-
+	
   LineSFormat(
   	out,
   	"i4 i2.2l0 i2.2l0 i2.2l0 i2.2l0 i i2.2l0",
@@ -1145,6 +1200,8 @@ static void cb_update_time(Stream out,void *data)
         c_tzhour,
         c_tzmin
   );
+#endif
+
 }
 
 /*******************************************************************/

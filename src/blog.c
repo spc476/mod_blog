@@ -450,7 +450,8 @@ int (BlogEntryRead)(BlogEntry entry)
   if (rc != 0)
     return(ERR_ERR);
   
-  entry->body = MemAlloc(status.st_size + 1);
+  entry->timestamp = status.st_mtime;
+  entry->body      = MemAlloc(status.st_size + 1);
   memset(entry->body,0,status.st_size + 1);
   in = FileStreamRead(fname);
   if (in == NULL)
