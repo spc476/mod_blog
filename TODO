@@ -11,6 +11,9 @@
 
 	The robots META tags should read "noindex, follow".
 
+	Also, it's not an archive section, it's an overview section.  Rename
+	the command appropriately.
+
 2007-02-07T03:05-05:00
 
 	Add code to translate HTML entities in the title field to numeric
@@ -23,8 +26,6 @@
         file has the real name.
 
 ==============================
-
-
 
 2007-08-27T12:00-05:00	DONE
 
