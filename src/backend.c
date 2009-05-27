@@ -38,11 +38,11 @@
 #include <cgilib/util.h>
 #include <cgilib/stream.h>
 #include <cgilib/cgi.h>
+#include <cgilib/chunk.h>
 
 #include "conf.h"
 #include "blog.h"
 #include "timeutil.h"
-#include "chunk.h"
 #include "wbtum.h"
 #include "frontend.h"
 #include "fix.h"

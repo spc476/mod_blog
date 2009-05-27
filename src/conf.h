@@ -110,10 +110,12 @@
 *
 *********************************************************************/
 
+#if 0
 #ifdef _POSIX_PATH_MAX
 #  define FILENAME_LEN	_POSIX_PATH_MAX
 #else
 #  define FILENAME_LEN 255
+#endif
 #endif
 
 #endif

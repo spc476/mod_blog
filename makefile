@@ -64,7 +64,6 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/blog.o		\
 		$(HOSTDIR)/callbacks.o		\
 		$(HOSTDIR)/cgi_main.o		\
-		$(HOSTDIR)/chunk.o		\
 		$(HOSTDIR)/cli_main.o		\
 		$(HOSTDIR)/conversion.o		\
 		$(HOSTDIR)/globals.o		\
@@ -80,7 +79,6 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/blog.o		\
 		$(HOSTDIR)/callbacks.o		\
 		$(HOSTDIR)/cgi_main.o		\
-		$(HOSTDIR)/chunk.o		\
 		$(HOSTDIR)/cli_main.o		\
 		$(HOSTDIR)/conversion.o		\
 		$(HOSTDIR)/globals.o		\
@@ -102,7 +100,6 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 $(HOSTDIR)/bp : $(HOSTDIR)/bp.o			\
 		$(HOSTDIR)/globals.o		\
 		$(HOSTDIR)/system.o		\
-		$(HOSTDIR)/chunk.o		\
 		$(HOSTDIR)/blog.o		\
 		$(HOSTDIR)/timeutil.o		\
 		$(HOSTDIR)/wbtum.o
@@ -110,7 +107,6 @@ $(HOSTDIR)/bp : $(HOSTDIR)/bp.o			\
 		$(HOSTDIR)/bp.o			\
 		$(HOSTDIR)/globals.o		\
 		$(HOSTDIR)/system.o		\
-		$(HOSTDIR)/chunk.o		\
 		$(HOSTDIR)/blog.o		\
 		$(HOSTDIR)/timeutil.o		\
 		$(HOSTDIR)/wbtum.o		\
@@ -187,9 +183,6 @@ $(HOSTDIR)/conversion.o : src/conversion.c src/conversion.h
 
 $(HOSTDIR)/timeutil.o : src/timeutil.c src/timeutil.h
 	$(CC) $(CFLAGS) -c -o $@ src/timeutil.c
-
-$(HOSTDIR)/chunk.o : src/chunk.c src/chunk.h
-	$(CC) $(CFLAGS) -c -o $@ src/chunk.c
 
 $(HOSTDIR)/wbttest.o : src/wbttest.c src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/wbttest.c
