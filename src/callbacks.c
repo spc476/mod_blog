@@ -75,7 +75,9 @@ static void	cb_entry_adtag			(Stream,void *);
 static void	cb_entry_author			(Stream,void *);
 static void	cb_entry_body			(Stream,void *);
 static void	cb_entry_body_entified		(Stream,void *);
+
 static void	cb_cond_hr			(Stream,void *);
+static void	cb_cond_blog_title		(Stream,void *);
 
 static void	cb_rss_pubdate			(Stream,void *);
 static void	cb_rss_url			(Stream,void *);
@@ -157,6 +159,7 @@ struct chunk_callback  m_callbacks[] =
   { "comments.check"		, cb_comments_check		} ,
   
   { "cond.hr"			, cb_cond_hr			} ,
+  { "cond.blog.title"		, cb_cond_blog_title		} ,
 
   { "rss.pubdate"		, cb_rss_pubdate		} ,
   { "rss.url"			, cb_rss_url			} ,
@@ -823,6 +826,28 @@ static void cb_cond_hr(Stream out,void *data)
   {
     if (blog->curnum)
       LineS(out,"<hr class=\"next\">");
+  }
+}
+
+/*********************************************************************/
+
+static void cb_cond_blog_title(Stream out,void *data)
+{
+  List    *plist = data;
+  BlogDay  blog;
+  
+  ddt(out != NULL);
+  ddt(data != NULL);
+  
+  if (gd.navunit == PART)
+  {
+    blog = (BlogDay)ListGetHead(plist);
+    LineSFormat(
+    	out,
+    	"$",
+    	"%a - ",
+    	blog->entries[blog->curnum]->title
+    );
   }
 }
 
