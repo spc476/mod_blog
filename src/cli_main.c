@@ -56,6 +56,7 @@ enum
   OPT_ENTRY,
   OPT_STDIN,
   OPT_REGENERATE,
+  OPT_FORCENOTIFY,
   OPT_HELP,
   OPT_DEBUG
 };
@@ -74,18 +75,19 @@ static int	cli_error		(Request,int,char *,char *, ... );
 
 static const struct option coptions[] =
 {
-  { "config"	 , required_argument	, NULL	, OPT_CONFIG 	 } ,
-  { "regenerate" , no_argument		, NULL	, OPT_REGENERATE } ,
-  { "regen"	 , no_argument		, NULL	, OPT_REGENERATE } ,
-  { "cmd"	 , required_argument	, NULL	, OPT_CMD    	 } ,
-  { "file"	 , required_argument	, NULL	, OPT_FILE   	 } ,
-  { "email"	 , no_argument		, NULL	, OPT_EMAIL  	 } ,
-  { "update"	 , required_argument	, NULL	, OPT_UPDATE 	 } ,
-  { "entry"	 , required_argument	, NULL	, OPT_ENTRY  	 } ,
-  { "stdin"      , no_argument          , NULL	, OPT_STDIN  	 } ,
-  { "help"	 , no_argument		, NULL	, OPT_HELP   	 } ,
-  { "debug"	 , no_argument		, NULL  , OPT_DEBUG  	 } ,
-  { NULL         , 0			, NULL	, 0          	 }
+  { "config"	   , required_argument	, NULL	, OPT_CONFIG 	  } ,
+  { "regenerate"   , no_argument	, NULL	, OPT_REGENERATE  } ,
+  { "regen"	   , no_argument	, NULL	, OPT_REGENERATE  } ,
+  { "cmd"	   , required_argument	, NULL	, OPT_CMD    	  } ,
+  { "file"	   , required_argument	, NULL	, OPT_FILE   	  } ,
+  { "email"	   , no_argument	, NULL	, OPT_EMAIL  	  } ,
+  { "update"	   , required_argument	, NULL	, OPT_UPDATE 	  } ,
+  { "entry"	   , required_argument	, NULL	, OPT_ENTRY  	  } ,
+  { "stdin"        , no_argument        , NULL	, OPT_STDIN  	  } ,
+  { "force-notify" , no_argument 	, NULL  , OPT_FORCENOTIFY } ,
+  { "help"	   , no_argument	, NULL	, OPT_HELP   	  } ,
+  { "debug"	   , no_argument	, NULL  , OPT_DEBUG  	  } ,
+  { NULL           , 0			, NULL	, 0          	  }
 };
 
 /*************************************************************************/
@@ -95,6 +97,7 @@ int main_cli(int argc,char *argv[])
   struct request  req;
   char           *config = NULL;
   int             rc;
+  int             forcenotify = FALSE;
   
   memset(&req,0,sizeof(struct request));
 
@@ -140,6 +143,9 @@ int main_cli(int argc,char *argv[])
       case OPT_REGENERATE:
            req.f.regenerate = TRUE;
            break;
+      case OPT_FORCENOTIFY:
+           forcenotify = TRUE;
+	   break;
       case OPT_CMD:
            get_cli_command(&req,optarg);
            break;
@@ -157,6 +163,7 @@ int main_cli(int argc,char *argv[])
 		"\t--update ('new' | 'modify' | 'template' | 'other')\n"
 		"\t--entry <tumbler>\n"
 		"\t--stdin\n"
+		"\t--force-notify\n"
 		"\t--help\n"
 		"\t--debug\n",
 		argv[0]
@@ -180,6 +187,12 @@ int main_cli(int argc,char *argv[])
   if (rc != ERR_OKAY)
     return((*req.error)(&req,HTTP_ISERVERERR,"","could not initialize dates"));
   
+  if (forcenotify)
+  {
+    notify_emaillist();
+    return(0);
+  }
+
   rc = (*req.command)(&req);
   return(rc);  
 }
