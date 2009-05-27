@@ -6,6 +6,5 @@ CVS
 *.a
 *~
 build/boston
-notes
-notes.conf
+NOTES
 
