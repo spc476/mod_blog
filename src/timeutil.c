@@ -150,16 +150,6 @@ int tm_cmp(struct tm *ptm1,struct tm *ptm2)
   if ((rc = ptm1->tm_mon  - ptm2->tm_mon))  return(rc);
   if ((rc = ptm1->tm_mday - ptm2->tm_mday)) return(rc);
 
-#if 0
-  /*----------------------------------------------------
-  ; I think this is the midnight display bug right here.
-  ; I'm commenting out this line and see if that blows up
-  ; things.  I don't think so.
-  ;----------------------------------------------------*/
-  
-  if ((rc = ptm1->tm_hour - ptm2->tm_hour)) return(rc);
-#endif
-
   return(0);
 }
 
