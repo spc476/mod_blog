@@ -737,7 +737,7 @@ static int display_file(Stream out,Tumbler spec)
     if (strcmp(type,"text/x-html") == 0)
     {
       gd.htmldump = in;
-      LineS(out,"HTTP/1.0 200 Okay\r\nContent-type: text/html\r\n\r\n");
+      LineS(out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
       generic_cb("main",out,NULL);
     }
     else
@@ -745,7 +745,7 @@ static int display_file(Stream out,Tumbler spec)
       LineSFormat(
       		out,
       		"$ L",
-                "HTTP/1.0 200 Okay\r\n"
+		"Status: 200\r\n"
                 "Content-type: %a\r\n"
   	        "Content-length: %b\r\n"
 		"\r\n",
@@ -1000,7 +1000,7 @@ static void display_error(Stream out,int err)
   LineSFormat(
   	out,
   	"i",
-        "HTTP/1.0 %a Error\r\n"
+	"Status: %a\r\n"
         "Content-type: text/html\r\n"
         "\r\n"
         "<html>\n"

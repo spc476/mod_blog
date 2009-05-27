@@ -110,7 +110,7 @@ static int cmd_cgi_get_new(Request req)
   
   ListInit(&days);
   gd.f.edit = 1;
-  LineS(req->out,"HTTP/1.0 200 Okay\r\nContent-type: text/html\r\n\r\n");
+  LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
   generic_cb("main",req->out,&days);
   return(0);
 }
@@ -127,7 +127,7 @@ static int cmd_cgi_get_show(Request req)
   {
     LineS(
     	req->out,
-    	"HTTP/1.0 200 Okay\r\n"
+	"Status: 200\r\n"
     	"Content-type: text/html\r\n"
     	"\r\n"
     );
@@ -140,7 +140,7 @@ static int cmd_cgi_get_show(Request req)
     if (rc == ERR_OKAY)
     {
       if (req->tumbler->flags.file == FALSE)
-        LineS(req->out,"HTTP/1.0 200 Okay\r\nContent-type: text/html\r\n\r\n");
+        LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
       rc = tumbler_page(req->out,req->tumbler);
     }
     else
@@ -257,7 +257,7 @@ static int cmd_cgi_post_new(Request req)
     LineSFormat(
     	req->out,
 	"i $",
-	"HTTP/1.0 %a Go here\r\n"
+	"Status: %a\r\n"
 	"Location: %b\r\n"
 	"Content-type: text/html\r\n"
 	"\r\n"
@@ -324,7 +324,7 @@ static int cmd_cgi_post_show(Request req)
   
   day->stentry = day->endentry;
   
-  LineS(req->out,"HTTP/1.0 200 Okay\r\nContent-type: text/html\r\n\r\n");
+  LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
   
   generic_cb("main",req->out,&listofdays);
   
@@ -354,7 +354,7 @@ static int cgi_error(Request req,int level,char *format,char *msg, ... )
   LineSFormat(
         req->out,
 	"i",
-	"HTTP/1.0 %a Error\r\n"
+	"Status: %a\r\n"
 	"Content-type: text/html\r\n"
 	"\r\n"
 	"<HTML>\n"
