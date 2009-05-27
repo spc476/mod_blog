@@ -463,9 +463,9 @@ static int cgi_error(Request req,int level,char *format,char *msg, ... )
     	"\r\n",
     	level);
     generic_cb("main",req->out,NULL);
+    StreamFree(in);
   }
 
-  StreamFree(in);
   return(ERR_OKAY);
 }
 
