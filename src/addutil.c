@@ -52,52 +52,34 @@
 
 int entry_add(Request req)
 {
-#if 0
-	/* XXX */
-  struct tm date;
-  BlogDay   day;
-  BlogEntry entry;
-  int       lock;
-  
-  ddt(req != NULL);
-    
-  if ((req->date == NULL) || (empty_string(req->date)))
-  {
-    time_t t;
-    struct tm *now;
-    
-    t = time(NULL);
-    now = localtime(&t);
-    date = *now;
-  }
-  else
-  {
-    char *p;
-    
-    date.tm_sec   = 0;
-    date.tm_min   = 0;
-    date.tm_hour  = 1;
-    date.tm_wday  = 0;
-    date.tm_yday  = 0;
-    date.tm_isdst = -1;
-    date.tm_year  = strtoul(req->date,&p,10); p++;
-    date.tm_mon   = strtoul(p,&p,10); p++;
-    date.tm_mday  = strtoul(p,NULL,10);
-    tm_to_tm(&date);
-  }
+  BlogEntry  entry;
+  char      *p;
   
   fix_entry(req);
-
-  if (c_authorfile) lock = BlogLock(c_lockfile);
-  BlogDayRead(&day,&date);
-  BlogEntryNew(&entry,req->title,req->class,req->author,req->body,strlen(req->body));
-  BlogDayEntryAdd(day,entry);
-  BlogDayWrite(day);
-  BlogDayFree(&day);
-  if (c_authorfile) BlogUnlock(lock);
-#endif
-
-  return(ERR_OKAY);
+  if (c_authorfile) BlogLock(g_blog);
+  
+  entry = BlogEntryNew(g_blog);
+  
+  if ((req->date == NULL) || (empty_string(req->date)))
+    entry->when = gd.updatetime;
+  else
+  {
+    entry->when.year  = strtoul(req->date,&p,10); p++;
+    entry->when.month = strtoul(p,        &p,10); p++;
+    entry->when.day   = strtoul(p,        &p,10);
+  }
+  
+  entry->when.part = 0;
+  entry->timestamp = gd.tst;
+  entry->title     = req->title;
+  entry->class     = req->class;
+  entry->author    = req->author;
+  entry->body      = req->body;
+  
+  BlogEntryWrite(entry);
+  
+  if (c_authorfile) BlogUnlock(g_blog);
+  return(ERR_OKAY);    
 }
 
 /************************************************************************/
