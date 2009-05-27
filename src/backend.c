@@ -1008,19 +1008,34 @@ static char *tag_pick(const char *tag)
   char   *pick;
   
   ddt(tag != NULL);
+
+  if (empty_string(tag))
+    return(dup_string(gd.adtag));
   
   pool = tag_split(&num,tag);
-  r    = (((double)rand() / (double)RAND_MAX) * (double)num); 
-  ddt(r < num);
-  
-  pick = MemAlloc(pool[r].s + 1);
-  memcpy(pick,pool[r].d,pool[r].s);
-  pick[pool[r].s] = '\0';
+
+  /*-------------------------------------
+  ; if num is 0, then the tag string was
+  ; malformed (basically, started with
+  ; a ',') and therefore, we fall back to
+  ; the default adtag.
+  ;-------------------------------------*/
+
+  if (num)
+  {
+    r  = (((double)rand() / (double)RAND_MAX) * (double)num); 
+    ddt(r < num);
+    pick = MemAlloc(pool[r].s + 1);
+    memcpy(pick,pool[r].d,pool[r].s);
+    pick[pool[r].s] = '\0';
+  }
+  else
+    pick = dup_string(gd.adtag);
   
   MemFree(pool);
   return(pick);
 }
-  
+ 
 /******************************************************************/
 
 static String *tag_split(size_t *pnum,const char *tag)
@@ -1043,8 +1058,8 @@ static String *tag_split(size_t *pnum,const char *tag)
     
     for (p = tag ; (*p) && (*p != ',') ; p++)
       ;
-    if (*p == '\0')
-      break;
+    if (p == tag) break;
+
     pool[num].d   = tag;
     pool[num++].s = p - tag;
     
