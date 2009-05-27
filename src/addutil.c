@@ -91,6 +91,24 @@ int entry_add(Request req)
   BlogDayWrite(day);
   BlogDayFree(&day);
   if (g_authorfile) BlogUnlock(lock);
+
+  /*------------------------------------------------------
+  ; Why do we call set_time() here?  Because of a subtle
+  ; bug.  Basically, the program starts, let's say at
+  ; time T, and we add an entry.  By the time we're finished,
+  ; it may be T+1s, and the content generation will consider
+  ; the newly added entry as being in the future (for
+  ; very small values of "future").  By doing this, we 
+  ; cause a temporal rift and slam the past up to the future
+  ; (or slam the future into the here-and-now---whatever).
+  ;
+  ; Basically, we are now assured of actually generating
+  ; the new content we just added.
+  ;
+  ; Just so you know.
+  ;-------------------------------------------------------*/
+
+  set_time();
   
   return(ERR_OKAY);
 }

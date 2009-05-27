@@ -33,6 +33,7 @@
 #include "globals.h"
 #include "blog.h"
 #include "timeutil.h"
+#include "fix.h"
 
 /************************************************************************/
 
@@ -69,10 +70,8 @@ int main(int argc,char *argv[])
 
 int BlogDatesInit(void)
 {
-  time_t     t;
-  struct tm *today;
-  BlogDay    day;
-  int        rc;
+  BlogDay day;
+  int     rc;
 
   tm_init(&gd.begin);
   gd.begin.tm_year = g_styear;
@@ -81,11 +80,8 @@ int BlogDatesInit(void)
   gd.begin.tm_hour = 1;
   
   tm_to_tm(&gd.begin);
+  set_time();
   
-  t     = time(NULL);
-  today = localtime(&t);
-  gd.now = gd.updatetime = *today;
-
   while(TRUE)
   {
     if (tm_cmp(&gd.now,&gd.begin) < 0)
@@ -111,6 +107,18 @@ int BlogDatesInit(void)
     break;
   }
   return(ERR_OKAY);
+}
+
+/***********************************************************************/
+
+void set_time(void)
+{
+  time_t     t;
+  struct tm *today;
+  
+  t      = time(NULL);
+  today  = localtime(&t);
+  gd.now = gd.updatetime = *today;
 }
 
 /***********************************************************************/
