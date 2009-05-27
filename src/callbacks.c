@@ -1148,13 +1148,13 @@ static void print_nav_url(Stream out,struct tm *ptm,int unit)
          LineSFormat(out,"i4","%a",date.tm_year);
          break;
     case MONTH:
-         LineSFormat(out,"i4 i","%a/%b",date.tm_year,date.tm_mon);
+         LineSFormat(out,"i4 i2r0","%a/%b",date.tm_year,date.tm_mon);
          break;
     case DAY:  
-         LineSFormat(out,"i4 i i","%a/%b/%c",date.tm_year,date.tm_mon,date.tm_mday);
+         LineSFormat(out,"i4 i2r0 i2r0","%a/%b/%c",date.tm_year,date.tm_mon,date.tm_mday);
          break;
     case PART:
-         LineSFormat(out,"i4 i i i","%a/%b/%c.%d",date.tm_year,date.tm_mon,date.tm_mday,date.tm_hour);
+         LineSFormat(out,"i4 i2r0 i2r0 i","%a/%b/%c.%d",date.tm_year,date.tm_mon,date.tm_mday,date.tm_hour);
          break;
     default:
          ddt(0);
