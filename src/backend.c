@@ -796,26 +796,27 @@ int primary_page(Stream out,int year,int month,int iday)
   {
     int rc;
     
-    /*------------------------------------------------------
-    ; I think there's a bug with the second statement
-    ; here, which (supposedly) prevents us from
-    ; displaying pages from the future.  I'll have
-    ; to investigate this some, but since I can't *EMERGE*
-    ; gdb on the production box (#!#!#$!~#$ package managers)
-    ; I can't fully debug this when it happens (and it doesn't
-    ; happen consistently) and until I get GDB install
-    ; on the production box, I may have to manually nudge the
-    ; output.  Just now (2006-02-11) had a problem where
+    /*-----------------------------------------------------------------
+    ; There's a bug.  gd.now isn't be initialized properly in all
+    ; code paths.  If it *isn't* initialized properly, then 
     ;
-    ;	nph-boston.cgi --config nph-boston.cnf --regen
-    ; 
-    ; failed, but
+    ;	blog --config conf 
     ;
-    ;	nph-boston.cgi --config nph-boston.cnf >index.html
+    ; works between 00:00:00 and 00:59:59, but
     ;
-    ; worked.  Wierd.
-    ;-------------------------------------------------------------*/
-
+    ;	blog --config conf --regen
+    ;
+    ; fails between 00:00:00 and 00:59:59.  If it *is* initialized
+    ; properly, then both would fail between 00:00:00 and 00:59:59.
+    ;
+    ; This bug is due to the way I use the struct tm.tm_hour field, not
+    ; as an hour per se, but as a entry to use.
+    ;
+    ; This is bad.
+    ;
+    ; I need to think on this.
+    ;-------------------------------------------------------------------*/
+    
     if (tm_cmp(&thisday,&gd.begin) < 0) break;
     if (tm_cmp(&thisday,&gd.now)   > 0) break;
 
