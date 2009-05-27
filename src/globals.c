@@ -74,7 +74,7 @@ const char    *c_author;
 const char    *c_email;
 const char    *c_authorfile;
 const char    *c_updatetype   = "NewEntry";
-const char    *c_lockfile;
+const char    *c_lockfile     = "/tmp/.mod_blog.lock";
 int            cf_weblogcom   = FALSE;
 const char    *c_weblogcomurl = "http://newhome.weblogs.com/pingSiteForm";
 char          *c_emaildb;
