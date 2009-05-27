@@ -1,6 +1,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <getopt.h>
 
@@ -8,7 +9,23 @@
 #include <cgi/buffer.h>
 #include <cgi/ddt.h>
 #include <cgi/clean.h>
+#include <cgi/errors.h>
 #include <cgi/cgi.h>
+#include <cgi/util.h>
+
+#include "conf.h"
+#include "globals.h"
+#include "blog.h"
+#include "frontend.h"
+#include "timeutil.h"
+#include "wbtum.h"
+#include "fix.h"
+
+#define MAILSETUPDATA	(ERR_APP + 1)
+#define SETUPERR_INPUT	(ERR_APP + 2)
+#define FILESETUPDATA	(ERR_APP + 3)
+#define SETUPERR_AUTH	(ERR_APP + 4)
+#define SETUPERR_MEMORY	(ERR_APP + 5)
 
 enum
 {
@@ -24,6 +41,16 @@ enum
   OPT_HELP,
   OPT_DEBUG
 };
+
+/*******************************************************************/
+
+int		cmd_cli_new		(Request);
+int		cmd_cli_show		(Request);
+void		get_cli_command		(Request,char *);
+static int	mail_setup_data		(Request);
+static int	file_setup_data		(Request);
+static int	mailfile_readdata	(Request);
+int		cli_error		(Request,char *, ... );
 
 /*************************************************************************/
 
@@ -47,12 +74,13 @@ static const struct option coptions[] =
 
 int main_cli(int argc,char *argv[])
 {
-  struct request req;
-  int            rc;
+  struct request  req;
+  char           *config;
+  int             rc;
   
   memset(&req,0,sizeof(struct request));
 
-  req.command    = cli_cmd_show;
+  req.command    = cmd_cli_show;
   req.error      = cli_error;
   req.fpin       = stdin;
   req.fpout      = stdout;
@@ -75,43 +103,43 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_FILE:
            req.f.filein = TRUE;
-           rc = FileBuffer(
+           break;
       case OPT_EMAIL:
            req.f.emailin = TRUE;
            break;
       case OPT_STDIN:
-           req.f.stdin = TRUE;
+           req.f.std_in = TRUE;
            break;
       case OPT_UPDATE:
            req.f.update = TRUE;
            set_g_updatetype(optarg);
            break;
       case OPT_ENTRY:
-           req.tumbler = dupstring(optarg);
+           req.reqtumbler = dup_string(optarg);
            break;
       case OPT_DEBUG:
            g_debug = TRUE;
            break;
       case OPT_REGENERATE:
-           req.f.regen = TRUE;
+           req.f.regenerate = TRUE;
            break;
       case OPT_CMD:
            get_cli_command(&req,optarg);
            break;
       case OPT_HELP:
       default:
-           return ((*req->error)(req,"%s - unknown option or help",argv[0]));
+           return ((*req.error)(&req,"%s - unknown option or help",argv[0]));
     }
   }
 
   if (config == NULL)
-    return((*req->error)(req,"no configuration file specified"));
+    return((*req.error)(&req,"no configuration file specified"));
   
   rc = GlobalsInit(config);
   if (rc != ERR_OKAY)
   {
     ErrorLog();
-    return((*req->error)(req,"could not open cofiguration file %s",config));
+    return((*req.error)(&req,"could not open cofiguration file %s",config));
   }
   
   BlogInit();
@@ -127,7 +155,6 @@ int cmd_cli_new(Request req)
 {
   int rc;
   
-  int rc;
   ddt(req         != NULL);
   ddt(req.f.cgiin == FALSE);
 
@@ -135,7 +162,7 @@ int cmd_cli_new(Request req)
   ; req.f.stdin and req.f.filein may be uneeded
   ;-------------------------------------------------*/
   
-  if (req.f.emailin)
+  if (req->f.emailin)
     rc = mail_setup_data(req);
   else
     rc = file_setup_data(req);
@@ -167,7 +194,6 @@ int entry_add(Request req)
   BlogDay   day;
   BlogEntry entry;
   int       lock;
-  int       rc;
   
   ddt(req != NULL);
     
@@ -200,7 +226,7 @@ int entry_add(Request req)
 
   if (g_authorfile) lock = BlogLock(g_lockfile);
   BlogDayRead(&day,&date);
-  BlogEntryNew(&entry,req->title,req->author,req->body,strlen(req->body));
+  BlogEntryNew(&entry,req->title,req->class,req->author,req->body,strlen(req->body));
   BlogDayEntryAdd(day,entry);
   BlogDayWrite(day);
   BlogDayFree(&day);
@@ -221,17 +247,19 @@ int cmd_cli_show(Request req)
   ddt(req.f.filein  == FALSE);
   ddt(req.f.update  == FALSE);
 
-  if (req.f.regen)
+  if (req->f.regenerate)
     rc = generate_pages(req);  
   else
   {
-    if (req.tumbler == NULL)
+    if (req->reqtumbler == NULL)
+    {
       /* ??? */
+    }
     else
     {
-      rc = TublerNew(&req->tumbler,req->reqtumbler);
+      rc = TumblerNew(&req->tumbler,&req->reqtumbler);
       if (rc == ERR_OKAY)
-        rc = tumbler_page(req);
+        rc = tumbler_page(req->fpout,req->tumbler);
       else
         rc = (*req->error)(req,"tumbler error---nothing found");
     }
@@ -260,6 +288,10 @@ void get_cli_command(Request req,char *value)
 
 static int mail_setup_data(Request req)
 {
+  int    rc;
+  size_t size;
+  char   data[BUFSIZ];
+  
   ddt(req != NULL);
   ddt(req.f.emailin == TRUE);
   
@@ -280,13 +312,15 @@ static int mail_setup_data(Request req)
     LineRead822(req->lbin,data,&size);
   } while ((size != 0) && (!empty_string(data)));
   
-  return(mailfile_readdata());
+  return(mailfile_readdata(req));
 }
 
 /*******************************************************************/
 
 static int file_setup_data(Request req)
 {
+  int rc;
+  
   rc = LineBuffer(&req->lbin,req->bin);
   if (rc != ERR_OKAY)
     return(ErrorPush(AppErr,FILESETUPDATA,SETUPERR_INPUT,""));
@@ -369,4 +403,11 @@ static int mailfile_readdata(Request req)
 }
 
 /***************************************************************************/
+
+int cli_error(Request req,char *msg, ... )
+{
+  return(ERR_OKAY);
+}
+
+/**************************************************************************/
 

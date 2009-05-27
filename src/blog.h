@@ -33,14 +33,14 @@
 
 typedef struct blogentry
 {
-  Node    node;
-  char   *date;
-  int     number;
-  const char   *title;
-  const char   *class;
-  const char   *author;
-  size_t  bsize;
-  void   *body;
+  Node        node;
+  char       *date;
+  int         number;
+  const char *title;
+  const char *class;
+  const char *author;
+  size_t      bsize;
+  void       *body;
 } *BlogEntry;
 
 typedef struct blogday

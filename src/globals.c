@@ -36,6 +36,8 @@
 #include "conf.h"
 #include "system.h"
 #include "conversion.h"
+#include "frontend.h"
+#include "fix.h"
 
 /***********************************************************/
 
@@ -83,6 +85,17 @@ int            g_tzmin        =  0;
 const char    *g_backend;
 void	     (*g_conversion)(char *,Buffer,Buffer)  =  html_conversion;
 volatile int   g_debug        = FALSE;
+
+#ifdef NEW
+  struct display gd =
+  {
+    m_callbacks,
+    CALLBACKS,
+    { FALSE , FALSE , FALSE , FALSE , TRUE , TRUE } ,
+    INDEX,
+    NULL
+  };
+#endif
 
 /****************************************************/
 

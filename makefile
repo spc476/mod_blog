@@ -54,7 +54,13 @@ LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4
 all:	$(HOSTDIR)/bp		\
 	$(HOSTDIR)/addentry
 
-boston:	$(HOSTDIR)/main.o
+boston:	$(HOSTDIR)/main.o		\
+	$(HOSTDIR)/cli_main.o		\
+	$(HOSTDIR)/cgi_main.o		\
+	$(HOSTDIR)/authenticate.o	\
+	$(HOSTDIR)/array.o		\
+	$(HOSTDIR)/addutil.o		\
+	$(HOSTDIR)/callbacks.o
 
 ###########################################################################
 #
@@ -145,6 +151,24 @@ $(HOSTDIR)/wbttest : $(HOSTDIR)/wbttest.o	\
 
 $(HOSTDIR)/main.o : src/main.c
 	$(CC) $(CFLAGS) -c -o $@ src/main.c
+
+$(HOSTDIR)/cli_main.o : src/cli_main.c
+	$(CC) $(CFLAGS) -c -o $@ src/cli_main.c
+
+$(HOSTDIR)/cgi_main.o : src/cgi_main.c
+	$(CC) $(CFLAGS) -c -o $@ src/cgi_main.c
+
+$(HOSTDIR)/authenticate.o : src/authenticate.c
+	$(CC) $(CFLAGS) -c -o $@ src/authenticate.c
+
+$(HOSTDIR)/array.o : src/array.c
+	$(CC) $(CFLAGS) -c -o $@ src/array.c
+
+$(HOSTDIR)/addutil.o : src/addutil.c
+	$(CC) $(CFLAGS) -c -o $@ src/addutil.c
+
+$(HOSTDIR)/callbacks.o : src/callbacks.c
+	$(CC) $(CFLAGS) -c -o $@ src/callbacks.c
 
 $(HOSTDIR)/bp.o : src/bp.c
 	$(CC) $(CFLAGS) -c -o $@ src/bp.c

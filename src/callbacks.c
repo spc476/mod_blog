@@ -27,8 +27,6 @@
 #include <limits.h>
 #include <string.h>
 #include <ctype.h>
-#include <errno.h>
-#include <assert.h>
 
 #include <sys/stat.h>
 #include <unistd.h>
@@ -47,25 +45,12 @@
 #include "chunk.h"
 #include "wbtum.h"
 #include "globals.h"
+#include "frontend.h"
+#include "fix.h"
 
 #define max(a,b)	((a) > (b)) ? (a) : (b)
 
 /*****************************************************************/
-
-static int	   cgi_main			(Cgi,int,char **);
-static int	   cli_main			(int,char **);
-static int         generate_pages		(void);
-static void	   BlogDatesInit		(void);
-
-static int	   tumbler_page			(FILE *,Tumbler);
-static void	   calculate_previous		(struct tm);
-static void	   calculate_next		(struct tm);
-static const char *mime_type			(char *);
-static int	   display_file			(Tumbler);
-static int	   primary_page			(FILE *,int,int,int);
-static int	   rss_page			(FILE *,int,int,int);
-static int	   tab_page			(FILE *,int,int,int);
-static void	   display_error		(int);
 
 static void	   generic_cb			(const char *,FILE *,void *);
 static void	   cb_blog_url			(FILE *,void *);
@@ -128,7 +113,7 @@ static void	   fixup_uri			(BlogDay,HtmlToken,const char *);
 
 /************************************************************************/
 
-static struct chunk_callback  m_callbacks[] =
+struct chunk_callback  m_callbacks[] =
 {
   { "blog.url"			, cb_blog_url			} ,
   { "blog.locallink"		, cb_blog_locallink		} ,
@@ -203,7 +188,7 @@ static void generic_cb(const char *which,FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  ChunkNew(&templates,g_templates,m_callbacks,CALLBACKS);
+  ChunkNew(&templates,g_templates,gd.callbacks,CALLBACKS);
   ChunkProcess(templates,which,fpout,data);
   ChunkFree(templates);
 }
@@ -250,14 +235,14 @@ static void cb_blog_body(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
 
-  if (m_htmldump)
+  if (gd.htmldump)
   {
     while(1)
     {
       size_t s;
       char   buffer[BUFSIZ];
     
-      s = fread(buffer,sizeof(char),BUFSIZ,m_htmldump);
+      s = fread(buffer,sizeof(char),BUFSIZ,gd.htmldump);
       if (s == 0) break;
       fwrite(buffer,sizeof(char),s,fpout);
     }
@@ -284,7 +269,7 @@ static void cb_blog_entry_locallinks(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  if (m_reverse)
+  if (gd.f.reverse)
   {
     for (i = blog->endentry ; i >= blog->stentry ; i--)
     {
@@ -382,7 +367,7 @@ static void cb_entry(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
 
-  if (m_reverse)
+  if (gd.f.reverse)
   {
     for (i = blog->endentry ; i >= blog->stentry ; i--)
     {
@@ -573,7 +558,7 @@ static void fixup_uri(BlogDay blog,HtmlToken token,const char *attrib)
     ; Which URL to use?  Full or partial?
     ;-----------------------------------------------------*/
     
-    if (m_fullurl)
+    if (gd.f.fullurl)
       baseurl = g_fullbaseurl;
     else
       baseurl = g_baseurl;
@@ -742,10 +727,10 @@ static void cb_cond_hr(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  if (m_navigation && (m_navunit == PART))
+  if (gd.f.navigation && (gd.navunit == PART))
     return;
 
-  if (m_reverse)
+  if (gd.f.reverse)
   {
     if (blog->curnum != blog->number - 1)
       fprintf(fpout,"<hr class=\"next\">");
@@ -801,7 +786,7 @@ static void cb_item(FILE *fpout,void *data)
         day = (BlogDay)NodeNext(&day->node)
       )
   {
-    if (m_reverse)
+    if (gd.f.reverse)
     {
       for (i = day->endentry ; (items < g_rssitems) && (i >= day->stentry) ; i--)
       {
@@ -843,7 +828,7 @@ static void cb_navigation_link(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  if (m_navigation == FALSE) return;
+  if (gd.f.navigation == FALSE) return;
   generic_cb("navigation.link",fpout,data);
 }
 
@@ -854,7 +839,7 @@ static void cb_navigation_link_next(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  if (m_navnext == FALSE) return;
+  if (gd.f.navnext == FALSE) return;
   generic_cb("navigation.link.next",fpout,data);
 }
 
@@ -865,7 +850,7 @@ static void cb_navigation_link_prev(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  if (m_navprev == FALSE) return;
+  if (gd.f.navprev == FALSE) return;
   generic_cb("navigation.link.prev",fpout,data);
 }
 
@@ -876,7 +861,7 @@ static void cb_navigation_bar(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  if (m_navigation == FALSE) return;
+  if (gd.f.navigation == FALSE) return;
   generic_cb("navigation.bar",fpout,data);
 }
 
@@ -887,7 +872,7 @@ static void cb_navigation_bar_next(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  if (m_navnext == FALSE) return;
+  if (gd.f.navnext == FALSE) return;
   generic_cb("navigation.bar.next",fpout,data);
 }
 
@@ -898,7 +883,7 @@ static void cb_navigation_bar_prev(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  if (m_navprev == FALSE) return;
+  if (gd.f.navprev == FALSE) return;
   generic_cb("navigation.bar.prev",fpout,data);
 }
 
@@ -909,7 +894,7 @@ static void cb_navigation_current(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  if (m_navunit != INDEX) return;
+  if (gd.navunit != INDEX) return;
   generic_cb("navigation.current",fpout,data);
 }
 
@@ -920,7 +905,7 @@ static void cb_navigation_next_url(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  print_nav_url(fpout,&m_next,m_navunit);
+  print_nav_url(fpout,&gd.next,gd.navunit);
 }
 
 /*******************************************************************/
@@ -930,7 +915,7 @@ static void cb_navigation_prev_url(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  print_nav_url(fpout,&m_previous,m_navunit);
+  print_nav_url(fpout,&gd.previous,gd.navunit);
 }
 
 /********************************************************************/
@@ -940,7 +925,7 @@ static void cb_navigation_current_url(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  print_nav_url(fpout,&m_now,MONTH);
+  print_nav_url(fpout,&gd.now,MONTH);
 }
 
 /*********************************************************************/
@@ -982,7 +967,7 @@ static void cb_begin_year(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  fprintf(fpout,"%4d",m_begin.tm_year + 1900);
+  fprintf(fpout,"%4d",gd.begin.tm_year + 1900);
 }
 
 /*******************************************************************/
@@ -992,7 +977,7 @@ static void cb_now_year(FILE *fpout,void *data)
   ddt(fpout != NULL);
   ddt(data  != NULL);
   
-  fprintf(fpout,"%4d",m_now.tm_year + 1900);
+  fprintf(fpout,"%4d",gd.now.tm_year + 1900);
 }
 
 /*******************************************************************/
@@ -1005,11 +990,11 @@ static void cb_update_time(FILE *fpout,void *data)
   fprintf(
            fpout,
            "%4d-%02d-%02dT%02d:%02d%+03d:%02d",
-           m_updatetime.tm_year + 1900,
-           m_updatetime.tm_mon  + 1,
-           m_updatetime.tm_mday,
-           m_updatetime.tm_hour,
-           m_updatetime.tm_min,
+           gd.updatetime.tm_year + 1900,
+           gd.updatetime.tm_mon  + 1,
+           gd.updatetime.tm_mday,
+           gd.updatetime.tm_hour,
+           gd.updatetime.tm_min,
            g_tzhour,
            g_tzmin
          );
@@ -1019,14 +1004,14 @@ static void cb_update_time(FILE *fpout,void *data)
 
 static void cb_update_type(FILE *fpout,void *data)
 {
-  fprintf(fpout,"%s",m_updatetype);
+  fprintf(fpout,"%s",g_updatetype);
 }
 
 /*******************************************************************/
 
 static void cb_robots_index(FILE *fpout,void *data)
 {
-  if (m_navunit == PART)
+  if (gd.navunit == PART)
     fprintf(fpout,"index");
   else
     fprintf(fpout,"noindex");
@@ -1036,7 +1021,7 @@ static void cb_robots_index(FILE *fpout,void *data)
 
 static void cb_comments(FILE *fpout,void *data)
 {
-  if (m_navunit != PART)
+  if (gd.navunit != PART)
     return;
   
   generic_cb("comments",fpout,data);

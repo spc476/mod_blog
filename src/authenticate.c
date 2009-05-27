@@ -4,8 +4,16 @@
 #include <stdlib.h>
 
 #include <cgi/memory.h>
+#include <cgi/buffer.h>
 #include <cgi/ddt.h>
+#include <cgi/clean.h>
+#include <cgi/errors.h>
+#include <cgi/cgi.h>
 #include <cgi/util.h>
+
+#include "conf.h"
+#include "globals.h"
+#include "frontend.h"
 
 #ifdef USE_GDBM
 #  include <gdbm.h>
@@ -191,12 +199,14 @@
           req->name   = req->author;
           req->author = dup_string(lines[2]);
 
-        fclose(fpin);
-        return(TRUE);
+          fclose(fpin);
+          return(TRUE);
+        }
       }
+      fclose(fpin);
+      return(FALSE);
     }
-    fclose(fpin);
-    return(FALSE);
+    return(TRUE);
   }
 
 #endif

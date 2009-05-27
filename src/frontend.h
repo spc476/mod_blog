@@ -2,9 +2,12 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
+#include <cgi/cgi.h>
+#include "wbtum.h"
+
 typedef struct rflags
 {
-  unsigned int stdin      : 1;
+  unsigned int std_in     : 1;
   unsigned int emailin    : 1;
   unsigned int filein     : 1;
   unsigned int cgiin      : 1;
@@ -50,14 +53,15 @@ typedef struct display
 {
   struct chunk_callback *callbacks;
   size_t                 numcb;
+  DFlags                 f;
+  int                    navunit;
+  FILE                  *htmldump;
   struct tm              begin;
   struct tm              now;
   struct tm              updatetime;
   struct tm              previous;
   struct tm              next;
-  FILE                  *htmldump;
-  DFlags                 f;
-  int                    navunit;
 } *Display;
 
 #endif
+
