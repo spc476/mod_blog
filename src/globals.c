@@ -85,7 +85,7 @@ const char    *c_overview;
 void	     (*c_conversion)(char *,Stream,Stream) =  html_conversion;
 
 const char    *g_templates;
-int            gf_emailupdate = FALSE;
+int            gf_emailupdate = TRUE;
 volatile int   gf_debug       = FALSE;
 Blog           g_blog;
 struct display gd =
