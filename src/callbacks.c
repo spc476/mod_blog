@@ -1148,7 +1148,7 @@ static void cb_robots_index(Stream out,void *data)
   ddt(out  != NULL);
   ddt(data != NULL);
   
-  if (gd.navunit == PART)
+  if ((gd.navunit == PART) || (gd.navunit == INDEX))
     LineS(out,"index");
   else
     LineS(out,"noindex");
