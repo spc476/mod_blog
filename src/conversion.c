@@ -374,7 +374,11 @@ static void html_handle_string(struct nested_params *local)
   
   ddt(local != NULL);
 
-  if (empty_string(text)) return;
+  /*---------------------------------------------------
+  ; I think is is why my tags sometime run together
+  ;---------------------------------------------------*/
+
+  /*if (empty_string(text)) return;*/	
 
   if (!local->pre)
   {
