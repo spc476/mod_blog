@@ -1,4 +1,79 @@
 
+restructuring both bp.c and addentry.c
+
+
+
+int main(int argc,char *argv[])
+{
+  Cgi cgi;
+
+  MemInit();
+  BufferInit();
+  DdtInit();
+  CleanInit();
+
+  if (CgiNew(&cgi,NULL) == ERR_OKAY)
+  {
+    switch(CgiMethod(cgi))
+    {
+      case GET:  rc = main_cgi_get (cgi,argv,argc); break;
+      case POST: rc = main_cgi_post(cgi,argv,argc); break;
+      default:   rc = XXX ; break;
+    }
+  }
+  else
+    rc = main_cli(argc,argv);
+  
+  return(rc);
+}
+
+int main_cgi_get(Cgi cgi,int argc,char *argv[])
+{
+}
+
+int main_cgi_post(Cgi cgi,int argc,char *argv[])
+{
+}
+
+int main_cli(int argc,char *argv[])
+{
+}
+
+
+
+GET:
+	$PATH_INFO	tumbler
+
+POST:
+	email	= 'yes'  | 'no'
+	filter	= 'text' | 'mixed' | 'html'
+	author	= string || $REMOTE_USER
+	title	= string
+	class	= string
+	date	= string
+	body	= string
+CLI:
+	--config	filespec
+	--file		input
+	--stdin		read from stdin
+	--email		read from stdin as email
+	--update	'new' | 'modify' | 'template' | 'other'
+	--spec		tumbler
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------
+
 Permissions for transcluding----look into adding a query string with
 permissions.
 
