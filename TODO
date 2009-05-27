@@ -1,3 +1,7 @@
+2007-08-06T01:14-05:00
+
+	Detect URLs of the form YYYY/M/D and redirect to YYYY/MM/DD
+
 2007-02-07T03:05-05:00
 
 	Add code to translate HTML entities in the title field to numeric
