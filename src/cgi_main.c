@@ -103,7 +103,7 @@ static void set_m_cgi_get_command(char *value,Request req)
 /***********************************************************************/
 
 static int cmd_cgi_get_new(Request req)
-{
+
   List days;
 
   ddt(req != NULL);
@@ -120,6 +120,8 @@ static int cmd_cgi_get_new(Request req)
 static int cmd_cgi_get_show(Request req)
 {
   int rc;
+  
+  ddt(req != NULL);
   
   if ((empty_string(req->reqtumbler)) || (strcmp(req->reqtumbler,"/") == 0))
   {
@@ -151,6 +153,7 @@ static int cmd_cgi_get_show(Request req)
 
 static int cmd_cgi_get_edit(Request req)
 {
+  ddt(req != NULL);
   return((*req->error)(req,HTTP_BADREQ,"","bad request"));
 }
 
@@ -160,6 +163,8 @@ int main_cgi_post(Cgi cgi,int argc,char *argv[])
 {
   struct request req;
   int            rc;
+  
+  ddt(cgi != NULL);
   
   rc = cgi_init(cgi,&req);
   if (rc != ERR_OKAY)
@@ -224,6 +229,8 @@ static void set_m_cgi_post_command(char *value,Request req)
 
 static void set_m_author(char *value,Request req)
 {
+  ddt(req != NULL);
+  
   if (emptynull_string(value))
     req->author = spc_getenv("REMOTE_USER");
   else
@@ -237,6 +244,8 @@ static void set_m_author(char *value,Request req)
 static int cmd_cgi_post_new(Request req)
 {
   int rc;
+  
+  ddt(req != NULL);
   
   rc = entry_add(req);
   if (rc == ERR_OKAY)
@@ -275,6 +284,8 @@ static int cmd_cgi_post_show(Request req)
   BlogEntry entry;
   struct tm date;
 
+  ddt(req != NULL);
+  
   gd.f.edit = TRUE;
   
   ListInit(&listofdays);
@@ -335,6 +346,10 @@ static int cgi_error(Request req,int level,char *format,char *msg, ... )
 {
   va_list args;
 
+  ddt(req    != NULL);
+  ddt(format != NULL);
+  ddt(msg    != NULL);
+  
   va_start(args,msg);
   LineSFormat(
         req->out,
@@ -364,6 +379,9 @@ static int cgi_init(Cgi cgi,Request req)
 {
   char *script;
   int   rc;
+  
+  ddt(cgi != NULL);
+  ddt(req != NULL);
   
   memset(req,0,sizeof(struct request));
   
