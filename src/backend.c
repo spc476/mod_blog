@@ -430,11 +430,8 @@ static void calculate_previous(struct btm start)
 
 static void calculate_next(struct btm end)
 {
-  gd.next.year  = 0;
-  gd.next.month = 1;
-  gd.next.day   = 1;
-  gd.next.part  = 1;
-    
+  gd.next = end;
+  
   switch(gd.navunit)
   {
     case YEAR:
@@ -450,21 +447,13 @@ static void calculate_next(struct btm end)
             )
            gd.f.navnext = FALSE;
          else
-         {
-           gd.next.year  = end.year;
-           gd.next.month = end.month;
            btm_add_month(&gd.next);
-         }
          break;
     case DAY:
          if (btm_cmp_date(&end,&gd.now) == 0)
            gd.f.navnext = FALSE;
          else
          {
-           gd.next.year  = end.year;
-           gd.next.month = end.month;
-           gd.next.day   = end.day;
-           gd.next.part  = 1;
            btm_add_day(&gd.next);
            
            while(btm_cmp(&gd.next,&gd.now) < 0)
@@ -489,24 +478,16 @@ static void calculate_next(struct btm end)
            gd.f.navnext = FALSE;
 	 else
 	 {
-           gd.next.year  = end.year;
-           gd.next.month = end.month;
-           gd.next.day   = end.day;
-           gd.next.part  = end.part + 1;
+	   gd.next.part++;
          
-           if (end.part > 23)
-           {
-             btm_add_day(&gd.next);
-             gd.next.part = 1;
-           }
-         
-           while(btm_cmp(&gd.next,&gd.now) < 0)
+           while(btm_cmp(&gd.next,&gd.now) <= 0)
            {
              BlogEntry entry;
              
              entry = BlogEntryRead(g_blog,&gd.next);
              if (entry == NULL)
              {
+               gd.next.part = 1;
                btm_add_day(&gd.next);
                continue;
              }
