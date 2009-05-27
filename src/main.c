@@ -65,7 +65,9 @@ int main(int argc,char *argv[])
   }
   else
     rc = main_cli(argc,argv);
-  
+
+  StreamFlush(StderrStream);
+  StreamFlush(StdoutStream);
   return(rc);
 }
 

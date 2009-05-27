@@ -197,7 +197,7 @@ struct chunk_callback  m_callbacks[] =
   { "edit.email"		, cb_edit_email			} ,
   { "edit.filter"		, cb_edit_filter		} ,
   { "edit.body"			, cb_edit_body			} ,
-  
+
   { "xyzzy"			, cb_xyzzy			} 
 
 };
@@ -1422,7 +1422,7 @@ static void cb_edit_body(Stream out,void *data)
 
 static void cb_xyzzy(Stream out,void *data)
 {
-  ddt(out != NULL);
+  ddt(out  != NULL);
   ddt(data != NULL);
   
   LineS(out,"Nothing happens.");

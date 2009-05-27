@@ -165,7 +165,7 @@ int tumbler_page(Stream out,Tumbler spec)
   if (spec->flags.file)
   {
     display_file(out,spec);
-    return(HTTP_CONTINUE);	/* XXX hack for now */
+    return(ERR_OKAY);	/* XXX hack for now */
   }
 
   ListInit(&listodays);

@@ -181,7 +181,7 @@ static int cmd_cgi_get_show(Request req)
         	c_fullbaseurl,
         	tum
         );
-	StreamFlush(req->out);
+	/*StreamFlush(req->out);*/
         MemFree(tum);
 	MemFree(status);
 	return(ERR_OKAY);
@@ -419,6 +419,19 @@ static int cgi_error(Request req,int level,char *format,char *msg, ... )
 {
   Stream in;
   char *file;
+  char *errmsg;
+  
+  {
+    Stream  stmp;
+    va_list args;
+    
+    stmp = StringStreamWrite();
+    va_start(args,msg);
+    LineSFormatv(stmp,format,msg,args);
+    va_end(args);
+    errmsg = StringFromStream(stmp);
+    StreamFree(stmp);
+  }
 
   {
     char   *docroot;
@@ -437,8 +450,9 @@ static int cgi_error(Request req,int level,char *format,char *msg, ... )
   {
     LineSFormat(
   	req->out,
-  	"i",
+  	"i $",
 	"Status: %a\r\n"
+	"X-Error: %b\r\n"
         "Content-type: text/html\r\n"
         "\r\n"
         "<html>\n"
@@ -447,10 +461,12 @@ static int cgi_error(Request req,int level,char *format,char *msg, ... )
         "</head>\n"
         "<body>\n"
         "<h1>Error %a</h1>\n"
+	"<p>%b</p>\n"
         "</body>\n"
         "</html>\n"
         "\n",
-        level
+        level,
+	errmsg
          );
   }
   else
@@ -458,11 +474,14 @@ static int cgi_error(Request req,int level,char *format,char *msg, ... )
     gd.htmldump = in;
     LineSFormat(
     	req->out,
-    	"i",
+    	"i $",
     	"Status: %a\r\n"
+    	"X-Error: %b\r\n"
     	"Content-type: text/html\r\n"
     	"\r\n",
-    	level);
+    	level,
+    	errmsg
+      );
     generic_cb("main",req->out,NULL);
     StreamFree(in);
   }
