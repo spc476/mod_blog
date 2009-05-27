@@ -74,7 +74,16 @@ int main(int argc,char *argv[])
 int BlogDatesInit(void)
 {
   BlogEntry entry;
+  struct tm *today;
   
+  gd.tst       = time(NULL);
+  today        = localtime(&gd.tst);
+  gd.stmst     = *today;
+  gd.now.year  = gd.updatetime.year  = today->tm_year + 1900;
+  gd.now.month = gd.updatetime.month = today->tm_mon + 1;
+  gd.now.day   = gd.updatetime.day   = today->tm_mday;
+  srand(gd.tst);
+
   while(TRUE)
   {
     if (btm_cmp_date(&gd.now,&gd.begin) < 0)

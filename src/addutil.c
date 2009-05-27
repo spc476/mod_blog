@@ -54,6 +54,7 @@ int entry_add(Request req)
 {
   BlogEntry  entry;
   char      *p;
+  int        reinit = FALSE;
   
   fix_entry(req);
   if (c_authorfile) BlogLock(g_blog);
@@ -61,7 +62,16 @@ int entry_add(Request req)
   entry = BlogEntryNew(g_blog);
   
   if ((req->date == NULL) || (empty_string(req->date)))
+  {
+    /*----------------------------------------------------------------------
+    ; if this is the case, then we need to ensure we update the main pages. 
+    ; By calling BlogDatesInit() after we update we ensure we generate the
+    ; content properly.
+    ;---------------------------------------------------------------------*/
+    
     entry->when = gd.updatetime;
+    reinit      = TRUE;
+  }
   else
   {
     entry->when.year  = strtoul(req->date,&p,10); p++;
@@ -79,6 +89,7 @@ int entry_add(Request req)
   BlogEntryWrite(entry);
   
   if (c_authorfile) BlogUnlock(g_blog);
+  if (reinit) BlogDatesInit();
   return(ERR_OKAY);    
 }
 

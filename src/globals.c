@@ -43,7 +43,6 @@
 
 /***********************************************************/
 
-void	set_time		(void);
 void	set_c_updatetype	(char *);
 void	set_gf_emailupdate	(char *);
 void	set_c_conversion	(char *);
@@ -108,7 +107,6 @@ int GlobalsInit(char *fspec)
   
   ddt(fspec != NULL);
 
-  set_time();
   ListInit(&headers);
   
 #ifdef PARALLEL_HACK  
@@ -373,19 +371,4 @@ void set_c_conversion(char *value)
 }
 
 /**************************************************************************/
-
-void set_time(void)
-{
-  struct tm *today;
-  
-  gd.tst       = time(NULL);
-  today        = localtime(&gd.tst);
-  gd.stmst     = *today;
-  gd.now.year  = gd.updatetime.year  = today->tm_year + 1900;
-  gd.now.month = gd.updatetime.month = today->tm_mon + 1;
-  gd.now.day   = gd.updatetime.day   = today->tm_mday;
-  srand(gd.tst);
-}
-
-/***************************************************************************/
 
