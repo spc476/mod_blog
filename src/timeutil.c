@@ -145,6 +145,20 @@ void btm_add_day(struct btm *d)
 
 /*************************************************************************/
 
+void btm_sub_part(struct btm *d)
+{
+  ddt(d != NULL);
+  
+  d->part--;
+  if (d->part == 0)
+  {
+    d->part = 23;
+    btm_sub_day(d);
+  }
+}
+
+/************************************************************************/
+
 void btm_sub_day(struct btm *d)
 {
   ddt(d != NULL);

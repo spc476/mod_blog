@@ -254,10 +254,10 @@ int tumbler_page(Stream out,Tumbler spec)
   ;------------------------------------------------------------*/
 
   nu1         = PART;
-  start.year  = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , gd.begin.year : (nu1 = YEAR  , tu1->entry[YEAR]);
-  start.month = (tu1->entry[MONTH] == 0) ? nu1 = YEAR    , 1             : (nu1 = MONTH , tu1->entry[MONTH]);
-  start.day   = (tu1->entry[DAY]   == 0) ? nu1 = MONTH   , 1             : (nu1 = DAY   , tu1->entry[DAY]);
-  start.part  = (tu1->entry[PART]  == 0) ? nu1 = DAY     , 1             : (nu1 = PART  , tu1->entry[PART]);
+  start.part  = (tu1->entry[PART]  == 0) ? nu1 = DAY     , 1             : tu1->entry[PART];
+  start.day   = (tu1->entry[DAY]   == 0) ? nu1 = MONTH   , 1             : tu1->entry[DAY];
+  start.month = (tu1->entry[MONTH] == 0) ? nu1 = YEAR    , 1             : tu1->entry[MONTH];
+  start.year  = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , gd.begin.year : tu1->entry[YEAR];
   
   if (start.day > max_monthday(start.year,start.month))
     return(1);				/* invalid day */
@@ -354,10 +354,7 @@ int tumbler_page(Stream out,Tumbler spec)
 
 static void calculate_previous(struct btm start)
 {
-  gd.previous.year = 0;
-  gd.previous.month = 1;
-  gd.previous.day   = 1;
-  gd.previous.part  = 1;
+  gd.previous = start;
 
   switch(gd.navunit)
   {
@@ -374,21 +371,13 @@ static void calculate_previous(struct btm start)
             )
            gd.f.navprev = FALSE;
          else
-         {
-           gd.previous.year  = start.year;
-           gd.previous.month = start.month;
-           btm_sub_month(&gd.previous);
-         }
+	   btm_sub_month(&gd.previous);
          break;
     case DAY:
          if (btm_cmp_date(&start,&gd.begin) == 0)
            gd.f.navprev = FALSE;
          else
          {
-           gd.previous.year  = start.year;
-           gd.previous.month = start.month;
-           gd.previous.day   = start.day;
-           gd.previous.part  = 1;
            btm_sub_day(&gd.previous);
            
            while(btm_cmp(&gd.previous,&gd.begin) > 0)
@@ -413,17 +402,8 @@ static void calculate_previous(struct btm start)
            gd.f.navprev = FALSE;
          else
          {
-           gd.previous.year  = start.year;
-           gd.previous.month = start.month;
-           gd.previous.day   = start.day;
-           gd.previous.part  = start.part - 1;
-           
-           if (start.part == 0)
-           {
-             btm_sub_day(&gd.previous);
-             gd.previous.part = 1;
-           }
-           
+	   btm_sub_part(&gd.previous);
+
            while(btm_cmp(&gd.previous,&gd.begin) > 0)
            {
              BlogEntry entry;
@@ -431,11 +411,10 @@ static void calculate_previous(struct btm start)
              entry = BlogEntryRead(g_blog,&gd.previous);
              if (entry == NULL)
              {
-               btm_sub_day(&gd.previous);
+	       btm_sub_part(&gd.previous);
                continue;
              }
              
-             gd.previous.part = g_blog->idx;
              return;
            }
            

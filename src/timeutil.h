@@ -42,6 +42,7 @@ void		 day_add	(struct tm *);
 void		 month_sub	(struct tm *);
 void		 day_sub	(struct tm *);
 void		 btm_add_day	(struct btm *);
+void		 btm_sub_part	(struct btm *);
 void		 btm_sub_day	(struct btm *);
 void		 btm_add_month	(struct btm *);
 void		 btm_sub_month	(struct btm *);
