@@ -1,0 +1,13 @@
+
+#define ``	&ldquo;
+#define ''	&rdquo;
+#define --	&ndash;
+#define ---	&mdash;
+#define ...	&hellip;
+#define ->	&rarr;
+#define (TM)	&trade;
+#define ^th	<sup>th</sup>
+#define ^st	<sup>st</sup>
+#define ^nd	<sup>nd</sup>
+#define ^rd	<sup>rd</sup>
+
