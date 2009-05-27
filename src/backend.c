@@ -455,8 +455,9 @@ static void calculate_next(struct btm end)
          else
          {
            btm_add_day(&gd.next);
+	   gd.next.part = 1;
            
-           while(btm_cmp(&gd.next,&gd.now) < 0)
+           while(btm_cmp(&gd.next,&gd.now) <= 0)
            {
              BlogEntry entry;
              
