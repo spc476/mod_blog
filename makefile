@@ -91,51 +91,6 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 		$(LFLAGS) 
 	$(SETUID) $(HOSTDIR)/boston
 
-###########################################################################
-#
-# Main programs for mod_blog.
-#
-###########################################################################
-
-$(HOSTDIR)/bp : $(HOSTDIR)/bp.o			\
-		$(HOSTDIR)/globals.o		\
-		$(HOSTDIR)/system.o		\
-		$(HOSTDIR)/blog.o		\
-		$(HOSTDIR)/timeutil.o		\
-		$(HOSTDIR)/wbtum.o
-	$(CC) $(CFLAGS) -o $@			\
-		$(HOSTDIR)/bp.o			\
-		$(HOSTDIR)/globals.o		\
-		$(HOSTDIR)/system.o		\
-		$(HOSTDIR)/blog.o		\
-		$(HOSTDIR)/timeutil.o		\
-		$(HOSTDIR)/wbtum.o		\
-		$(LFLAGS)
-	$(SETUID) $(HOSTDIR)/bp
-
-$(HOSTDIR)/addentry : $(HOSTDIR)/addentry.o	\
-		$(HOSTDIR)/globals.o		\
-		$(HOSTDIR)/system.o		\
-		$(HOSTDIR)/blog.o		\
-		$(HOSTDIR)/timeutil.o		\
-		$(HOSTDIR)/conversion.o		\
-	$(CC) $(CFLAGS) -o $@			\
-		$(HOSTDIR)/addentry.o		\
-		$(HOSTDIR)/blog.o		\
-		$(HOSTDIR)/globals.o		\
-		$(HOSTDIR)/system.o		\
-		$(HOSTDIR)/conversion.o		\
-		$(HOSTDIR)/timeutil.o		\
-		$(LFLAGS) -lgdbm
-	$(SETUID) $(HOSTDIR)/addentry
-
-$(HOSTDIR)/wbttest : $(HOSTDIR)/wbttest.o	\
-		$(HOSTDIR)/wbtum.o
-	$(CC) $(CFLAGS) -o $@			\
-		$(HOSTDIR)/wbttest.o		\
-		$(HOSTDIR)/wbtum.o		\
-		$(LFLAGS)
-
 #######################################################################
 #
 # Individual files
