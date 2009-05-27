@@ -54,10 +54,8 @@ int entry_add(Request req)
 {
   BlogEntry  entry;
   char      *p;
-  int        reinit = FALSE;
   
   fix_entry(req);
-  if (c_authorfile) BlogLock(g_blog);
   
   entry = BlogEntryNew(g_blog);
   
@@ -70,7 +68,6 @@ int entry_add(Request req)
     ;---------------------------------------------------------------------*/
     
     entry->when = gd.updatetime;
-    reinit      = TRUE;
   }
   else
   {
@@ -86,10 +83,14 @@ int entry_add(Request req)
   entry->author    = req->author;
   entry->body      = req->body;
   
-  BlogEntryWrite(entry);
-  
+  if (c_authorfile) BlogLock(g_blog);
+
+    BlogEntryWrite(entry);
+
   if (c_authorfile) BlogUnlock(g_blog);
-  if (reinit) BlogDatesInit();
+
+  BlogDatesInit();
+
   return(ERR_OKAY);    
 }
 

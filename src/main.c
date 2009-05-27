@@ -82,7 +82,7 @@ int BlogDatesInit(void)
   gd.now.year  = gd.updatetime.year  = today->tm_year + 1900;
   gd.now.month = gd.updatetime.month = today->tm_mon + 1;
   gd.now.day   = gd.updatetime.day   = today->tm_mday;
-  gd.now.part  = gd.updatetime.part  = 0;
+  gd.now.part  = gd.updatetime.part  = 1;
   srand(gd.tst);
 
   while(TRUE)
