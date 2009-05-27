@@ -1,0 +1,5 @@
+2005-09-21T15:45-05:00
+
+        Add a configuration option to specify which field of an htpasswd
+        file has the real name.
+
