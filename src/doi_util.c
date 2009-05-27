@@ -27,7 +27,7 @@
 #include <cgilib/ddt.h>
 #include <cgilib/mail.h>
 
-#ifndef FEATURE_NEW_EMAIL 
+#ifndef FIXED_BROKEN_EMAIL
 #  define SENDMAIL	"/usr/sbin/sendmail"
 #endif
 
@@ -42,25 +42,23 @@ int send_message(
 		)
 {
 #ifdef FIXED_BROKEN_EMAIL
-  Email email;
+  Email  email;
+  Stream in;
 
-  email = EmailNew();
-
-  MemFree(email->from);
-  MemFree(email->to);
-  MemFree(email->subject);
-
+  email          = EmailNew();
   email->from    = from;
   email->to      = to;
   email->subject = subject;
 
   if (replyto)
-  {
-    MemFree(email->replyto);
     email->replyto = replyto;
-  }
 
-  LineS(email->body,message);
+  in = FileStreamRead(message);
+  if (in == NULL)
+    return(ERR_ERR);    
+  StreamCopy(email->body,in);
+  StreamFree(in);
+
   EmailSend(email);
   EmailFree(email);
   return(0);

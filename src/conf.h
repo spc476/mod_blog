@@ -99,11 +99,11 @@
 ; At some point, these should all go away.  Hopefully.
 ;----------------------------------------------------------------------*/
 
-#undef FEATURE_MULTI_TUMBLER
-#undef FEATURE_REDIRECT
-#undef FIXED_BROKEN_EMAIL
-#undef FIXED_BROKEN_FULLBASEURL
-#undef FIXED_BROKEN_RAWFMT
+#undef  FEATURE_MULTI_TUMBLER
+#undef  FEATURE_REDIRECT
+#define FIXED_BROKEN_EMAIL
+#undef  FIXED_BROKEN_FULLBASEURL
+#undef  FIXED_BROKEN_RAWFMT
 
 /*********************************************************************
 *
