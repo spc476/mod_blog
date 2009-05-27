@@ -44,7 +44,9 @@ static void	 date_to_dir		(char *,struct btm *);
 static void	 date_to_filename	(char *,struct btm *,const char *);
 static void	 date_to_part		(char *,struct btm *,int);
 static Stream	 open_file_r		(const char *,struct btm *);
+static Stream	 open_file_w		(const char *,struct btm *);
 static int	 date_check		(struct btm *);
+static int	 date_checkcreate	(struct btm *);
 static int	 blog_cache_day		(Blog,struct btm *);
 
 #if 0
@@ -338,6 +340,92 @@ void (BlogEntryReadXU)(Blog blog,List *list,struct btm *start,size_t num)
 
 /**************************************************************************/
 
+int (BlogEntryWrite)(BlogEntry entry)
+{
+  Blog   blog;
+  char   buffer[FILENAME_MAX];
+  Stream stitles;
+  Stream sclass;
+  Stream sauthors;
+  Stream out;
+  int    rc;
+  size_t i;
+  
+  ddt(entry != NULL);
+  
+  /*-----------------------------------------------
+  ; cache the day the entry is to be added to.  We
+  ; need this information when we add the entry
+  ; (since the anciliary files need to be recreated).
+  ;-------------------------------------------------*/
+  
+  blog = entry->blog;
+  rc   = blog_cache_day(blog,&entry->when);
+  if (rc != ERR_OKAY)
+    return(rc);
+    
+  /*---------------------------------------------
+  ; if when.part is 0, then this is a new entry
+  ; to be added.  Otherwise, add to the apropriate
+  ; spot in the day.
+  ;---------------------------------------------*/
+  
+  if (entry->when.part == 0)
+  {
+    blog->entries[blog->idx++] = entry;
+    entry->when.part           = blog->idx;
+  }
+  else
+    blog->entries[entry->when.part - 1] = entry;
+  
+  /*---------------------------------------------
+  ; now update all the information.
+  ;--------------------------------------------*/
+  
+  rc = date_checkcreate(&entry->when);
+  if (rc != ERR_OKAY)
+    return(rc);
+  
+  stitles = open_file_w("titles",&blog->cache);
+  if (stitles == NULL)
+    return(ERR_ERR);
+  
+  sclass = open_file_w("class",&blog->cache);
+  if (sclass == NULL)
+  {
+    StreamFree(stitles);
+    return(ERR_ERR);
+  }
+  
+  sauthors = open_file_w("authors",&blog->cache);
+  if (sauthors == NULL)
+  {
+    StreamFree(sclass);
+    StreamFree(stitles);
+    return(ERR_ERR);
+  }
+  
+  for (i = 0 ; i < blog->idx ; i++)
+  {
+    LineSFormat(stitles, "$","%a\n",blog->entries[i]->title);
+    LineSFormat(sclass,  "$","%a\n",blog->entries[i]->class);
+    LineSFormat(sauthors,"$","%a\n",blog->entries[i]->author);
+  }
+      
+  date_to_part(buffer,&entry->when,entry->when.part);
+  out = FileStreamWrite(buffer,FILE_RECREATE);
+  LineS(out,entry->body);
+  
+  StreamFree(out);
+  StreamFree(sauthors);
+  StreamFree(sclass);
+  StreamFree(stitles);
+  
+  return(ERR_OKAY);
+}
+
+/***********************************************************************/
+
 int (BlogEntryFree)(BlogEntry entry)
 {
   ddt(entry != NULL);
@@ -401,6 +489,21 @@ static Stream open_file_r(const char *name,struct btm *date)
 
 /**********************************************************************/
 
+static Stream open_file_w(const char *name,struct btm *date)
+{
+  Stream out;
+  char   buffer[FILENAME_MAX];
+  
+  ddt(name != NULL);
+  ddt(date != NULL);
+  
+  date_to_filename(buffer,date,name);
+  out = FileStreamWrite(buffer,FILE_RECREATE);
+  return(out);
+}
+
+/*********************************************************************/
+
 static int date_check(struct btm *date)
 {
   int rc;
@@ -414,6 +517,52 @@ static int date_check(struct btm *date)
 
 /************************************************************************/
 
+static int date_checkcreate(struct btm *date)
+{
+  int         rc;
+  char        tname[FILENAME_LEN];
+  struct stat status;
+  
+  ddt(date != NULL);
+  
+  sprintf(tname,"%04d",date->year);
+  rc = stat(tname,&status);
+  if (rc != 0)
+  {
+    if (errno != ENOENT)
+      return(ERR_ERR);
+    rc = mkdir(tname,0777);
+    if (rc != 0)
+      return(ERR_ERR);
+  }
+  
+  sprintf(tname,"%04d/%02d",date->year,date->month);
+  rc = stat(tname,&status);
+  if (rc != 0)
+  {
+    if (errno != ENOENT)
+      return(ERR_ERR);
+    rc = mkdir(tname,0777);
+    if (rc != 0)
+      return(ERR_ERR);
+  }
+  
+  sprintf(tname,"%04d/%02d/%02d",date->year,date->month,date->day);
+  rc = stat(tname,&status);
+  if (rc != 0)
+  {
+    if (errno != ENOENT)
+      return(ERR_ERR);
+    rc = mkdir(tname,0777);
+    if (rc != 0)
+      return(ERR_ERR);
+  }
+  
+  return(ERR_OKAY);
+}
+
+/********************************************************************/
+
 static int blog_cache_day(Blog blog,struct btm *date)
 {
   Stream    stitles;
@@ -425,17 +574,38 @@ static int blog_cache_day(Blog blog,struct btm *date)
   ddt(blog != NULL);
   ddt(date != NULL);
   
+  /*---------------------------------------------
+  ; trivial check---if we already have the data
+  ; for this date, then don't bother re-reading
+  ; anything.
+  ;--------------------------------------------*/
+  
+  if (btm_cmp_date(&blog->cache,date) == 0)
+    return(ERR_OKAY);
+  
+  /*------------------------------------------
+  ; free any nodes not in use, so we don't
+  ; leak memory.
+  ;
+  ; Note, there's some suble bug somewhere that's
+  ; causing the nodes to get bogus node pointers.
+  ;-----------------------------------------------*/
+  
   for (i = 0 ; i < blog->idx ; i++)
   {
+    /* if (!NodeValid(&blog->entries[i]->node)) */
     if (
          (blog->entries[i]->node.ln_Succ == NULL)
 	 && (blog->entries[i]->node.ln_Pred == NULL)
        )
     {
-      /*if (!NodeValid(&blog->entries[i]->node))*/
       BlogEntryFree(blog->entries[i]);
     }
   } 
+  
+  /*--------------------------------------------
+  ; read in the day's entries 
+  ;-------------------------------------------*/
   
   blog->idx = 0;
   stitles   = open_file_r("titles", date);
