@@ -347,6 +347,20 @@ int tumbler_page(Stream out,Tumbler spec)
           blog->endentry = end.tm_hour - 1;
       }
     }
+
+    /*----------------------------------------------------
+    ; I have no idea how long ago I wrote this code, but in
+    ; all that time, I never knew that blog->stentry or 
+    ; blog->endentry could become negative.  It didn't seem
+    ; to affect the rest of the code, but with the new adtag
+    ; feature, it became a problem.  This bit o' code ensures
+    ; that they at least remain positive.  
+    ;
+    ; I still don't fully understand what I'm doing here.
+    ;--------------------------------------------------------*/
+
+    if (blog->stentry  < 0) blog->stentry  = 0;
+    if (blog->endentry < 0) blog->endentry = 0;
     
     /*------------------------------------------------------
     ; the rest of this should be pretty easy to understand.
