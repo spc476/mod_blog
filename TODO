@@ -1,9 +1,22 @@
-2006-07-30T05:10-05:00
+2007-02-07T03:05-05:00
+
+	Add code to translate HTML entities in the title field to numeric
+	HTML entities because RSS (and presumedly Atom) consumers don't
+	understand the named HTML entities.
+
+2005-09-21T15:45-05:00
+
+        Add a configuration option to specify which field of an htpasswd
+        file has the real name.
+
+==============================
+
+2006-07-30T05:10-05:00	DONE
 
 	Extend the "ad word" feature to *not* URL encode it, so I can throw
 	it into the Google search box on the sidebar.
 
-2006-01-29T02:02-05:00 
+2006-01-29T02:02-05:00 DONE
 
 	Add an "ad word" feature.  For each entry, take the tags, add them
 	all together.  Then, pick a random word from that list, weighted,
@@ -15,8 +28,4 @@
 	tag that appears most often will, statistically speaking, be picked
 	more often.
 
-2005-09-21T15:45-05:00
-
-        Add a configuration option to specify which field of an htpasswd
-        file has the real name.
 

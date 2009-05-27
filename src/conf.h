@@ -78,6 +78,19 @@
 #undef USE_DB
 #define USE_HTPASSWD
 
+/*-----------------------------------------------------------
+; Some features being worked on:
+;	FEATURE_MULTI_TUMBLER	- support multiple tumbler requests
+;					(doesn't work)
+;	FEATURE_REDIRECT	- Use canonical URLs
+;	FEATURE_NEW_EMAIL	- Use the new email notification code
+;					(doesn't work)
+;------------------------------------------------------------*/
+
+#undef FEATURE_MULTI_TUMBLER
+#undef FEATURE_REDIRECT
+#undef FEATURE_NEW_EMAIL
+
 /*********************************************************************
 *
 * Non-settable paramters (read:  you best know what you are doing 

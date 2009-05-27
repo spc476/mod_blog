@@ -1,3 +1,18 @@
+How about this:
+
+#define ---	&mdash;
+#define --	&ndash;
+#define ``	&lsquo;
+#define ''	&rdquo;
+#define ...	&hellip;
+
+or some similar type of declaration for inputing data?  
+
+see 2007/01/09.1 for some details
+
+----------
+
+
 
 restructuring both bp.c and addentry.c
 

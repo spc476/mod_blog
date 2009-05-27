@@ -20,6 +20,30 @@
 *
 *************************************************************************/
 
+/********************************************************************
+*
+* There are a few comments in here about canonical URLs.  Canonical URLs
+* based upon tumblers are of the form:
+*
+*	YYYY/MM/DD
+*	
+* The form:
+*
+*	YYYY/M/D
+*
+* are considered non-canonical and are marked for a later perm. redirect. 
+* The rational for this is the Google duplicate-content problem.  Since the
+* two URLs of:
+*
+*	1999/3/4
+*	1999/03/04
+*
+* referr to the same entry, Google will see it as duplicate content and
+* penalize the Page Ranking by a bit.  By detecting this and offering a
+* (permanent) redirect, we can canonalize the URLs and avoid this problem.
+*
+************************************************************************/
+
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -172,7 +196,7 @@ static struct fpreturn state_a(Tumbler t,TumblerUnit *ptu,char **pstr)
       next.state = NULL;
       return(next);
     }
-#if 0 
+#if FEATURE_MULTI_TUMBLER
     if (*s == ',')
     {
       ListAddTail(&t->units,&tu->node);
@@ -193,7 +217,7 @@ static struct fpreturn state_a(Tumbler t,TumblerUnit *ptu,char **pstr)
   
     if ((*s == '.') || (*s == ':'))
     {
-#ifdef OHNO
+#ifdef FEATURE_REDIRECT
       t->flags.redirect = TRUE;
 #endif
       *pstr      = ++s;
@@ -246,6 +270,17 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
       next.state     = NULL;
       return(next);
     }
+
+#ifdef FEATURE_REDIRECT
+    /*-------------------------------------------
+    ; Canonical URLs contain a two-digit
+    ; month.  If not, mark it as a non-canonical
+    ;-------------------------------------------*/
+        
+    if (p != (s + 2))
+      t->flags.redirect = TRUE;
+#endif
+
     s = p;
   }
   
@@ -269,7 +304,7 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
   
   if ((*s == '.') || (*s == ':'))
   {
-#ifdef OHNO
+#ifdef FEATURE_REDIRECT
     t->flags.redirect = TRUE;
 #endif
     *pstr      = ++s;
@@ -288,7 +323,7 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
     return(next);
   }
   
-#if 0
+#if FEATURE_MULTI_TUMBLER
 
   /*----------------------------------------
   ; for now, skip handling multiple tumblers
@@ -340,6 +375,17 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
       next.state     = NULL;
       return(next);
     }
+
+#ifdef FEATURE_REDIRECT
+    /*----------------------------------------------
+    ; Canonical URLs contain a two-digit day.  If not,
+    ; mark as such.
+    ;-----------------------------------------------*/
+    
+    if (p != (s + 2))
+      t->flags.redirect = TRUE;
+#endif
+
     s = p;
   }
   
@@ -363,7 +409,7 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
   
   if (*s == ':')
   {
-#ifdef OHNO
+#ifdef FEATURE_REDIRECT
     t->flags.redirect = TRUE;
 #endif
     *pstr      = ++s;
@@ -390,7 +436,7 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
     return(next);
   }
   
-#if 0
+#if FEATURE_MULTI_TUMBLER 
 
   /*----------------------------------
   ; for now, skip handling multiple
@@ -469,6 +515,17 @@ static State state_e(Tumbler t,TumblerUnit *ptu,char **pstr)
 
   if (isdigit(*s))
   {
+#ifdef FEATURE_REDIRECT
+    /*------------------------------------------------
+    ; Canonical URLs do not have leading zeros in the
+    ; part section of the tumbler.  If so, mark it as
+    ; non-canonical.
+    ;-----------------------------------------------*/
+    
+    if (*s == '0')
+      t->flags.redirect = TRUE;
+#endif
+
     tu->entry[PART] = strtoul(s,&p,10);
     tu->size++;
     if (s == p)
@@ -499,7 +556,7 @@ static State state_e(Tumbler t,TumblerUnit *ptu,char **pstr)
     next.state = state_a;
     return(next);
   }
-#if 0 
+#if FEATURE_MULTI_TUMBLER
   if (*s == ',')
   {
     ListAddTail(&t->units,&tu->node);
