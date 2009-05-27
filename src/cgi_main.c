@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include <cgilib/memory.h>
+#include <cgilib/stream.h>
 #include <cgilib/errors.h>
 #include <cgilib/ddt.h>
 #include <cgilib/cgi.h>
@@ -35,7 +36,6 @@
 #include "blog.h"
 #include "frontend.h"
 #include "timeutil.h"
-#include "stream.h"
 #include "wbtum.h"
 #include "fix.h"
 
@@ -47,6 +47,7 @@ static void	set_m_cgi_get_command	(char *,Request);
 static int	cmd_cgi_get_new		(Request);
 static int	cmd_cgi_get_show	(Request);
 static int	cmd_cgi_get_edit	(Request);
+static int	cmd_cgi_get_overview	(Request);
 
 static void	set_m_cgi_post_command	(char *,Request);
 static void	set_m_author		(char *,Request);
@@ -114,6 +115,8 @@ static void set_m_cgi_get_command(char *value,Request req)
     req->command = cmd_cgi_get_show;
   else if (strcmp(value,"EDIT") == 0)
     req->command = cmd_cgi_get_edit;
+  else if (strcmp(value,"OVERVIEW") == 0)
+    req->command = cmd_cgi_get_overview;
 }
 
 /***********************************************************************/
@@ -230,6 +233,20 @@ static int cmd_cgi_get_edit(Request req)
 }
 
 /***********************************************************************/
+
+static int cmd_cgi_get_overview(Request req)
+{
+  List days;
+  ddt(req != NULL);
+  
+  ListInit(&days);
+  gd.f.overview = TRUE;
+  LineSFormat(req->out,"i","Status: %a\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
+  generic_cb("main",req->out,&days);
+  return(0);  
+}
+
+/**********************************************************************/
 
 int main_cgi_post(Cgi cgi,int argc,char *argv[])
 {

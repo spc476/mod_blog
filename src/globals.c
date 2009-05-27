@@ -81,6 +81,7 @@ const char    *c_emailsubject;
 const char    *c_emailmsg;
 int            c_tzhour       = -5;	/* Eastern */
 int            c_tzmin        =  0;
+const char    *c_overview;
 void	     (*c_conversion)(char *,Stream,Stream) =  html_conversion;
 
 const char    *g_templates;
@@ -263,8 +264,7 @@ int GlobalsInit(char *fspec)
     }
     else if (strcmp(ppair->name,"EMAIL-LIST") == 0)
     {
-      gf_emailupdate = TRUE;
-      c_emaildb      = dup_string(ppair->value);
+      c_emaildb = dup_string(ppair->value);
     }
     else if (strcmp(ppair->name,"EMAIL-SUBJECT") == 0)
     {
@@ -289,6 +289,11 @@ int GlobalsInit(char *fspec)
     else if (strcmp(ppair->name,"ADTAG") == 0)
     {
       gd.adtag = dup_string(ppair->value);
+    }
+    else if (strcmp(ppair->name,"OVERVIEW") == 0)
+    {
+      c_overview    = dup_string(ppair->value);
+      gd.f.overview = TRUE;
     }
     else if (strcmp(ppair->name,"DEBUG") == 0)
     {

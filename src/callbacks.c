@@ -118,6 +118,10 @@ static void	cb_edit_email			(Stream,void *);
 static void	cb_edit_filter			(Stream,void *);
 static void	cb_edit_body			(Stream,void *);
 
+static void	cb_overview			(Stream,void *);
+static void	cb_overview_date		(Stream,void *);
+static void	cb_overview_list		(Stream,void *);
+
 static void	cb_xyzzy			(Stream,void *);
 
 static void	print_nav_url		(Stream,struct btm *,int);
@@ -197,6 +201,10 @@ struct chunk_callback  m_callbacks[] =
   { "edit.filter"		, cb_edit_filter		} ,
   { "edit.body"			, cb_edit_body			} ,
 
+  { "overview"			, cb_overview			} ,
+  { "overview.date"		, cb_overview_date		} ,
+  { "overview.list"		, cb_overview_list		} ,
+  
   { "xyzzy"			, cb_xyzzy			} 
 
 };
@@ -297,6 +305,12 @@ static void cb_entry(Stream out,void *data)
     return;
   }
 
+  if (gd.f.overview)
+  {
+    generic_cb("overview",out,data);
+    return;
+  }
+  
   for
   (
     entry = (BlogEntry)ListRemHead(&cbd->list);
@@ -1341,4 +1355,32 @@ static void cb_entry_name(Stream out,void *data)
 }
 
 /***********************************************************************/
+
+static void cb_overview(Stream out,void *data)
+{
+  ddt(out  != NULL);
+  ddt(data != NULL);
+}
+
+/***********************************************************************/
+
+static void cb_overview_date(Stream out,void *data)
+{
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  LineS(out,"DATE");
+}
+
+/***********************************************************************/
+
+static void cb_overview_list(Stream out,void *data)
+{
+  ddt(out  != NULL);
+  ddt(data != NULL);
+  
+  LineS(out,"<li>OVERVIEW</li>");
+}
+
+/**********************************************************************/
 

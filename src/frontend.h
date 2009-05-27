@@ -70,6 +70,7 @@ typedef struct dflags
   unsigned int navprev    : 1;
   unsigned int navnext    : 1;
   unsigned int edit       : 1;
+  unsigned int overview   : 1;
 } DFlags;
 
 typedef struct display

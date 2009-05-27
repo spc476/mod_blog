@@ -24,7 +24,7 @@
 #define FIX_H
 
 #include <cgilib/errors.h>
-#include "chunk.h"
+#include <cgilib/chunk.h>
 
 #define DB_BLOCK	1024
 

@@ -76,6 +76,7 @@ extern const int              c_tzmin;
 extern       void           (*c_conversion)(char *,Stream,Stream);
 extern const struct btm       c_start;
 extern const struct btm       c_now;
+extern const char *const      c_overview;
 
 extern const char *           g_templates;	/* work on */
 extern int                    gf_emailupdate;	/* work on */
