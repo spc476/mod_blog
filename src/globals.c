@@ -64,6 +64,7 @@ int            g_stday        = -1;
 const char    *g_author;
 const char    *g_email;
 const char    *g_authorfile;
+const char    *g_updatetype   = "NewEntry";
 const char    *g_lockfile;
 int            g_weblogcom    = FALSE;
 const char    *g_weblogcomurl = "http://newhome.weblogs.com/pingSiteForm";
@@ -262,12 +263,7 @@ int GlobalsInit(char *fspec)
     }
     else if (strcmp(ppair->name,"CONVERSION") == 0)
     {
-      if (strcmp(ppair->value,"text") == 0)
-        g_conversion = text_conversion;
-      else if (strcmp(ppair->value,"html") == 0)
-        g_conversion = html_conversion;
-      else if (strcmp(ppair->value,"mixed") == 0)
-        g_conversion = mixed_conversion;
+      set_g_conversion(ppair->value);
     }
     else if (strcmp(ppair->name,"DEBUG") == 0)
     {
@@ -294,3 +290,53 @@ int GlobalsInit(char *fspec)
 
 /********************************************************************/
 
+void set_g_updatetype(char *value)
+{
+  if (value == NULL) return;
+  if (empty_string(value)) return;
+  
+  up_string(value);
+  
+  if (strcmp(value,"NEW") == 0)
+    g_updatetype = "NewEntry";
+  else if (strcmp(value,"MODIFY") == 0)
+    g_updatetype = "ModifiedEntry";
+  else if (strcmp(value,"EDIT") == 0)
+    g_updatetype = "ModifiedEntry";
+  else if (strcmp(value,"TEMPLATE") == 0)
+    g_updatetype = "TemplateChange";
+  else 
+    g_updatetype = "Other";
+}
+
+/************************************************************************/
+
+void set_g_emailupdate(char *value)
+{
+  if (value && !empty_string(value))
+  {
+    up_string(value);
+    if (strcmp(value,"NO") == 0)
+      g_emailupdate = FALSE;
+    else if (strcmp(value,"YES" == 0)
+      g_emailupdate = TRUE;
+  }
+}
+
+/***************************************************************************/
+
+void set_g_conversion(char *value)
+{
+  if (value == NULL) return;
+  if (empty_string(value)) return;
+  up_string(value);
+  
+  if (strcmp(value,"TEXT") == 0)
+    g_conversion = text_conversion;
+  else if (strcmp(value,"MIXED") == 0)
+    g_conversion = mixed_conversion;
+  else if (strcmp(value,"HTML") == 0)
+    g_conversion = html_conversion;
+}
+
+/**************************************************************************/

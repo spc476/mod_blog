@@ -55,6 +55,7 @@ extern const int           g_stday;
 extern const char *const   g_author;
 extern const char *const   g_email;
 extern const char *const   g_authorfile;
+extern const char *const   g_updatetype;
 extern const char *const   g_lockfile;
 extern const int           g_weblogcom;
 extern const char *const   g_weblogcomurl;

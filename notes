@@ -53,7 +53,7 @@ POST:
 	class	= string
 	date	= string
 	body	= string
-	cmd	= 'post' | 'preview' | 'edit'
+	cmd	= --> 'new' | 'show' | 'edit' | 'delete'
 
 
 PUT:
@@ -63,7 +63,7 @@ DELETE:
 
 CLI:
 	--config	filespec
-	--cmd		'new' | 'edit' | 'delete' | --> 'show' 
+	--cmd		'new' | --> 'show' [ | 'edit' | 'delete' ]
 	--file		input
 	--stdin		read from stdin
 	--email		read from stdin as email
