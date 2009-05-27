@@ -380,6 +380,7 @@ static int cmd_cgi_post_show(Request req)
 
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
+  fix_entry(req);
   entry = BlogEntryNew(g_blog);
   
   if (emptynull_string(req->date))

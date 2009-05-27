@@ -314,9 +314,6 @@ int GlobalsInit(char *fspec)
   StreamFree(input);
   MemFree(cfs);
 
-  while(gf_debug)
-    ;
-
   g_blog = BlogNew(c_basedir,c_lockfile);
   if (g_blog == NULL)
     return(ERR_ERR);
