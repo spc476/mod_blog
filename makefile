@@ -28,7 +28,8 @@ SETUID=chmod 4755
 #SETUID=echo >/dev/null
 
 CC=gcc -Wall -pedantic 
-CINCL=-I $(CGILIB)/src
+#CINCL=-I $(CGILIB)/src
+CINCL=
 
 #CFLAGS=-g -ansi -Wall -pedantic -Wtraditional -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
 #CFLAGS=-DSCREAM -O4 -fomit-frame-pointer  $(CINCL)
@@ -40,7 +41,8 @@ CINCL=-I $(CGILIB)/src
 CFLAGS=-g $(CINCL)
 #CFLAGS=-g -pg $(CINCL)
 
-LFLAGS=-lgdbm -L$(CGILIB)/$(HOSTDIR) -lcgi5 
+#LFLAGS=-lgdbm -L$(CGILIB)/$(HOSTDIR) -lcgi5 
+LFLAGS=-lgdbm -lcgi5 
 #LFLAGS= -L$(CGILIB)/$(HOSTDIR) -lcgi5 
 #LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 -pg
 # For Solaris, use this line
