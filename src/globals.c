@@ -268,7 +268,7 @@ int GlobalsInit(char *fspec)
     {
       char *p = ppair->value;
       
-      g_tzhour = strtoul(p,&p,10);
+      g_tzhour = strtol(p,&p,10);
       p++;	/* skip `:' */
       g_tzmin  = strtoul(p,NULL,10);
     }
