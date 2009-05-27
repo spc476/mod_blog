@@ -34,6 +34,7 @@
 #include <cgilib/util.h>
 #include <cgilib/pair.h>
 #include <cgilib/cgi.h>
+#include <cgilib/mail.h>
 
 #include "conf.h"
 #include "blog.h"
@@ -199,11 +200,28 @@ void notify_emaillist(void)
   GDBM_FILE list;
   datum     key;
   datum     content;
+  Email     email;
+  Stream    in;
  
   list = gdbm_open((char *)c_emaildb,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
     return;
  
+  email          = EmailNew();
+  email->from    = c_email;
+  email->subject = c_emailsubject;
+  
+  in = FileStreamRead(c_emailmsg);
+  if (in == NULL)
+  {
+    EmailFree(email);
+    gdbm_close(list);
+    return;
+  }
+  
+  StreamCopy(email->body,in);
+  StreamFree(in);
+  
   key = gdbm_firstkey(list);
  
   while(key.dptr != NULL)
@@ -211,10 +229,17 @@ void notify_emaillist(void)
     content = gdbm_fetch(list,key);
     if (content.dptr != NULL)
     {
+      email->to = content.dptr;
+      SendEmail(email);
+#if 0
       send_message(c_email,NULL,content.dptr,c_emailsubject,c_emailmsg);
+#endif
     }
     key = gdbm_nextkey(list,key);
   }
+
+  email->to = NULL;
+  EmailFree(email);
   gdbm_close(list);
 #endif
 }

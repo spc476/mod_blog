@@ -22,8 +22,8 @@
 ########################################################################
 
 SHELL=/bin/sh
-#CGILIB=/home/spc/source/cgi
-CGILIB=../../cgi
+CGILIB=/home/spc/source/cgi
+#CGILIB=../../cgi
 SETUID=chmod 4755
 #SETUID=echo >/dev/null
 
