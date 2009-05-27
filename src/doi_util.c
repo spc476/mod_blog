@@ -74,9 +74,11 @@ int send_message(
   
   fprintf(
            fpout,
+	   "To: %s\n"
            "Subject: %s\n"
            "Date: %s\n"
            "\n",
+	   to,
            subject,
            date
          );

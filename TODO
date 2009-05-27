@@ -1,3 +1,8 @@
+2006-07-30T05:10-05:00
+
+	Extend the "ad word" feature to *not* URL encode it, so I can throw
+	it into the Google search box on the sidebar.
+
 2006-01-29T02:02-05:00 
 
 	Add an "ad word" feature.  For each entry, take the tags, add them
