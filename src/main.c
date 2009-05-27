@@ -87,7 +87,7 @@ int BlogDatesInit(void)
   while(TRUE)
   {
     if (tm_cmp(&gd.now,&gd.begin) < 0)
-      return(ERR_ERR);	/* XXX - this may not be an error */
+      return(ERR_OKAY);	/* XXX - this may not be an error */
     
     rc = BlogDayRead(&day,&gd.now);
     if (rc != ERR_OKAY)

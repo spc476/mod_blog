@@ -32,7 +32,7 @@ extern struct chunk_callback m_callbacks[];
 extern size_t                m_cbnum;
 
 void	 set_time			(void);
-char	*get_remote_user			(void);
+char	*get_remote_user		(void);
 int	 authenticate_author		(Request);
 int	 generate_pages			(Request);
 void	 notify_weblogcom		(void);
