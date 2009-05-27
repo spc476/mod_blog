@@ -399,10 +399,20 @@ static int cmd_cgi_post_show(Request req)
   entry->body      = req->body;
   
   ListAddTail(&cbd.list,&entry->node);
+  gd.f.edit = 1;
   LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
   generic_cb("main",req->out,&cbd);
-  BlogEntryFree(entry);
-  
+
+  /*-----------------------------------
+  ; we don't free entry because in doing so,
+  ; we get a segfault.  I'm not sure what
+  ; exactly is causing it (it's on the entry->body
+  ; field) but we can prevent it from happening
+  ; if we skip the BlogEntryFree() call.
+  ;
+  ; Lame, I know.
+  ;-----------------------------------------*/
+
   return(0);  
 }
 
