@@ -386,6 +386,14 @@ static void html_handle_tag(struct nested_params *local)
     check_for_uri(local,"SRC");
     check_for_uri(local,"FOR");
   }
+
+  /*---------------------------------------------
+  ; this isn't strict HTML 4.01, but its use did
+  ; come up once ... oops.
+  ;---------------------------------------------*/
+
+  else if (strcmp(HtmlParseValue(local->token),"IFRAME") == 0)
+    check_for_uri(local,"SRC");
   else
   {
     if (!local->blockquote)
