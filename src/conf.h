@@ -92,7 +92,6 @@
 ;	FEATURE_MULTI_TUMBLER	- support multiple tumbler requests
 ;					(doesn't work)
 ;	FEATURE_REDIRECT	- Use canonical URLs
-;	FIXED_BROKEN_EMAIL		- Bad code fixed.
 ;	FIXED_BROKEN_FULLBASEURL	- Bad code fixed. 
 ;	FIXED_BROKEN_RAWFMT		- Bad code fixed.
 ;
@@ -101,7 +100,6 @@
 
 #undef  FEATURE_MULTI_TUMBLER
 #undef  FEATURE_REDIRECT
-#define FIXED_BROKEN_EMAIL
 #undef  FIXED_BROKEN_FULLBASEURL
 #undef  FIXED_BROKEN_RAWFMT
 
