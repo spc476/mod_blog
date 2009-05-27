@@ -384,7 +384,6 @@ void set_time(void)
   gd.now.year  = gd.updatetime.year  = today->tm_year + 1900;
   gd.now.month = gd.updatetime.month = today->tm_mon + 1;
   gd.now.day   = gd.updatetime.day   = today->tm_mday;
-  gd.now.part  = 1;
   srand(gd.tst);
 }
 
