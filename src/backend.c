@@ -73,17 +73,16 @@ int generate_pages(Request req)
   ddt(req != NULL);
 
   /*------------------------------------------------------
-  ; Why do we call set_time() here?  Because of a subtle
-  ; bug.  Basically, the program starts, let's say at
-  ; time T, and we add an entry.  By the time we're finished,
-  ; it may be T+1s, and the content generation will consider
-  ; the newly added entry as being in the future (for
-  ; very small values of "future").  By doing this, we 
-  ; cause a temporal rift and slam the past up to the future
-  ; (or slam the future into the here-and-now---whatever).
+  ; Why do we call set_time() here?  Because of a subtle bug.  Basically,
+  ; the program starts, let's say at time T, and we add an entry.  By the
+  ; time we're finished, it may be T+1s, and the content generation will
+  ; consider the newly added entry as being in the future (for very small
+  ; values of "future").  By doing this, we cause a temporal rift and slam
+  ; the past up to the future (or slam the future into the
+  ; here-and-now---whatever).
   ;
-  ; Basically, we are now assured of actually generating
-  ; the new content we just added.
+  ; Basically, we are now assured of actually generating the new content we
+  ; just added.
   ;
   ; Just so you know.
   ;-------------------------------------------------------*/
@@ -797,6 +796,26 @@ int primary_page(Stream out,int year,int month,int iday)
   {
     int rc;
     
+    /*------------------------------------------------------
+    ; I think there's a bug with the second statement
+    ; here, which (supposedly) prevents us from
+    ; displaying pages from the future.  I'll have
+    ; to investigate this some, but since I can't *EMERGE*
+    ; gdb on the production box (#!#!#$!~#$ package managers)
+    ; I can't fully debug this when it happens (and it doesn't
+    ; happen consistently) and until I get GDB install
+    ; on the production box, I may have to manually nudge the
+    ; output.  Just now (2006-02-11) had a problem where
+    ;
+    ;	nph-boston.cgi --config nph-boston.cnf --regen
+    ; 
+    ; failed, but
+    ;
+    ;	nph-boston.cgi --config nph-boston.cnf >index.html
+    ;
+    ; worked.  Wierd.
+    ;-------------------------------------------------------------*/
+
     if (tm_cmp(&thisday,&gd.begin) < 0) break;
     if (tm_cmp(&thisday,&gd.now)   > 0) break;
 
