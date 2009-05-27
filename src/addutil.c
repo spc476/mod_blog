@@ -40,7 +40,6 @@
 #include "blog.h"
 #include "conversion.h"
 #include "timeutil.h"
-#include "doi_util.h"
 #include "frontend.h"
 #include "globals.h"
 #include "fix.h"
@@ -231,9 +230,6 @@ void notify_emaillist(void)
     {
       email->to = content.dptr;
       EmailSend(email);
-#if 0
-      send_message(c_email,NULL,content.dptr,c_emailsubject,c_emailmsg);
-#endif
     }
     key = gdbm_nextkey(list,key);
   }

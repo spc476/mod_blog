@@ -67,7 +67,6 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/chunk.o		\
 		$(HOSTDIR)/cli_main.o		\
 		$(HOSTDIR)/conversion.o		\
-		$(HOSTDIR)/doi_util.o		\
 		$(HOSTDIR)/globals.o		\
 		$(HOSTDIR)/main.o		\
 		$(HOSTDIR)/timeutil.o		\
@@ -84,7 +83,6 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/chunk.o		\
 		$(HOSTDIR)/cli_main.o		\
 		$(HOSTDIR)/conversion.o		\
-		$(HOSTDIR)/doi_util.o		\
 		$(HOSTDIR)/globals.o		\
 		$(HOSTDIR)/main.o		\
 		$(HOSTDIR)/timeutil.o		\
@@ -125,7 +123,6 @@ $(HOSTDIR)/addentry : $(HOSTDIR)/addentry.o	\
 		$(HOSTDIR)/blog.o		\
 		$(HOSTDIR)/timeutil.o		\
 		$(HOSTDIR)/conversion.o		\
-		$(HOSTDIR)/doi_util.o
 	$(CC) $(CFLAGS) -o $@			\
 		$(HOSTDIR)/addentry.o		\
 		$(HOSTDIR)/blog.o		\
@@ -133,7 +130,6 @@ $(HOSTDIR)/addentry : $(HOSTDIR)/addentry.o	\
 		$(HOSTDIR)/system.o		\
 		$(HOSTDIR)/conversion.o		\
 		$(HOSTDIR)/timeutil.o		\
-		$(HOSTDIR)/doi_util.o		\
 		$(LFLAGS) -lgdbm
 	$(SETUID) $(HOSTDIR)/addentry
 
@@ -200,9 +196,6 @@ $(HOSTDIR)/wbttest.o : src/wbttest.c src/wbtum.h
 
 $(HOSTDIR)/wbtum.o : src/wbtum.c src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/wbtum.c
-
-$(HOSTDIR)/doi_util.o : src/doi_util.c src/doi_util.h
-	$(CC) $(CFLAGS) -c -o $@ src/doi_util.c
 
 $(HOSTDIR)/system.o : src/system.c 
 	$(CC) $(CFLAGS) -c -o $@ src/system.c
