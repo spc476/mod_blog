@@ -31,6 +31,7 @@ static const struct option coptions[] =
 {
   { "config"	 , required_argument	, NULL	, OPT_CONFIG 	 } ,
   { "regenerate" , no_argument		, NULL	, OPT_REGENERATE } ,
+  { "regen"	 , no_argument		, NULL	, OPT_REGENERATE } ,
   { "cmd"	 , required_argument	, NULL	, OPT_CMD    	 } ,
   { "file"	 , required_argument	, NULL	, OPT_FILE   	 } ,
   { "email"	 , no_argument		, NULL	, OPT_EMAIL  	 } ,
@@ -51,7 +52,8 @@ int main_cli(int argc,char *argv[])
   
   memset(&req,0,sizeof(struct request));
 
-  req.command    = cmd_cli_show;
+  req.command    = cli_cmd_show;
+  req.error      = cli_error;
   req.fpin       = stdin;
   req.fpout      = stdout;
 
@@ -98,22 +100,18 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_HELP:
       default:
-           return (usage(argv[0],"unknown option or help"));
+           return ((*req->error)(req,"%s - unknown option or help",argv[0]));
     }
   }
 
   if (config == NULL)
-  {
-    fprintf(stderr,"no configuation file specified\n");
-    return(EXIT_FAILURE);
-  }
+    return((*req->error)(req,"no configuration file specified"));
   
   rc = GlobalsInit(config);
   if (rc != ERR_OKAY)
   {
     ErrorLog();
-    fprintf(stderr,"could not open configuration file %s\n",config);
-    return(rc);
+    return((*req->error)(req,"could not open cofiguration file %s",config));
   }
   
   BlogInit();
@@ -127,11 +125,7 @@ int main_cli(int argc,char *argv[])
 
 int cmd_cli_new(Request req)
 {
-  struct tm date;
-  BlogDay   day;
-  BlogEntry entry;
-  int       lock;
-  int       rc;
+  int rc;
   
   int rc;
   ddt(req         != NULL);
@@ -152,7 +146,31 @@ int cmd_cli_new(Request req)
     ErrorClear();
     return(EXIT_FAILURE);
   }
+
+  rc = entry_add(req);
+
+  if (rc == ERR_OKAY)
+  {
+    generate_pages(req);  
+    if (g_weblogcom)   notify_weblogcom();
+    if (g_emailupdate) notify_emaillist();
+  }
   
+  return(rc);
+}
+
+/****************************************************************************/
+
+int entry_add(Request req)
+{
+  struct tm date;
+  BlogDay   day;
+  BlogEntry entry;
+  int       lock;
+  int       rc;
+  
+  ddt(req != NULL);
+    
   if ((req->date == NULL) || (empty_string(req->date)))
   {
     time_t t;
@@ -188,14 +206,7 @@ int cmd_cli_new(Request req)
   BlogDayFree(&day);
   if (g_authorfile) BlogUnlock(lock);
   
-  /* XXX --- add the calls to what we used to shell out for */
-
-  generate_pages(req);
-  
-  if (g_weblogcom)   notify_weblogcom();
-  if (g_emailupdate) notify_emaillist();
-  
-  return(EXIT_SUCCESS);
+  return(ERR_OKAY);
 }
 
 /************************************************************************/
@@ -208,7 +219,6 @@ int cmd_cli_show(Request req)
   ddt(req.f.stdin   == FALSE);
   ddt(req.f.emailin == FALSE);
   ddt(req.f.filein  == FALSE);
-  ddt(req.f.cgiin   == FALSE);
   ddt(req.f.update  == FALSE);
 
   if (req.f.regen)
@@ -223,10 +233,7 @@ int cmd_cli_show(Request req)
       if (rc == ERR_OKAY)
         rc = tumbler_page(req);
       else
-      {
-        fprintf(stderr,"tumbler error---nothing found\n");
-        rc = EXIT_FAILURE;
-      }
+        rc = (*req->error)(req,"tumbler error---nothing found");
     }
   }
 
@@ -291,9 +298,6 @@ static int file_setup_data(Request req)
 
 static int mailfile_readdata(Request req)
 {
-  ddt(req      != NULL);
-  ddt(req.lbin != NULL);
-  
   char         data       [BUFSIZ];
   char         megabuffer [65536UL];
   char        *pt;
@@ -302,6 +306,9 @@ static int mailfile_readdata(Request req)
   Buffer       output;
   int          rc;
 
+  ddt(req      != NULL);
+  ddt(req.lbin != NULL);
+  
   memset(megabuffer,0,sizeof(megabuffer));
  
   /*--------------------------------------------
@@ -343,7 +350,7 @@ static int mailfile_readdata(Request req)
     PairFree(ppair);
   }
 
-  if (authenticate_author() == FALSE)
+  if (authenticate_author(req) == FALSE)
   {
     BufferFree(&req->lbin);
     BufferFree(&req->bin);

@@ -54,11 +54,45 @@ LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4
 all:	$(HOSTDIR)/bp		\
 	$(HOSTDIR)/addentry
 
+boston:	$(HOSTDIR)/main.o
+
 ###########################################################################
 #
 # Main programs for mod_blog.
 #
 ###########################################################################
+
+$(HOSTDIR)/boston : $(HOSTDIR)/main.o		\
+		$(HOSTDIR)/cgi_main.o		\
+		$(HOSTDIR)/cli_main.o		\
+		$(HOSTDIR)/authenticate.o	\
+		$(HOSTDIR)/backend.o		\
+		$(HOSTDIR)/blog.o		\
+		$(HOSTDIR)/callbacks.o		\
+		$(HOSTDIR)/chunk.o		\
+		$(HOSTDIR)/conversion.o		\
+		$(HOSTDIR)/doi_util.o		\
+		$(HOSTDIR)/globals.o		\
+		$(HOSTDIR)/system.o		\
+		$(HOSTDIR)/timeutil.o		\
+		$(HOSTDIR)/wbtum.o
+	$(CC) $(CFLAGS) -o $@			\
+		$(HOSTDIR)/main.o		\
+		$(HOSTDIR)/cgi_main.o		\
+		$(HOSTDIR)/cli_main.o		\
+		$(HOSTDIR)/authenticate.o	\
+		$(HOSTDIR)/backend.o		\
+		$(HOSTDIR)/blog.o		\
+		$(HOSTDIR)/callbacks.o		\
+		$(HOSTDIR)/chunk.o		\
+		$(HOSTDIR)/conversion.o		\
+		$(HOSTDIR)/doi_util.o		\
+		$(HOSTDIR)/globals.o		\
+		$(HOSTDIR)/system.o		\
+		$(HOSTDIR)/timeutil.o		\
+		$(HOSTDIR)/wbtum.o		\
+		$(LFLAGS)
+	$(SETUID) $(HOSTDIR)/boston
 
 $(HOSTDIR)/bp : $(HOSTDIR)/bp.o			\
 		$(HOSTDIR)/globals.o		\
@@ -108,6 +142,9 @@ $(HOSTDIR)/wbttest : $(HOSTDIR)/wbttest.o	\
 # Individual files
 #
 ########################################################################
+
+$(HOSTDIR)/main.o : src/main.c
+	$(CC) $(CFLAGS) -c -o $@ src/main.c
 
 $(HOSTDIR)/bp.o : src/bp.c
 	$(CC) $(CFLAGS) -c -o $@ src/bp.c

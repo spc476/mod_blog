@@ -37,6 +37,12 @@
 #include "system.h"
 #include "conversion.h"
 
+/***********************************************************/
+
+void	set_g_updatetype	(char *);
+void	set_g_emailupdate	(char *);
+void	set_g_conversion	(char *);
+
 /************************************************************/
 
 #ifdef PARALLEL_HACK
@@ -318,7 +324,7 @@ void set_g_emailupdate(char *value)
     up_string(value);
     if (strcmp(value,"NO") == 0)
       g_emailupdate = FALSE;
-    else if (strcmp(value,"YES" == 0)
+    else if (strcmp(value,"YES") == 0)
       g_emailupdate = TRUE;
   }
 }

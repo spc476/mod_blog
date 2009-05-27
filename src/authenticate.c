@@ -21,21 +21,24 @@
 
 #ifdef USE_GDBM
 
-  int authenticate_author(void)
+  int authenticate_author(Request req)
   {
     GDBM_FILE list;
     datum     key;
     int       rc;
 
+    ddt(req         != NULL);
+    ddt(req->author != NULL);
+    
     if (g_authorfile == NULL)
-      return (strcmp(m_author,g_author) == 0);
+      return (strcmp(req->author,g_author) == 0);
 
     list = gdbm_open(g_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
     if (list == NULL)
       return(FALSE);
 
-    key.dptr  = m_author;
-    key.dsize = strlen(m_author) + 1;
+    key.dptr  = req->author;
+    key.dsize = strlen(req->author) + 1;
     rc        = gdbm_exists(list,key);
     gdbm_close(list);
     return(rc);
@@ -45,30 +48,31 @@
 
 #elif defined (USE_DB)
 
-  int authenticate_author(void)
+  int authenticate_author(Request req)
   {
     DB  *list;
     DBT  key;
     DBT  data;
     int  rc;
 
+    ddt(req         != NULL);
+    ddt(req->author != NULL);
+    
     /*--------------------------------------------------------------
     ; this version will replace the login name with the full name,
     ; assuming it's defined in the database file as the (hardcoded)
     ; third field of the value portion returned.
     ;---------------------------------------------------------------*/
 
-    ddt(author != NULL);
-
     if (g_authorfile == NULL)
-      return (strcmp(m_author,g_author) == 0);
+      return (strcmp(req->author,g_author) == 0);
 
     list = dbopen(g_authorfile,O_RDONLY,0644,DB_HASH,NULL);
     if (list == NULL)
       return(FALSE);
 
-    key.data = m_author;
-    key.size = strlen(m_author);
+    key.data = req->author;
+    key.size = strlen(req->author);
     rc       = (list->get)(list,&key,&data,0);
     (list->close)(list);
     if (rc) return(FALSE);
@@ -157,14 +161,17 @@
 
   /*------------------------------------------------------*/
 
-  int authenticate_author(void)
+  int authenticate_author(Request req)
   {
     FILE   *fpin;
     char   *lines[10];	/* 10 fields max */
     size_t  cnt;
 
+    ddt(req         != NULL);
+    ddt(req->author != NULL);
+    
     if (g_authorfile == NULL)
-      return (strcmp(m_author,g_author) == 0);
+      return (strcmp(req->author,g_author) == 0);
  
     fpin = fopen(g_authorfile,"r");
     if (fpin == NULL)
@@ -172,7 +179,7 @@
  
     while((cnt = breakline(lines,10,fpin)))
     {
-      if (strcmp(m_author,lines[0]) == 0)
+      if (strcmp(req->author,lines[0]) == 0)
       {
         /*--------------------------------------------------
         ; A potential memory leak---see the comment above in 
@@ -180,7 +187,9 @@
         ;---------------------------------------------------*/
         
         if (cnt >= 3)
-          m_author = dup_string(lines[2]);
+        {
+          req->name   = req->author;
+          req->author = dup_string(lines[2]);
 
         fclose(fpin);
         return(TRUE);

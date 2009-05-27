@@ -16,6 +16,7 @@ typedef struct rflags
 typedef struct request
 {
   int     (*command)(struct request *);
+  int     (*error)  (struct request *,char *, ... );
   RFlags    f;
   Cgi       cgi;
   Buffer    bin;

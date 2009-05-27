@@ -1,12 +1,18 @@
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <cgi/memory.h>
 #include <cgi/buffer.h>
 #include <cgi/ddt.h>
 #include <cgi/clean.h>
 #include <cgi/cgi.h>
+
+#include "conf.h"
+#include "globals.h"
+#include "blog.h"
+#include "timeutil.h"
 
 /************************************************************************/
 
@@ -37,7 +43,11 @@ int main(int argc,char *argv[])
 
 /***********************************************************************/
 
-static void BlogDatesInit(void)
+static struct tm m_begin;
+static struct tm m_now;
+static struct tm m_updatetime;
+
+void BlogDatesInit(void)
 {
   time_t     t;
   struct tm *today;

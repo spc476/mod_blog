@@ -73,6 +73,13 @@ extern       void        (*g_conversion)(char *,Buffer,Buffer);
 extern volatile int        g_debug;
 
 int		GlobalsInit		(char *);
+void		set_g_updatetype	(char *);
+void		set_g_emailupdate	(char *);
+void		set_g_conversion	(char *);
+
+int		main_cgi_get		(Cgi,int,char *[]);
+int		main_cgi_post		(Cgi,int,char *[]);
+int		main_cli		(int,char *[]);
 
 #endif
 
