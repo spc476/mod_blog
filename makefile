@@ -39,7 +39,7 @@ CINCL=-I $(CGILIB)/src
 CFLAGS=-g $(CINCL)
 #CFLAGS=-g -pg $(CINCL)
 
-LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 
+LFLAGS=-lgdbm -L$(CGILIB)/$(HOSTDIR) -lcgi5 
 #LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 -pg
 # For Solaris, use this line
 #LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 -lsocket -lnsl
@@ -90,7 +90,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/system.o		\
-		$(LFLAGS) -lgdbm
+		$(LFLAGS) 
 	$(SETUID) $(HOSTDIR)/boston
 
 ###########################################################################

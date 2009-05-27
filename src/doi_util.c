@@ -25,8 +25,11 @@
 #include <time.h>
 
 #include <cgilib/ddt.h>
+#include <cgilib/mail.h>
 
+#if 0
 #define SENDMAIL	"/usr/sbin/sendmail"
+#endif
 
 /**************************************************************************/
 
@@ -38,6 +41,22 @@ int send_message(
 		  const char *message
 		)
 {
+  Email email;
+
+  email          = EmailNew();
+  email->from    = from;
+  email->to      = to;
+  email->subject = subject;
+
+  if (replyto) email->replyto = replyto;
+
+  LineS(email->body,message);
+  EmailSend(email);
+  EmailFree(email);
+  return(0);
+
+#if 0
+
   FILE      *fpin;
   FILE      *fpout;
   time_t     now;
@@ -92,6 +111,7 @@ int send_message(
   fclose(fpin);
   
   return(0);
+#endif
 }
 
 /************************************************************************/
