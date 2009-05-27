@@ -1,8 +1,11 @@
 .git
+.exclude
 .DS_Store
 CVS
 *.o
 *.a
 *~
 build/boston
+notes
+notes.conf
 
