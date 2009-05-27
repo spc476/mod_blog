@@ -360,6 +360,58 @@ static int cmd_cgi_post_edit(Request req)
 
 static int cgi_error(Request req,int level,char *format,char *msg, ... )
 {
+  Stream in;
+  char *file;
+
+  {
+    char   *docroot;
+    Stream  stmp;
+
+    docroot = spc_getenv("DOCUMENT_ROOT");
+    stmp    = StringStreamWrite();
+    LineSFormat(stmp,"$ i","%a/errors/%b.html",docroot,level);
+    file    = StringFromStream(stmp);
+    StreamFree(stmp);
+    MemFree(docroot);
+  }
+
+  in = FileStreamRead(file);
+  if (in == NULL)
+  {
+    LineSFormat(
+  	req->out,
+  	"i",
+	"Status: %a\r\n"
+        "Content-type: text/html\r\n"
+        "\r\n"
+        "<html>\n"
+        "<head>\n"
+        "<title>Error %a</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "<h1>Error %a</h1>\n"
+        "</body>\n"
+        "</html>\n"
+        "\n",
+        level
+         );
+  }
+  else
+  {
+    gd.htmldump = in;
+    LineSFormat(
+    	req->out,
+    	"i",
+    	"Status: %a\r\n"
+    	"Content-type: text/html\r\n"
+    	"\r\n",
+    	level);
+    generic_cb("main",req->out,NULL);
+  }
+
+  StreamFree(in);
+
+#if 0
   va_list args;
 
   ddt(req    != NULL);
@@ -386,7 +438,10 @@ static int cgi_error(Request req,int level,char *format,char *msg, ... )
   LineSFormatv(req->out,format,msg,args);
   LineS(req->out,"</P>\n</BODY>\n</HTML>\n");
   va_end(args);
+#endif
+
   return(ERR_OKAY);
+
 }
 
 /**********************************************************************/

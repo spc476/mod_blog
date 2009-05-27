@@ -997,6 +997,58 @@ static int tab_page(Stream out,int year, int month, int iday)
 
 static void display_error(Stream out,int err)
 {
+  Stream in;
+  char *file;
+
+  {
+    char   *docroot;
+    Stream  stmp;
+
+    docroot = spc_getenv("DOCUMENT_ROOT");
+    stmp    = StringStreamWrite();
+    LineSFormat(stmp,"$ i","%a/errors/%b.html",docroot,err);
+    file    = StringFromStream(stmp);
+    StreamFree(stmp);
+    MemFree(docroot);
+  }
+
+  in = FileStreamRead(file);
+  if (in == NULL)
+  {
+    LineSFormat(
+  	out,
+  	"i",
+	"Status: %a\r\n"
+        "Content-type: text/html\r\n"
+        "\r\n"
+        "<html>\n"
+        "<head>\n"
+        "<title>Error %a</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "<h1>Error %a</h1>\n"
+        "</body>\n"
+        "</html>\n"
+        "\n",
+        err
+         );
+  }
+  else
+  {
+    gd.htmldump = in;
+    LineSFormat(
+    	gd.req->out,
+    	"i",
+    	"Status: %a\r\n"
+    	"Content-type: text/html\r\n"
+    	"\r\n",
+    	err);
+    generic_cb("main",gd.req->out,NULL);
+  }
+
+  StreamFree(in);
+
+#if 0
   LineSFormat(
   	out,
   	"i",
@@ -1014,6 +1066,7 @@ static void display_error(Stream out,int err)
         "\n",
         err
          );
+#endif
 }
 
 /*******************************************************************/
