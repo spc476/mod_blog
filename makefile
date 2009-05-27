@@ -22,7 +22,8 @@
 ########################################################################
 
 SHELL=/bin/sh
-CGILIB=/home/spc/source/cgi
+#CGILIB=/home/spc/source/cgi
+CGILIB=../../cgi
 SETUID=chmod 4755
 #SETUID=echo >/dev/null
 
@@ -40,6 +41,7 @@ CFLAGS=-g $(CINCL)
 #CFLAGS=-g -pg $(CINCL)
 
 LFLAGS=-lgdbm -L$(CGILIB)/$(HOSTDIR) -lcgi5 
+#LFLAGS= -L$(CGILIB)/$(HOSTDIR) -lcgi5 
 #LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 -pg
 # For Solaris, use this line
 #LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 -lsocket -lnsl

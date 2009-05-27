@@ -20,7 +20,7 @@
 *
 ******************************************************************/
 
-#ifndef __unix__
+#if !(defined(__unix__) || defined(__MACH__))
 #  error This code is Unix specific.  You have been warned.
 #endif
 

@@ -25,8 +25,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <gdbm.h>
-
 #include <cgilib/memory.h>
 #include <cgilib/ddt.h>
 #include <cgilib/stream.h>
@@ -45,6 +43,10 @@
 #include "frontend.h"
 #include "globals.h"
 #include "fix.h"
+
+#ifdef EMAIL_NOTIFY
+#  include <gdbm.h>
+#endif
 
 /*********************************************************************/
 
@@ -193,6 +195,7 @@ void notify_weblogcom(void)
 
 void notify_emaillist(void)
 {
+#ifdef EMAIL_NOTIFY
   GDBM_FILE list;
   datum     key;
   datum     content;
@@ -213,6 +216,7 @@ void notify_emaillist(void)
     key = gdbm_nextkey(list,key);
   }
   gdbm_close(list);
+#endif
 }
 
 /*************************************************************************/

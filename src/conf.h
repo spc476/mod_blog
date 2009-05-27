@@ -78,6 +78,14 @@
 #undef USE_DB
 #define USE_HTPASSWD
 
+/*-------------------------------------------------------------------
+; Define the following if you want email notification support (which
+; uses GDBM files, so if your system doesn't support it, turn this
+; feature off.
+;------------------------------------------------------------------*/
+
+#define EMAIL_NOTIFY
+
 /*-----------------------------------------------------------
 ; Some features being worked on:
 ;
