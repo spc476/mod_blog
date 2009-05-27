@@ -1053,7 +1053,7 @@ static String *tag_split(size_t *pnum,const char *tag)
     if (num == max)
     {
       max += 1024;
-      pool = MemResize(pool,max);
+      pool = MemResize(pool,max * sizeof(String));
     }
     
     for (p = tag ; (*p) && (*p != ',') ; p++)
