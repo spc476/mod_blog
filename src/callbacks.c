@@ -460,6 +460,7 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
   if (
        (src != NULL)
        && (src->value[0] != '/')
+       && (src->value[0] != '#')
        && (strncmp(src->value,"http:",5)        != 0)
        && (strncmp(src->value,"https:",6)       != 0)
        && (strncmp(src->value,"mailto:",7)      != 0)
