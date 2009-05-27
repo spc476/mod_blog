@@ -22,7 +22,7 @@
 ########################################################################
 
 SHELL=/bin/sh
-CGILIB=../cgi
+CGILIB=/home/spc/source/cgi
 SETUID=chmod 4755
 #SETUID=echo >/dev/null
 

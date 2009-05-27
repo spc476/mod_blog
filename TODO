@@ -1,3 +1,15 @@
+2006-01-29T02:02-05:00 
+
+	Add an "ad word" feature.  For each entry, take the tags, add them
+	all together.  Then, pick a random word from that list, weighted,
+	according to how many times each tag appears.  Then use that to tag
+	the advertisement (say, Amazon).
+
+	Actually, we don't need to weight them ... just separate out the
+	(long) string of comma separated tags, then pick one at random.  The
+	tag that appears most often will, statistically speaking, be picked
+	more often.
+
 2005-09-21T15:45-05:00
 
         Add a configuration option to specify which field of an htpasswd
