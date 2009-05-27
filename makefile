@@ -22,21 +22,24 @@
 ########################################################################
 
 SHELL=/bin/sh
-CGILIB=/home/spc/source/cgi4
+CGILIB=../cgi5
 SETUID=chmod 4755
 #SETUID=echo >/dev/null
 
-CC=gcc -Wall -pedantic
+CC=gcc -Wall -pedantic 
 CINCL=-I $(CGILIB)/src
 
 #CFLAGS=-g -ansi -Wall -pedantic -Wtraditional -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
 #CFLAGS=-DSCREAM -O4 -fomit-frame-pointer  $(CINCL)
+#CFLAGS=-O3 -fomit-frame-pointer  $(CINCL)
 #CFLAGS=-pg -g -DSCREAM -DNOSTATS -O4 $(CINCL)
 #CFLAGS=-g -DDDT $(CINCL)
 #CFLAGS=-g -march=pentium3 -O3 $(CINCL)
 CFLAGS=-g $(CINCL)
+#CFLAGS=-g -pg $(CINCL)
 
 LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4 
+#LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4 -pg
 # For Solaris, use this line
 #LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4 -lsocket -lnsl
 
@@ -51,8 +54,41 @@ LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4
 #
 ################################################
 
-all:	$(HOSTDIR)/bp		\
-	$(HOSTDIR)/addentry
+all: $(HOSTDIR)/boston
+
+$(HOSTDIR)/boston : $(HOSTDIR)/addutil.o		\
+		$(HOSTDIR)/authenticate.o	\
+		$(HOSTDIR)/blog.o		\
+		$(HOSTDIR)/callbacks.o		\
+		$(HOSTDIR)/cgi_main.o		\
+		$(HOSTDIR)/chunk.o		\
+		$(HOSTDIR)/cli_main.o		\
+		$(HOSTDIR)/conversion.o		\
+		$(HOSTDIR)/doi_util.o		\
+		$(HOSTDIR)/globals.o		\
+		$(HOSTDIR)/main.o		\
+		$(HOSTDIR)/timeutil.o		\
+		$(HOSTDIR)/wbtum.o		\
+		$(HOSTDIR)/backend.o		\
+		$(HOSTDIR)/system.o
+	$(CC) $(CFLAGS) -o $@			\
+		$(HOSTDIR)/addutil.o		\
+		$(HOSTDIR)/authenticate.o	\
+		$(HOSTDIR)/blog.o		\
+		$(HOSTDIR)/callbacks.o		\
+		$(HOSTDIR)/cgi_main.o		\
+		$(HOSTDIR)/chunk.o		\
+		$(HOSTDIR)/cli_main.o		\
+		$(HOSTDIR)/conversion.o		\
+		$(HOSTDIR)/doi_util.o		\
+		$(HOSTDIR)/globals.o		\
+		$(HOSTDIR)/main.o		\
+		$(HOSTDIR)/timeutil.o		\
+		$(HOSTDIR)/wbtum.o		\
+		$(HOSTDIR)/backend.o		\
+		$(HOSTDIR)/system.o		\
+		$(LFLAGS) -lgdbm
+	$(SETUID) $(HOSTDIR)/boston
 
 ###########################################################################
 #
@@ -108,6 +144,30 @@ $(HOSTDIR)/wbttest : $(HOSTDIR)/wbttest.o	\
 # Individual files
 #
 ########################################################################
+
+$(HOSTDIR)/main.o : src/main.c
+	$(CC) $(CFLAGS) -c -o $@ src/main.c
+
+$(HOSTDIR)/backend.o : src/backend.c
+	$(CC) $(CFLAGS) -c -o $@ src/backend.c
+
+$(HOSTDIR)/cli_main.o : src/cli_main.c
+	$(CC) $(CFLAGS) -c -o $@ src/cli_main.c
+
+$(HOSTDIR)/cgi_main.o : src/cgi_main.c
+	$(CC) $(CFLAGS) -c -o $@ src/cgi_main.c
+
+$(HOSTDIR)/authenticate.o : src/authenticate.c
+	$(CC) $(CFLAGS) -c -o $@ src/authenticate.c
+
+$(HOSTDIR)/array.o : src/array.c
+	$(CC) $(CFLAGS) -c -o $@ src/array.c
+
+$(HOSTDIR)/addutil.o : src/addutil.c
+	$(CC) $(CFLAGS) -c -o $@ src/addutil.c
+
+$(HOSTDIR)/callbacks.o : src/callbacks.c
+	$(CC) $(CFLAGS) -c -o $@ src/callbacks.c
 
 $(HOSTDIR)/bp.o : src/bp.c
 	$(CC) $(CFLAGS) -c -o $@ src/bp.c
