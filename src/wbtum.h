@@ -68,6 +68,7 @@ typedef struct tumunit
 /***********************************************************************/
 
 int		 (TumblerNew)		(Tumbler *,char **);
+char		*(TumblerCanonical)	(Tumbler);
 int		 (TumblerFree)		(Tumbler *);
 
 #endif

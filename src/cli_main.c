@@ -255,7 +255,18 @@ static int cmd_cli_show(Request req)
     {
       rc = TumblerNew(&req->tumbler,&req->reqtumbler);
       if (rc == ERR_OKAY)
+      {
+#ifdef FEATURE_REDIRECT
+        if (req->tumbler->flags.redirect)
+        {
+          char *tum = TumblerCanonical(req->tumbler);
+          rc = (*req->error)(req,HTTP_MOVEPERM,"$","Redirect: %a",tum);
+          MemFree(tum);
+          return(rc);
+        }
+#endif
         rc = tumbler_page(req->out,req->tumbler);
+      }
       else
         rc = (*req->error)(req,HTTP_NOTFOUND,"","tumbler error---nothing found");
     }

@@ -146,6 +146,31 @@ static int cmd_cgi_get_show(Request req)
     rc = TumblerNew(&req->tumbler,&req->reqtumbler);
     if (rc == ERR_OKAY)
     {
+
+#ifdef FEATURE_REDIRECT
+      if (req->tumbler->flags.redirect)
+      {
+        char *tum = TumblerCanonical(req->tumbler);
+        LineSFormat(
+        	req->out,
+        	"i $ $",
+        	"Status: %a\r\n"
+        	"Location: %b/%c\r\n"
+        	"Content-Type: text/html\r\n\r\n"
+        	"<html>"
+        	"<head><title>Redirect</title></head>"
+        	"<body><p>Redirect to <a href='%b/%c'>%b/%c</a></p></body>"
+        	"</html>\n",
+        	HTTP_MOVEPERM,
+        	c_fullbaseurl,
+        	tum
+        );
+        MemFree(tum);
+	MemFree(status);
+	return(ERR_OKAY);
+      }
+#endif
+
       if (req->tumbler->flags.file == FALSE)
         LineSFormat(
         	req->out,

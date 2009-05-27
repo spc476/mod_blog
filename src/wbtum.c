@@ -55,6 +55,7 @@
 #include <cgilib/types.h>
 #include <cgilib/util.h>
 
+#include "conf.h"
 #include "wbtum.h"
 
 /**************************************************************************/
@@ -64,6 +65,7 @@ typedef struct fpreturn
   struct fpreturn (*state)(Tumbler,TumblerUnit *,char **);
 } State;
 
+static void		tumblerunit_canonize	(Stream,TumblerUnit);
 static TumblerUnit	tumblerunit_new		(enum ttypes);
 static State		state_a			(Tumbler,TumblerUnit *,char **);
 static State		state_b			(Tumbler,TumblerUnit *,char **);
@@ -104,9 +106,72 @@ int (TumblerNew)(Tumbler *pt,char **pstr)
     TumblerFree(&t);
     return(ERR_ERR);
   }
+
+#ifdef FEATURE_REDIRECT
+  /*------------------------------------------
+  ; I need to rethink how this is done, but for
+  ; now, we don't redirect on tumbler ranges
+  ;--------------------------------------------*/
   
+  tu = (TumblerUnit)ListGetHead(&t->units);
+  if (tu->type == TUMBLER_RANGE)
+    t->flags.redirect = FALSE;
+#endif
+ 
   *pt = t;
   return(ERR_OKAY);  
+}
+
+/************************************************************************/
+
+char *(TumblerCanonical)(Tumbler t)
+{
+  TumblerUnit  tu;
+  Stream       out;
+  char        *text;
+
+  out = StringStreamWrite(); 
+  tu  = (TumblerUnit)ListGetHead(&t->units);
+
+  if (tu->type == TUMBLER_SINGLE)
+    tumblerunit_canonize(out,tu);
+  else if (tu->type == TUMBLER_RANGE)
+    ddt(0);
+  else
+    ddt(0);
+
+  text = StringFromStream(out);
+  StreamFree(out);
+  return(text);
+}
+
+/************************************************************************/
+
+static void tumblerunit_canonize(Stream out,TumblerUnit tu)
+{
+  ddt(out != NULL);
+  ddt(tu  != NULL);
+  
+  switch(tu->size)
+  {
+    case 1:
+         LineSFormat(out,"i","%a",tu->entry[0]);
+         break;
+    case 2:
+         LineSFormat(out,"i i2r0","%a/%b",tu->entry[0],tu->entry[1]);
+         break;
+    case 3:
+         LineSFormat(out,"i i2r0 i2r0","%a/%b/%c",tu->entry[0],tu->entry[1],tu->entry[2]);
+         if (tu->file)
+           LineSFormat(out,"$","/%a",tu->file);
+         break;
+    case 4:
+         LineSFormat(out,"i i2r0 i2r0 i","%a/%b/%c.%d",tu->entry[0],tu->entry[1],tu->entry[2],tu->entry[3]);
+         break;
+    case 0:
+    default:
+         ddt(0);
+  }  
 }
 
 /************************************************************************/
