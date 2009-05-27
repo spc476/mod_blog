@@ -22,7 +22,7 @@
 ########################################################################
 
 SHELL=/bin/sh
-CGILIB=../cgi5
+CGILIB=../../cgi
 SETUID=chmod 4755
 #SETUID=echo >/dev/null
 
@@ -38,10 +38,10 @@ CINCL=-I $(CGILIB)/src
 CFLAGS=-g $(CINCL)
 #CFLAGS=-g -pg $(CINCL)
 
-LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4 
-#LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4 -pg
+LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 
+#LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 -pg
 # For Solaris, use this line
-#LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi4 -lsocket -lnsl
+#LFLAGS=-ldb -L$(CGILIB)/$(HOSTDIR) -lcgi5 -lsocket -lnsl
 
 ###################################
 # some notes
