@@ -116,8 +116,6 @@ void fix_entry(Request req)
   req->title = entity_conversion(tmp);
   MemFree(tmp);
   
-  /*req->title = StringFromStream(out);*/
-  
   StreamFlush(out);
   
   /*--------------
