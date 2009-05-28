@@ -21,18 +21,18 @@ http://www.wordyard.com/2007/08/28/can-newspapers-fix-old-errors/#comment-124268
 	Also, it's not an archive section, it's an overview section.  Rename
 	the command appropriately.
 
-2007-02-07T03:05-05:00
-
-	Add code to translate HTML entities in the title field to numeric
-	HTML entities because RSS (and presumedly Atom) consumers don't
-	understand the named HTML entities.
-
 2005-09-21T15:45-05:00
 
         Add a configuration option to specify which field of an htpasswd
         file has the real name.
 
 ==============================
+
+2007-02-07T03:05-05:00	DONE
+
+	Add code to translate HTML entities in the title field to numeric
+	HTML entities because RSS (and presumedly Atom) consumers don't
+	understand the named HTML entities.
 
 2007-08-27T12:00-05:00	DONE
 
