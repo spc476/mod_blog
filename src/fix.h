@@ -43,6 +43,7 @@ int	 entry_add			(Request);
 void	 fix_entry			(Request);
 void	 generic_cb			(const char *,Stream,void *);
 void	 dbcritical			(char *);
+char	*entity_conversion		(const char *);
 
 #endif
 

@@ -70,6 +70,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/wbtum.o		\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
+		$(HOSTDIR)/entity-conversion.o	\
 		$(HOSTDIR)/system.o
 	$(CC) $(CFLAGS) -o $@			\
 		$(HOSTDIR)/addutil.o		\
@@ -86,6 +87,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/system.o		\
+		$(HOSTDIR)/entity-conversion.o	\
 		$(LFLAGS) 
 	$(SETUID) $(HOSTDIR)/boston
 
@@ -151,6 +153,9 @@ $(HOSTDIR)/system.o : src/system.c
 
 $(HOSTDIR)/blogutil.o : src/blogutil.c src/blogutil.h
 	$(CC) $(CFLAGS) -c -o $@ src/blogutil.c
+
+$(HOSTDIR)/entity-conversion.o : src/entity-conversion.c
+	$(CC) $(CFLAGS) -c -o $@ src/entity-conversion.c
 
 #######################################################################
 #

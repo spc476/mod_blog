@@ -98,8 +98,9 @@ int entry_add(Request req)
 
 void fix_entry(Request req)
 {
-  Stream in;
-  Stream out;
+  Stream  in;
+  Stream  out;
+  char   *tmp;
   
   out = StringStreamWrite();
   
@@ -111,7 +112,11 @@ void fix_entry(Request req)
   buff_conversion(in,out,QUOTE_SMART);
   StreamFree(in);
   MemFree(req->title);
-  req->title = StringFromStream(out);
+  tmp = StringFromStream(out);
+  req->title = entity_conversion(tmp);
+  MemFree(tmp);
+  
+  /*req->title = StringFromStream(out);*/
   
   StreamFlush(out);
   
