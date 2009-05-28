@@ -36,6 +36,12 @@ struct entity_conv
 
 /********************************************************************/
 
+	/*------------------------------------------------
+	; the following table is sorted via the C locale.
+	; This is okay, as that locale for collation is
+	; set at the beginning of the program.
+	;----------------------------------------------*/
+
 const struct entity_conv m_table[] =
 {
   { "AElig" 	,  198 },

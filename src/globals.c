@@ -25,6 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <locale.h>
 
 #include <cgilib/ddt.h>
 #include <cgilib/memory.h>
@@ -317,6 +318,14 @@ int GlobalsInit(char *fspec)
   g_blog = BlogNew(c_basedir,c_lockfile);
   if (g_blog == NULL)
     return(ERR_ERR);
+
+  /*-------------------------------------------------------
+  ; for most sorting routines, I just assume C sorting
+  ; conventions---this makes sure I have those for sorting
+  ; and searching only.
+  ;--------------------------------------------------------*/
+  
+  setlocale(LC_COLLATE,"C");
 
   return(ERR_OKAY);
 }
