@@ -1,3 +1,14 @@
+2009-05-30T23:36-05:00
+
+	Translate
+
+	<a href="asin:12345568">...</a>
+
+	to
+
+	<a href="http://www.amazon.com/exec/obidos/ASIN/12345678/conmanlaborat-20">
+
+	How to do that without hardcoding it into the program itself.
 
 2007-08-29T16:44-05:00
 
