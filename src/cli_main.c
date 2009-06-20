@@ -23,6 +23,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <time.h>
 
 #include <getopt.h>
 
@@ -258,7 +261,7 @@ static int cmd_cli_show(Request req)
         {
           char *tum = TumblerCanonical(req->tumbler);
           rc = (*req->error)(req,HTTP_MOVEPERM,"$","Redirect: %a",tum);
-          MemFree(tum);
+          free(tum);
           return(rc);
         }
 #endif

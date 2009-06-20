@@ -20,8 +20,12 @@
 *
 *********************************************************************/
 
+#define _GNU_SOURCE	1
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include <cgilib/ddt.h>
 #include <cgilib/stream.h>
@@ -317,13 +321,16 @@ static int entity_cmp(const void *needle,const void *haystack)
 
 char *entity_conversion(const char *s)
 {
-  Stream  tmp;
-  char   *r;
+  FILE *tmp;
+  char *t = NULL;
+  size_t sz = 0;
+  
+  char *r;
   
   ddt(s != NULL);
   
-  tmp = StringStreamWrite();
-  
+  tmp = open_memstream(&t,&sz);
+
   while(*s)
   {
     if (*s == '&')
@@ -334,8 +341,8 @@ char *entity_conversion(const char *s)
       
       if (*++s == '#')
       {
-        StreamWrite(tmp,'&');
-        StreamWrite(tmp,*s++);
+        fputc('&',tmp);
+        fputc(*s++,tmp);
         continue;
       }
       
@@ -347,16 +354,15 @@ char *entity_conversion(const char *s)
       pe = bsearch(entity,m_table,ENTITIES,sizeof(struct entity_conv),entity_cmp);
      
       if (pe == NULL)
-        StreamWrite(tmp,'?');
+        fputc('?',tmp);
       else
-        LineSFormat(tmp,"i","&#%a;",pe->value);
+        fprintf(tmp,"&#%d;",pe->value);
     }
     else
-      StreamWrite(tmp,*s++);
+      fputc(*s++,tmp);
   }
   
-  r = StringFromStream(tmp);
-  StreamFree(tmp);
+  fclose(tmp);
   return r;
 }
 

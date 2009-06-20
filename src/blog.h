@@ -23,8 +23,6 @@
 #ifndef BLOG_MKENTRY
 #define BLOG_MKENTRY
 
-#include <time.h>
-
 #include <cgilib/nodelist.h>
 #include <cgilib/errors.h>
 

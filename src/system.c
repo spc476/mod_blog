@@ -27,10 +27,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#include <stdarg.h>
 
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
+
+#define __USE_POSIX
 #include <signal.h>
 
 #include <cgilib/pair.h>

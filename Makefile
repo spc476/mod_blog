@@ -25,7 +25,7 @@ SHELL=/bin/sh
 HOSTDIR=build
 SETUID=chmod 4755
 
-CC=gcc -Wall -pedantic 
+CC=gcc -Wall -pedantic -std=c99
 CINCL=
 
 #CFLAGS=-g -ansi -Wall -pedantic -Wtraditional -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)

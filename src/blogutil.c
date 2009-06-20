@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 #include <cgilib/memory.h>
 #include <cgilib/ddt.h>

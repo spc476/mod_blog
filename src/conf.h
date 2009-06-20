@@ -23,7 +23,6 @@
 #ifndef CONF_H
 #define CONF_H
 
-#include <limits.h>
 #include <cgilib/pair.h>
 #include <cgilib/errors.h>
 

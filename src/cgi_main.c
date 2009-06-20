@@ -23,6 +23,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+#include <time.h>
 
 #include <cgilib/memory.h>
 #include <cgilib/stream.h>
@@ -184,7 +186,7 @@ static int cmd_cgi_get_show(Request req)
         	c_fullbaseurl,
         	tum
         );
-        MemFree(tum);
+        free(tum);
 	MemFree(status);
 	return(ERR_OKAY);
       }

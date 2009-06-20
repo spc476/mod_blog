@@ -23,7 +23,6 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
-#include <time.h>
 #include <cgilib/cgi.h>
 #include "wbtum.h"
 #include "timeutil.h"

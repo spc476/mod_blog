@@ -20,9 +20,12 @@
 *
 *********************************************************************/
 
+#define _GNU_SOURCE	1
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <time.h>
 
 #include <cgilib/memory.h>
@@ -98,37 +101,44 @@ int entry_add(Request req)
 
 void fix_entry(Request req)
 {
-  Stream  in;
-  Stream  out;
+  FILE   *out;
+  FILE   *in;
   char   *tmp;
+  size_t  size;
   
-  out = StringStreamWrite();
+  assert(req != NULL);
   
-  /*-------------------
+  /*---------------------------------
   ; convert the title
-  ;--------------------*/
+  ;--------------------------------*/
   
-  in  = MemoryStreamRead(req->title,strlen(req->title));
+  tmp  = NULL;
+  size = 0;
+  out  = open_memstream(&tmp,&size);
+  in   = fmemopen(req->title,strlen(req->title));
+  
   buff_conversion(in,out,QUOTE_SMART);
-  StreamFree(in);
+  fclose(in);
+  fclose(out);
   MemFree(req->title);
-  tmp = StringFromStream(out);
+  
   req->title = entity_conversion(tmp);
-  MemFree(tmp);
+  free(tmp);
   
-  StreamFlush(out);
+  /*-------------------------------------
+  ; convert body 
+  ;--------------------------------------*/
   
-  /*--------------
-  ; convert body
-  ;----------------*/
+  tmp  = NULL;
+  size = 0;
+  out  = open_memstream(&tmp,&size);
+  in   = fmemopen(req->body,strlen(req->body));
   
-  in = MemoryStreamRead(req->body,strlen(req->body));
   (*c_conversion)("body",in,out);
-  StreamFree(in);
-  MemFree(req->body);
-  req->body = StringFromStream(out);
+  fclose(in);
+  fclose(out);
   
-  StreamFree(out);
+  req->body = tmp;
 }
 
 /************************************************************************/

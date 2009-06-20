@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <locale.h>
+#include <stdarg.h>
+#include <time.h>
 
 #include <cgilib/ddt.h>
 #include <cgilib/memory.h>

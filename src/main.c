@@ -23,6 +23,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdarg.h>
 
 #include <cgilib/memory.h>
 #include <cgilib/ddt.h>

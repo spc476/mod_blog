@@ -26,6 +26,7 @@
 #include <limits.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 #include <sys/stat.h>
 #include <unistd.h>
