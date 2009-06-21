@@ -214,13 +214,17 @@ char *get_remote_user(void)
     char   *colon;
     size_t  cnt;
     size_t  size;
+    ssize_t rc;
     
-    getline(&line,&size,in);
-    if (emptynull_string(line))
+    rc = getline(&line,&size,in);
+    if ((rc == -1) || (emptynull_string(line)))
     {
       free(line);
       return(0);
     }
+    
+    if (line[size - 1] == '\n')
+      line[size - 1] = '\0';
 
     tmp = malloc(sizeof(char *) * dsize);
     p   = line;

@@ -610,30 +610,53 @@ static int blog_cache_day(Blog blog,struct btm *date)
   
   while(!feof(stitles) || !feof(sclass) || !feof(sauthors))
   {
-    char   pname[FILENAME_MAX];
-
+    char  pname[FILENAME_MAX];
+    char *p;
+    
     entry               = malloc(sizeof(struct blogentry));
     entry->node.ln_Succ = NULL;
     entry->node.ln_Pred = NULL;
     entry->when.year    = date->year;
     entry->when.month   = date->month;
     entry->when.day     = date->day;
+    entry->title        = NULL;
+    entry->class        = NULL;
+    entry->author       = NULL;
+    entry->body         = NULL;
     
+    size = 0;
     if (!feof(stitles))
-      getline(&entry->title,&size,stitles);
+    {
+      if (getline(&entry->title,&size,stitles) == -1)
+        entry->title = strdup("");
+    }
     else
       entry->title = strdup("");
     
+    p = memchr(entry->title,'\n',size); if (p) *p = '\0';
+    
+    size = 0;
     if (!feof(sclass))
-      getline(&entry->class,&size,sclass);
+    {
+      if (getline(&entry->class,&size,sclass) == -1)
+        entry->class = strdup("");
+    }
     else
       entry->class = strdup("");
     
+    p = memchr(entry->class,'\n',size); if (p) *p = '\0';
+    
+    size = 0;
     if (!feof(sauthors))
-      getline(&entry->author,&size,sauthors);
+    {
+      if (getline(&entry->author,&size,sauthors) == -1)
+        entry->author = strdup("");
+    }
     else
       entry->author = strdup("");
-      
+    
+    p = memchr(entry->author,'\n',size); if (p) *p = '\0';
+    
     date_to_part(pname,date,blog->idx + 1);
     
     {
@@ -662,6 +685,18 @@ static int blog_cache_day(Blog blog,struct btm *date)
     
     blog->entries[blog->idx++] = entry;
     entry->when.part           = blog->idx;
+    
+    /*-------------------------------------------------
+    ; Sigh.  SCL (Standard C Library) doesn't set end-of-file
+    ; until you actually attempt to READ, even if it
+    ; is indeed at the end of the file.  So this lovely
+    ; little bit of code reads and unreads some data
+    ; from each file to trigger the eof condition.
+    ;--------------------------------------------------*/
+    
+    ungetc(fgetc(stitles),stitles);
+    ungetc(fgetc(sclass),sclass);
+    ungetc(fgetc(sauthors),sauthors);
   }
   
   blog->cache = *date;
