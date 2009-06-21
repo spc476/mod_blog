@@ -38,7 +38,7 @@ CINCL=
 CFLAGS=-g $(CINCL)
 #CFLAGS=-g -pg $(CINCL)
 
-LFLAGS=-lgdbm -lcgi5 
+LFLAGS=-lgdbm -lcgi6 
 #LFLAGS= lcgi5 
 #LFLAGS=-ldb -lcgi5 -pg
 # For Solaris, use this line

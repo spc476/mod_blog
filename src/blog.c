@@ -35,10 +35,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <cgilib/ddt.h>
-#include <cgilib/errors.h>
-#include <cgilib/memory.h>
-#include <cgilib/util.h>
+#include <cgilib6/errors.h>
+#include <cgilib6/util.h>
+#include <cgilib6/nodelist.h>
 
 #include "conf.h"
 #include "blog.h"
@@ -71,7 +70,7 @@ Blog (BlogNew)(const char *location,const char *lockfile)
   if (rc != 0)
     return(NULL);
   
-  blog           = MemAlloc(sizeof(struct blog));
+  blog           = malloc(sizeof(struct blog));
   memset(blog,0,sizeof(struct blog));
   blog->lockfile = strdup(lockfile);
   blog->lock     = 0;
@@ -164,7 +163,7 @@ BlogEntry (BlogEntryNew)(Blog blog)
 
   assert(blog != NULL);
   
-  pbe               = MemAlloc(sizeof(struct blogentry));
+  pbe               = malloc(sizeof(struct blogentry));
   pbe->node.ln_Succ = NULL;
   pbe->node.ln_Pred = NULL;
   pbe->blog         = blog;
@@ -503,7 +502,7 @@ static FILE *open_file_w(const char *name,struct btm *date)
 static int date_check(struct btm *date)
 {
   int rc;
-  char tname[FILENAME_LEN];
+  char tname[FILENAME_MAX];
   struct stat status;
   
   date_to_dir(tname,date);
@@ -516,7 +515,7 @@ static int date_check(struct btm *date)
 static int date_checkcreate(struct btm *date)
 {
   int         rc;
-  char        tname[FILENAME_LEN];
+  char        tname[FILENAME_MAX];
   struct stat status;
   
   assert(date != NULL);
@@ -611,7 +610,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
   
   while(!feof(stitles) || !feof(sclass) || !feof(sauthors))
   {
-    char   pname[FILENAME_LEN];
+    char   pname[FILENAME_MAX];
 
     entry               = malloc(sizeof(struct blogentry));
     entry->node.ln_Succ = NULL;
