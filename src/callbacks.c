@@ -121,7 +121,7 @@ static void	fixup_uri		(BlogEntry,HtmlToken,const char *);
 
 /************************************************************************/
 
-struct chunk_callback  m_callbacks[] =
+const struct chunk_callback  m_callbacks[] =
 {  
   { "ad"			, cb_ad				} ,
   { "ad.content"		, cb_ad_content			} ,
@@ -187,7 +187,8 @@ struct chunk_callback  m_callbacks[] =
   { "update.type"               , cb_update_type                } ,
   { "xyzzy"			, cb_xyzzy			} 
 };
-size_t m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
+
+const size_t m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
 
 /*************************************************************************/
 

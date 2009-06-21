@@ -489,8 +489,8 @@ static void calculate_next(struct btm end)
 
 static const char *mime_type(char *filename)
 {
-  int                   i;
-  static struct dstring types[] = 
+  int                         i;
+  static const struct dstring types[] = 
   {
     { ".jpeg"		, "image/jpeg"	},
     { ".jpg"		, "image/jpeg"	},

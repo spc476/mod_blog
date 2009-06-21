@@ -98,8 +98,8 @@
 #define HTTP_HTTPVERSION	505		/* 1.1	*/
 #define HTTP_500MAX		505
 
-extern struct chunk_callback m_callbacks[];
-extern size_t                m_cbnum;
+extern const struct chunk_callback m_callbacks[];
+extern const size_t                m_cbnum;
 
 char	*get_remote_user		(void);
 int	 authenticate_author		(Request);
