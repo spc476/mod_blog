@@ -114,6 +114,9 @@ void	 fix_entry			(Request);
 void	 generic_cb			(const char *,FILE *,void *);
 void	 dbcritical			(char *);
 char	*entity_conversion		(const char *);
+char	*entity_encode			(const char *);
+FILE	*fentity_encode_onread		(FILE *);
+FILE	*fentity_encode_onwrite		(FILE *);
 size_t	 fcopy				(FILE *,FILE *);
 
 #endif

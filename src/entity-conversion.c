@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdbool.h>
+#include <errno.h>
 #include <assert.h>
 
 /*********************************************************************/
@@ -35,6 +37,17 @@ struct entity_conv
   const char *const name;
   const       int   value;
 };
+
+/********************************************************************/
+
+static bool		char_entity	(char **,size_t *,int);
+
+static __ssize_t	fer_read	(void *,char *,size_t);
+static __ssize_t	few_read	(void *,char *,size_t);
+static __ssize_t	fer_write	(void *,const char *,size_t);
+static __ssize_t	few_write	(void *,const char *,size_t);
+static int		fnop_seek	(void *,_IO_off64_t *,int);
+static int		fnop_close	(void *);
 
 /********************************************************************/
 
@@ -319,11 +332,9 @@ static int entity_cmp(const void *needle,const void *haystack)
 
 char *entity_conversion(const char *s)
 {
-  FILE *tmp;
-  char *t = NULL;
-  size_t sz = 0;
-  
-  char *r;
+  FILE   *tmp;
+  char   *t  = NULL;
+  size_t  sz = 0;
   
   assert(s != NULL);
   
@@ -334,8 +345,8 @@ char *entity_conversion(const char *s)
     if (*s == '&')
     {
       const struct entity_conv *pe;
-      char                entity[BUFSIZ];
-      char               *p;
+      char                      entity[BUFSIZ];
+      char                     *p;
       
       if (*++s == '#')
       {
@@ -361,6 +372,175 @@ char *entity_conversion(const char *s)
   }
   
   fclose(tmp);
-  return r;
+  return t;
 }
+
+/***********************************************************************/
+
+static bool char_entity(char **tag,size_t *ps,int c)
+{
+  assert(tag != NULL);
+  assert(ps  != NULL);
+  
+  switch(c)
+  {
+    case '>':  *tag = "&lt;";   *ps = 4; return true;
+    case '<':  *tag = "&gt;";   *ps = 4; return true;
+    case '&':  *tag = "&amp;";  *ps = 5; return true;
+    case '"':  *tag = "&quot;"; *ps = 6; return true;
+    case '\'': *tag = "&apos;"; *ps = 6; return true;
+    default:                             return false;
+  }
+}
+
+/**********************************************************************/
+
+char *entity_encode(const char *s)
+{
+  FILE   *out;   
+  char   *text;
+  size_t  size;
+  char   *entity;
+  size_t  dummy;
+ 
+  assert(s      != NULL);
+
+  out = open_memstream(&text,&size);
+
+  for ( ; *s ; s++)
+  {
+    if (char_entity(&entity,&dummy,*s))
+      fputs(entity,out);
+    else
+      fputc(*s,out);
+  }
+
+  fclose(out);
+  return text;
+}
+
+/********************************************************************/
+
+FILE *fentity_encode_onread(FILE *in)
+{
+  return fopencookie(in,"r",(_IO_cookie_io_functions_t)
+  				{
+  				  fer_read,
+  				  fer_write,
+  				  fnop_seek,
+  				  fnop_close
+  				});
+}
+
+/*******************************************************************/
+
+FILE *fentity_encode_onwrite(FILE *out)
+{
+  return fopencookie(out,"w",(_IO_cookie_io_functions_t)
+  				{
+  				  few_read,
+  				  few_write,
+  				  fnop_seek,
+  				  fnop_close
+  				});
+}
+
+/******************************************************************/
+
+static __ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
+{
+  FILE   *realin = cookie;
+  size_t  s      = 0;
+  char   *replace;
+  size_t  repsize;
+  int     c;
+  
+  if (feof(realin))
+    return 0;
+  
+  while(bytes)
+  {
+    c = fgetc(realin);
+    if (c == EOF) return s;
+    
+    if (char_entity(&replace,&repsize,c))
+    {
+      if (bytes < repsize)
+      {
+        ungetc(c,realin);
+        return s;
+      }
+      
+      memcpy(buffer,replace,repsize);
+      buffer += repsize;
+      bytes  -= repsize;
+      s      += repsize;
+    }
+    else
+    {
+      *buffer++ = c;
+      bytes--;
+      s++;
+    }
+  }
+  
+  return s;
+}
+
+/*******************************************************************/
+
+static __ssize_t few_read(void *cookie,char *buffer,size_t bytes)
+{
+  assert(0);
+  return 0;
+}
+
+/******************************************************************/
+
+static __ssize_t fer_write(void *cookie,const char *buffer,size_t bytes)
+{
+  assert(0);
+  return 0;
+}
+
+/****************************************************************/
+
+static __ssize_t few_write(void *cookie,const char *buffer,size_t bytes)
+{
+  FILE   *realout = cookie;
+  size_t  size    = bytes;
+  char   *replace;
+  size_t  repsize;
+
+  while(bytes)
+  {
+    if (char_entity(&replace,&repsize,*buffer))
+      fputs(replace,realout);
+    else
+      fputc(*buffer,realout);
+    
+    buffer++;
+    bytes--;
+  }
+  
+  return size;
+}
+
+/*******************************************************************/
+
+static int fnop_seek(void *cookie,_IO_off64_t *pos,int whence)
+{
+  assert(0);
+  errno = ENXIO;
+  return -1;
+}
+
+/******************************************************************/
+
+static int fnop_close(void *cookie)
+{
+  return 0;
+}
+
+/*******************************************************************/
 

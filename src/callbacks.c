@@ -302,17 +302,15 @@ static void cb_blog_adtag(FILE *out,void *data)
 
 static void cb_blog_adtag_entity(FILE *out,void *data)
 {
-#if 0
-  Stream entityout;
+  FILE *entityout;
 
   assert(out  != NULL);
   assert(data != NULL);
   
-  entityout = EntityStreamWrite(out);
+  entityout = fentity_encode_onwrite(out);
   if (entityout == NULL) return;
-  LineS(entityout,gd.adtag);
-  StreamFree(entityout);
-#endif
+  fputs(gd.adtag,entityout);
+  fclose(entityout);
 }
 
 /********************************************************************/
@@ -686,14 +684,15 @@ static void cb_entry_body(FILE *out,void *data)
 
 static void cb_entry_body_entified(FILE *out,void *data)
 {
-#if 0
-  Stream eout;
+  FILE *eout;
   
-  eout = EntityStreamWrite(out);
+  assert(out != NULL);
+  assert(data != NULL);
+  
+  eout = fentity_encode_onwrite(out);
   if (eout == NULL) return;
   cb_entry_body(eout,data);
-  StreamFree(eout);  
-#endif
+  fclose(eout);
 }
 
 /*********************************************************************/
@@ -855,17 +854,15 @@ static void cb_atom_categories(FILE *out,void *data)
 
 static void cb_atom_category(FILE *out,void *data)
 {
-#if 0
-  Stream eout;
+  FILE *eout;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  eout = EntityStreamWrite(out);
+  eout = fentity_encode_onwrite(out);
   if (eout == NULL) return;
-  LineS(eout,data);
-  StreamFree(eout);
-#endif
+  fputs(data,eout);
+  fclose(eout);
 }
 
 /****************************************************************/

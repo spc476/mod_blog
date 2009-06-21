@@ -70,7 +70,9 @@ static int	cmd_cli_show		(Request);
 static void	get_cli_command		(Request,char *);
 static int	mail_setup_data		(Request);
 static int	mailfile_readdata	(Request);
+#if 0
 static void	collect_body		(FILE *,FILE *);
+#endif
 static int	cli_error		(Request,int,char *, ... );
 
 /*************************************************************************/
@@ -364,7 +366,8 @@ static int mailfile_readdata(Request req)
   }
   
   output = open_memstream(&req->origbody,&size);
-  collect_body(output,req->in);
+  fcopy(output,req->in);
+  /*collect_body(output,req->in);*/
   fclose(output);
 
   req->body     = strdup(req->origbody);
@@ -373,6 +376,7 @@ static int mailfile_readdata(Request req)
 
 /***************************************************************************/
 
+#if 0
 static void collect_body(FILE *output,FILE *input)
 {
   HtmlToken token;
@@ -401,6 +405,7 @@ static void collect_body(FILE *output,FILE *input)
 
   HtmlParseFree(token);
 }
+#endif
 
 /***********************************************************************/
 
