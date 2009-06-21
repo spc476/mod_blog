@@ -149,8 +149,11 @@ static char *headers[] =
   NULL
 };
 
+#endif
+
 void notify_weblogcom(void)
 {
+#if 0
   URLHTTP url;
   HTTP    conn;
   char    *query;
@@ -197,8 +200,8 @@ void notify_weblogcom(void)
   HttpClose(&conn);
   UrlFree((URL *)&url);
   MemFree(headers[0]);
-}
 #endif
+}
 
 /*************************************************************************/
 
