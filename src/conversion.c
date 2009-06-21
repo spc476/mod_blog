@@ -112,11 +112,11 @@ static void text_conversion_backend(char *fname,FILE *in,FILE *out,bool entities
       if (entities)
       {
         filter = EntityStreamRead(tmpin,ENTITY_NOAMP);
-        buff_conversion(filter,tmpout,QUOTE_SMART);
+        buff_conversion(filter,tmpout);
         StreamFree(filter);
       }
       else
-        buff_conversion(tmpin,tmpout,QUOTE_SMART);
+        buff_conversion(tmpin,tmpout);
   
       StreamWrite(tmpout,' ');
       StreamFree(tmpin);
@@ -388,7 +388,7 @@ static void html_handle_string(struct nested_params *local)
   if (!local->pre)
   {
     in = fmemopen(text,strlen(text),"r");
-    buff_conversion(in,local->out,QUOTE_DUMB);
+    buff_conversion(in,local->out);
     fclose(in);
   }
   else
@@ -406,7 +406,7 @@ static void html_handle_comment(struct nested_params *local)
 
 /**************************************************************************/
 
-void buff_conversion(FILE * in,FILE * out,int quotetype)
+void buff_conversion(FILE * in,FILE * out)
 {
   int c;
   
@@ -421,8 +421,6 @@ void buff_conversion(FILE * in,FILE * out,int quotetype)
   ; on this.  Also, add in some logic to handle '&' in strings.
   ; look for something like &[^\s]+; and if so, then pass
   ; it through unchanged; if not, then convert '&' to "&amp;".
-  ;
-  ; Okay, use QUOTE_SMART and QUOTE_DUMB when I get back to this.
   ;---------------------------------------------------------------*/
     
   while(!feof(in))

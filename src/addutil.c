@@ -114,7 +114,7 @@ void fix_entry(Request req)
   out  = open_memstream(&tmp,&size);
   in   = fmemopen(req->title,strlen(req->title),"r");
   
-  buff_conversion(in,out,QUOTE_SMART);
+  buff_conversion(in,out);
   fclose(in);
   fclose(out);
   free(req->title);

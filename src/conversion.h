@@ -25,15 +25,9 @@
 
 #include <stdio.h>
 
-#define QUOTE_DUMB	0
-#define QUOTE_SMART	1
-
-/******************************************************************/
-
 void		text_conversion		(char *,FILE *,FILE *);
 void		mixed_conversion	(char *,FILE *,FILE *);
 void		html_conversion		(char *,FILE *,FILE *);
-
-void		buff_conversion		(FILE *,FILE *,int);
+void		buff_conversion		(FILE *,FILE *);
 
 #endif
