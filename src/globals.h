@@ -23,7 +23,8 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include <cgilib/cgi.h>
+#include <stdbool.h>
+#include <cgilib6/cgi.h>
 
 #include "frontend.h"
 #include "timeutil.h"
@@ -54,7 +55,7 @@ extern const int              c_days;
 extern const char *const      c_rssfile;
 extern const char *const      c_atomfile;
 extern const int              c_rssitems;
-extern const int              cf_rssreverse;
+extern const bool             cf_rssreverse;
 extern const int              c_styear;
 extern const int              c_stmon;
 extern const int              c_stday;
@@ -70,17 +71,17 @@ extern const char *const      c_emailsubject;
 extern const char *const      c_emailmsg;
 extern const char *const      c_tabtemplates;
 extern const char *const      c_tabfile;
-extern const int              cf_tabreverse;
+extern const bool             cf_tabreverse;
 extern const int              c_tzhour;
 extern const int              c_tzmin;
-extern       void           (*c_conversion)(char *,Stream,Stream);
+extern       void           (*c_conversion)(char *,FILE *,FILE *);
 extern const struct btm       c_start;
 extern const struct btm       c_now;
 extern const char *const      c_overview;
 
 extern const char *           g_templates;	/* work on */
-extern int                    gf_emailupdate;	/* work on */
-extern volatile int           gf_debug;
+extern bool                   gf_emailupdate;	/* work on */
+extern volatile bool          gf_debug;
 extern Blog                   g_blog;
 extern struct display         gd;		/* work on */
 

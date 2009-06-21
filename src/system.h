@@ -23,7 +23,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include <cgilib/pair.h>
+#include <cgilib6/pair.h>
 
 int		SystemLimit		(struct pair *);
 

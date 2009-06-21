@@ -23,17 +23,17 @@
 #ifndef CONVERSION_H
 #define CONVERSION_H
 
-#include <cgilib/stream.h>
+#include <stdio.h>
 
 #define QUOTE_DUMB	0
 #define QUOTE_SMART	1
 
 /******************************************************************/
 
-void		text_conversion		(char *,Stream,Stream);
-void		mixed_conversion	(char *,Stream,Stream);
-void		html_conversion		(char *,Stream,Stream);
+void		text_conversion		(char *,FILE *,FILE *);
+void		mixed_conversion	(char *,FILE *,FILE *);
+void		html_conversion		(char *,FILE *,FILE *);
 
-void		buff_conversion		(Stream,Stream,int);
+void		buff_conversion		(FILE *,FILE *,int);
 
 #endif

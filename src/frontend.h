@@ -23,7 +23,8 @@
 #ifndef FRONTEND_H
 #define FRONTEND_H
 
-#include <cgilib/cgi.h>
+#include <cgilib6/cgi.h>
+
 #include "wbtum.h"
 #include "timeutil.h"
 #include "blog.h"
@@ -42,11 +43,11 @@ typedef struct rflags
 typedef struct request
 {
   int     (*command)(struct request *);
-  int     (*error)  (struct request *,int,char *,char *, ... );
+  int     (*error)  (struct request *,int,char *, ... );
   RFlags    f;
   Cgi       cgi;
-  Stream    in;
-  Stream    out;
+  FILE     *in;
+  FILE     *out;
   char     *update;
   char     *origauthor;
   char     *author;
@@ -77,7 +78,7 @@ typedef struct display
   DFlags      f;
   int         navunit;
   char       *adtag;
-  Stream      htmldump;
+  FILE       *htmldump;
   Cgi         cgi;
   Request     req;
   struct btm  begin;
@@ -94,7 +95,7 @@ struct callback_data
   List       list;
   struct btm last;	/* timestamp of previous entry */
   BlogEntry  entry;	/* current entry being processed */
-  Stream     ad;	/* file containing ad */
+  FILE      *ad;	/* file containing ad */
 };
 
 #endif

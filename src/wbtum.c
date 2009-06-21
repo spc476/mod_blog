@@ -44,20 +44,17 @@
 *
 ************************************************************************/
 
-#define _GNU_SOURCE
-#include <stdio.h>
+#define _GNU_SOURCE 1
 
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include <cgilib/memory.h>
-#include <cgilib/ddt.h>
-#include <cgilib/nodelist.h>
-#include <cgilib/errors.h>
-#include <cgilib/types.h>
-#include <cgilib/util.h>
+#include <cgilib6/nodelist.h>
+#include <cgilib6/errors.h>
+#include <cgilib6/util.h>
 
 #include "conf.h"
 #include "wbtum.h"
@@ -86,16 +83,16 @@ int (TumblerNew)(Tumbler *pt,char **pstr)
   TumblerUnit     tu;
   struct fpreturn current;
   
-  ddt(pt    != NULL);
-  ddt(pstr  != NULL);
-  ddt(*pstr != NULL);
+  assert(pt    != NULL);
+  assert(pstr  != NULL);
+  assert(*pstr != NULL);
   
-  t = MemAlloc(sizeof(struct tumbler));
+  t = malloc(sizeof(struct tumbler));
   ListInit(&t->units);
   t->pairs          = 0;
-  t->flags.file     = FALSE;
-  t->flags.redirect = FALSE;
-  t->flags.error    = FALSE;
+  t->flags.file     = false;
+  t->flags.redirect = false;
+  t->flags.error    = false;
   
   tu            = tumblerunit_new(TUMBLER_SINGLE);
   current.state = state_a;
@@ -119,7 +116,7 @@ int (TumblerNew)(Tumbler *pt,char **pstr)
   
   tu = (TumblerUnit)ListGetHead(&t->units);
   if (tu->type == TUMBLER_RANGE)
-    t->flags.redirect = FALSE;
+    t->flags.redirect = false;
 #endif
  
   *pt = t;
@@ -138,9 +135,9 @@ char *(TumblerCanonical)(Tumbler t)
   if (tu->type == TUMBLER_SINGLE)
     tumblerunit_canonize(&text,tu);
   else if (tu->type == TUMBLER_RANGE)
-    ddt(0);
+    assert(0);
   else
-    ddt(0);
+    assert(0);
 
   return(text);
 }
@@ -149,8 +146,8 @@ char *(TumblerCanonical)(Tumbler t)
 
 static void tumblerunit_canonize(char **ptext,TumblerUnit tu)
 {
-  ddt(out != NULL);
-  ddt(tu  != NULL);
+  assert(ptext != NULL);
+  assert(tu    != NULL);
   
   switch(tu->size)
   {
@@ -171,7 +168,7 @@ static void tumblerunit_canonize(char **ptext,TumblerUnit tu)
          break;
     case 0:
     default:
-         ddt(0);
+         assert(0);
          break;         
   }  
 }
@@ -183,8 +180,8 @@ int (TumblerFree)(Tumbler *pt)
   Tumbler     t;
   TumblerUnit tu;
   
-  ddt(pt  != NULL);
-  ddt(*pt != NULL);
+  assert(pt  != NULL);
+  assert(*pt != NULL);
   
   t = *pt;
   
@@ -194,10 +191,10 @@ int (TumblerFree)(Tumbler *pt)
         tu = (TumblerUnit)ListRemHead(&t->units)
       )
   {
-    if (tu->file) MemFree(tu->file);
-    MemFree(tu);
+    if (tu->file) free(tu->file);
+    free(tu);
   }
-  MemFree(t);
+  free(t);
   *pt = NULL;
   return(ERR_OKAY);
 }
@@ -208,12 +205,12 @@ static TumblerUnit tumblerunit_new(enum ttypes type)
 {
   TumblerUnit tu;
   
-  ddt(
+  assert(
        (type == TUMBLER_SINGLE)
        || (type == TUMBLER_RANGE)
      );
      
-  tu        = MemAlloc(sizeof(struct tumunit));
+  tu        = malloc(sizeof(struct tumunit));
   tu->type  = type;
   tu->file  = NULL;
   tu->size  = 0;
@@ -230,11 +227,11 @@ static struct fpreturn state_a(Tumbler t,TumblerUnit *ptu,char **pstr)
   TumblerUnit      tu;
   struct fpreturn  next;
   
-  ddt(t     != NULL);
-  ddt(ptu   != NULL);
-  ddt(*ptu  != NULL);
-  ddt(pstr  != NULL);
-  ddt(*pstr != NULL);
+  assert(t     != NULL);
+  assert(ptu   != NULL);
+  assert(*ptu  != NULL);
+  assert(pstr  != NULL);
+  assert(*pstr != NULL);
   
   s  = *pstr;
   tu = *ptu;
@@ -247,7 +244,7 @@ static struct fpreturn state_a(Tumbler t,TumblerUnit *ptu,char **pstr)
       tu->size++;
       if (s == p)
       {
-        t->flags.error = TRUE;
+        t->flags.error = true;
         next.state     = NULL;
         return(next);
       }
@@ -285,7 +282,7 @@ static struct fpreturn state_a(Tumbler t,TumblerUnit *ptu,char **pstr)
     if ((*s == '.') || (*s == ':'))
     {
 #ifdef FEATURE_REDIRECT
-      t->flags.redirect = TRUE;
+      t->flags.redirect = true;
 #endif
       *pstr      = ++s;
       *ptu       = tu;
@@ -301,7 +298,7 @@ static struct fpreturn state_a(Tumbler t,TumblerUnit *ptu,char **pstr)
       return(next);
     }
   
-    t->flags.error = TRUE;
+    t->flags.error = true;
     *pstr          = s;
     *ptu           = tu;
     next.state     = NULL;
@@ -318,11 +315,11 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
   char            *s;
   char            *p;
   
-  ddt(t     != NULL);
-  ddt(ptu   != NULL);
-  ddt(*ptu  != NULL);
-  ddt(pstr  != NULL);
-  ddt(*pstr != NULL);
+  assert(t     != NULL);
+  assert(ptu   != NULL);
+  assert(*ptu  != NULL);
+  assert(pstr  != NULL);
+  assert(*pstr != NULL);
   
   s  = *pstr;
   tu = *ptu;
@@ -333,7 +330,7 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
     tu->size++;
     if (s == p)
     {
-      t->flags.error = TRUE;
+      t->flags.error = true;
       next.state     = NULL;
       return(next);
     }
@@ -345,7 +342,7 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
     ;-------------------------------------------*/
         
     if (p != (s + 2))
-      t->flags.redirect = TRUE;
+      t->flags.redirect = true;
 #endif
 
     s = p;
@@ -372,7 +369,7 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
   if ((*s == '.') || (*s == ':'))
   {
 #ifdef FEATURE_REDIRECT
-    t->flags.redirect = TRUE;
+    t->flags.redirect = true;
 #endif
     *pstr      = ++s;
     *ptu       = tu;
@@ -407,7 +404,7 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
   }
 #endif
 
-  t->flags.error = TRUE;
+  t->flags.error = true;
   *pstr          = s;
   *ptu           = tu;
   next.state     = NULL;
@@ -423,11 +420,11 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
   char            *s;
   char            *p;
   
-  ddt(t     != NULL);
-  ddt(ptu   != NULL);
-  ddt(*ptu  != NULL);
-  ddt(pstr  != NULL);
-  ddt(*pstr != NULL);
+  assert(t     != NULL);
+  assert(ptu   != NULL);
+  assert(*ptu  != NULL);
+  assert(pstr  != NULL);
+  assert(*pstr != NULL);
   
   s  = *pstr;
   tu = *ptu;
@@ -438,7 +435,7 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
     tu->size++;
     if (s == p)
     {
-      t->flags.error = TRUE;
+      t->flags.error = true;
       next.state     = NULL;
       return(next);
     }
@@ -450,7 +447,7 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
     ;-----------------------------------------------*/
     
     if (p != (s + 2))
-      t->flags.redirect = TRUE;
+      t->flags.redirect = true;
 #endif
 
     s = p;
@@ -477,7 +474,7 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
   if (*s == ':')
   {
 #ifdef FEATURE_REDIRECT
-    t->flags.redirect = TRUE;
+    t->flags.redirect = true;
 #endif
     *pstr      = ++s;
     *ptu       = tu;
@@ -521,7 +518,7 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
   }
 #endif
 
-  t->flags.error = TRUE;
+  t->flags.error = true;
   *pstr          = s;
   *ptu           = tu;
   next.state     = NULL;
@@ -535,25 +532,25 @@ static State state_d(Tumbler t,TumblerUnit *ptu,char **pstr)
   struct fpreturn next;
   size_t          sfn;
   
-  ddt(t     != NULL);
-  ddt(ptu   != NULL);
-  ddt(*ptu  != NULL);
-  ddt(pstr  != NULL);
-  ddt(*pstr != NULL);
+  assert(t     != NULL);
+  assert(ptu   != NULL);
+  assert(*ptu  != NULL);
+  assert(pstr  != NULL);
+  assert(*pstr != NULL);
 
   next.state = NULL;
   
   if (t->pairs > 0)
   {
-    t->flags.error = TRUE;
+    t->flags.error = true;
     return(next);
   }
 
   sfn = strlen(*pstr);
   if (sfn)
   {
-    (*ptu)->file   = dup_string(*pstr);
-    t->flags.file  = TRUE;
+    (*ptu)->file   = strdup(*pstr);
+    t->flags.file  = true;
     *pstr         += sfn;
   }
   
@@ -571,11 +568,11 @@ static State state_e(Tumbler t,TumblerUnit *ptu,char **pstr)
   char            *s;
   char            *p;
 
-  ddt(t     != NULL);
-  ddt(ptu   != NULL);
-  ddt(*ptu  != NULL);
-  ddt(pstr  != NULL);
-  ddt(*pstr != NULL);
+  assert(t     != NULL);
+  assert(ptu   != NULL);
+  assert(*ptu  != NULL);
+  assert(pstr  != NULL);
+  assert(*pstr != NULL);
 
   s  = *pstr;
   tu = *ptu;
@@ -590,14 +587,14 @@ static State state_e(Tumbler t,TumblerUnit *ptu,char **pstr)
     ;-----------------------------------------------*/
     
     if (*s == '0')
-      t->flags.redirect = TRUE;
+      t->flags.redirect = true;
 #endif
 
     tu->entry[PART] = strtoul(s,&p,10);
     tu->size++;
     if (s == p)
     {
-      t->flags.error = TRUE;
+      t->flags.error = true;
       next.state     = NULL;
       return(next);
     }
@@ -634,7 +631,7 @@ static State state_e(Tumbler t,TumblerUnit *ptu,char **pstr)
     return(next);
   }
 #endif 
-  t->flags.error = TRUE;
+  t->flags.error = true;
   *pstr          = s;
   *ptu           = tu;
   next.state     = NULL;
@@ -649,17 +646,14 @@ static int tumbler_normalize(Tumbler t)
   TumblerUnit last;
   TumblerUnit current;
   
-  ddt(t != NULL);
+  assert(t != NULL);
   
   if (t->flags.file) return(ERR_OKAY);
-  /*if (t->pairs == 1) return(ERR_OKAY);*/
   
   base    = last = (TumblerUnit)ListGetHead(&t->units);
   if ((base->type == TUMBLER_SINGLE) && (t->pairs == 1)) return(ERR_OKAY);
   current = (TumblerUnit)NodeNext(&last->node);
 
-  /*ddt(NodeValid(&current->node));*/
-  
   while(NodeValid(&current->node))
   {
     if (current->size >= base->size)
@@ -692,11 +686,11 @@ static int tumbler_normalize(Tumbler t)
     
     if ((last->type == TUMBLER_RANGE) && (current->type == TUMBLER_RANGE))
     {
-      ddt(base != last);		/* make sure we do good testing */
+      assert(base != last);		/* make sure we do good testing */
       NodeRemove(&current->node);
-      if (current->file) MemFree(current->file);
-      MemFree(current);
-      t->flags.redirect = TRUE;
+      if (current->file) free(current->file);
+      free(current);
+      t->flags.redirect = true;
       current = last;
     }
     

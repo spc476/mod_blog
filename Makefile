@@ -60,13 +60,13 @@ all: $(HOSTDIR)/boston
 $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/authenticate.o	\
 		$(HOSTDIR)/blog.o		\
-		$(HOSTDIR)/callbacks.o		\
 		$(HOSTDIR)/cgi_main.o		\
 		$(HOSTDIR)/cli_main.o		\
-		$(HOSTDIR)/conversion.o		\
 		$(HOSTDIR)/globals.o		\
 		$(HOSTDIR)/main.o		\
 		$(HOSTDIR)/timeutil.o		\
+		$(HOSTDIR)/conversion.o		\
+		$(HOSTDIR)/callbacks.o		\
 		$(HOSTDIR)/wbtum.o		\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
@@ -76,13 +76,13 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/authenticate.o	\
 		$(HOSTDIR)/blog.o		\
-		$(HOSTDIR)/callbacks.o		\
 		$(HOSTDIR)/cgi_main.o		\
 		$(HOSTDIR)/cli_main.o		\
-		$(HOSTDIR)/conversion.o		\
 		$(HOSTDIR)/globals.o		\
 		$(HOSTDIR)/main.o		\
 		$(HOSTDIR)/timeutil.o		\
+		$(HOSTDIR)/conversion.o		\
+		$(HOSTDIR)/callbacks.o		\
 		$(HOSTDIR)/wbtum.o		\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
@@ -165,7 +165,7 @@ $(HOSTDIR)/entity-conversion.o : src/entity-conversion.c
 
 clean :
 	/bin/rm -rf $(HOSTDIR)/*.o
-	/bin/rm -rf src/*~
+	/bin/rm -rf *~ src/*~
 
 tarball:
 	(cd .. ; tar czvf /tmp/boston.tar.gz -X boston/.exclude boston/ )

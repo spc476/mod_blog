@@ -26,9 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-
-#include <cgilib/ddt.h>
-#include <cgilib/stream.h>
+#include <assert.h>
 
 /*********************************************************************/
 
@@ -311,8 +309,8 @@ static int entity_cmp(const void *needle,const void *haystack)
   const char               *key = needle;
   const struct entity_conv *hay = haystack;
   
-  ddt(left  != NULL);
-  ddt(right != NULL);
+  assert(needle   != NULL);
+  assert(haystack != NULL);
   
   return strcmp(key,hay->name);
 }
@@ -327,7 +325,7 @@ char *entity_conversion(const char *s)
   
   char *r;
   
-  ddt(s != NULL);
+  assert(s != NULL);
   
   tmp = open_memstream(&t,&sz);
 

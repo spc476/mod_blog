@@ -23,9 +23,6 @@
 #ifndef CONF_H
 #define CONF_H
 
-#include <cgilib/pair.h>
-#include <cgilib/errors.h>
-
 /*****************************************************************
 *
 * Settable parameters.  Read the description and see if you want
@@ -92,7 +89,6 @@
 ;						(doesn't work)
 ;	FEATURE_REDIRECT		- Use canonical URLs
 ;	FIXED_BROKEN_FULLBASEURL	- Bad code fixed. 
-;	FIXED_BROKEN_RAWFMT		- Bad code fixed.
 ;
 ; At some point, these should all go away.  Hopefully.
 ;----------------------------------------------------------------------*/
@@ -100,7 +96,6 @@
 #undef  FEATURE_MULTI_TUMBLER
 #define FEATURE_REDIRECT
 #undef  FIXED_BROKEN_FULLBASEURL
-#undef  FIXED_BROKEN_RAWFMT
 
 #endif
 

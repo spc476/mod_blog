@@ -20,20 +20,20 @@
 *
 *********************************************************************/
 
+#define _GNU_SOURCE 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdbool.h>
+#include <assert.h>
 
-#include <cgilib/memory.h>
-#include <cgilib/ddt.h>
-#include <cgilib/stream.h>
-#include <cgilib/pair.h>
-#include <cgilib/nodelist.h>
-#include <cgilib/errors.h>
-#include <cgilib/types.h>
-#include <cgilib/util.h>
-#include <cgilib/htmltok.h>
+#include <cgilib6/pair.h>
+#include <cgilib6/nodelist.h>
+#include <cgilib6/errors.h>
+#include <cgilib6/util.h>
+#include <cgilib6/htmltok.h>
 
 #include "conversion.h"
 
@@ -42,50 +42,51 @@
 struct nested_params
 {
   char        *fname;
-  Stream       in;
-  Stream       out;
+  FILE        *in;
+  FILE        *out;
   HtmlToken    token;
-  int          p;
-  int          pre;
-  int          list;
-  int          blockquote;
+  bool         p;
+  bool         pre;
+  bool         list;
+  bool         blockquote;
 };
 
 /**********************************************************************/
 
-static void	text_conversion_backend	(char *,Stream,Stream,int);
+static void	text_conversion_backend	(char *,FILE *,FILE *,bool);
 static void	html_handle_tag		(struct nested_params *);
 static void	check_for_uri		(struct nested_params *,const char *);
 static void	entify_char		(char *,size_t,char *,char,const char *);
 static void	html_handle_string	(struct nested_params *);
 static void	html_handle_comment	(struct nested_params *);
-static void	handle_backquote	(Stream,Stream);
-static void	handle_quote		(Stream,Stream);
-static void	handle_dash		(Stream,Stream);
-static void	handle_period		(Stream,Stream);
+static void	handle_backquote	(FILE *,FILE *);
+static void	handle_quote		(FILE *,FILE *);
+static void	handle_dash		(FILE *,FILE *);
+static void	handle_period		(FILE *,FILE *);
 
 /**********************************************************************/
 
-void text_conversion(char *fname,Stream in,Stream out)
+void text_conversion(char *fname,FILE *in,FILE *out)
 {
-  ddt(fname != NULL);
-  ddt(in    != NULL);
-  ddt(out   != NULL);
+  assert(fname != NULL);
+  assert(in    != NULL);
+  assert(out   != NULL);
 
-  text_conversion_backend(fname,in,out,TRUE);
+  text_conversion_backend(fname,in,out,true);
 }
 
 /**********************************************************************/
 
-static void text_conversion_backend(char *fname,Stream in,Stream out,int entities)
+static void text_conversion_backend(char *fname,FILE *in,FILE *out,bool entities)
 {
+#if 0
   Stream  tmpout;
   char   *line;
   char   *newline;
 
-  ddt(fname != NULL);
-  ddt(in    != NULL);
-  ddt(out   != NULL);
+  assert(fname != NULL);
+  assert(in    != NULL);
+  assert(out   != NULL);
   
   tmpout = StringStreamWrite();
 
@@ -98,7 +99,7 @@ static void text_conversion_backend(char *fname,Stream in,Stream out,int entitie
       newline = StringFromStream(tmpout);
       if (!empty_string(newline))
         LineSFormat(out,"$","<p>%a</p>\n",newline);
-      MemFree(newline);
+      free(newline);
       StreamFlush(tmpout);
     }
     else
@@ -121,30 +122,32 @@ static void text_conversion_backend(char *fname,Stream in,Stream out,int entitie
       StreamFree(tmpin);
     }
     
-    MemFree(line);
+    free(line);
   }
   
   newline = StringFromStream(tmpout);
   if (!empty_string(newline))
     LineSFormat(out,"$","<p>%a</p>\n",newline);
   
-  MemFree(newline);
+  free(newline);
   StreamFree(tmpout);
+#endif
 }
   
 /***********************************************************************/
 
-void mixed_conversion(char *fname,Stream in,Stream out)
+void mixed_conversion(char *fname,FILE *in,FILE *out)
 {
+#if 0
   Stream  tmp;
   char   *line;
 
-  ddt(fname != NULL);
-  ddt(in    != NULL);
-  ddt(out   != NULL);
+  assert(fname != NULL);
+  assert(in    != NULL);
+  assert(out   != NULL);
   
   tmp = StringStreamWrite();
-  text_conversion_backend(fname,in,tmp,FALSE);
+  text_conversion_backend(fname,in,tmp,false);
   
   line = StringFromStream(tmp);
   StreamFree(tmp);
@@ -153,30 +156,31 @@ void mixed_conversion(char *fname,Stream in,Stream out)
   html_conversion(fname,tmp,out);
   
   StreamFree(tmp);
-  MemFree(line);
+  free(line);
+#endif
 }
 
 
 /*************************************************************************/
 
-void html_conversion(char *fname,Stream in,Stream out)
+void html_conversion(char *fname,FILE *in,FILE *out)
 {
   struct nested_params local;
   int                  t;
 
-  ddt(fname != NULL);
-  ddt(in    != NULL);
-  ddt(out   != NULL);
+  assert(fname != NULL);
+  assert(in    != NULL);
+  assert(out   != NULL);
     
   local.fname      = fname;
   local.in         = in;
   local.out        = out;
-  local.p          = FALSE;
-  local.pre        = FALSE;
-  local.blockquote = FALSE;
-  local.list       = FALSE;
+  local.p          = false;
+  local.pre        = false;
+  local.blockquote = false;
+  local.list       = false;
   
-  HtmlParseNew(&local.token,local.in);
+  local.token = HtmlParseNew(local.in);
   
   while((t = HtmlParseNext(local.token)) != T_EOF)
   {
@@ -188,30 +192,30 @@ void html_conversion(char *fname,Stream in,Stream out)
       html_handle_string(&local);
   }
   
-  HtmlParseFree(&local.token);
+  HtmlParseFree(local.token);
 }
 
 /**********************************************************************/
 
 static void html_handle_tag(struct nested_params *local)
 {
-  ddt(local != NULL);
+  assert(local != NULL);
   
   /*---------------------------------------------------------
   ; tags that change a state
   ;----------------------------------------------------------*/
   
   if (strcmp(HtmlParseValue(local->token),"P") == 0)
-    local->p = TRUE;
+    local->p = true;
   else if (strcmp(HtmlParseValue(local->token),"/P") == 0)
-    local->p = FALSE;
+    local->p = false;
   else if (strcmp(HtmlParseValue(local->token),"PRE") == 0)
   {
-    local->pre = TRUE;
-    local->p   = FALSE;
+    local->pre = true;
+    local->p   = false;
   }
   else if (strcmp(HtmlParseValue(local->token),"/PRE") == 0)
-    local->pre = FALSE;
+    local->pre = false;
   else if
   (
     (strcmp(HtmlParseValue(local->token),"TT") == 0)
@@ -220,7 +224,7 @@ static void html_handle_tag(struct nested_params *local)
     || (strcmp(HtmlParseValue(local->token),"KBD")  == 0)
     || (strcmp(HtmlParseValue(local->token),"VAR")  == 0)
   )
-    local->pre = TRUE;
+    local->pre = true;
   else if
   (
     (strcmp(HtmlParseValue(local->token),"/VAR") == 0)
@@ -229,19 +233,19 @@ static void html_handle_tag(struct nested_params *local)
     || (strcmp(HtmlParseValue(local->token),"/CODE") == 0)
     || (strcmp(HtmlParseValue(local->token),"/TT")   == 0)
   )
-    local->pre = FALSE;
+    local->pre = false;
   else if
   (
     (strcmp(HtmlParseValue(local->token),"UL") == 0)
     || (strcmp(HtmlParseValue(local->token),"OL") == 0)
   )
-    local->list = TRUE;
+    local->list = true;
   else if 
   (
     (strcmp(HtmlParseValue(local->token),"/UL") == 0)
     || (strcmp(HtmlParseValue(local->token),"/OL") == 0)
   )
-    local->list = FALSE;
+    local->list = false;
 
   /*--------------------------------------------------------------
   ; tags that have URIs that need to be checked for & and fixed.
@@ -251,12 +255,12 @@ static void html_handle_tag(struct nested_params *local)
     check_for_uri(local,"HREF");
   else if (strcmp(HtmlParseValue(local->token),"BLOCKQUOTE") == 0)
   {
-    local->p          = FALSE;
-    local->blockquote = TRUE;
+    local->p          = false;
+    local->blockquote = true;
     check_for_uri(local,"CITE");
   }
   else if (strcmp(HtmlParseValue(local->token),"/BLOCKQUOTE") == 0)
-    local->blockquote = FALSE;
+    local->blockquote = false;
   else if (strcmp(HtmlParseValue(local->token),"AREA") == 0)
     check_for_uri(local,"HREF");
   else if (strcmp(HtmlParseValue(local->token),"LINK") == 0)
@@ -300,7 +304,7 @@ static void html_handle_tag(struct nested_params *local)
   else
   {
     if (!local->blockquote)
-      local->p = FALSE;
+      local->p = false;
   }
   
   HtmlParsePrintTag(local->token,local->out);
@@ -314,8 +318,8 @@ static void check_for_uri(struct nested_params *local,const char *attrib)
   struct pair *src;
   struct pair *np;
   
-  ddt(local  != NULL);
-  ddt(attrib != NULL);
+  assert(local  != NULL);
+  assert(attrib != NULL);
   
   src = HtmlParseGetPair(local->token,attrib);
   if (src == NULL) return;
@@ -334,11 +338,11 @@ static void entify_char(char *d,size_t ds,char *s,char e,const char *entity)
 {
   size_t se;
   
-  ddt(d      != NULL);
-  ddt(ds     >  0);
-  ddt(s      != NULL);
-  ddt(e      != '\0');
-  ddt(entity != NULL);
+  assert(d      != NULL);
+  assert(ds     >  0);
+  assert(s      != NULL);
+  assert(e      != '\0');
+  assert(entity != NULL);
   
   se = strlen(entity);
   
@@ -370,10 +374,10 @@ static void entify_char(char *d,size_t ds,char *s,char e,const char *entity)
       
 static void html_handle_string(struct nested_params *local)
 {
-  Stream  in;
-  char   *text = HtmlParseValue(local->token);
+  FILE *in;
+  char *text = HtmlParseValue(local->token);
   
-  ddt(local != NULL);
+  assert(local != NULL);
 
   /*---------------------------------------------------
   ; I think is is why my tags sometime run together
@@ -383,31 +387,31 @@ static void html_handle_string(struct nested_params *local)
 
   if (!local->pre)
   {
-    in = MemoryStreamRead(text,strlen(text));
+    in = fmemopen(text,strlen(text),"r");
     buff_conversion(in,local->out,QUOTE_DUMB);
-    StreamFree(in);
+    fclose(in);
   }
   else
-    LineS(local->out,text);
+    fputs(text,local->out);
 }
 
 /************************************************************************/
 
 static void html_handle_comment(struct nested_params *local)
 {
-  ddt(local != NULL);
+  assert(local != NULL);
   
-  LineSFormat(local->out,"$","<!%a>",HtmlParseValue(local->token));
+  fprintf(local->out,"<!%s>",HtmlParseValue(local->token));
 }
 
 /**************************************************************************/
 
-void buff_conversion(Stream in,Stream out,int quotetype)
+void buff_conversion(FILE * in,FILE * out,int quotetype)
 {
-  char   c;
+  int c;
   
-  ddt(in  != NULL);
-  ddt(out != NULL);
+  assert(in  != NULL);
+  assert(out != NULL);
 
   /*----------------------------------------------------------------
   ; XXX
@@ -421,137 +425,137 @@ void buff_conversion(Stream in,Stream out,int quotetype)
   ; Okay, use QUOTE_SMART and QUOTE_DUMB when I get back to this.
   ;---------------------------------------------------------------*/
     
-  while(!StreamEOF(in))
+  while(!feof(in))
   {
-    c = StreamRead(in);
+    c = fgetc(in);
     switch(c)
     {
-      case IEOF: break;
+      case EOF:  break;
       case '`':  handle_backquote(in,out); break;
       case '\'': handle_quote(in,out); break;
       case '-':  handle_dash(in,out); break;
       case '.':  handle_period(in,out); break;
-      case '\0': ddt(0);
-      default:   StreamWrite(out,c); break;
+      case '\0': assert(0);
+      default:   fputc(c,out); break;
     }
   }
 }
 
 /*****************************************************************/
 
-static void handle_backquote(Stream input,Stream output)
+static void handle_backquote(FILE *input,FILE *output)
 {
-  char   c;
+  int c;
 
-  ddt(input  != NULL);
-  ddt(output != NULL);  
+  assert(input  != NULL);
+  assert(output != NULL);  
 
-  if (StreamEOF(input))
+  if (feof(input))
   {
-    StreamWrite(output,'`');
+    fputc('`',output);
     return;
   }
 
-  c = StreamRead(input);
+  c = fgetc(input);
   if (c == '`')
-    LineS(output,"&#8220;");
+    fputs("&#8220;",output);
   else
   {
-    StreamWrite(output,'`');
-    StreamUnRead(input,c);
+    fputc('`',output);
+    ungetc(c,input);
   }
 }
 
 /********************************************************************/
 
-static void handle_quote(Stream input,Stream output)
+static void handle_quote(FILE *input,FILE *output)
 {
-  char   c;
+  int c;
   
-  ddt(input  != NULL);
-  ddt(output != NULL);
+  assert(input  != NULL);
+  assert(output != NULL);
   
-  if (StreamEOF(input))
+  if (feof(input))
   {
-    StreamWrite(output,'\'');
+    fputc('\'',output);
     return;
   }
 
-  c = StreamRead(input);
+  c = fgetc(input);
   if (c == '\'')
-    LineS(output,"&#8221;");
+    fputs("&#8221;",output);
   else
   {
-    StreamWrite(output,'\'');
-    StreamUnRead(input,c);
+    fputc('\'',output);
+    ungetc(c,input);
   }
 }
 
 /**********************************************************************/
 
-static void handle_dash(Stream input,Stream output)
+static void handle_dash(FILE *input,FILE *output)
 {
-  char   c;
+  int c;
     
-  ddt(input  != NULL);
-  ddt(output != NULL);
+  assert(input  != NULL);
+  assert(output != NULL);
   
-  if (StreamEOF(input))
+  if (feof(input))
   {
-    StreamWrite(output,'-');
+    fputc('-',output);
     return;
   }
 
-  c = StreamRead(input);
+  c = fgetc(input);
   if (c == '-')
   {
-    c = StreamRead(input);
+    c = fgetc(input);
     if (c == '-')
-      LineS(output,"&#8212;");
+      fputs("&#8212;",output);
     else
     {
-      LineS(output,"&#8211;");
-      StreamUnRead(input,c);
+      fputs("&#8211;",output);
+      ungetc(c,input);
     }
   }
   else
   {
-    StreamWrite(output,'-');
-    StreamUnRead(input,c);
+    fputc('-',output);
+    ungetc(c,input);
   }
 }
 
 /********************************************************************/
 
-static void handle_period(Stream input,Stream output)
+static void handle_period(FILE *input,FILE *output)
 {
-  char   c;
+  int c;
   
-  ddt(input  != NULL);
-  ddt(output != NULL);
+  assert(input  != NULL);
+  assert(output != NULL);
   
-  if (StreamEOF(input))
+  if (feof(input))
   {
-    StreamWrite(output,'.');
+    fputc('.',output);
     return;
   }
 
-  c = StreamRead(input);
+  c = fgetc(input);
   if (c == '.')
   {
-    c = StreamRead(input);
+    c = fgetc(input);
     if (c == '.')
-      LineS(output,"&#8230;");
+      fputs("&#8230;",output);
     else
     {
-      LineS(output,"&#8229;");
-      StreamUnRead(input,c);
+      fputs("&#8229;",output);
+      ungetc(c,input);
     }
   }
   else
   {
-    StreamWrite(output,'.');
-    StreamUnRead(input,c);
+    fputc('.',output);
+    ungetc(c,input);
   }
 }
 

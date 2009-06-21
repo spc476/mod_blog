@@ -24,21 +24,22 @@
 #  error This code is Unix specific.  You have been warned.
 #endif
 
+#define _GNU_SOURCE 1
+
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
-
-#define __USE_POSIX
 #include <signal.h>
 
-#include <cgilib/pair.h>
-#include <cgilib/ddt.h>
-#include <cgilib/util.h>
+#include <cgilib6/util.h>
+
+#include "system.h"
 
 /*******************************************************************/
 
@@ -47,7 +48,7 @@ static int limit_resource(int resource,struct pair *data)
   struct rlimit limit;
   int           rc;
 
-  ddt(data != NULL);
+  assert(data != NULL);
   
   rc = getrlimit(resource,&limit);
   if (rc) return(rc);
@@ -60,7 +61,7 @@ static int limit_resource(int resource,struct pair *data)
 int SystemLimit(struct pair *data)
 {
 
-  ddt(data != NULL);
+  assert(data != NULL);
 
   if (strcmp(data->name,"_SYSTEM-CPU") == 0)
   {

@@ -20,25 +20,24 @@
 *
 *************************************************************************/
 
+#define _GNU_SOURCE 1
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <time.h>
+#include <assert.h>
 
 #include <getopt.h>
 
-#include <cgilib/memory.h>
-#include <cgilib/ddt.h>
-#include <cgilib/stream.h>
-#include <cgilib/pair.h>
-#include <cgilib/errors.h>
-#include <cgilib/htmltok.h>
-#include <cgilib/rfc822.h>
-#include <cgilib/http.h>
-#include <cgilib/cgi.h>
-#include <cgilib/util.h>
+#include <cgilib6/pair.h>
+#include <cgilib6/errors.h>
+#include <cgilib6/htmltok.h>
+#include <cgilib6/rfc822.h>
+#include <cgilib6/cgi.h>
+#include <cgilib6/util.h>
 
 #include "conf.h"
 #include "globals.h"
@@ -71,8 +70,8 @@ static int	cmd_cli_show		(Request);
 static void	get_cli_command		(Request,char *);
 static int	mail_setup_data		(Request);
 static int	mailfile_readdata	(Request);
-static void	collect_body		(Stream,Stream);
-static int	cli_error		(Request,int,char *,char *, ... );
+static void	collect_body		(FILE *,FILE *);
+static int	cli_error		(Request,int,char *, ... );
 
 /*************************************************************************/
 
@@ -100,14 +99,14 @@ int main_cli(int argc,char *argv[])
   struct request  req;
   char           *config = NULL;
   int             rc;
-  int             forcenotify = FALSE;
+  int             forcenotify = false;
   
   memset(&req,0,sizeof(struct request));
 
   req.command    = cmd_cli_show;
   req.error      = cli_error;
-  req.in         = StdinStream;
-  req.out        = StdoutStream;
+  req.in         = stdin;
+  req.out        = stdout;
   gd.req         = &req;
   
   while(1)
@@ -124,40 +123,39 @@ int main_cli(int argc,char *argv[])
            config = optarg;
            break;
       case OPT_FILE:
-           req.in = FileStreamRead(optarg);
-           req.f.filein = TRUE;
+           req.in = fopen(optarg,"r");
+           req.f.filein = true;
            break;
       case OPT_EMAIL:
-           req.f.emailin = TRUE;
+           req.f.emailin = true;
            break;
       case OPT_STDIN:
-           req.f.std_in = TRUE;
+           req.f.std_in = true;
            break;
       case OPT_UPDATE:
-           req.f.update = TRUE;
+           req.f.update = true;
            set_c_updatetype(optarg);
            break;
       case OPT_ENTRY:
-           req.reqtumbler = dup_string(optarg);
+           req.reqtumbler = strdup(optarg);
            break;
       case OPT_DEBUG:
-           gf_debug = TRUE;
+           gf_debug = true;
            break;
       case OPT_REGENERATE:
-           req.f.regenerate = TRUE;
+           req.f.regenerate = true;
            break;
       case OPT_FORCENOTIFY:
-           forcenotify = TRUE;
+           forcenotify = true;
 	   break;
       case OPT_CMD:
            get_cli_command(&req,optarg);
            break;
       case OPT_HELP:
       default:
-           LineSFormat(
-	   	StderrStream,
-		"$",
-		"usage: %a --options... \n"
+           fprintf(
+           	stderr,
+		"usage: %s --options... \n"
 		"\t--config file\n"
 		"\t--regenerate | --regen\n"
 		"\t--cmd ('new' | 'show')\n"
@@ -171,20 +169,20 @@ int main_cli(int argc,char *argv[])
 		"\t--debug\n",
 		argv[0]
 	      );
-	    return(EXIT_FAILURE);
+	   return(EXIT_FAILURE);
     }
   }
 
   if (config == NULL)
-    return((*req.error)(&req,HTTP_ISERVERERR,"","no configuration file specified"));
+    return((*req.error)(&req,HTTP_ISERVERERR,"no configuration file specified"));
   
   rc = GlobalsInit(config);
   if (rc != ERR_OKAY)
-    return((*req.error)(&req,HTTP_ISERVERERR,"","could not open cofiguration file %s",config));
+    return((*req.error)(&req,HTTP_ISERVERERR,"could not open cofiguration file %s",config));
   
   rc = BlogDatesInit();
   if (rc != ERR_OKAY)
-    return((*req.error)(&req,HTTP_ISERVERERR,"","could not initialize dates"));
+    return((*req.error)(&req,HTTP_ISERVERERR,"could not initialize dates"));
   
   if (forcenotify)
   {
@@ -202,8 +200,8 @@ static int cmd_cli_new(Request req)
 {
   int rc;
   
-  ddt(req         != NULL);
-  ddt(req->f.cgiin == FALSE);
+  assert(req         != NULL);
+  assert(req->f.cgiin == false);
 
   /*-------------------------------------------------
   ; req.f.stdin and req.f.filein may be uneeded
@@ -234,10 +232,10 @@ static int cmd_cli_show(Request req)
 {
   int rc;
   
-  ddt(req            != NULL);
-  ddt(req->f.emailin == FALSE);
-  ddt(req->f.filein  == FALSE);
-  ddt(req->f.update  == FALSE);
+  assert(req            != NULL);
+  assert(req->f.emailin == false);
+  assert(req->f.filein  == false);
+  assert(req->f.update  == false);
 
   if (req->f.regenerate)
     rc = generate_pages(req);  
@@ -260,7 +258,7 @@ static int cmd_cli_show(Request req)
         if (req->tumbler->flags.redirect)
         {
           char *tum = TumblerCanonical(req->tumbler);
-          rc = (*req->error)(req,HTTP_MOVEPERM,"$","Redirect: %a",tum);
+          rc = (*req->error)(req,HTTP_MOVEPERM,"Redirect: %s",tum);
           free(tum);
           return(rc);
         }
@@ -268,7 +266,7 @@ static int cmd_cli_show(Request req)
         rc = tumbler_page(req->out,req->tumbler);
       }
       else
-        rc = (*req->error)(req,HTTP_NOTFOUND,"","tumbler error---nothing found");
+        rc = (*req->error)(req,HTTP_NOTFOUND,"tumbler error---nothing found");
     }
   }
 
@@ -279,7 +277,7 @@ static int cmd_cli_show(Request req)
 
 static void get_cli_command(Request req,char *value)
 {
-  ddt(req != NULL);
+  assert(req != NULL);
 
   if (emptynull_string(value)) return;
   up_string(value);
@@ -296,16 +294,17 @@ static void get_cli_command(Request req,char *value)
 
 static int mail_setup_data(Request req)
 {
-  List  headers;
-  char *line;
+  List    headers;
+  char   *line;
+  size_t  size;
   
-  ddt(req            != NULL);
-  ddt(req->f.emailin == TRUE);
+  assert(req            != NULL);
+  assert(req->f.emailin == true);
 
   ListInit(&headers);
   
-  line = LineSRead(req->in);		/* skip Unix 'From ' line */
-  MemFree(line);  
+  getline(&line,&size,req->in);	/* skip Unix 'From ' line */
+  free(line);  
   
   /*----------------------------------------------
   ; skip the header section for now---just ignore it
@@ -321,13 +320,14 @@ static int mail_setup_data(Request req)
 
 static int mailfile_readdata(Request req)
 {
-  Stream  output;
+  FILE   *output;
   List    headers;
   char   *email;
   char   *filter;
+  size_t  size;
 
-  ddt(req     != NULL);
-  ddt(req->in != NULL);
+  assert(req     != NULL);
+  assert(req->in != NULL);
 
   ListInit(&headers);
   RFC822HeadersRead(req->in,&headers);
@@ -339,48 +339,50 @@ static int mailfile_readdata(Request req)
   email       = PairListGetValue(&headers,"EMAIL");
   filter      = PairListGetValue(&headers,"FILTER");
   
-  if (req->author != NULL) req->author = dup_string(req->author);
+  if (req->author != NULL) req->author = strdup(req->author);
 
   if (req->title  != NULL) 
-    req->title  = dup_string(req->title);
+    req->title  = strdup(req->title);
   else
-    req->title = dup_string("");
+    req->title = strdup("");
 
   if (req->class  != NULL) 
-    req->class  = dup_string(req->class);
+    req->class  = strdup(req->class);
   else
-    req->class = dup_string("");
+    req->class = strdup("");
 
-  if (req->date   != NULL) req->date = dup_string(req->date);
+  if (req->date   != NULL) req->date = strdup(req->date);
   if (email       != NULL) set_gf_emailupdate(email);
   if (filter      != NULL) set_c_conversion(filter);
 
   PairListFree(&headers);	/* got everything we need, dump this */
   
-  if (authenticate_author(req) == FALSE)
+  if (authenticate_author(req) == false)
   {
-    StreamFree(req->in);
+    fclose(req->in);
     return(ERR_ERR);
   }
   
-  output = StringStreamWrite();
+  output = open_memstream(&req->origbody,&size);
   collect_body(output,req->in);
-  req->origbody = StringFromStream(output);
-  req->body     = dup_string(req->origbody);
-  StreamFree(output);
+  fclose(output);
+
+  req->body     = strdup(req->origbody);
   return(ERR_OKAY);
 }
 
 /***************************************************************************/
 
-static void collect_body(Stream output,Stream input)
+static void collect_body(FILE *output,FILE *input)
 {
   HtmlToken token;
-  int       rc;
   int       t;
   
-  rc = HtmlParseNew(&token,input);
-  if (rc != ERR_OKAY)
+  assert(output != NULL);
+  assert(input  != NULL);
+  
+  token = HtmlParseNew(input);
+  if (token == NULL)
     return;
   
   while((t = HtmlParseNext(token)) != T_EOF)
@@ -392,26 +394,29 @@ static void collect_body(Stream output,Stream input)
       HtmlParsePrintTag(token,output);
     }
     else if (t == T_STRING)
-      LineS(output,HtmlParseValue(token));
+      fputs(HtmlParseValue(token),output);
     else if (t == T_COMMENT)
-      LineSFormat(output,"$","<!%a>",HtmlParseValue(token));
+      fprintf(stderr,"<!%s>",HtmlParseValue(token));
   }
 
-  HtmlParseFree(&token);
+  HtmlParseFree(token);
 }
 
 /***********************************************************************/
 
-static int cli_error(Request req,int level,char *format,char *msg, ... )
+static int cli_error(Request req,int level,char *msg, ... )
 {
   va_list args;
   
+  fprintf(stderr,"Error %d: ",level);
+  
   va_start(args,msg);
-  LineSFormat(StderrStream,"i3.3","Error %a: ",level);
-  LineSFormatv(StderrStream,format,msg,args);
-  StreamWrite(StderrStream,'\n');
+  vfprintf(stderr,msg,args);
   va_end(args);
-  return(ERR_ERR);
+
+  fputc('\n',stderr);
+  
+  return ERR_ERR;
 }
 
 /**************************************************************************/

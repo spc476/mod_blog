@@ -20,7 +20,7 @@
 *
 *****************************************************/
 
-#define GLOBALS
+#define _GNU_SOURCE 1
 
 #include <string.h>
 #include <stdlib.h>
@@ -28,13 +28,12 @@
 #include <locale.h>
 #include <stdarg.h>
 #include <time.h>
+#include <stdbool.h>
+#include <assert.h>
 
-#include <cgilib/ddt.h>
-#include <cgilib/memory.h>
-#include <cgilib/stream.h>
-#include <cgilib/rfc822.h>
-#include <cgilib/util.h>
-#include <cgilib/pair.h>
+#include <cgilib6/rfc822.h>
+#include <cgilib6/util.h>
+#include <cgilib6/pair.h>
 
 #include "conf.h"
 #include "system.h"
@@ -65,19 +64,19 @@ const char    *c_tabtemplates;
 const char    *c_rsstemplates;
 const char    *c_atomtemplates;
 const char    *c_tabfile;
-int            cf_tabreverse  = TRUE;
+bool           cf_tabreverse  = true;
 const char    *c_daypage;
 int            c_days         = -1;
 const char    *c_rssfile;
 const char    *c_atomfile;
 int            c_rssitems     = 15;
-int            cf_rssreverse  = TRUE;
+bool           cf_rssreverse  = true;
 const char    *c_author;
 const char    *c_email;
 const char    *c_authorfile;
 const char    *c_updatetype   = "NewEntry";
 const char    *c_lockfile     = "/tmp/.mod_blog.lock";
-int            cf_weblogcom   = FALSE;
+bool           cf_weblogcom   = false;
 const char    *c_weblogcomurl = "http://newhome.weblogs.com/pingSiteForm";
 char          *c_emaildb;
 const char    *c_emailsubject;
@@ -85,15 +84,15 @@ const char    *c_emailmsg;
 int            c_tzhour       = -5;	/* Eastern */
 int            c_tzmin        =  0;
 const char    *c_overview;
-void	     (*c_conversion)(char *,Stream,Stream) =  html_conversion;
+void	     (*c_conversion)(char *,FILE *,FILE *) =  html_conversion;
 
 const char    *g_templates;
-int            gf_emailupdate = TRUE;
-volatile int   gf_debug       = FALSE;
+bool           gf_emailupdate = true;
+volatile bool  gf_debug       = false;
 Blog           g_blog;
 struct display gd =
 {
-  { FALSE , FALSE , FALSE , FALSE , TRUE , TRUE } ,
+  { false , false , false , false , true , true } ,
   INDEX,
   "programming",	/* default tag for advertising */
   NULL
@@ -103,21 +102,21 @@ struct display gd =
 
 int GlobalsInit(char *fspec)
 {
-  Stream       input;
+  FILE        *input;
   List         headers;
   char        *cfs;
   char        *ext;
   struct pair *ppair;
   
-  ddt(fspec != NULL);
+  assert(fspec != NULL);
 
   ListInit(&headers);
   
 #ifdef PARALLEL_HACK  
-  c_scriptname = dup_string(fspec);
+  c_scriptname = strdup(fspec);
 #endif
 
-  cfs = dup_string(fspec);
+  cfs = strdup(fspec);
   ext = strstr(cfs,".cnf");
 
   if (ext == NULL)
@@ -129,7 +128,7 @@ int GlobalsInit(char *fspec)
     ext[3] = 'f';
   }
 
-  input = FileStreamRead(cfs);
+  input = fopen(cfs,"r");
   if (input == NULL)
     return(ERR_ERR);
     
@@ -144,17 +143,17 @@ int GlobalsInit(char *fspec)
   {
     if (strcmp(ppair->name,"BASEDIR") == 0)
     {
-      c_basedir = dup_string(ppair->value);
+      c_basedir = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"WEBDIR") == 0)
     {
-      c_webdir = dup_string(ppair->value);
+      c_webdir = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"BASEURL") == 0)
     {
       char *p = strrchr(ppair->value,'/');
       if (p != NULL) *p = '\0';
-      c_baseurl = dup_string(ppair->value);
+      c_baseurl = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"FULLBASEURL") == 0)
     {
@@ -169,15 +168,15 @@ int GlobalsInit(char *fspec)
       char *p = strrchr(ppair->value,'/');
       if (p != NULL) *p = '\0';
 #endif
-      c_fullbaseurl = dup_string(ppair->value);
+      c_fullbaseurl = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"TEMPLATES") == 0)
     {
-      g_templates = dup_string(ppair->value);
+      g_templates = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"DAYPAGE") == 0)
     {
-      c_daypage = dup_string(ppair->value);
+      c_daypage = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"DAYS") == 0)
     {
@@ -185,47 +184,47 @@ int GlobalsInit(char *fspec)
     }
     else if (strcmp(ppair->name,"RSSFILE") == 0)
     {
-      c_rssfile = dup_string(ppair->value);
+      c_rssfile = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"RSSTEMPLATES") == 0)
     {
-      c_rsstemplates = dup_string(ppair->value);
+      c_rsstemplates = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"RSSFIRST") == 0)
     {
       down_string(ppair->value);
       if (strcmp(ppair->value,"earliest") == 0)
-        cf_rssreverse = FALSE;
+        cf_rssreverse = false;
       else if (strcmp(ppair->value,"latest") == 0)
-        cf_rssreverse = TRUE;
+        cf_rssreverse = true;
       else
-        cf_rssreverse = FALSE;
+        cf_rssreverse = false;
     }
     else if (strcmp(ppair->name,"ATOMTEMPLATES") == 0)
     {
-      c_atomtemplates = dup_string(ppair->value);
+      c_atomtemplates = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"ATOMFILE") == 0)
     {
-      c_atomfile = dup_string(ppair->value);
+      c_atomfile = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"TABFILE") == 0)
     {
-      c_tabfile = dup_string(ppair->value);
+      c_tabfile = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"TABTEMPLATES") == 0)
     {
-      c_tabtemplates = dup_string(ppair->value);
+      c_tabtemplates = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"TABFIRST") == 0)
     {
       down_string(ppair->value);
       if (strcmp(ppair->value,"earliest") == 0)
-        cf_tabreverse = FALSE;
+        cf_tabreverse = false;
       else if (strcmp(ppair->value,"latest") == 0)
-        cf_tabreverse = TRUE;
+        cf_tabreverse = true;
       else
-        cf_tabreverse = FALSE;
+        cf_tabreverse = false;
     }
     else if (strcmp(ppair->name,"STARTDATE") == 0)
     {
@@ -238,44 +237,44 @@ int GlobalsInit(char *fspec)
     }
     else if (strcmp(ppair->name,"AUTHOR") == 0)
     {
-      c_author = dup_string(ppair->value);
+      c_author = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"AUTHORS") == 0)
     {
-      c_authorfile = dup_string(ppair->value);
+      c_authorfile = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"LOCKFILE") == 0)
     {
-      c_lockfile = dup_string(ppair->value);
+      c_lockfile = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"EMAIL") == 0)
     {
-      c_email = dup_string(ppair->value);
+      c_email = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"NAME") == 0)
     {
-      c_name = dup_string(ppair->value);
+      c_name = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"WEBLOGCOM") == 0)
     {
       down_string(ppair->value);
      
       if (strcmp(ppair->value,"true") == 0)
-        cf_weblogcom = TRUE;
+        cf_weblogcom = true;
       else if (strcmp(ppair->value,"false") == 0)
-        cf_weblogcom = FALSE;
+        cf_weblogcom = false;
     }
     else if (strcmp(ppair->name,"EMAIL-LIST") == 0)
     {
-      c_emaildb = dup_string(ppair->value);
+      c_emaildb = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"EMAIL-SUBJECT") == 0)
     {
-      c_emailsubject = dup_string(ppair->value);
+      c_emailsubject = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"EMAIL-MESSAGE") == 0)
     {
-      c_emailmsg = dup_string(ppair->value);
+      c_emailmsg = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"TIMEZONE") == 0)
     {
@@ -291,17 +290,17 @@ int GlobalsInit(char *fspec)
     }
     else if (strcmp(ppair->name,"ADTAG") == 0)
     {
-      gd.adtag = dup_string(ppair->value);
+      gd.adtag = strdup(ppair->value);
     }
     else if (strcmp(ppair->name,"OVERVIEW") == 0)
     {
-      c_overview    = dup_string(ppair->value);
-      gd.f.overview = TRUE;
+      c_overview    = strdup(ppair->value);
+      gd.f.overview = true;
     }
     else if (strcmp(ppair->name,"DEBUG") == 0)
     {
       if (strcmp(ppair->value,"true") == 0)
-        gf_debug = TRUE;
+        gf_debug = true;
     }
     else if (strncmp(ppair->name,"_SYSTEM",7) == 0)
     {
@@ -314,8 +313,8 @@ int GlobalsInit(char *fspec)
   }
 
   PairListFree(&headers);
-  StreamFree(input);
-  MemFree(cfs);
+  fclose(input);
+  free(cfs);
 
   g_blog = BlogNew(c_basedir,c_lockfile);
   if (g_blog == NULL)
@@ -361,9 +360,9 @@ void set_gf_emailupdate(char *value)
   {
     up_string(value);
     if (strcmp(value,"NO") == 0)
-      gf_emailupdate = FALSE;
+      gf_emailupdate = false;
     else if (strcmp(value,"YES") == 0)
-      gf_emailupdate = TRUE;
+      gf_emailupdate = true;
   }
 }
 

@@ -20,13 +20,15 @@
 *
 *****************************************************************/
 
+#define _GNU_SOURCE 1
+
 #include <string.h>
+#include <stdlib.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <ctype.h>
 #include <stdarg.h>
-
-#include <cgilib/memory.h>
-#include <cgilib/ddt.h>
+#include <assert.h>
 
 #include "blogutil.h"
 
@@ -39,15 +41,15 @@ String *tag_split(size_t *pnum,const char *tag)
   String     *pool = NULL;
   const char *p;
   
-  ddt(pnum != NULL);
-  ddt(tag  != NULL);
+  assert(pnum != NULL);
+  assert(tag  != NULL);
   
   while(*tag)
   {
     if (num == max)
     {
       max += 1024;
-      pool = MemResize(pool,max * sizeof(String));
+      pool = realloc(pool,max * sizeof(String));
     }
     
     for (p = tag ; (*p) && (*p != ',') ; p++)
@@ -74,10 +76,29 @@ char *fromstring(String src)
 {
   char *dest;
   
-  dest = MemAlloc(src.s + 1);
+  dest = malloc(src.s + 1);
   memcpy(dest,src.d,src.s);
   dest[src.s] = '\0';
   return (dest);
+}
+
+/*********************************************************************/
+
+size_t fcopy(FILE *out,FILE *in)
+{
+  char buffer[BUFSIZ];
+  size_t inbytes;
+  size_t outbytes;
+  
+  outbytes = 0;
+  
+  do
+  {
+    inbytes = fread(buffer,1,BUFSIZ,in);
+    outbytes += fwrite(buffer,1,inbytes,out);
+  } while (inbytes > 0);
+  
+  return outbytes;
 }
 
 /*********************************************************************/

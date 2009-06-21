@@ -23,8 +23,8 @@
 #ifndef BLOG_MKENTRY
 #define BLOG_MKENTRY
 
-#include <cgilib/nodelist.h>
-#include <cgilib/errors.h>
+#include <cgilib6/nodelist.h>
+#include <cgilib6/errors.h>
 
 #include "timeutil.h"
 
@@ -54,7 +54,7 @@ typedef struct blogentry
 
 /*********************************************************************/
 
-Blog		(BlogNew)		(char *,char *);
+Blog		(BlogNew)		(const char *,const char *);
 int		(BlogLock)		(Blog);
 int		(BlogUnlock)		(Blog);
 int		(BlogFree)		(Blog);

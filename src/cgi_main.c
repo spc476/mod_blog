@@ -20,18 +20,18 @@
 *
 *************************************************************************/
 
+#define _GNU_SOURCE 1
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <time.h>
+#include <assert.h>
 
-#include <cgilib/memory.h>
-#include <cgilib/stream.h>
-#include <cgilib/errors.h>
-#include <cgilib/ddt.h>
-#include <cgilib/cgi.h>
-#include <cgilib/util.h>
+#include <cgilib6/errors.h>
+#include <cgilib6/cgi.h>
+#include <cgilib6/util.h>
 
 #include "conf.h"
 #include "globals.h"
@@ -57,7 +57,7 @@ static int	cmd_cgi_post_new	(Request);
 static int	cmd_cgi_post_show	(Request);
 static int	cmd_cgi_post_edit	(Request);
 
-static int	cgi_error		(Request,int,char *,char *, ... );
+static int	cgi_error		(Request,int,char *, ... );
 
 /*************************************************************************/
 
@@ -66,13 +66,13 @@ int main_cgi_head(Cgi cgi,int argc,char *argv[])
   struct request req;
   int            rc;
   
-  ddt(cgi != NULL);
+  assert(cgi != NULL);
   
   rc = cgi_init(cgi,&req);
   if (rc != ERR_OKAY)
-    return((*req.error)(&req,HTTP_ISERVERERR,"","cgi_init() failed"));
+    return((*req.error)(&req,HTTP_ISERVERERR,"cgi_init() failed"));
   
-  return((*req.error)(&req,HTTP_METHODNOTALLOWED,"","","HEAD method not supported"));
+  return((*req.error)(&req,HTTP_METHODNOTALLOWED,"HEAD method not supported"));
 }
 
 /**********************************************************************/
@@ -82,14 +82,14 @@ int main_cgi_get(Cgi cgi,int argc,char *argv[])
   struct request  req;
   int             rc;
   
-  ddt(cgi != NULL);
+  assert(cgi != NULL);
 
   rc = cgi_init(cgi,&req);
   if (rc != ERR_OKAY)
-    return((*req.error)(&req,HTTP_ISERVERERR,"","cgi_init() failed"));
+    return((*req.error)(&req,HTTP_ISERVERERR,"cgi_init() failed"));
 
   req.command    = cmd_cgi_get_show;
-  req.reqtumbler = CgiEnvGet(cgi,"PATH_INFO");
+  req.reqtumbler = getenv("PATH_INFO");
   gd.req         = &req;
   
   CgiListMake(cgi);
@@ -104,7 +104,7 @@ int main_cgi_get(Cgi cgi,int argc,char *argv[])
 
 static void set_m_cgi_get_command(char *value,Request req)
 {
-  ddt(req != NULL);
+  assert(req != NULL);
   
   if (emptynull_string(value)) return;
   up_string(value);
@@ -127,11 +127,11 @@ static int cmd_cgi_get_new(Request req)
 {
   List days;
 
-  ddt(req != NULL);
+  assert(req != NULL);
   
   ListInit(&days);
   gd.f.edit = 1;
-  LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
+  fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
   generic_cb("main",req->out,&days);
   return(0);
 }
@@ -143,18 +143,17 @@ static int cmd_cgi_get_show(Request req)
   char *status;
   int   rc;
   
-  ddt(req != NULL);
+  assert(req != NULL);
   
   status = CgiListGetValue(req->cgi,"status");
   if (emptynull_string(status))
-    status = dup_string("200");
+    status = strdup("200");
   
   if ((empty_string(req->reqtumbler)) || (strcmp(req->reqtumbler,"/") == 0))
   {
-    LineSFormat(
+    fprintf(
     	req->out,
-    	"$",
-	"Status: %a\r\n"
+	"Status: %s\r\n"
     	"Content-type: text/html\r\n"
     	"\r\n",
     	status
@@ -172,31 +171,30 @@ static int cmd_cgi_get_show(Request req)
       if (req->tumbler->flags.redirect)
       {
         char *tum = TumblerCanonical(req->tumbler);
-        LineSFormat(
+        fprintf(
         	req->out,
-        	"i $ $",
-        	"Status: %a\r\n"
-        	"Location: %b/%c\r\n"
+        	"Status: %d\r\n"
+        	"Location: %s/%s\r\n"
         	"Content-Type: text/html\r\n\r\n"
         	"<html>"
         	"<head><title>Redirect</title></head>"
-        	"<body><p>Redirect to <a href='%b/%c'>%b/%c</a></p></body>"
+        	"<body><p>Redirect to <a href='%s/%s'>%s/%s</a></p></body>"
         	"</html>\n",
         	HTTP_MOVEPERM,
-        	c_fullbaseurl,
-        	tum
+        	c_fullbaseurl, tum,
+        	c_fullbaseurl, tum,
+        	c_fullbaseurl, tum
         );
         free(tum);
-	MemFree(status);
+	free(status);
 	return(ERR_OKAY);
       }
 #endif
 
-      if (req->tumbler->flags.file == FALSE)
-        LineSFormat(
+      if (req->tumbler->flags.file == false)
+        fprintf(
         	req->out,
-        	"$",
-        	"Status: %a\r\n"
+        	"Status: %s\r\n"
         	"Content-type: text/html\r\n\r\n",
         	status
         );
@@ -204,25 +202,22 @@ static int cmd_cgi_get_show(Request req)
     }
     else
     {
-      Stream  in;
-      char   *file;
+      FILE *in;
       
-      file = spc_getenv("PATH_TRANSLATED");
-      in   = FileStreamRead(file);
-      MemFree(file);
+      in   = fopen(getenv("PATH_TRANSLATED"),"r");
       if (in == NULL)
-        rc = (*req->error)(req,HTTP_BADREQ,"","bad request");
+        rc = (*req->error)(req,HTTP_BADREQ,"bad request");
       else
       {
         gd.htmldump = in;
-        LineSFormat(req->out,"$","Status: %a\r\nContent-type: text/html\r\n\r\n",status);
+        fprintf(req->out,"Status: %s\r\nContent-type: text/html\r\n\r\n",status);
         generic_cb("main",req->out,NULL);
         rc = 0;
       }
     }
   }
   
-  MemFree(status);
+  free(status);
   return(rc);
 }
 
@@ -230,8 +225,8 @@ static int cmd_cgi_get_show(Request req)
 
 static int cmd_cgi_get_edit(Request req)
 {
-  ddt(req != NULL);
-  return((*req->error)(req,HTTP_BADREQ,"","bad request"));
+  assert(req != NULL);
+  return((*req->error)(req,HTTP_BADREQ,"bad request"));
 }
 
 /***********************************************************************/
@@ -239,11 +234,11 @@ static int cmd_cgi_get_edit(Request req)
 static int cmd_cgi_get_overview(Request req)
 {
   List days;
-  ddt(req != NULL);
+  assert(req != NULL);
   
   ListInit(&days);
-  gd.f.overview = TRUE;
-  LineSFormat(req->out,"i","Status: %a\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
+  gd.f.overview = true;
+  fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
   generic_cb("main",req->out,&days);
   return(0);  
 }
@@ -255,11 +250,11 @@ int main_cgi_post(Cgi cgi,int argc,char *argv[])
   struct request req;
   int            rc;
   
-  ddt(cgi != NULL);
+  assert(cgi != NULL);
   
   rc = cgi_init(cgi,&req);
   if (rc != ERR_OKAY)
-    return((*req.error)(&req,HTTP_ISERVERERR,"","cgi_init() failed"));
+    return((*req.error)(&req,HTTP_ISERVERERR,"cgi_init() failed"));
   
   req.command = cmd_cgi_post_new;  
   gd.req      = &req;
@@ -276,7 +271,7 @@ int main_cgi_post(Cgi cgi,int argc,char *argv[])
   req.class     = CgiListGetValue(cgi,"class");
   req.date      = CgiListGetValue(cgi,"date");
   req.origbody  = CgiListGetValue(cgi,"body");
-  req.body      = dup_string(req.origbody);
+  req.body      = strdup(req.origbody);
 
   if (
        (emptynull_string(req.author))
@@ -284,15 +279,15 @@ int main_cgi_post(Cgi cgi,int argc,char *argv[])
        || (emptynull_string(req.body))
      )
   {
-    return((*req.error)(&req,HTTP_BADREQ,"","errors-missing"));
+    return((*req.error)(&req,HTTP_BADREQ,"errors-missing"));
   }
 
   if (req.class == NULL)
-    req.class = dup_string("");
+    req.class = strdup("");
   
-  if (authenticate_author(&req) == FALSE)
+  if (authenticate_author(&req) == false)
   {
-    return((*req.error)(&req,HTTP_UNAUTHORIZED,"$ $","errors-author not authenticated got [%a] wanted [%b]",req.author,CgiListGetValue(cgi,"author")));
+    return((*req.error)(&req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",req.author,CgiListGetValue(cgi,"author")));
   }
 
   rc = (*req.command)(&req);
@@ -303,7 +298,7 @@ int main_cgi_post(Cgi cgi,int argc,char *argv[])
 
 static void set_m_cgi_post_command(char *value,Request req)
 {
-  ddt(req != NULL);
+  assert(req != NULL);
 
   if (emptynull_string(value)) return;  
   up_string(value);
@@ -320,14 +315,14 @@ static void set_m_cgi_post_command(char *value,Request req)
 
 static void set_m_author(char *value,Request req)
 {
-  ddt(req != NULL);
+  assert(req != NULL);
   
   if (emptynull_string(value))
     req->author = get_remote_user();
   else
-    req->author = dup_string(value);
+    req->author = strdup(value);
     
-  req->origauthor = dup_string(req->author);
+  req->origauthor = strdup(req->author);
 }
 
 /************************************************************************/
@@ -336,7 +331,7 @@ static int cmd_cgi_post_new(Request req)
 {
   int rc;
   
-  ddt(req != NULL);
+  assert(req != NULL);
   
   rc = entry_add(req);
   if (rc == ERR_OKAY)
@@ -344,24 +339,24 @@ static int cmd_cgi_post_new(Request req)
     generate_pages(req);
     if (cf_weblogcom)   notify_weblogcom();
     if (gf_emailupdate) notify_emaillist();
-    D(ddtlog(ddtstream,"$","about to redirect to %a",c_fullbaseurl);)
-    LineSFormat(
+    fprintf(
     	req->out,
-	"i $",
-	"Status: %a\r\n"
-	"Location: %b\r\n"
+	"Status: %d\r\n"
+	"Location: %s\r\n"
 	"Content-type: text/html\r\n"
 	"\r\n"
 	"<HTML>\n"
 	"  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
-	"  <BODY><A HREF='%b'>Go here</A></BODY>\n"
+	"  <BODY><A HREF='%s'>Go here</A></BODY>\n"
 	"</HTML>\n",
 	HTTP_MOVETEMP,
+	c_fullbaseurl,
 	c_fullbaseurl
+	
     );
   }
   else
-    rc = (*req->error)(req,HTTP_ISERVERERR,"","couldn't add entry");
+    rc = (*req->error)(req,HTTP_ISERVERERR,"couldn't add entry");
   
   return(rc);
 }
@@ -403,7 +398,7 @@ static int cmd_cgi_post_show(Request req)
   
   ListAddTail(&cbd.list,&entry->node);
   gd.f.edit = 1;
-  LineS(req->out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
+  fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
   generic_cb("main",req->out,&cbd);
 
   /*-----------------------------------
@@ -423,82 +418,69 @@ static int cmd_cgi_post_show(Request req)
 
 static int cmd_cgi_post_edit(Request req)
 {
-  return((req->error)(req,HTTP_BADREQ,"","bad request"));
+  return((req->error)(req,HTTP_BADREQ,"bad request"));
 }
 
 /***********************************************************************/
 
-static int cgi_error(Request req,int level,char *format,char *msg, ... )
+static int cgi_error(Request req,int level,char *msg, ... )
 {
-  Stream in;
-  char *file;
-  char *errmsg;
+  FILE    *in;
+  va_list  args;
+  char    *file   = NULL;
+  char    *errmsg = NULL;
   
-  {
-    Stream  stmp;
-    va_list args;
-    
-    stmp = StringStreamWrite();
-    va_start(args,msg);
-    LineSFormatv(stmp,format,msg,args);
-    va_end(args);
-    errmsg = StringFromStream(stmp);
-    StreamFree(stmp);
-  }
+  va_start(args,msg);
+  vasprintf(&errmsg,msg,args);
+  va_end(args);
 
-  {
-    char   *docroot;
-    Stream  stmp;
+  asprintf(&file,"%s/errors/%d.html",getenv("DOCUMENT_ROOT"),level);
 
-    docroot = spc_getenv("DOCUMENT_ROOT");
-    stmp    = StringStreamWrite();
-    LineSFormat(stmp,"$ i","%a/errors/%b.html",docroot,level);
-    file    = StringFromStream(stmp);
-    StreamFree(stmp);
-    MemFree(docroot);
-  }
-
-  in = FileStreamRead(file);
+  in = fopen(file,"r");
   if (in == NULL)
   {
-    LineSFormat(
-  	req->out,
-  	"i $",
-	"Status: %a\r\n"
-	"X-Error: %b\r\n"
+    fprintf(
+    	req->out,
+	"Status: %d\r\n"
+	"X-Error: %s\r\n"
         "Content-type: text/html\r\n"
         "\r\n"
         "<html>\n"
         "<head>\n"
-        "<title>Error %a</title>\n"
+        "<title>Error %d</title>\n"
         "</head>\n"
         "<body>\n"
-        "<h1>Error %a</h1>\n"
-	"<p>%b</p>\n"
+        "<h1>Error %d</h1>\n"
+	"<p>%s</p>\n"
         "</body>\n"
         "</html>\n"
         "\n",
         level,
+	errmsg,
+	level,
+	level,
 	errmsg
-         );
+    );
   }
   else
   {
     gd.htmldump = in;
-    LineSFormat(
-    	req->out,
-    	"i $",
-    	"Status: %a\r\n"
-    	"X-Error: %b\r\n"
+    fprintf(
+    	req->out,    	
+    	"Status: %d\r\n"
+    	"X-Error: %s\r\n"
     	"Content-type: text/html\r\n"
     	"\r\n",
     	level,
     	errmsg
       );
     generic_cb("main",req->out,NULL);
-    StreamFree(in);
+    fclose(in);
   }
 
+  free(file);
+  free(errmsg);
+  
   return(ERR_OKAY);
 }
 
@@ -509,23 +491,23 @@ static int cgi_init(Cgi cgi,Request req)
   char *script;
   int   rc;
   
-  ddt(cgi != NULL);
-  ddt(req != NULL);
+  assert(cgi != NULL);
+  assert(req != NULL);
   
   memset(req,0,sizeof(struct request));
   
   req->error = cgi_error;
-  req->in    = StdinStream;
-  req->out   = StdoutStream;
+  req->in    = stdin;
+  req->out   = stdout;
   req->cgi   = cgi;
   
-  script = CgiEnvGet(cgi,"SCRIPT_FILENAME");
-  if (!empty_string(script))
-  {
-    rc = GlobalsInit(script);
-    if (rc != ERR_OKAY)
-      return(rc);
-  }
+  script = getenv("SCRIPT_FILENAME");
+  assert(script != NULL);
+
+  rc = GlobalsInit(script);
+
+  if (rc != ERR_OKAY)
+    return rc;
   
   BlogDatesInit();
   return(ERR_OKAY);

@@ -20,6 +20,8 @@
 *
 ************************************************/
 
+#define _GNU_SOURCE 1
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -33,13 +35,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <cgilib/memory.h>
-#include <cgilib/ddt.h>
-#include <cgilib/htmltok.h>
-#include <cgilib/util.h>
-#include <cgilib/stream.h>
-#include <cgilib/cgi.h>
-#include <cgilib/chunk.h>
+#include <cgilib6/htmltok.h>
+#include <cgilib6/util.h>
+#include <cgilib6/cgi.h>
+#include <cgilib6/chunk.h>
 
 #include "conf.h"
 #include "blog.h"
@@ -55,8 +54,8 @@
 static void	   calculate_previous		(struct btm);
 static void	   calculate_next		(struct btm);
 static const char *mime_type			(char *);
-static int	   display_file			(Stream,Tumbler);
-static int	   rss_page			(Stream,struct btm *,int,int);
+static int	   display_file			(FILE *,Tumbler);
+static int	   rss_page			(FILE *,struct btm *,int,int);
 static char       *tag_collect			(List *);
 static char	  *tag_pick                     (const char *);
 static void	   free_entries			(List *);
@@ -65,47 +64,48 @@ static void	   free_entries			(List *);
 
 int generate_pages(Request req)
 {
-  Stream out;
-  int    rc = 0;
+  FILE *out;
+  int   rc = 0;
 
-  ddt(req != NULL);
+  assert(req != NULL);
 
-  out = FileStreamWrite(c_daypage,FILE_RECREATE);  
+  out = fopen(c_daypage,"w");
   if (out == NULL) 
   {
     return(ERR_ERR);
   }
+  
   rc = primary_page(out,gd.now.year,gd.now.month,gd.now.day,gd.now.part);
-  StreamFree(out);
+  fclose(out);
   
   if (c_rsstemplates)
   {
     g_templates = c_rsstemplates;
-    out         = FileStreamWrite(c_rssfile,FILE_RECREATE);
+    out         = fopen(c_rssfile,"w");
     if (out == NULL)
       return(ERR_ERR);
-    rc = rss_page(out,&gd.now,TRUE,cf_rssreverse);
-    StreamFree(out);
+    rc = rss_page(out,&gd.now,true,cf_rssreverse);
+    fclose(out);
   }
 
   if (c_atomtemplates)
   {
     g_templates = c_atomtemplates;
-    out         = FileStreamWrite(c_atomfile,FILE_RECREATE);
+    out         = fopen(c_atomfile,"w");
     if (out == NULL)
       return(ERR_ERR);
-    rc = rss_page(out,&gd.now,TRUE,cf_rssreverse);
-    StreamFree(out);
+    rc = rss_page(out,&gd.now,true,cf_rssreverse);
+    fclose(out);
   }
   
   if (c_tabtemplates)
   {
     g_templates = c_tabtemplates;
-    out         = FileStreamWrite(c_tabfile,FILE_RECREATE);
+    out         = fopen(c_tabfile,"w");
     if (out == NULL)
       return(ERR_ERR);
-    rc = rss_page(out,&gd.now,FALSE,cf_tabreverse);
-    StreamFree(out);
+    rc = rss_page(out,&gd.now,false,cf_tabreverse);
+    fclose(out);
   }
   
   return(rc);
@@ -113,7 +113,7 @@ int generate_pages(Request req)
 
 /******************************************************************/
 
-int tumbler_page(Stream out,Tumbler spec)
+int tumbler_page(FILE *out,Tumbler spec)
 {
   struct btm            start;
   struct btm            end;
@@ -124,10 +124,10 @@ int tumbler_page(Stream out,Tumbler spec)
   char                 *tags;
   struct callback_data  cbd;
   
-  ddt(out  != NULL);
-  ddt(spec != NULL);
+  assert(out  != NULL);
+  assert(spec != NULL);
   
-  gd.f.fullurl = FALSE;
+  gd.f.fullurl = false;
   
   /*---------------------------------------------------------
   ; easy checks first.  Get these out of the way ... 
@@ -190,7 +190,7 @@ int tumbler_page(Stream out,Tumbler spec)
     
     if (tu1->entry[YEAR] > tu2->entry[YEAR])
     {
-      gd.f.reverse = TRUE;
+      gd.f.reverse = true;
       tmp = tu1;
       tu1 = tu2;
       tu2 = tmp;
@@ -199,7 +199,7 @@ int tumbler_page(Stream out,Tumbler spec)
     }
     else if (tu1->entry[MONTH] > tu2->entry[MONTH])
     {
-      gd.f.reverse = TRUE;
+      gd.f.reverse = true;
       tmp = tu1;
       tu1 = tu2;
       tu2 = tmp;
@@ -208,7 +208,7 @@ int tumbler_page(Stream out,Tumbler spec)
     }
     else if (tu1->entry[DAY] > tu2->entry[DAY])
     {
-      gd.f.reverse = TRUE;
+      gd.f.reverse = true;
       tmp = tu1;
       tu1 = tu2;
       tu2 = tmp;
@@ -217,7 +217,7 @@ int tumbler_page(Stream out,Tumbler spec)
     }
     else if (tu1->entry[PART] > tu2->entry[PART])
     {
-      gd.f.reverse = TRUE;
+      gd.f.reverse = true;
       tmp = tu1;
       tu1 = tu2;
       tu2 = tmp;
@@ -251,7 +251,7 @@ int tumbler_page(Stream out,Tumbler spec)
   
   if (tu1->type == TUMBLER_SINGLE)
   {
-    gd.f.navigation = TRUE;
+    gd.f.navigation = true;
     nu2        = PART;
     end.year   = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , gd.now.year                      : tu1->entry[YEAR];
     end.month  = (tu1->entry[MONTH] == 0) ? nu2 = MONTH , 12                               : tu1->entry[MONTH];
@@ -284,17 +284,17 @@ int tumbler_page(Stream out,Tumbler spec)
   ; code.
   ;------------------------------------------------*/
   
-  ddt(start.year  >= 1);
-  ddt(start.month >= 1);
-  ddt(start.month <= 12);
-  ddt(start.day   >= 1);
-  ddt(start.day   <= max_monthday(start.year,start.month));
+  assert(start.year  >= 1);
+  assert(start.month >= 1);
+  assert(start.month <= 12);
+  assert(start.day   >= 1);
+  assert(start.day   <= max_monthday(start.year,start.month));
   
-  ddt(end.year  >= 1);
-  ddt(end.month >= 1);
-  ddt(end.month <= 12);
-  ddt(end.day   >= 1);
-  ddt(end.day   <= max_monthday(end.year,end.month));
+  assert(end.year  >= 1);
+  assert(end.month >= 1);
+  assert(end.month <= 12);
+  assert(end.day   >= 1);
+  assert(end.day   <= max_monthday(end.year,end.month));
   
   /*--------------------------------------------------------------
   ; okay, resume processing ... bound against the starting time of
@@ -325,7 +325,7 @@ int tumbler_page(Stream out,Tumbler spec)
   
   tags     = tag_collect(&cbd.list);  
   gd.adtag = tag_pick(tags);
-  MemFree(tags);
+  free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
 
@@ -342,7 +342,7 @@ static void calculate_previous(struct btm start)
   {
     case YEAR:
          if (start.year == gd.begin.year)
-           gd.f.navprev = FALSE;
+           gd.f.navprev = false;
          else
            gd.previous.year = start.year - 1;
          break;
@@ -351,13 +351,13 @@ static void calculate_previous(struct btm start)
               (start.year == gd.begin.year) 
               && (start.month == gd.begin.month)
             )
-           gd.f.navprev = FALSE;
+           gd.f.navprev = false;
          else
 	   btm_sub_month(&gd.previous);
          break;
     case DAY:
          if (btm_cmp_date(&start,&gd.begin) == 0)
-           gd.f.navprev = FALSE;
+           gd.f.navprev = false;
          else
          {
            btm_sub_day(&gd.previous);
@@ -376,12 +376,12 @@ static void calculate_previous(struct btm start)
              return;
            }
                       
-           gd.f.navprev = FALSE;
+           gd.f.navprev = false;
          }
          break;
     case PART:
          if (btm_cmp(&start,&gd.begin) == 0)
-           gd.f.navprev = FALSE;
+           gd.f.navprev = false;
          else
          {
 	   btm_sub_part(&gd.previous);
@@ -400,11 +400,11 @@ static void calculate_previous(struct btm start)
              return;
            }
            
-           gd.f.navprev = FALSE;
+           gd.f.navprev = false;
          }
          break;
     default:
-         ddt(0);
+         assert(0);
   }
 }
 
@@ -418,7 +418,7 @@ static void calculate_next(struct btm end)
   {
     case YEAR:
          if (end.year == gd.now.year)
-           gd.f.navnext = FALSE;
+           gd.f.navnext = false;
          else
            gd.next.year  = end.year + 1;
          break;
@@ -427,13 +427,13 @@ static void calculate_next(struct btm end)
               (end.year == gd.now.year) 
               && (end.month == gd.now.month)
             )
-           gd.f.navnext = FALSE;
+           gd.f.navnext = false;
          else
            btm_add_month(&gd.next);
          break;
     case DAY:
          if (btm_cmp_date(&end,&gd.now) == 0)
-           gd.f.navnext = FALSE;
+           gd.f.navnext = false;
          else
          {
            btm_add_day(&gd.next);
@@ -453,12 +453,12 @@ static void calculate_next(struct btm end)
              return;
            }
            
-           gd.f.navnext = FALSE;
+           gd.f.navnext = false;
          }
          break;
     case PART:
          if (btm_cmp(&end,&gd.now) == 0)
-           gd.f.navnext = FALSE;
+           gd.f.navnext = false;
 	 else
 	 {
 	   gd.next.part++;
@@ -477,11 +477,11 @@ static void calculate_next(struct btm end)
              
              return;
            }
-           gd.f.navnext = FALSE;
+           gd.f.navnext = false;
 	 }
          break;
     default:
-         ddt(0);
+         assert(0);
   }
 }
 
@@ -506,7 +506,7 @@ static const char *mime_type(char *filename)
     { NULL		, NULL		}
   };
   
-  ddt(filename != NULL);
+  assert(filename != NULL);
   
   for (i = 0 ; types[i].s1 != NULL ; i++)
   {
@@ -519,13 +519,13 @@ static const char *mime_type(char *filename)
 
 /******************************************************************/
 
-static int display_file(Stream out,Tumbler spec)
+static int display_file(FILE * out,Tumbler spec)
 {
   TumblerUnit tu;
   char        fname[FILENAME_MAX];
   
-  ddt(out  != NULL);
-  ddt(spec != NULL);
+  assert(out  != NULL);
+  assert(spec != NULL);
 
   tu = (TumblerUnit)ListGetHead(&spec->units);
   
@@ -541,7 +541,7 @@ static int display_file(Stream out,Tumbler spec)
   if (gd.cgi)
   {
     struct stat  status;
-    Stream       in;
+    FILE        *in;
     const char  *type;
     int          rc;
     
@@ -549,18 +549,18 @@ static int display_file(Stream out,Tumbler spec)
     if (rc == -1) 
     {
       if (errno == ENOENT)
-        (*gd.req->error)(gd.req,HTTP_NOTFOUND,"$ $","%a: %b",fname,strerror(errno));
+        (*gd.req->error)(gd.req,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
       else if (errno == EACCES)
-        (*gd.req->error)(gd.req,HTTP_FORBIDDEN,"$ $","%a: %b",fname,strerror(errno));
+        (*gd.req->error)(gd.req,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
       else
-        (*gd.req->error)(gd.req,HTTP_ISERVERERR,"$ $","%a: %b",fname,strerror(errno));
+        (*gd.req->error)(gd.req,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
       return(1);
     }
 
-    in = FileStreamRead(fname);    
+    in = fopen(fname,"r");
     if (in == NULL)
     {
-      (*gd.req->error)(gd.req,HTTP_NOTFOUND,"$","%a: some internal error",fname);
+      (*gd.req->error)(gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
       return(1);
     }
     
@@ -569,36 +569,34 @@ static int display_file(Stream out,Tumbler spec)
     if (strcmp(type,"text/x-html") == 0)
     {
       gd.htmldump = in;
-      LineS(out,"Status: 200\r\nContent-type: text/html\r\n\r\n");
+      fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",out);
       generic_cb("main",out,NULL);
     }
     else
     {
-      LineSFormat(
-      		out,
-      		"$ L",
-		"Status: 200\r\n"
-                "Content-type: %a\r\n"
-  	        "Content-length: %b\r\n"
-		"\r\n",
-	        type,
-	        (unsigned long)status.st_size
-	    );
-    
-      StreamCopy(out,in);
+      fprintf(
+      	out,
+      	"Status: 200\r\n"
+      	"Content-Type: %s\r\n"
+      	"Content-Length: %lu\r\n"
+      	"\r\n",
+      	type,
+      	(unsigned long)status.st_size
+      );
+      
+      fcopy(out,in);
     }
-    StreamFree(in);    
+    fclose(in);
   }
   else
-  {
-    LineSFormat(out,"$","File to open: %a\n",fname);
-  }
+    fprintf(out,"File to open: %s\n",fname);
+
   return(ERR_OKAY);
 }
 
 /*****************************************************************/
 
-int primary_page(Stream out,int year,int month,int iday,int part)
+int primary_page(FILE *out,int year,int month,int iday,int part)
 {
   BlogEntry             entry;
   struct btm            thisday;
@@ -607,15 +605,15 @@ int primary_page(Stream out,int year,int month,int iday,int part)
   struct callback_data  cbd;
   int                   added;
   
-  ddt(out   != NULL);
-  ddt(year  >  0);
-  ddt(month >  0);
-  ddt(month <  13);
-  ddt(iday  >  0);
-  ddt(iday  <= max_monthday(year,month));
+  assert(out   != NULL);
+  assert(year  >  0);
+  assert(month >  0);
+  assert(month <  13);
+  assert(iday  >  0);
+  assert(iday  <= max_monthday(year,month));
 
-  gd.f.fullurl = FALSE;
-  gd.f.reverse = TRUE;
+  gd.f.fullurl = false;
+  gd.f.reverse = true;
     
   thisday.year  = year;
   thisday.month = month;
@@ -624,7 +622,7 @@ int primary_page(Stream out,int year,int month,int iday,int part)
   
   memset(&cbd,0,sizeof(struct callback_data));
   
-  for (ListInit(&cbd.list) , days = 0 , added = FALSE ; days < c_days ; )
+  for (ListInit(&cbd.list) , days = 0 , added = false ; days < c_days ; )
   {
     if (btm_cmp(&thisday,&gd.begin) < 0) break;
     
@@ -632,7 +630,7 @@ int primary_page(Stream out,int year,int month,int iday,int part)
     if (entry)
     {
       ListAddTail(&cbd.list,&entry->node);
-      added = TRUE;
+      added = true;
     }
 
     thisday.part--;
@@ -642,13 +640,13 @@ int primary_page(Stream out,int year,int month,int iday,int part)
       btm_sub_day(&thisday);
       if (added)
         days++;
-      added = FALSE;
+      added = false;
     }
   }
 
   tags = tag_collect(&cbd.list);
   gd.adtag = tag_pick(tags);
-  MemFree(tags);
+  free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
   
@@ -657,14 +655,14 @@ int primary_page(Stream out,int year,int month,int iday,int part)
 
 /********************************************************************/
 
-static int rss_page(Stream out,struct btm *when,int fullurl,int reverse)
+static int rss_page(FILE *out,struct btm *when,int fullurl,int reverse)
 {
   struct btm            thisday;
   char                 *tags;
   struct callback_data  cbd;
   
-  ddt(out   != NULL);
-  ddt(when  != NULL);
+  assert(out   != NULL);
+  assert(when  != NULL);
   
   gd.f.fullurl = fullurl;
   gd.f.reverse = reverse;
@@ -680,7 +678,7 @@ static int rss_page(Stream out,struct btm *when,int fullurl,int reverse)
 
   tags     = tag_collect(&cbd.list);  
   gd.adtag = tag_pick(tags);
-  MemFree(tags);
+  free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
 
@@ -691,12 +689,13 @@ static int rss_page(Stream out,struct btm *when,int fullurl,int reverse)
 
 static char *tag_collect(List *list)
 {
-  Stream     stags;
+  FILE      *stags;
   BlogEntry  entry;
   char      *comma = "";
   char      *tags;
+  size_t     size;
   
-  stags = StringStreamWrite();
+  stags = open_memstream(&tags,&size);
   
   for
   (
@@ -706,13 +705,11 @@ static char *tag_collect(List *list)
   )
   {
     if (empty_string(entry->class)) continue;
-    LineS(stags,comma);
-    LineS(stags,entry->class);
+    fprintf(stags,"%s%s",comma,entry->class);
     comma = ", ";
   }
-  
-  tags = StringFromStream(stags);
-  StreamFree(stags);
+
+  fclose(stags);  
   return(tags);
 }
 
@@ -725,10 +722,10 @@ static char *tag_pick(const char *tag)
   size_t  r;
   char   *pick;
   
-  ddt(tag != NULL);
+  assert(tag != NULL);
 
   if (empty_string(tag))
-    return(dup_string(gd.adtag));
+    return(strdup(gd.adtag));
   
   pool = tag_split(&num,tag);
 
@@ -742,13 +739,13 @@ static char *tag_pick(const char *tag)
   if (num)
   {
     r  = (((double)rand() / (double)RAND_MAX) * (double)num); 
-    ddt(r < num);
+    assert(r < num);
     pick = fromstring(pool[r]);
   }
   else
-    pick = dup_string(gd.adtag);
+    pick = strdup(gd.adtag);
   
-  MemFree(pool);
+  free(pool);
   return(pick);
 }
  

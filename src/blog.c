@@ -20,12 +20,15 @@
 *
 ****************************************************/
 
+#define _GNU_SOURCE 1
+
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -40,27 +43,28 @@
 #include "conf.h"
 #include "blog.h"
 #include "globals.h"
+#include "fix.h"
 
 /**********************************************************************/
 
 static void	 date_to_dir		(char *,struct btm *);
 static void	 date_to_filename	(char *,struct btm *,const char *);
 static void	 date_to_part		(char *,struct btm *,int);
-static Stream	 open_file_r		(const char *,struct btm *);
-static Stream	 open_file_w		(const char *,struct btm *);
+static FILE	*open_file_r		(const char *,struct btm *);
+static FILE	*open_file_w		(const char *,struct btm *);
 static int	 date_check		(struct btm *);
 static int	 date_checkcreate	(struct btm *);
 static int	 blog_cache_day		(Blog,struct btm *);
 
 /***********************************************************************/
 
-Blog (BlogNew)(char *location,char *lockfile)
+Blog (BlogNew)(const char *location,const char *lockfile)
 {
   Blog blog;
   int  rc;
   
-  ddt(location != NULL);
-  ddt(lockfile != NULL);
+  assert(location != NULL);
+  assert(lockfile != NULL);
   
   umask(DEFAULT_PERMS);
   rc = chdir(location);
@@ -69,7 +73,7 @@ Blog (BlogNew)(char *location,char *lockfile)
   
   blog           = MemAlloc(sizeof(struct blog));
   memset(blog,0,sizeof(struct blog));
-  blog->lockfile = dup_string(lockfile);
+  blog->lockfile = strdup(lockfile);
   blog->lock     = 0;
   blog->max      = 100;
   blog->idx      = 0;
@@ -86,10 +90,10 @@ int (BlogLock)(Blog blog)
   struct flock lockdata;
   int          rc;
   
-  ddt(blog != NULL);
+  assert(blog != NULL);
   
   blog->lock = open(blog->lockfile,O_CREAT | O_RDWR, 0666);
-  if (blog->lock == -1) return(FALSE);
+  if (blog->lock == -1) return(false);
   
   lockdata.l_type   = F_WRLCK;
   lockdata.l_start  = 0;
@@ -101,10 +105,10 @@ int (BlogLock)(Blog blog)
   if (rc < 0)
   {
     close(blog->lock);
-    return(FALSE);
+    return(false);
   }
 
-  return (TRUE);
+  return (true);
 }
 
 /***********************************************************************/
@@ -114,8 +118,8 @@ int (BlogUnlock)(Blog blog)
   struct flock lockdata;
   int          rc;
   
-  ddt(blog       != NULL);
-  ddt(blog->lock >  0);
+  assert(blog       != NULL);
+  assert(blog->lock >  0);
   
   lockdata.l_type   = F_UNLCK;
   lockdata.l_start  = 0;
@@ -127,10 +131,10 @@ int (BlogUnlock)(Blog blog)
   {
     close(blog->lock);
     blog->lock = 0;
-    return(TRUE);
+    return(true);
   }
   else
-    return(FALSE);
+    return(false);
 }
 
 /***********************************************************************/
@@ -139,7 +143,7 @@ int (BlogFree)(Blog blog)
 {
   size_t    i;
   
-  ddt(blog != NULL);
+  assert(blog != NULL);
   
   if (blog->lock > 0)
     BlogUnlock(blog);
@@ -147,8 +151,8 @@ int (BlogFree)(Blog blog)
   for (i = 0 ; i < blog->idx ; i++)
     BlogEntryFree(blog->entries[i]);
   
-  MemFree(blog->lockfile);
-  MemFree(blog);
+  free(blog->lockfile);
+  free(blog);
   return(ERR_OKAY);
 }
 
@@ -158,7 +162,7 @@ BlogEntry (BlogEntryNew)(Blog blog)
 {
   BlogEntry pbe;
 
-  ddt(blog != NULL);
+  assert(blog != NULL);
   
   pbe               = MemAlloc(sizeof(struct blogentry));
   pbe->node.ln_Succ = NULL;
@@ -168,10 +172,10 @@ BlogEntry (BlogEntryNew)(Blog blog)
   pbe->when.month   = gd.now.month;
   pbe->when.day     = gd.now.day;
   pbe->when.part    = 0;
-  pbe->title        = dup_string("");
-  pbe->class        = dup_string("");
-  pbe->author       = dup_string("");
-  pbe->body         = dup_string("");
+  pbe->title        = strdup("");
+  pbe->class        = strdup("");
+  pbe->author       = strdup("");
+  pbe->body         = strdup("");
   
   return(pbe);
 }
@@ -182,12 +186,12 @@ BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
 {
   int part;
 
-  ddt(blog                          != NULL);
-  ddt(which                         != NULL);
-  ddt(which->part                   >  0);
-  ddt(btm_cmp_date(which,&gd.begin) >= 0);
+  assert(blog                          != NULL);
+  assert(which                         != NULL);
+  assert(which->part                   >  0);
+  assert(btm_cmp_date(which,&gd.begin) >= 0);
   
-  if (date_check(which) == FALSE)
+  if (date_check(which) == false)
     return(NULL);
 
   while(1)
@@ -200,7 +204,7 @@ BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
       if (which->part > blog->idx)
         return(NULL);
       
-      ddt(btm_cmp(&blog->entries[which->part - 1]->when,which) == 0);
+      assert(btm_cmp(&blog->entries[which->part - 1]->when,which) == 0);
       return(blog->entries[which->part - 1]);
     }
   
@@ -217,10 +221,10 @@ void (BlogEntryReadBetweenU)(Blog blog,List *list,struct btm *start,struct btm *
 {
   BlogEntry entry;
   
-  ddt(blog               != NULL);
-  ddt(start              != NULL);
-  ddt(end                != NULL);
-  ddt(btm_cmp(start,end) <= 0);
+  assert(blog               != NULL);
+  assert(start              != NULL);
+  assert(end                != NULL);
+  assert(btm_cmp(start,end) <= 0);
   
   while(btm_cmp(start,end) <= 0)
   {
@@ -245,10 +249,10 @@ void (BlogEntryReadBetweenD)(Blog blog,List *listb,struct btm *end,struct btm *s
   List  lista;
   Node *node;
   
-  ddt(blog               != NULL);
-  ddt(start              != NULL);
-  ddt(end                != NULL);
-  ddt(btm_cmp(end,start) >= 0);
+  assert(blog               != NULL);
+  assert(start              != NULL);
+  assert(end                != NULL);
+  assert(btm_cmp(end,start) >= 0);
   
   ListInit(&lista);
   
@@ -276,9 +280,9 @@ void (BlogEntryReadXD)(Blog blog,List *list,struct btm *start,size_t num)
 {
   BlogEntry entry;
   
-  ddt(blog  != NULL);
-  ddt(start != NULL);
-  ddt(num   >  0);
+  assert(blog  != NULL);
+  assert(start != NULL);
+  assert(num   >  0);
   
   while(num)
   {
@@ -311,9 +315,9 @@ void (BlogEntryReadXU)(Blog blog,List *list,struct btm *start,size_t num)
 {
   BlogEntry entry;
   
-  ddt(blog  != NULL);
-  ddt(start != NULL);
-  ddt(num   >  0);
+  assert(blog  != NULL);
+  assert(start != NULL);
+  assert(num   >  0);
   
   while((num) && (btm_cmp_date(start,&gd.now) <= 0))
   {
@@ -338,14 +342,14 @@ int (BlogEntryWrite)(BlogEntry entry)
 {
   Blog   blog;
   char   buffer[FILENAME_MAX];
-  Stream stitles;
-  Stream sclass;
-  Stream sauthors;
-  Stream out;
+  FILE  *stitles;
+  FILE  *sclass;
+  FILE  *sauthors;
+  FILE  *out;
   int    rc;
   size_t i;
   
-  ddt(entry != NULL);
+  assert(entry != NULL);
   
   /*-----------------------------------------------
   ; cache the day the entry is to be added to.  We
@@ -387,33 +391,33 @@ int (BlogEntryWrite)(BlogEntry entry)
   sclass = open_file_w("class",&blog->cache);
   if (sclass == NULL)
   {
-    StreamFree(stitles);
+    fclose(stitles);
     return(ERR_ERR);
   }
   
   sauthors = open_file_w("authors",&blog->cache);
   if (sauthors == NULL)
   {
-    StreamFree(sclass);
-    StreamFree(stitles);
+    fclose(sclass);
+    fclose(stitles);
     return(ERR_ERR);
   }
   
   for (i = 0 ; i < blog->idx ; i++)
   {
-    LineSFormat(stitles, "$","%a\n",blog->entries[i]->title);
-    LineSFormat(sclass,  "$","%a\n",blog->entries[i]->class);
-    LineSFormat(sauthors,"$","%a\n",blog->entries[i]->author);
+    fprintf(stitles, "%s\n",blog->entries[i]->title);
+    fprintf(sclass,  "%s\n",blog->entries[i]->class);
+    fprintf(sauthors,"%s\n",blog->entries[i]->author);
   }
       
   date_to_part(buffer,&entry->when,entry->when.part);
-  out = FileStreamWrite(buffer,FILE_RECREATE);
-  LineS(out,entry->body);
+  out = fopen(buffer,"w");
+  fputs(entry->body,out);
   
-  StreamFree(out);
-  StreamFree(sauthors);
-  StreamFree(sclass);
-  StreamFree(stitles);
+  fclose(out);
+  fclose(sauthors);
+  fclose(sclass);
+  fclose(stitles);
   
   return(ERR_OKAY);
 }
@@ -422,13 +426,13 @@ int (BlogEntryWrite)(BlogEntry entry)
 
 int (BlogEntryFree)(BlogEntry entry)
 {
-  ddt(entry != NULL);
+  assert(entry != NULL);
   
-  MemFree(entry->body);
-  MemFree(entry->author);
-  MemFree(entry->class);
-  MemFree(entry->title);
-  MemFree(entry);
+  free(entry->body);
+  free(entry->author);
+  free(entry->class);
+  free(entry->title);
+  free(entry);
   return(ERR_OKAY);
 }
 
@@ -436,8 +440,8 @@ int (BlogEntryFree)(BlogEntry entry)
 
 static void date_to_dir(char *tname,struct btm *date)
 {
-  ddt(tname != NULL);
-  ddt(date  != NULL);
+  assert(tname != NULL);
+  assert(date  != NULL);
   
   sprintf(tname,"%04d/%02d/%02d",date->year,date->month,date->day);
 }
@@ -446,9 +450,9 @@ static void date_to_dir(char *tname,struct btm *date)
 
 static void date_to_filename(char *tname,struct btm *date,const char *file)
 {
-  ddt(tname != NULL);
-  ddt(date  != NULL);
-  ddt(file  != NULL);
+  assert(tname != NULL);
+  assert(date  != NULL);
+  assert(file  != NULL);
   
   sprintf(tname,"%04d/%02d/%02d/%s",date->year,date->month,date->day,file);
 }
@@ -457,42 +461,40 @@ static void date_to_filename(char *tname,struct btm *date,const char *file)
 
 static void date_to_part(char *tname,struct btm *date,int p)
 {
-  ddt(tname != NULL);
-  ddt(date  != NULL);
-  ddt(p     >  0);
+  assert(tname != NULL);
+  assert(date  != NULL);
+  assert(p     >  0);
   
   sprintf(tname,"%04d/%02d/%02d/%d",date->year,date->month,date->day,p);
 }
 
 /*********************************************************************/
 
-static Stream open_file_r(const char *name,struct btm *date)
+static FILE *open_file_r(const char *name,struct btm *date)
 {
-  Stream in;
-  char   buffer[FILENAME_MAX];
+  FILE *in;
+  char  buffer[FILENAME_MAX];
   
-  ddt(name != NULL);
-  ddt(date != NULL);
+  assert(name != NULL);
+  assert(date != NULL);
   
   date_to_filename(buffer,date,name);
-  in = FileStreamRead(buffer);
-  if (in == NULL)
-    in = StreamNewRead();
+  in = fopen(buffer,"r");
   return(in);
 }
 
 /**********************************************************************/
 
-static Stream open_file_w(const char *name,struct btm *date)
+static FILE *open_file_w(const char *name,struct btm *date)
 {
-  Stream out;
-  char   buffer[FILENAME_MAX];
+  FILE *out;
+  char  buffer[FILENAME_MAX];
   
-  ddt(name != NULL);
-  ddt(date != NULL);
+  assert(name != NULL);
+  assert(date != NULL);
   
   date_to_filename(buffer,date,name);
-  out = FileStreamWrite(buffer,FILE_RECREATE);
+  out = fopen(buffer,"w");
   return(out);
 }
 
@@ -517,7 +519,7 @@ static int date_checkcreate(struct btm *date)
   char        tname[FILENAME_LEN];
   struct stat status;
   
-  ddt(date != NULL);
+  assert(date != NULL);
   
   sprintf(tname,"%04d",date->year);
   rc = stat(tname,&status);
@@ -559,14 +561,15 @@ static int date_checkcreate(struct btm *date)
 
 static int blog_cache_day(Blog blog,struct btm *date)
 {
-  Stream    stitles;
-  Stream    sclass;
-  Stream    sauthors;
-  BlogEntry entry;
-  size_t    i;
+  FILE      *stitles;
+  FILE      *sclass;
+  FILE      *sauthors;
+  BlogEntry  entry;
+  size_t     i;
+  size_t     size;
 
-  ddt(blog != NULL);
-  ddt(date != NULL);
+  assert(blog != NULL);
+  assert(date != NULL);
   
   /*---------------------------------------------
   ; trivial check---if we already have the data
@@ -606,39 +609,39 @@ static int blog_cache_day(Blog blog,struct btm *date)
   sclass    = open_file_r("class",  date);
   sauthors  = open_file_r("authors",date);
   
-  while(!StreamEOF(stitles) || !StreamEOF(sclass) || !StreamEOF(sauthors))
+  while(!feof(stitles) || !feof(sclass) || !feof(sauthors))
   {
     char   pname[FILENAME_LEN];
 
-    entry               = MemAlloc(sizeof(struct blogentry));
+    entry               = malloc(sizeof(struct blogentry));
     entry->node.ln_Succ = NULL;
     entry->node.ln_Pred = NULL;
     entry->when.year    = date->year;
     entry->when.month   = date->month;
     entry->when.day     = date->day;
     
-    if (!StreamEOF(stitles))
-      entry->title = LineSRead(stitles);
+    if (!feof(stitles))
+      getline(&entry->title,&size,stitles);
     else
-      entry->title = dup_string("");
+      entry->title = strdup("");
     
-    if (!StreamEOF(sclass))
-      entry->class = LineSRead(sclass);
+    if (!feof(sclass))
+      getline(&entry->class,&size,sclass);
     else
-      entry->class = dup_string("");
+      entry->class = strdup("");
     
-    if (!StreamEOF(sauthors))
-      entry->author = LineSRead(sauthors);
+    if (!feof(sauthors))
+      getline(&entry->author,&size,sauthors);
     else
-      entry->author = dup_string("");
+      entry->author = strdup("");
       
     date_to_part(pname,date,blog->idx + 1);
     
     {
-      Stream      sinbody;
-      Stream      soutbody;
-      struct stat status;
-      int         rc;
+      FILE        *sinbody;
+      FILE        *soutbody;
+      struct stat  status;
+      int          rc;
       
       rc = stat(pname,&status);
       if (rc == 0)
@@ -646,16 +649,15 @@ static int blog_cache_day(Blog blog,struct btm *date)
       else
         entry->timestamp = gd.tst;
       
-      sinbody = FileStreamRead(pname);
+      sinbody = fopen(pname,"r");
       if (sinbody == NULL)
-        entry->body = dup_string("");
+        entry->body = strdup("");
       else
       {
-        soutbody = StringStreamWrite();
-        StreamCopy(soutbody,sinbody);
-        entry->body = StringFromStream(soutbody);
-        StreamFree(soutbody);
-        StreamFree(sinbody);
+        soutbody = open_memstream(&entry->body,&size);
+        fcopy(soutbody,sinbody);
+        fclose(soutbody);
+        fclose(sinbody);
       }
     }
     
@@ -664,9 +666,9 @@ static int blog_cache_day(Blog blog,struct btm *date)
   }
   
   blog->cache = *date;
-  StreamFree(sauthors);
-  StreamFree(sclass);
-  StreamFree(stitles);
+  fclose(sauthors);
+  fclose(sclass);
+  fclose(stitles);
   return(ERR_OKAY);
 }
 

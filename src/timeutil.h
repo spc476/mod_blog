@@ -23,6 +23,8 @@
 #ifndef BLOG_UTIL
 #define BLOG_UTIL
 
+#include <time.h>
+
 struct btm
 {
   int year;

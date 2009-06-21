@@ -20,15 +20,14 @@
 *
 *************************************************************************/
 
+#define _GNU_SOURCE 1
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <time.h>
 #include <stdarg.h>
 
-#include <cgilib/memory.h>
-#include <cgilib/ddt.h>
-#include <cgilib/stream.h>
-#include <cgilib/cgi.h>
+#include <cgilib6/cgi.h>
 
 #include "conf.h"
 #include "globals.h"
@@ -46,11 +45,9 @@ int main(int argc,char *argv[])
   while(gf_debug)
     ;
 
-  MemInit   ();
-  DdtInit   ();
-  StreamInit();
-
-  if (CgiNew(&cgi,NULL) == ERR_OKAY)
+  cgi = CgiNew(NULL);
+  
+  if (cgi != NULL)
   {
     gd.cgi = cgi;
 
@@ -65,8 +62,6 @@ int main(int argc,char *argv[])
   else
     rc = main_cli(argc,argv);
 
-  StreamFlush(StderrStream);
-  StreamFlush(StdoutStream);
   return(rc);
 }
 
@@ -86,7 +81,7 @@ int BlogDatesInit(void)
   gd.now.part  = gd.updatetime.part  = 1;
   srand(gd.tst);
 
-  while(TRUE)
+  while(true)
   {
     if (btm_cmp_date(&gd.now,&gd.begin) < 0)
       return(ERR_OKAY);	/* XXX - this may not be an error */

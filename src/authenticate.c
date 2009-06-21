@@ -20,17 +20,18 @@
 *
 *************************************************************************/
 
+#define _GNU_SOURCE 1
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
+#include <stdbool.h>
+#include <assert.h>
 
-#include <cgilib/memory.h>
-#include <cgilib/ddt.h>
-#include <cgilib/errors.h>
-#include <cgilib/cgi.h>
-#include <cgilib/util.h>
-#include <cgilib/stream.h>
+#include <cgilib6/errors.h>
+#include <cgilib6/cgi.h>
+#include <cgilib6/util.h>
 
 #include "conf.h"
 #include "globals.h"
@@ -68,43 +69,43 @@ char *get_remote_user(void)
   {
     name = getenv("REDIRECT_REMOTE_USER");
     if (name == NULL)
-      return(dup_string(""));
+      return(strdup(""));
   }
   
-  return(dup_string(name));
+  return(strdup(name));
 }
 
 /************************************************************************/
 
 #if defined(USE_NONE)
 
-  int authenticate_author(Request req)
+  bool authenticate_author(Request req)
   {
-    ddt(req         != NULL);
-    ddt(req->author != NULL);
+    assert(req         != NULL);
+    assert(req->author != NULL);
     
     return(strcmp(req->author,c_author) == 0);
   }
   
-/************************************************************************/
+  /************************************************************************/
     
 #elif defined(USE_GDBM)
 
-  int authenticate_author(Request req)
+  bool authenticate_author(Request req)
   {
     GDBM_FILE list;
     datum     key;
     int       rc;
 
-    ddt(req         != NULL);
-    ddt(req->author != NULL);
+    assert(req         != NULL);
+    assert(req->author != NULL);
     
     if (c_authorfile == NULL)
       return (strcmp(req->author,c_author) == 0);
 
     list = gdbm_open(c_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
     if (list == NULL)
-      return(FALSE);
+      return(false);
 
     key.dptr  = req->author;
     key.dsize = strlen(req->author) + 1;
@@ -113,19 +114,19 @@ char *get_remote_user(void)
     return(rc);
   }
 
-/***********************************************************************/
+  /***********************************************************************/
 
 #elif defined (USE_DB)
 
-  int authenticate_author(Request req)
+  bool authenticate_author(Request req)
   {
     DB  *list;
     DBT  key;
     DBT  data;
     int  rc;
 
-    ddt(req         != NULL);
-    ddt(req->author != NULL);
+    assert(req         != NULL);
+    assert(req->author != NULL);
     
     /*--------------------------------------------------------------
     ; this version will replace the login name with the full name,
@@ -138,13 +139,13 @@ char *get_remote_user(void)
 
     list = dbopen(c_authorfile,O_RDONLY,0644,DB_HASH,NULL);
     if (list == NULL)
-      return(FALSE);
+      return(false);
 
     key.data = req->author;
     key.size = strlen(req->author);
     rc       = (list->get)(list,&key,&data,0);
     (list->close)(list);
-    if (rc) return(FALSE);
+    if (rc) return(false);
     
     {
       char   *tmp;
@@ -152,7 +153,7 @@ char *get_remote_user(void)
       char   *q;
       size_t  i;
 
-      tmp = MemAlloc(data.size + 1);
+      tmp = malloc(data.size + 1);
       memset(tmp,0,data.size + 1);
       memcpy(tmp,data.data,data.size);
  
@@ -169,8 +170,8 @@ char *get_remote_user(void)
         p = strchr(p,':');
         if (p == NULL)
         {
-          MemFree(tmp);
-          return(TRUE);
+          free(tmp);
+          return(true);
         }
         p++;
       }
@@ -194,33 +195,34 @@ char *get_remote_user(void)
       ; infinitely, this is somewhat okay.
       ;------------------------------------------------------*/
  
-      m_author = dup_string(p);
-      MemFree(tmp);
+      m_author = strdup(p);
+      free(tmp);
     }
 
-    return(TRUE);
+    return(true);
   }
 
-/*************************************************************************/
+  /**********************************************************************/
 
 #elif defined (USE_HTPASSWD)
 
-  static size_t breakline(char **dest,size_t dsize,Stream in)
+  static size_t breakline(char **dest,size_t dsize,FILE *in)
   {
     char  **tmp;
     char   *line;
     char   *p;
     char   *colon;
     size_t  cnt;
+    size_t  size;
     
-    line = LineSRead(in);
-    if (empty_string(line))
+    getline(&line,&size,in);
+    if (emptynull_string(line))
     {
-      MemFree(line);
+      free(line);
       return(0);
     }
 
-    tmp = MemAlloc(sizeof(char *) * dsize);
+    tmp = malloc(sizeof(char *) * dsize);
     p   = line;
     cnt = 0;
     
@@ -239,30 +241,30 @@ char *get_remote_user(void)
     dsize = cnt;
     
     for (cnt = 0 ; cnt < dsize ; cnt++)
-      dest[cnt] = dup_string(tmp[cnt]);
+      dest[cnt] = strdup(tmp[cnt]);
  
-    MemFree(tmp);
-    MemFree(line);
+    free(tmp);
+    free(line);
     return(dsize);
   }
   
   /*------------------------------------------------------*/
 
-  int authenticate_author(Request req)
+  bool authenticate_author(Request req)
   {
-    Stream  in;
+    FILE   *in;
     char   *lines[10];
     size_t  cnt;
     
-    ddt(req         != NULL);
-    ddt(req->author != NULL);
+    assert(req         != NULL);
+    assert(req->author != NULL);
     
     if (c_authorfile == NULL)
       return(strcmp(req->author,c_author) == 0);
     
-    in = FileStreamRead(c_authorfile);
+    in = fopen(c_authorfile,"r");
     if (in == NULL)
-      return(FALSE);
+      return(false);
     
     while((cnt = breakline(lines,10,in)))
     {
@@ -276,15 +278,15 @@ char *get_remote_user(void)
         if (cnt >= 3)
         {
           req->name   = req->author;
-          req->author = dup_string(lines[2]);
-          StreamFree(in);
-          return(TRUE);
+          req->author = strdup(lines[2]);
+          fclose(in);
+          return(true);
         }
       }
     }
 
-    StreamFree(in);
-    return(FALSE);
+    fclose(in);
+    return(false);
   }
 
 #endif

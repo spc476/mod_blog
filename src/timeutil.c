@@ -20,12 +20,13 @@
 *
 ***************************/
 
+#define _GNU_SOURCE 1
+
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
-#include <cgilib/ddt.h>
+#include <assert.h>
 
 #include "timeutil.h"
 
@@ -35,9 +36,9 @@ int max_monthday(int year,int month)
 {
   static const int days[] = { 31,0,31,30,31,30,31,31,30,31,30,31 } ;
   
-  ddt(year  >  0);
-  ddt(month >  0);
-  ddt(month < 13);
+  assert(year  >  0);
+  assert(month >  0);
+  assert(month < 13);
 
   if (month == 2)
   {
@@ -61,7 +62,7 @@ int max_monthday(int year,int month)
 
 void btm_add_day(struct btm *d)
 {
-  ddt(d != NULL);
+  assert(d != NULL);
   
   d->day ++;
   if (d->day > max_monthday(d->year,d->month))
@@ -75,7 +76,7 @@ void btm_add_day(struct btm *d)
 
 void btm_sub_part(struct btm *d)
 {
-  ddt(d != NULL);
+  assert(d != NULL);
   
   d->part--;
   if (d->part == 0)
@@ -89,7 +90,7 @@ void btm_sub_part(struct btm *d)
 
 void btm_sub_day(struct btm *d)
 {
-  ddt(d != NULL);
+  assert(d != NULL);
   d->day--;
   if (d->day == 0)
   {
@@ -102,7 +103,7 @@ void btm_sub_day(struct btm *d)
 
 void btm_add_month(struct btm *d)
 {
-  ddt(d != NULL);
+  assert(d != NULL);
   
   d->month++;
   if (d->month == 13)
@@ -116,7 +117,7 @@ void btm_add_month(struct btm *d)
 
 void btm_sub_month(struct btm *d)
 {
-  ddt(d != NULL);
+  assert(d != NULL);
   
   d->month--;
   if (d->month == 0)
@@ -132,8 +133,8 @@ int btm_cmp(const struct btm *d1,const struct btm *d2)
 {
   int rc;
   
-  ddt(d1 != NULL);
-  ddt(d2 != NULL);
+  assert(d1 != NULL);
+  assert(d2 != NULL);
   
   if ((rc = d1->year  - d2->year))  return(rc);
   if ((rc = d1->month - d2->month)) return(rc);
@@ -149,8 +150,8 @@ int btm_cmp_date(const struct btm *d1,const struct btm *d2)
 {
   int rc;
   
-  ddt(d1 != NULL);
-  ddt(d2 != NULL);
+  assert(d1 != NULL);
+  assert(d2 != NULL);
   
   if ((rc = d1->year  - d2->year))  return(rc);
   if ((rc = d1->month - d2->month)) return(rc);

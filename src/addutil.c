@@ -28,16 +28,13 @@
 #include <stdarg.h>
 #include <time.h>
 
-#include <cgilib/memory.h>
-#include <cgilib/ddt.h>
-#include <cgilib/stream.h>
-#include <cgilib/errors.h>
-#include <cgilib/nodelist.h>
-#include <cgilib/htmltok.h>
-#include <cgilib/util.h>
-#include <cgilib/pair.h>
-#include <cgilib/cgi.h>
-#include <cgilib/mail.h>
+#include <cgilib6/errors.h>
+#include <cgilib6/nodelist.h>
+#include <cgilib6/htmltok.h>
+#include <cgilib6/util.h>
+#include <cgilib6/pair.h>
+#include <cgilib6/cgi.h>
+#include <cgilib6/mail.h>
 
 #include "conf.h"
 #include "blog.h"
@@ -115,12 +112,12 @@ void fix_entry(Request req)
   tmp  = NULL;
   size = 0;
   out  = open_memstream(&tmp,&size);
-  in   = fmemopen(req->title,strlen(req->title));
+  in   = fmemopen(req->title,strlen(req->title),"r");
   
   buff_conversion(in,out,QUOTE_SMART);
   fclose(in);
   fclose(out);
-  MemFree(req->title);
+  free(req->title);
   
   req->title = entity_conversion(tmp);
   free(tmp);
@@ -132,7 +129,7 @@ void fix_entry(Request req)
   tmp  = NULL;
   size = 0;
   out  = open_memstream(&tmp,&size);
-  in   = fmemopen(req->body,strlen(req->body));
+  in   = fmemopen(req->body,strlen(req->body),"r");
   
   (*c_conversion)("body",in,out);
   fclose(in);
@@ -143,6 +140,7 @@ void fix_entry(Request req)
 
 /************************************************************************/
 
+#if 0
 static char *headers[] = 
 {
   "",
@@ -200,17 +198,18 @@ void notify_weblogcom(void)
   UrlFree((URL *)&url);
   MemFree(headers[0]);
 }
+#endif
 
 /*************************************************************************/
 
 void notify_emaillist(void)
 {
 #ifdef EMAIL_NOTIFY
-  GDBM_FILE list;
-  datum     key;
-  datum     content;
-  Email     email;
-  Stream    in;
+  GDBM_FILE  list;
+  datum      key;
+  datum      content;
+  Email      email;
+  FILE      *in;
  
   list = gdbm_open((char *)c_emaildb,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
@@ -220,7 +219,7 @@ void notify_emaillist(void)
   email->from    = c_email;
   email->subject = c_emailsubject;
   
-  in = FileStreamRead(c_emailmsg);
+  in = fopen(c_emailmsg,"r");
   if (in == NULL)
   {
     EmailFree(email);
@@ -228,8 +227,8 @@ void notify_emaillist(void)
     return;
   }
   
-  StreamCopy(email->body,in);
-  StreamFree(in);
+  fcopy(email->body,in);
+  fclose(in);
   
   key = gdbm_firstkey(list);
  
@@ -255,7 +254,7 @@ void notify_emaillist(void)
 void dbcritical(char *msg)
 {
   if (msg)
-    ddtlog(ddtstream,"$","critical error [%a]",msg);
+    fprintf(stderr,"critical error: %s\n",msg);
 }
 
 /*************************************************************************/

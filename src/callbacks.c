@@ -20,6 +20,8 @@
 *
 ************************************************/
 
+#define _GNU_SOURCE 1
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -31,13 +33,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <cgilib/memory.h>
-#include <cgilib/ddt.h>
-#include <cgilib/htmltok.h>
-#include <cgilib/stream.h>
-#include <cgilib/util.h>
-#include <cgilib/cgi.h>
-#include <cgilib/chunk.h>
+#include <cgilib6/htmltok.h>
+#include <cgilib6/util.h>
+#include <cgilib6/cgi.h>
+#include <cgilib6/chunk.h>
 
 #include "conf.h"
 #include "blog.h"
@@ -52,72 +51,72 @@
 
 /*****************************************************************/
 
-static void	cb_ad				(Stream,void *);
-static void	cb_ad_content			(Stream,void *);
-static void	cb_atom_categories		(Stream,void *);
-static void	cb_atom_category		(Stream,void *);
-static void	cb_atom_entry			(Stream,void *);
-static void	cb_begin_year			(Stream,void *);
-static void	cb_blog_adtag			(Stream,void *);
-static void	cb_blog_adtag_entity		(Stream,void *);
-static void	cb_blog_name			(Stream,void *);
-static void	cb_blog_script			(Stream,void *);
-static void	cb_blog_url			(Stream,void *);
-static void	cb_comments			(Stream,void *);
-static void	cb_comments_body		(Stream,void *);
-static void	cb_comments_check		(Stream,void *);
-static void	cb_comments_filename		(Stream,void *);
-static void	cb_cond_blog_title		(Stream,void *);
-static void	cb_cond_hr			(Stream,void *);
-static void	cb_date_day			(Stream,void *);
-static void	cb_date_day_normal		(Stream,void *);
-static void	cb_date_day_url			(Stream,void *);
-static void	cb_edit				(Stream,void *);
-static void	cb_edit_author			(Stream,void *);
-static void	cb_edit_body			(Stream,void *);
-static void	cb_edit_class			(Stream,void *);
-static void	cb_edit_date			(Stream,void *);
-static void	cb_edit_email			(Stream,void *);
-static void	cb_edit_filter			(Stream,void *);
-static void	cb_edit_title			(Stream,void *);
-static void	cb_entry			(Stream,void *);
-static void	cb_entry_adtag			(Stream,void *);
-static void	cb_entry_author			(Stream,void *);
-static void	cb_entry_body			(Stream,void *);
-static void	cb_entry_body_entified		(Stream,void *);
-static void	cb_entry_class			(Stream,void *);
-static void	cb_entry_cond_date		(Stream,void *);
-static void	cb_entry_date			(Stream,void *);
-static void	cb_entry_id			(Stream,void *);
-static void	cb_entry_name			(Stream,void *);
-static void	cb_entry_pubdate		(Stream,void *);
-static void	cb_entry_title			(Stream,void *);
-static void	cb_entry_url			(Stream,void *);
-static void	cb_navigation_bar		(Stream,void *);
-static void	cb_navigation_bar_next		(Stream,void *);
-static void	cb_navigation_bar_prev		(Stream,void *);
-static void	cb_navigation_current		(Stream,void *);
-static void	cb_navigation_current_url	(Stream,void *);
-static void	cb_navigation_link		(Stream,void *);
-static void	cb_navigation_next_url		(Stream,void *);
-static void	cb_navigation_prev_url		(Stream,void *);
-static void	cb_now_year			(Stream,void *);
-static void	cb_overview			(Stream,void *);
-static void	cb_overview_date		(Stream,void *);
-static void	cb_overview_list		(Stream,void *);
-static void	cb_robots_index			(Stream,void *);
-static void	cb_rss_item			(Stream,void *);
-static void	cb_rss_item_url			(Stream,void *);
-static void	cb_rss_pubdate			(Stream,void *);
-static void	cb_rss_url			(Stream,void *);
-static void	cb_xyzzy			(Stream,void *);
-static void     cb_navigation_link_next		(Stream,void *);
-static void     cb_navigation_link_prev		(Stream,void *);
-static void     cb_update_time			(Stream,void *);
-static void     cb_update_type			(Stream,void *);
+static void	cb_ad				(FILE *,void *);
+static void	cb_ad_content			(FILE *,void *);
+static void	cb_atom_categories		(FILE *,void *);
+static void	cb_atom_category		(FILE *,void *);
+static void	cb_atom_entry			(FILE *,void *);
+static void	cb_begin_year			(FILE *,void *);
+static void	cb_blog_adtag			(FILE *,void *);
+static void	cb_blog_adtag_entity		(FILE *,void *);
+static void	cb_blog_name			(FILE *,void *);
+static void	cb_blog_script			(FILE *,void *);
+static void	cb_blog_url			(FILE *,void *);
+static void	cb_comments			(FILE *,void *);
+static void	cb_comments_body		(FILE *,void *);
+static void	cb_comments_check		(FILE *,void *);
+static void	cb_comments_filename		(FILE *,void *);
+static void	cb_cond_blog_title		(FILE *,void *);
+static void	cb_cond_hr			(FILE *,void *);
+static void	cb_date_day			(FILE *,void *);
+static void	cb_date_day_normal		(FILE *,void *);
+static void	cb_date_day_url			(FILE *,void *);
+static void	cb_edit				(FILE *,void *);
+static void	cb_edit_author			(FILE *,void *);
+static void	cb_edit_body			(FILE *,void *);
+static void	cb_edit_class			(FILE *,void *);
+static void	cb_edit_date			(FILE *,void *);
+static void	cb_edit_email			(FILE *,void *);
+static void	cb_edit_filter			(FILE *,void *);
+static void	cb_edit_title			(FILE *,void *);
+static void	cb_entry			(FILE *,void *);
+static void	cb_entry_adtag			(FILE *,void *);
+static void	cb_entry_author			(FILE *,void *);
+static void	cb_entry_body			(FILE *,void *);
+static void	cb_entry_body_entified		(FILE *,void *);
+static void	cb_entry_class			(FILE *,void *);
+static void	cb_entry_cond_date		(FILE *,void *);
+static void	cb_entry_date			(FILE *,void *);
+static void	cb_entry_id			(FILE *,void *);
+static void	cb_entry_name			(FILE *,void *);
+static void	cb_entry_pubdate		(FILE *,void *);
+static void	cb_entry_title			(FILE *,void *);
+static void	cb_entry_url			(FILE *,void *);
+static void	cb_navigation_bar		(FILE *,void *);
+static void	cb_navigation_bar_next		(FILE *,void *);
+static void	cb_navigation_bar_prev		(FILE *,void *);
+static void	cb_navigation_current		(FILE *,void *);
+static void	cb_navigation_current_url	(FILE *,void *);
+static void	cb_navigation_link		(FILE *,void *);
+static void	cb_navigation_next_url		(FILE *,void *);
+static void	cb_navigation_prev_url		(FILE *,void *);
+static void	cb_now_year			(FILE *,void *);
+static void	cb_overview			(FILE *,void *);
+static void	cb_overview_date		(FILE *,void *);
+static void	cb_overview_list		(FILE *,void *);
+static void	cb_robots_index			(FILE *,void *);
+static void	cb_rss_item			(FILE *,void *);
+static void	cb_rss_item_url			(FILE *,void *);
+static void	cb_rss_pubdate			(FILE *,void *);
+static void	cb_rss_url			(FILE *,void *);
+static void	cb_xyzzy			(FILE *,void *);
+static void     cb_navigation_link_next		(FILE *,void *);
+static void     cb_navigation_link_prev		(FILE *,void *);
+static void     cb_update_time			(FILE *,void *);
+static void     cb_update_type			(FILE *,void *);
 
-static void	print_nav_url		(Stream,struct btm *,int);
-static void	print_nav_name		(Stream,struct btm *,int,char);
+static void	print_nav_url		(FILE *,struct btm *,int);
+static void	print_nav_name		(FILE *,struct btm *,int,char);
 static void	fixup_uri		(BlogEntry,HtmlToken,const char *);
 
 /************************************************************************/
@@ -192,28 +191,28 @@ size_t m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
 
 /*************************************************************************/
 
-void generic_cb(const char *which,Stream out,void *data)
+void generic_cb(const char *which,FILE* out,void *data)
 {
   Chunk templates;
   
-  ddt(which != NULL);
-  ddt(out   != NULL);
+  assert(which != NULL);
+  assert(out   != NULL);
   
-  ChunkNew(&templates,g_templates,m_callbacks,m_cbnum);
+  templates = ChunkNew(g_templates,m_callbacks,m_cbnum);
   ChunkProcess(templates,which,out,data);
   ChunkFree(templates);
-  StreamFlush(out);
+  fflush(out);
 }
 
 /*********************************************************************/
 
-static void cb_ad(Stream out,void *data)
+static void cb_ad(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  char                  fname[FILENAME_LEN];
+  char                  fname[FILENAME_MAX];
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   sprintf(
   	fname,
@@ -224,108 +223,110 @@ static void cb_ad(Stream out,void *data)
   	cbd->entry->when.part
   );
   
-  cbd->ad = FileStreamRead(fname);
+  cbd->ad = fopen(fname,"r");
   if (cbd->ad == NULL) return;
   generic_cb("ad",out,data);
-  StreamFree(cbd->ad);
+  fclose(cbd->ad);
   cbd->ad = NULL;
 }
 
 /**********************************************************************/
 
-static void cb_ad_content(Stream out,void *data)
+static void cb_ad_content(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
-  ddt(out     != NULL);
-  ddt(data    != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   /*------------------------------------------
   ; we might also do a generic_cb() here, but
-  ; I would need one that takes a Stream
+  ; I would need one that takes a FILE *
   ; object ... just an idea ... 
   ;-------------------------------------------*/
   
-  StreamCopy(out,cbd->ad);
+  fcopy(out,cbd->ad);
 }  
   
 /*********************************************************************/  
 
-static void cb_blog_script(Stream out,void *data)
+static void cb_blog_script(FILE *out,void *data)
 {
   char *script;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  script = spc_getenv("SCRIPT_NAME");
-  LineS(out,script);
-  MemFree(script);
+  script = getenv("SCRIPT_NAME");
+  if (script)
+    fputs(script,out);
 }
 
 /**********************************************************************/
 
-static void cb_blog_url(Stream out,void *data)
+static void cb_blog_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   print_nav_url(out,&cbd->entry->when,DAY);
 }
 
 /*************************************************************************/
 
-static void cb_blog_name(Stream out,void *data)
+static void cb_blog_name(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  LineS(out,c_name);
+  fputs(c_name,out);
 }
 
 /*********************************************************************/
 
-static void cb_blog_adtag(Stream out,void *data)
+static void cb_blog_adtag(FILE *out,void *data)
 {
   char *tag;
 
-  ddt(out  != NULL);
+  assert(out != NULL);
 
   tag = UrlEncodeString(gd.adtag);
-  LineS(out,tag);
-  MemFree(tag);
+  fputs(tag,out);
+  free(tag);
 }
 
 /*********************************************************************/
 
-static void cb_blog_adtag_entity(Stream out,void *data)
+static void cb_blog_adtag_entity(FILE *out,void *data)
 {
+#if 0
   Stream entityout;
 
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   entityout = EntityStreamWrite(out);
   if (entityout == NULL) return;
   LineS(entityout,gd.adtag);
   StreamFree(entityout);
+#endif
 }
 
 /********************************************************************/
 
-static void cb_entry(Stream out,void *data)
+static void cb_entry(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
+  assert(out  != NULL);
 
   if (data == NULL)
   {
     if (gd.htmldump)
-      StreamCopy(out,gd.htmldump);
+      fcopy(out,gd.htmldump);
     return;
   }
 
@@ -353,13 +354,13 @@ static void cb_entry(Stream out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_url(Stream out,void *data)
+static void cb_entry_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
   entry = cbd->entry;
   print_nav_url(out,&entry->when,PART);
@@ -367,13 +368,13 @@ static void cb_entry_url(Stream out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_id(Stream out,void *data)
+static void cb_entry_id(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
   entry = cbd->entry;
   print_nav_name(out,&entry->when,DAY,'-');
@@ -381,28 +382,28 @@ static void cb_entry_id(Stream out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_date(Stream out,void *data)
+static void cb_entry_date(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
   print_nav_url(out,&cbd->entry->when,DAY);  
 }
 
 /*********************************************************************/
 
-static void cb_entry_pubdate(Stream out,void *data)
+static void cb_entry_pubdate(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry  entry;
-  time_t     ts;
-  struct tm *ptm;
-  char       buffer[BUFSIZ];
+  BlogEntry             entry;
+  time_t                ts;
+  struct tm            *ptm;
+  char                  buffer[BUFSIZ];
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   entry = cbd->entry;
   ts    = entry->timestamp;
@@ -420,54 +421,54 @@ static void cb_entry_pubdate(Stream out,void *data)
   	c_tzhour,
   	c_tzmin
   );
-
-  LineS(out,buffer);
+  
+  fputs(buffer,out);
 }
 
 /********************************************************************/
 
-static void cb_entry_title(Stream out,void *data)
+static void cb_entry_title(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
     
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
-  LineS(out,cbd->entry->title);  
+  fputs(cbd->entry->title,out);
 }
 
 /***********************************************************************/
 
-static void cb_entry_class(Stream out,void *data)
+static void cb_entry_class(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
-  LineS(out,cbd->entry->class);  
+  fputs(cbd->entry->class,out);  
 }
 
 /***********************************************************************/
 
-static void cb_entry_adtag(Stream out,void *data)
+static void cb_entry_adtag(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  LineS(out,"Soon young Skywalker.  Soon.");
+  fputs("Soon young Skywalker.  Soon.",out);
 }
 
 /**********************************************************************/
 
-static void cb_entry_author(Stream out,void *data)
+static void cb_entry_author(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
-  LineS(out,cbd->entry->author);  
+  fputs(cbd->entry->author,out);
 }
 
 /*************************************************************************/
@@ -477,8 +478,8 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
   struct pair *src;
   struct pair *np;
   
-  ddt(token  != NULL);
-  ddt(attrib != NULL);
+  assert(token  != NULL);
+  assert(attrib != NULL);
   
   src = HtmlParseGetPair(token,attrib);
   if (
@@ -586,25 +587,25 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
 
 /***************************************************************/
 
-static void cb_entry_body(Stream out,void *data)
+static void cb_entry_body(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
-  Stream                in;
+  FILE                 *in;
   HtmlToken             token;
   int                   rc;
   int                   t;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
   entry = cbd->entry;
-  in    = MemoryStreamRead(entry->body,strlen(entry->body));
-  rc    = HtmlParseNew(&token,in);
+  in    = fmemopen(entry->body,strlen(entry->body),"r");
+  token = HtmlParseNew(in);
   
   if (rc != ERR_OKAY)
   {
-    StreamFree(in);
+    fclose(in);
     return;
   }
   
@@ -671,36 +672,38 @@ static void cb_entry_body(Stream out,void *data)
       HtmlParsePrintTag(token,out);
     }
     else if (t == T_STRING)
-      LineS(out,HtmlParseValue(token));
+      fputs(HtmlParseValue(token),out);
     else if (t == T_COMMENT)
-      LineSFormat(out,"$","<!%a>",HtmlParseValue(token));
+      fprintf(out,"<!%s>",HtmlParseValue(token));
   }
   
-  HtmlParseFree(&token);
-  StreamFree(in);  
+  HtmlParseFree(token);
+  fclose(in);
 }
 
 /**********************************************************************/
 
-static void cb_entry_body_entified(Stream out,void *data)
+static void cb_entry_body_entified(FILE *out,void *data)
 {
+#if 0
   Stream eout;
   
   eout = EntityStreamWrite(out);
   if (eout == NULL) return;
   cb_entry_body(eout,data);
   StreamFree(eout);  
+#endif
 }
 
 /*********************************************************************/
 
-static void cb_cond_hr(Stream out,void *data)
+static void cb_cond_hr(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   if (gd.f.navigation && (gd.navunit == PART))
     return;
@@ -709,64 +712,61 @@ static void cb_cond_hr(Stream out,void *data)
   if (btm_cmp_date(&entry->when,&cbd->last) == 0)
   {
     if (entry->when.part != cbd->last.part)
-      LineS(out,"<hr class=\"next\">");
+      fputs("<hr class=\"next\">",out);
   }
 }
 
 /*********************************************************************/
 
-static void cb_cond_blog_title(Stream out,void *data)
+static void cb_cond_blog_title(FILE *out,void *data)
 {
   List *plist = data;
   BlogEntry     entry;
   
-  ddt(out  != NULL);
+  assert(out != NULL);
   
   if (gd.navunit == PART)
   {
     entry = (BlogEntry)ListGetHead(plist);
-    LineSFormat(
-    	out,
-    	"$",
-    	"%a - ",
-    	entry->title
-    );
+    fprintf(out,"%s - ",entry->title);
   }
 }
 
 /*********************************************************************/
 
-static void cb_rss_pubdate(Stream out,void *data)
+static void cb_rss_pubdate(FILE *out,void *data)
 {
   struct tm *ptm;
   char       buffer[BUFSIZ];
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   ptm = gmtime(&gd.tst);
   strftime(buffer,BUFSIZ,"%a, %d %b %Y %H:%M:%S GMT",ptm);
-  LineS(out,buffer);
+  fputs(buffer,out);
 }
 
 /********************************************************************/
 
-static void cb_rss_url(Stream out,void *data)
+static void cb_rss_url(FILE *out,void *data)
 {
-  ddt(out  != NULL);
+  assert(out != NULL);
   
-  LineSFormat(out,"$","%a/",c_fullbaseurl);
+  fprintf(out,"%s/",c_fullbaseurl);
 }
 
 /*******************************************************************/
 
-static void cb_rss_item(Stream out,void *data)
+static void cb_rss_item(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  /* XXX really?  This works?! */
   
   for
   (
@@ -786,26 +786,28 @@ static void cb_rss_item(Stream out,void *data)
 
 /******************************************************************/
 
-static void cb_rss_item_url(Stream out,void *data)
+static void cb_rss_item_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  LineSFormat(out,"$","%a",c_fullbaseurl);
+  fprintf(out,"%s",c_fullbaseurl);
   print_nav_url(out,&cbd->entry->when,PART);
 }
 
 /********************************************************************/
 
-static void cb_atom_entry(Stream out,void *data)
+static void cb_atom_entry(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  /* XXX really? What's going on here? */
   
   for
   (
@@ -825,7 +827,7 @@ static void cb_atom_entry(Stream out,void *data)
 
 /************************************************************************/
 
-static void cb_atom_categories(Stream out,void *data)
+static void cb_atom_categories(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   String  *cats;
@@ -833,8 +835,8 @@ static void cb_atom_categories(Stream out,void *data)
   size_t   i;
   size_t   num;
 
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   cats = tag_split(&num,cbd->entry->class);
 
@@ -842,96 +844,98 @@ static void cb_atom_categories(Stream out,void *data)
   {
     tag = fromstring(cats[i]);
     generic_cb("categories",out,tag);
-    MemFree(tag);
+    free(tag);
   }
 
-  MemFree(cats);
+  free(cats);
 }
 
 /************************************************************************/
 
-static void cb_atom_category(Stream out,void *data)
+static void cb_atom_category(FILE *out,void *data)
 {
+#if 0
   Stream eout;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   eout = EntityStreamWrite(out);
   if (eout == NULL) return;
   LineS(eout,data);
   StreamFree(eout);
+#endif
 }
 
 /****************************************************************/
 
-static void cb_navigation_link(Stream out,void *data)
+static void cb_navigation_link(FILE *out,void *data)
 {
-  ddt(out  != NULL);
+  assert(out != NULL);
   
-  if (gd.f.navigation == FALSE) return;
+  if (gd.f.navigation == false) return;
   generic_cb("navigation.link",out,data);
 }
 
 /********************************************************************/
 
-static void cb_navigation_link_next(Stream out,void *data)
+static void cb_navigation_link_next(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  if (gd.f.navnext == FALSE) return;
+  if (gd.f.navnext == false) return;
   generic_cb("navigation.link.next",out,data);
 }
 
 /*******************************************************************/
 
-static void cb_navigation_link_prev(Stream out,void *data)
+static void cb_navigation_link_prev(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  if (gd.f.navprev == FALSE) return;
+  if (gd.f.navprev == false) return;
   generic_cb("navigation.link.prev",out,data);
 }
 
 /*******************************************************************/
 
-static void cb_navigation_bar(Stream out,void *data)
+static void cb_navigation_bar(FILE *out,void *data)
 {
-  ddt(out  != NULL);
+  assert(out != NULL);
   
-  if (gd.f.navigation == FALSE) return;
+  if (gd.f.navigation == false) return;
   generic_cb("navigation.bar",out,data);
 }
 
 /*******************************************************************/
 
-static void cb_navigation_bar_next(Stream out,void *data)
+static void cb_navigation_bar_next(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  if (gd.f.navnext == FALSE) return;
+  if (gd.f.navnext == false) return;
   generic_cb("navigation.bar.next",out,data);
 }
 
 /*******************************************************************/
 
-static void cb_navigation_bar_prev(Stream out,void *data)
+static void cb_navigation_bar_prev(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  if (gd.f.navprev == FALSE) return;
+  if (gd.f.navprev == false) return;
   generic_cb("navigation.bar.prev",out,data);
 }
 
 /*******************************************************************/
 
-static void cb_navigation_current(Stream out,void *data)
+static void cb_navigation_current(FILE *out,void *data)
 {
-  ddt(out  != NULL);
+  assert(out != NULL);
   
   if (gd.navunit != INDEX) return;
   generic_cb("navigation.current",out,data);
@@ -939,12 +943,12 @@ static void cb_navigation_current(Stream out,void *data)
 
 /********************************************************************/
 
-static void cb_navigation_next_url(Stream out,void *data)
+static void cb_navigation_next_url(FILE *out,void *data)
 {
   struct btm tmp;
 
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
   tmp = gd.next;
   print_nav_url(out,&tmp,gd.navunit);
@@ -952,12 +956,12 @@ static void cb_navigation_next_url(Stream out,void *data)
 
 /*******************************************************************/
 
-static void cb_navigation_prev_url(Stream out,void *data)
+static void cb_navigation_prev_url(FILE *out,void *data)
 {
   struct btm tmp;
 
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   tmp = gd.previous;
   print_nav_url(out,&tmp,gd.navunit);
@@ -965,11 +969,11 @@ static void cb_navigation_prev_url(Stream out,void *data)
 
 /********************************************************************/
 
-static void cb_navigation_current_url(Stream out,void *data)
+static void cb_navigation_current_url(FILE *out,void *data)
 {
   struct btm tmp;
 
-  ddt(out  != NULL);
+  assert(out != NULL);
   
   tmp = gd.now;
   print_nav_url(out,&tmp,MONTH);
@@ -977,69 +981,68 @@ static void cb_navigation_current_url(Stream out,void *data)
 
 /*********************************************************************/
 
-static void print_nav_url(Stream out,struct btm *date,int unit)
+static void print_nav_url(FILE *out,struct btm *date,int unit)
 {
-  ddt(out  != NULL);
-  ddt(date != NULL);
+  assert(out  != NULL);
+  assert(date != NULL);
   
-  LineSFormat(out,"$","%a/",c_baseurl);
+  fprintf(out,"%s/",c_baseurl);
   print_nav_name(out,date,unit,'/');
 }
 
 /*******************************************************************/
 
-static void print_nav_name(Stream out,struct btm *date,int unit,char sep)
+static void print_nav_name(FILE *out,struct btm *date,int unit,char sep)
 {
-  ddt(out  != NULL);
-  ddt(date != NULL);
+  assert(out  != NULL);
+  assert(date != NULL);
 
   switch(unit)
   {
-    case YEAR: 
-         LineSFormat(out,"i4","%a",date->year);
+    case YEAR:
+         fprintf(out,"%04d",date->year);
          break;
     case MONTH:
-         LineSFormat(out,"c i4 i2r0","%b%a%c",sep,date->year,date->month);
+         fprintf(out,"%04d%c%02d",date->year,sep,date->month);
          break;
-    case DAY:  
-         LineSFormat(out,"c i4 i2r0 i2r0","%b%a%c%a%d",sep,date->year,date->month,date->day);
+    case DAY:
+         fprintf(out,"%04d%c%02d%c%02d",date->year,sep,date->month,sep,date->day);
          break;
     case PART:
-         LineSFormat(out,"c i4 i2r0 i2r0 i","%b%a%c%a%d.%e",sep,date->year,date->month,date->day,date->part);
+         fprintf(out,"%04d%c%02d%c%02d.%d",date->year,sep,date->month,sep,date->day,date->part);
          break;
     default:
-         ddt(0);
+         assert(0);
+         break;
   }
 }
 
 /********************************************************************/
  
-static void cb_begin_year(Stream out,void *data)
+static void cb_begin_year(FILE *out,void *data)
 {
-  ddt(out  != NULL);
+  assert(out != NULL);
   
-  LineSFormat(out,"i4","%a",gd.begin.year);
+  fprintf(out,"%04d",gd.begin.year);
 }
 
 /*******************************************************************/
 
-static void cb_now_year(Stream out,void *data)
+static void cb_now_year(FILE *out,void *data)
 {
-  ddt(out  != NULL);
+  assert(out != NULL);
  
-  LineSFormat(out,"i4","%a",gd.now.year); 
+  fprintf(out,"%04d",gd.now.year);
 }
 
 /*******************************************************************/
 
-static void cb_update_time(Stream out,void *data)
+static void cb_update_time(FILE *out,void *data)
 {
   char buffer[BUFSIZ];
   
-  ddt(out  != NULL);
+  assert(out != NULL);
   
-#ifndef FIXED_BROKEN_RAWFMT 
-
   sprintf(
   	buffer,
   	"%04d-%02d-%02dT%02d:%02d:%02d%+03d:%02d",
@@ -1052,62 +1055,38 @@ static void cb_update_time(Stream out,void *data)
 	c_tzhour,
 	c_tzmin
   );
-
-  LineS(out,buffer);
-
-#else
   
-  /*--------------------------------------------------
-  ; until I can fix RawFmt(), the original format
-  ; string used was:
-  ;
-  ;	"i4 i2.2l0 i2.2l0 i2.2l0 i2.2l0 i i2.2l0",
-  ;--------------------------------------------------*/
-	
-  LineSFormat(
-  	out,
-  	"i4 i2.2l0 i2.2l0 i2.2l0 i2.2l0 i i2.2l0",
-  	"%a-%b-%cT%d:%e%f:%g",
-        gd.updatetime.tm_year + 1900,
-        gd.updatetime.tm_mon  + 1,
-        gd.updatetime.tm_mday,
-        gd.updatetime.tm_hour,
-        gd.updatetime.tm_min,
-        c_tzhour,
-        c_tzmin
-  );
-#endif
-
+  fputs(buffer,out);
 }
 
 /*******************************************************************/
 
-static void cb_update_type(Stream out,void *data)
+static void cb_update_type(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  LineS(out,c_updatetype);
+  fputs(c_updatetype,out);
 }
 
 /*******************************************************************/
 
-static void cb_robots_index(Stream out,void *data)
+static void cb_robots_index(FILE *out,void *data)
 {
-  ddt(out  != NULL);
+  assert(out  != NULL);
   
   if ((gd.navunit == PART) || (gd.navunit == INDEX))
-    LineS(out,"index");
+    fputs("index",out);
   else
-    LineS(out,"noindex");
+    fputs("noindex",out);
 }
 
 /********************************************************************/
 
-static void cb_comments(Stream out,void *data)
+static void cb_comments(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   if (gd.navunit != PART)
     return;
@@ -1117,14 +1096,14 @@ static void cb_comments(Stream out,void *data)
 
 /*******************************************************************/
 
-static void cb_comments_body(Stream out,void *data)
+static void cb_comments_body(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  Stream   in;
-  char     fname[FILENAME_LEN];
+  FILE                 *in;
+  char                  fname[FILENAME_MAX];
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   sprintf(
   	fname,
@@ -1135,25 +1114,24 @@ static void cb_comments_body(Stream out,void *data)
   	cbd->entry->when.part
   );
   
-  in = FileStreamRead(fname);
+  in = fopen(fname,"r");
   if (in == NULL) return;
-  StreamCopy(out,in);
-  StreamFree(in);
+  fcopy(out,in);
+  fclose(in);
 }
 
 /*******************************************************************/
 
-static void cb_comments_filename(Stream out,void *data)
+static void cb_comments_filename(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
-  LineSFormat(
+  fprintf(
   	out,
-  	"i4 i2r0 i2r0 i",
-  	"%a/%b/%c/%d.comments",
+  	"%04d/%02d/%02d/%d.comments",
   	cbd->entry->when.year,
   	cbd->entry->when.month,
   	cbd->entry->when.day,
@@ -1163,15 +1141,13 @@ static void cb_comments_filename(Stream out,void *data)
 
 /*******************************************************************/
 
-static void cb_comments_check(Stream out,void *data)
+static void cb_comments_check(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct stat status;
   char        fname[BUFSIZ];
-  int         rc;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
   sprintf(
   	fname,
@@ -1182,18 +1158,17 @@ static void cb_comments_check(Stream out,void *data)
   	cbd->entry->when.part
   );
     
-  rc = stat(fname,&status);
-  if (rc == -1)
-    LineS(out,"No ");
+  if (access(fname,R_OK) < 0)
+    fputs("No ",out);
 
-  LineS(out,"Comments");
+  fputs("Comments",out);
 }
 
 /********************************************************************/
 
-static void cb_edit(Stream out,void *data)
+static void cb_edit(FILE *out,void *data)
 {
-  ddt(out  != NULL);
+  assert(out  != NULL);
   
   if (gd.f.edit == 0) return;
   generic_cb("edit",out,data);
@@ -1201,111 +1176,111 @@ static void cb_edit(Stream out,void *data)
 
 /*********************************************************************/
 
-static void cb_edit_author(Stream out,void *data)
+static void cb_edit_author(FILE *out,void *data)
 {
   char *name;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
   if (gd.req->origauthor != NULL)
-    LineS(out,gd.req->origauthor);
+    fputs(gd.req->origauthor,out);
   else
   {
     name = get_remote_user();
-    LineS(out,name);
-    MemFree(name);
+    fputs(name,out);
+    free(name);
   }
 }
 
 /********************************************************************/
 
-static void cb_edit_title(Stream out,void *data)
+static void cb_edit_title(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   if (gd.req->title != NULL)
-    LineS(out,gd.req->title);
+    fputs(gd.req->title,out);
 }
 
 /********************************************************************/
 
-static void cb_edit_date(Stream out,void *data)
+static void cb_edit_date(FILE *out,void *data)
 {
   time_t     now;
   struct tm *ptm;
   char       buffer[BUFSIZ];
 
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
   if (gd.req->date != NULL)
-    LineS(out,gd.req->date);
+    fputs(gd.req->date,out);
   else
   {
     now = time(NULL);
     ptm = localtime(&now);
     strftime(buffer,BUFSIZ,"%Y/%m/%d",ptm);
-    LineS(out,buffer);
+    fputs(buffer,out);
   }
 }
 
 /********************************************************************/
 
-static void cb_edit_class(Stream out,void *data)
+static void cb_edit_class(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   if (gd.req->class)
-    LineS(out,gd.req->class);
+    fputs(gd.req->class,out);
 }
 
 /********************************************************************/
 
-static void cb_edit_email(Stream out,void *data)
+static void cb_edit_email(FILE *out,void *data)
 {
   /* XXX */
 }
 
 /*******************************************************************/
 
-static void cb_edit_filter(Stream out,void *data)
+static void cb_edit_filter(FILE *out,void *data)
 {
   /* XXX */
 }
 
 /*******************************************************************/
 
-static void cb_edit_body(Stream out,void *data)
+static void cb_edit_body(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   if (gd.req->origbody)
-    LineS(out,gd.req->origbody);
+    fputs(gd.req->origbody,out);
 }
 
 /********************************************************************/
 
-static void cb_xyzzy(Stream out,void *data)
+static void cb_xyzzy(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  LineS(out,"Nothing happens.");
+  fputs("Nothing happens.",out);
 }
 
 /********************************************************************/
 
-static void cb_date_day(Stream out,void *data)
+static void cb_date_day(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   entry = cbd->entry;
   print_nav_name(out,&entry->when,DAY,'-');
@@ -1313,13 +1288,13 @@ static void cb_date_day(Stream out,void *data)
 
 /*************************************************************************/
 
-static void cb_date_day_url(Stream out,void *data)
+static void cb_date_day_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   entry = cbd->entry;
   print_nav_url(out,&entry->when,DAY);
@@ -1327,15 +1302,15 @@ static void cb_date_day_url(Stream out,void *data)
 
 /********************************************************************/
 
-static void cb_date_day_normal(Stream out,void *data)
+static void cb_date_day_normal(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   struct tm             day;
   char                  buffer[BUFSIZ];
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   tm_init(&day);
   entry       = cbd->entry;
@@ -1346,18 +1321,18 @@ static void cb_date_day_normal(Stream out,void *data)
   mktime(&day);
   
   strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&day);
-  LineS(out,buffer);
+  fputs(buffer,out);
 }
 
 /**********************************************************************/
 
-static void cb_entry_cond_date(Stream out,void *data)
+static void cb_entry_cond_date(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
   entry = cbd->entry;  
   
@@ -1367,13 +1342,13 @@ static void cb_entry_cond_date(Stream out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_name(Stream out,void *data)
+static void cb_entry_name(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   entry = cbd->entry;
   print_nav_name(out,&entry->when,PART,'-');
@@ -1381,30 +1356,30 @@ static void cb_entry_name(Stream out,void *data)
 
 /***********************************************************************/
 
-static void cb_overview(Stream out,void *data)
+static void cb_overview(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 }
 
 /***********************************************************************/
 
-static void cb_overview_date(Stream out,void *data)
+static void cb_overview_date(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  LineS(out,"DATE");
+  fputs("DATE",out);
 }
 
 /***********************************************************************/
 
-static void cb_overview_list(Stream out,void *data)
+static void cb_overview_list(FILE *out,void *data)
 {
-  ddt(out  != NULL);
-  ddt(data != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  LineS(out,"<li>OVERVIEW</li>");
+  fputs("<li>OVERVIEW</li>",out);
 }
 
 /**********************************************************************/

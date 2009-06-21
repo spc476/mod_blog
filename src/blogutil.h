@@ -23,8 +23,6 @@
 #ifndef BLOGUTIL
 #define BLOGUTIL
 
-#include <cgilib/stream.h>
-
 /*********************************************************************/
 
 typedef struct mystring

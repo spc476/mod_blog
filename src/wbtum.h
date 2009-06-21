@@ -23,7 +23,8 @@
 #ifndef WBTUM_H
 #define WBTUM_H
 
-#include <cgilib/nodelist.h>
+#include <stdint.h>
+#include <cgilib6/nodelist.h>
 
 /**********************************************************************/
 
@@ -51,7 +52,7 @@ typedef struct tt
 
 typedef struct tumbler
 {
-  Size   pairs;
+  size_t pairs;
   TFlags flags;
   List   units;
 } *Tumbler;
@@ -59,7 +60,7 @@ typedef struct tumbler
 typedef struct tumunit
 {
   Node         node;
-  Size         size;
+  size_t       size;
   enum ttypes  type;
   int          entry[4];
   char        *file;  
