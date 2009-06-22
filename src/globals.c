@@ -249,6 +249,10 @@ int GlobalsInit(char *fspec)
     {
       c_lockfile = strdup(ppair->value);
     }
+    else if (strcmp(ppair->name,"EMAIL-UPDATE") == 0)
+    {
+      set_gf_emailupdate(ppair->value);
+    }
     else if (strcmp(ppair->name,"EMAIL") == 0)
     {
       c_email = strdup(ppair->value);
