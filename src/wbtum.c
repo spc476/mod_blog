@@ -108,7 +108,6 @@ int (TumblerNew)(Tumbler *pt,char **pstr)
     return(ERR_ERR);
   }
 
-#ifdef FEATURE_REDIRECT
   /*------------------------------------------
   ; I need to rethink how this is done, but for
   ; now, we don't redirect on tumbler ranges
@@ -117,7 +116,6 @@ int (TumblerNew)(Tumbler *pt,char **pstr)
   tu = (TumblerUnit)ListGetHead(&t->units);
   if (tu->type == TUMBLER_RANGE)
     t->flags.redirect = false;
-#endif
  
   *pt = t;
   return(ERR_OKAY);  
@@ -281,9 +279,7 @@ static struct fpreturn state_a(Tumbler t,TumblerUnit *ptu,char **pstr)
   
     if ((*s == '.') || (*s == ':'))
     {
-#ifdef FEATURE_REDIRECT
       t->flags.redirect = true;
-#endif
       *pstr      = ++s;
       *ptu       = tu;
       next.state = state_b;
@@ -335,7 +331,6 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
       return(next);
     }
 
-#ifdef FEATURE_REDIRECT
     /*-------------------------------------------
     ; Canonical URLs contain a two-digit
     ; month.  If not, mark it as a non-canonical
@@ -343,7 +338,6 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
         
     if (p != (s + 2))
       t->flags.redirect = true;
-#endif
 
     s = p;
   }
@@ -368,9 +362,7 @@ static State state_b(Tumbler t,TumblerUnit *ptu,char **pstr)
   
   if ((*s == '.') || (*s == ':'))
   {
-#ifdef FEATURE_REDIRECT
     t->flags.redirect = true;
-#endif
     *pstr      = ++s;
     *ptu       = tu;
     next.state = state_c;
@@ -440,7 +432,6 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
       return(next);
     }
 
-#ifdef FEATURE_REDIRECT
     /*----------------------------------------------
     ; Canonical URLs contain a two-digit day.  If not,
     ; mark as such.
@@ -448,7 +439,6 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
     
     if (p != (s + 2))
       t->flags.redirect = true;
-#endif
 
     s = p;
   }
@@ -473,9 +463,7 @@ static State state_c(Tumbler t,TumblerUnit *ptu,char **pstr)
   
   if (*s == ':')
   {
-#ifdef FEATURE_REDIRECT
     t->flags.redirect = true;
-#endif
     *pstr      = ++s;
     *ptu       = tu;
     next.state = state_e;
@@ -579,7 +567,6 @@ static State state_e(Tumbler t,TumblerUnit *ptu,char **pstr)
 
   if (isdigit(*s))
   {
-#ifdef FEATURE_REDIRECT
     /*------------------------------------------------
     ; Canonical URLs do not have leading zeros in the
     ; part section of the tumbler.  If so, mark it as
@@ -588,7 +575,6 @@ static State state_e(Tumbler t,TumblerUnit *ptu,char **pstr)
     
     if (*s == '0')
       t->flags.redirect = true;
-#endif
 
     tu->entry[PART] = strtoul(s,&p,10);
     tu->size++;

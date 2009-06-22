@@ -167,7 +167,6 @@ static int cmd_cgi_get_show(Request req)
     if (rc == ERR_OKAY)
     {
 
-#ifdef FEATURE_REDIRECT
       if (req->tumbler->flags.redirect)
       {
         char *tum = TumblerCanonical(req->tumbler);
@@ -189,7 +188,6 @@ static int cmd_cgi_get_show(Request req)
 	free(status);
 	return(ERR_OKAY);
       }
-#endif
 
       if (req->tumbler->flags.file == false)
         fprintf(
