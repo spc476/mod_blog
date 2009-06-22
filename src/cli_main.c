@@ -70,9 +70,6 @@ static int	cmd_cli_show		(Request);
 static void	get_cli_command		(Request,char *);
 static int	mail_setup_data		(Request);
 static int	mailfile_readdata	(Request);
-#if 0
-static void	collect_body		(FILE *,FILE *);
-#endif
 static int	cli_error		(Request,int,char *, ... );
 
 /*************************************************************************/
@@ -366,7 +363,6 @@ static int mailfile_readdata(Request req)
   
   output = open_memstream(&req->origbody,&size);
   fcopy(output,req->in);
-  /*collect_body(output,req->in);*/
   fclose(output);
 
   req->body     = strdup(req->origbody);
@@ -374,39 +370,6 @@ static int mailfile_readdata(Request req)
 }
 
 /***************************************************************************/
-
-#if 0
-static void collect_body(FILE *output,FILE *input)
-{
-  HtmlToken token;
-  int       t;
-  
-  assert(output != NULL);
-  assert(input  != NULL);
-  
-  token = HtmlParseNew(input);
-  if (token == NULL)
-    return;
-  
-  while((t = HtmlParseNext(token)) != T_EOF)
-  {
-    if (t == T_TAG)
-    {
-      if (strcmp(HtmlParseValue(token),"/HTML") == 0) break;
-      if (strcmp(HtmlParseValue(token),"/BODY") == 0) break;
-      HtmlParsePrintTag(token,output);
-    }
-    else if (t == T_STRING)
-      fputs(HtmlParseValue(token),output);
-    else if (t == T_COMMENT)
-      fprintf(stderr,"<!%s>",HtmlParseValue(token));
-  }
-
-  HtmlParseFree(token);
-}
-#endif
-
-/***********************************************************************/
 
 static int cli_error(Request req,int level,char *msg, ... )
 {
