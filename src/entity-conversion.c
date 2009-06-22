@@ -43,11 +43,7 @@ struct entity_conv
 static bool		char_entity	(char **,size_t *,int);
 
 static __ssize_t	fer_read	(void *,char *,size_t);
-static __ssize_t	few_read	(void *,char *,size_t);
-static __ssize_t	fer_write	(void *,const char *,size_t);
 static __ssize_t	few_write	(void *,const char *,size_t);
-static int		fnop_seek	(void *,_IO_off64_t *,int);
-static int		fnop_close	(void *);
 
 /********************************************************************/
 
@@ -426,9 +422,9 @@ FILE *fentity_encode_onread(FILE *in)
   return fopencookie(in,"r",(_IO_cookie_io_functions_t)
   				{
   				  fer_read,
-  				  fer_write,
-  				  fnop_seek,
-  				  fnop_close
+  				  NULL,
+  				  NULL,
+  				  NULL
   				});
 }
 
@@ -438,10 +434,10 @@ FILE *fentity_encode_onwrite(FILE *out)
 {
   return fopencookie(out,"w",(_IO_cookie_io_functions_t)
   				{
-  				  few_read,
+  				  NULL,
   				  few_write,
-  				  fnop_seek,
-  				  fnop_close
+  				  NULL,
+  				  NULL
   				});
 }
 
@@ -489,22 +485,6 @@ static __ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
 
 /*******************************************************************/
 
-static __ssize_t few_read(void *cookie,char *buffer,size_t bytes)
-{
-  assert(0);
-  return 0;
-}
-
-/******************************************************************/
-
-static __ssize_t fer_write(void *cookie,const char *buffer,size_t bytes)
-{
-  assert(0);
-  return 0;
-}
-
-/****************************************************************/
-
 static __ssize_t few_write(void *cookie,const char *buffer,size_t bytes)
 {
   FILE   *realout = cookie;
@@ -524,22 +504,6 @@ static __ssize_t few_write(void *cookie,const char *buffer,size_t bytes)
   }
   
   return size;
-}
-
-/*******************************************************************/
-
-static int fnop_seek(void *cookie,_IO_off64_t *pos,int whence)
-{
-  assert(0);
-  errno = ENXIO;
-  return -1;
-}
-
-/******************************************************************/
-
-static int fnop_close(void *cookie)
-{
-  return 0;
 }
 
 /*******************************************************************/
