@@ -631,7 +631,10 @@ static int blog_cache_day(Blog blog,struct btm *date)
     if (!feof(stitles))
     {
       if (getline(&entry->title,&size,stitles) == -1)
+      {
         entry->title = strdup("");
+	size = 0;
+      }
     }
     else
       entry->title = strdup("");
@@ -642,7 +645,10 @@ static int blog_cache_day(Blog blog,struct btm *date)
     if (!feof(sclass))
     {
       if (getline(&entry->class,&size,sclass) == -1)
+      {
         entry->class = strdup("");
+	size = 0;
+      }
     }
     else
       entry->class = strdup("");
@@ -653,7 +659,10 @@ static int blog_cache_day(Blog blog,struct btm *date)
     if (!feof(sauthors))
     {
       if (getline(&entry->author,&size,sauthors) == -1)
+      {
         entry->author = strdup("");
+	size = 0;
+      }
     }
     else
       entry->author = strdup("");
@@ -664,7 +673,6 @@ static int blog_cache_day(Blog blog,struct btm *date)
     
     {
       FILE        *sinbody;
-      FILE        *soutbody;
       struct stat  status;
       int          rc;
       
@@ -679,10 +687,10 @@ static int blog_cache_day(Blog blog,struct btm *date)
         entry->body = strdup("");
       else
       {
-        soutbody = open_memstream(&entry->body,&size);
-        fcopy(soutbody,sinbody);
-        fclose(soutbody);
+        entry->body = malloc(status.st_size + 1);
+        fread(entry->body,1,status.st_size,sinbody);
         fclose(sinbody);
+        entry->body[status.st_size] = '\0';
       }
     }
     
