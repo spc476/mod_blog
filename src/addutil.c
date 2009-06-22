@@ -140,67 +140,8 @@ void fix_entry(Request req)
 
 /************************************************************************/
 
-#if 0
-static char *headers[] = 
-{
-  "",
-  "User-agent: mod_blog/R14 (addentry-2.0 http://boston.conman.org/about)",
-  "Accept: text/html",
-  NULL
-};
-
-#endif
-
 void notify_weblogcom(void)
 {
-#if 0
-  URLHTTP url;
-  HTTP    conn;
-  char    *query;
-  char    *name;
-  char    *blogurl;
-  char    *nfile;
-  int      rc;
-  int      c;
-  size_t   size;
-  size_t   fsize;
-
-  fsize      = 6 + strlen(c_email) + 2 + 1;
-  headers[0] = MemAlloc(fsize);
-  sprintf(headers[0],"From: %s\r\n",c_email);
-
-  name    = UrlEncodeString(c_name);
-  blogurl = UrlEncodeString(c_fullbaseurl);
-
-  size = 5	/* name = */
-         + strlen(name)
-         + 1	/* & */
-         + 4	/* url= */
-         + strlen(blogurl)
-         + 1;	/* EOS */
-
-  query = MemAlloc(size);
-  sprintf(query,"name=%s&url=%s",name,blogurl);
-
-  UrlNew((URL *)&url,c_weblogcomurl);
- 
-  nfile = MemAlloc(strlen(url->file) + 1 + strlen(query) + 1);
-  sprintf(nfile,"%s?%s",url->file,query);
-  MemFree(url->file);
-  MemFree(query);
-  url->file = nfile;
- 
-  rc = HttpOpen(&conn,GET,url,(const char **)headers);
-  if (rc != ERR_OKAY)
-    return;
-
-  while(!StreamEOF(HttpStreamRead(conn)))
-    c = StreamRead(HttpStreamRead(conn));
-  
-  HttpClose(&conn);
-  UrlFree((URL *)&url);
-  MemFree(headers[0]);
-#endif
 }
 
 /*************************************************************************/
