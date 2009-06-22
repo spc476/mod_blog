@@ -36,6 +36,7 @@
 #include <cgilib6/htmltok.h>
 
 #include "conversion.h"
+#include "fix.h"
 
 /**********************************************************************/
 
@@ -52,7 +53,7 @@ struct nested_params
 
 /**********************************************************************/
 
-static void	text_conversion_backend	(FILE *,FILE *,bool);
+static void	text_conversion_backend	(FILE *,FILE *);
 static void	html_handle_tag		(struct nested_params *);
 static void	check_for_uri		(struct nested_params *,const char *);
 static void	entify_char		(char *,size_t,char *,char,const char *);
@@ -67,95 +68,92 @@ static void	handle_period		(FILE *,FILE *);
 
 void text_conversion(FILE *in,FILE *out)
 {
+  FILE *entin;
+  
   assert(in    != NULL);
   assert(out   != NULL);
 
-  text_conversion_backend(in,out,true);
+  entin = fentity_encode_onread(in);
+  text_conversion_backend(entin,out);
+  fclose(entin);
 }
 
 /**********************************************************************/
 
-static void text_conversion_backend(FILE *in,FILE *out,bool entities)
+static void text_conversion_backend(FILE *in,FILE *out)
 {
-#if 0
-  Stream  tmpout;
-  char   *line;
-  char   *newline;
-
-  assert(in    != NULL);
-  assert(out   != NULL);
+  FILE   *tmpout;
+  char   *buffer;
+  char   *line;  
+  size_t  bufsize;
   
-  tmpout = StringStreamWrite();
-
-  while(!StreamEOF(in))
+  line    = NULL;
+  buffer  = NULL;
+  bufsize = 0;   
+  tmpout  = open_memstream(&buffer,&bufsize);
+  
+  while(!feof(in))
   {
-    line = LineSRead(in);
-
+    size_t   linesize = 0;
+    ssize_t  bytes;
+    
+    bytes = getline(&line,&linesize,in);
+    if (bytes <= 0) break;
+    line[--bytes] = '\0'; 
+    
     if (empty_string(line))
     {
-      newline = StringFromStream(tmpout);
-      if (!empty_string(newline))
-        LineSFormat(out,"$","<p>%a</p>\n",newline);
-      free(newline);
-      StreamFlush(tmpout);
+      fclose(tmpout);
+      
+      if (!empty_string(buffer))
+        fprintf(out,"<p>%s</p>\n",buffer);
+      
+      free(buffer);
+      
+      buffer  = NULL;
+      bufsize = 0;   
+      tmpout  = open_memstream(&buffer,&bufsize);
     }
     else
-    {
-      Stream tmpin;
-      Stream filter;
+    {   
+      FILE *tmpin;
       
-      tmpin = MemoryStreamRead(line,strlen(line));
-  
-      if (entities)
-      {
-        filter = EntityStreamRead(tmpin,ENTITY_NOAMP);
-        buff_conversion(filter,tmpout);
-        StreamFree(filter);
-      }
-      else
-        buff_conversion(tmpin,tmpout);
-  
-      StreamWrite(tmpout,' ');
-      StreamFree(tmpin);
+      tmpin = fmemopen(line,bytes,"r");
+      buff_conversion(tmpin,tmpout);   
+      fclose(tmpin);
+      fputc(' ',tmpout);
     }
+  }  
+     
+  fclose(tmpout);
+  if (!empty_string(buffer))
+    fprintf(out,"<p>%s</p>\n",buffer);
     
-    free(line);
-  }
-  
-  newline = StringFromStream(tmpout);
-  if (!empty_string(newline))
-    LineSFormat(out,"$","<p>%a</p>\n",newline);
-  
-  free(newline);
-  StreamFree(tmpout);
-#endif
+  free(line);
+  free(buffer);
 }
-  
+
 /***********************************************************************/
 
 void mixed_conversion(FILE *in,FILE *out)
 {
-#if 0
-  Stream  tmp;
-  char   *line;
-
-  assert(in    != NULL);
-  assert(out   != NULL);
+  FILE *tmpfp;
+  char *text;
+  size_t size;
   
-  tmp = StringStreamWrite();
-  text_conversion_backend(fname,in,tmp,false);
+  assert(in  != NULL);
+  assert(out != NULL);
   
-  line = StringFromStream(tmp);
-  StreamFree(tmp);
+  tmpfp = open_memstream(&text,&size);
+  text_conversion_backend(in,tmpfp);
+  fclose(tmpfp);
   
-  tmp = MemoryStreamRead(line,strlen(line));
-  html_conversion(fname,tmp,out);
+  tmpfp = fmemopen(text,size,"r");
+  html_conversion(tmpfp,out);
+  fclose(tmpfp);
   
-  StreamFree(tmp);
-  free(line);
-#endif
+  free(text);
 }
-
 
 /*************************************************************************/
 

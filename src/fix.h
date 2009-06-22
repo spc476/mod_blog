@@ -26,6 +26,8 @@
 #include <cgilib6/errors.h>
 #include <cgilib6/chunk.h>
 
+#include "frontend.h"
+
 #define DB_BLOCK	1024
 
 	/*-----------------------------------
