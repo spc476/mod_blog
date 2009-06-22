@@ -139,7 +139,7 @@ int main_cli(int argc,char *argv[])
            set_c_updatetype(optarg);
            break;
       case OPT_ENTRY:
-           req.reqtumbler = strdup(optarg);
+           req.reqtumbler = optarg;
            break;
       case OPT_DEBUG:
            gf_debug = true;
@@ -266,6 +266,7 @@ static int cmd_cli_show(Request req)
         }
 #endif
         rc = tumbler_page(req->out,req->tumbler);
+        TumblerFree(&req->tumbler);
       }
       else
         rc = (*req->error)(req,HTTP_NOTFOUND,"tumbler error---nothing found");

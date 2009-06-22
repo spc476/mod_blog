@@ -60,6 +60,7 @@ const char    *c_basedir;
 const char    *c_webdir;
 const char    *c_baseurl;
 const char    *c_fullbaseurl;
+const char    *c_htmltemplates;
 const char    *c_tabtemplates;
 const char    *c_rsstemplates;
 const char    *c_atomtemplates;
@@ -172,7 +173,8 @@ int GlobalsInit(char *fspec)
     }
     else if (strcmp(ppair->name,"TEMPLATES") == 0)
     {
-      g_templates = strdup(ppair->value);
+      c_htmltemplates = strdup(ppair->value);
+      g_templates    = c_htmltemplates;
     }
     else if (strcmp(ppair->name,"DAYPAGE") == 0)
     {

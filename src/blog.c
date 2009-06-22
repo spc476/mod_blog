@@ -632,6 +632,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
     {
       if (getline(&entry->title,&size,stitles) == -1)
       {
+        free(entry->title);
         entry->title = strdup("");
 	size = 0;
       }
@@ -646,6 +647,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
     {
       if (getline(&entry->class,&size,sclass) == -1)
       {
+        free(entry->class);
         entry->class = strdup("");
 	size = 0;
       }
@@ -660,6 +662,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
     {
       if (getline(&entry->author,&size,sauthors) == -1)
       {
+        free(entry->author);
         entry->author = strdup("");
 	size = 0;
       }

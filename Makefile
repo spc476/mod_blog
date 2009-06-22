@@ -23,7 +23,8 @@
 
 SHELL=/bin/sh
 HOSTDIR=build
-SETUID=chmod 4755
+#SETUID=chmod 4755
+SETUID=echo
 
 CC=gcc -Wall -pedantic -std=c99
 CINCL=
