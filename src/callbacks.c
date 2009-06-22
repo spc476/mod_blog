@@ -592,7 +592,6 @@ static void cb_entry_body(FILE *out,void *data)
   BlogEntry             entry;
   FILE                 *in;
   HtmlToken             token;
-  int                   rc;
   int                   t;
   
   assert(out  != NULL);
@@ -602,7 +601,7 @@ static void cb_entry_body(FILE *out,void *data)
   in    = fmemopen(entry->body,strlen(entry->body),"r");
   token = HtmlParseNew(in);
   
-  if (rc != ERR_OKAY)
+  if (token == NULL)
   {
     fclose(in);
     return;
