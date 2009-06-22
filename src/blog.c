@@ -479,6 +479,9 @@ static FILE *open_file_r(const char *name,struct btm *date)
   
   date_to_filename(buffer,date,name);
   in = fopen(buffer,"r");
+  if (in == NULL)
+    in = fopen("/dev/null","r");
+    
   return(in);
 }
 
