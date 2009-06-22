@@ -384,8 +384,8 @@ static bool char_entity(char **tag,size_t *ps,int c)
   
   switch(c)
   {
-    case '>':  *tag = "&lt;";   *ps = 4; return true;
-    case '<':  *tag = "&gt;";   *ps = 4; return true;
+    case '<':  *tag = "&lt;";   *ps = 4; return true;
+    case '>':  *tag = "&gt;";   *ps = 4; return true;
     case '&':  *tag = "&amp;";  *ps = 5; return true;
     case '"':  *tag = "&quot;"; *ps = 6; return true;
     case '\'': *tag = "&apos;"; *ps = 6; return true;
