@@ -75,7 +75,7 @@ extern const char *const      c_tabfile;
 extern const bool             cf_tabreverse;
 extern const int              c_tzhour;
 extern const int              c_tzmin;
-extern       void           (*c_conversion)(char *,FILE *,FILE *);
+extern       void           (*c_conversion)(FILE *,FILE *);
 extern const struct btm       c_start;
 extern const struct btm       c_now;
 extern const char *const      c_overview;

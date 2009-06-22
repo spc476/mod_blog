@@ -131,7 +131,7 @@ void fix_entry(Request req)
   out  = open_memstream(&tmp,&size);
   in   = fmemopen(req->body,strlen(req->body),"r");
   
-  (*c_conversion)("body",in,out);
+  (*c_conversion)(in,out);
   fclose(in);
   fclose(out);
   

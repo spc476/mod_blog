@@ -85,7 +85,7 @@ const char    *c_emailmsg;
 int            c_tzhour       = -5;	/* Eastern */
 int            c_tzmin        =  0;
 const char    *c_overview;
-void	     (*c_conversion)(char *,FILE *,FILE *) =  html_conversion;
+void	     (*c_conversion)(FILE *,FILE *) =  html_conversion;
 
 const char    *g_templates;
 bool           gf_emailupdate = true;

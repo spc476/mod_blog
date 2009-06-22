@@ -41,7 +41,6 @@
 
 struct nested_params
 {
-  char        *fname;
   FILE        *in;
   FILE        *out;
   HtmlToken    token;
@@ -53,7 +52,7 @@ struct nested_params
 
 /**********************************************************************/
 
-static void	text_conversion_backend	(char *,FILE *,FILE *,bool);
+static void	text_conversion_backend	(FILE *,FILE *,bool);
 static void	html_handle_tag		(struct nested_params *);
 static void	check_for_uri		(struct nested_params *,const char *);
 static void	entify_char		(char *,size_t,char *,char,const char *);
@@ -66,25 +65,23 @@ static void	handle_period		(FILE *,FILE *);
 
 /**********************************************************************/
 
-void text_conversion(char *fname,FILE *in,FILE *out)
+void text_conversion(FILE *in,FILE *out)
 {
-  assert(fname != NULL);
   assert(in    != NULL);
   assert(out   != NULL);
 
-  text_conversion_backend(fname,in,out,true);
+  text_conversion_backend(in,out,true);
 }
 
 /**********************************************************************/
 
-static void text_conversion_backend(char *fname,FILE *in,FILE *out,bool entities)
+static void text_conversion_backend(FILE *in,FILE *out,bool entities)
 {
 #if 0
   Stream  tmpout;
   char   *line;
   char   *newline;
 
-  assert(fname != NULL);
   assert(in    != NULL);
   assert(out   != NULL);
   
@@ -136,13 +133,12 @@ static void text_conversion_backend(char *fname,FILE *in,FILE *out,bool entities
   
 /***********************************************************************/
 
-void mixed_conversion(char *fname,FILE *in,FILE *out)
+void mixed_conversion(FILE *in,FILE *out)
 {
 #if 0
   Stream  tmp;
   char   *line;
 
-  assert(fname != NULL);
   assert(in    != NULL);
   assert(out   != NULL);
   
@@ -163,16 +159,14 @@ void mixed_conversion(char *fname,FILE *in,FILE *out)
 
 /*************************************************************************/
 
-void html_conversion(char *fname,FILE *in,FILE *out)
+void html_conversion(FILE *in,FILE *out)
 {
   struct nested_params local;
   int                  t;
 
-  assert(fname != NULL);
   assert(in    != NULL);
   assert(out   != NULL);
     
-  local.fname      = fname;
   local.in         = in;
   local.out        = out;
   local.p          = false;
