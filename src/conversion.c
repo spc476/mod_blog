@@ -400,10 +400,14 @@ static void html_handle_comment(struct nested_params *local)
 
 /**************************************************************************/
 
-void buff_conversion(FILE * in,FILE * out)
+void buff_conversion(FILE *in,FILE *out)
 {
   int c;
   
+  /*----------------------------------------------------
+  ; this is basically the macro substitution module.
+  ;-----------------------------------------------------*/
+
   assert(in  != NULL);
   assert(out != NULL);
 
