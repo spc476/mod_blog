@@ -121,6 +121,11 @@ static void	fixup_uri		(BlogEntry,HtmlToken,const char *);
 
 /************************************************************************/
 
+	/*--------------------------------
+	; the following table needs to
+	; be in alphabetical order
+	;--------------------------------*/
+	
 const struct chunk_callback  m_callbacks[] =
 {  
   { "ad"			, cb_ad				} ,
