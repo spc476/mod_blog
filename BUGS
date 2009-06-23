@@ -4,10 +4,19 @@
 	adtag, but http://boston.conman.org/2005/12/10.1 did not.  Need
 	to follow the paths and see what happened ... 
 
+	2009-06-22T22:29-05:00
+
+	Can't reproduce, so closing the bug.
+
 20041228.1
 
 	If the author, title or class isn't specified in the email, a
 	default is provided, but it *isn't* allocated from the heap.  Either
 	I need to set the defaults by coping, or check before calling
 	BlogDayFree().  Blarg ... 
+
+	2009-06-22T22:29-05:00
+
+	Allocating the fields from heap.  Have been doing so for quite some
+	time now ... 
 
