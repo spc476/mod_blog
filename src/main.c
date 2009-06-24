@@ -20,8 +20,6 @@
 *
 *************************************************************************/
 
-#define _GNU_SOURCE 1
-
 #include <stddef.h>
 #include <stdlib.h>
 #include <time.h>

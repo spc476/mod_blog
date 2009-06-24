@@ -20,8 +20,6 @@
 *
 *****************************************************************/
 
-#define _GNU_SOURCE 1
-
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
