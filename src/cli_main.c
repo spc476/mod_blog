@@ -299,8 +299,10 @@ static int mail_setup_data(Request req)
   assert(req            != NULL);
   assert(req->f.emailin == true);
 
-  ListInit(&headers);
+  line = NULL;
+  size = 0;
   
+  ListInit(&headers);
   getline(&line,&size,req->in);	/* skip Unix 'From ' line */
   free(line);  
   
