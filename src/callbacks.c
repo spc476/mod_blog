@@ -98,7 +98,9 @@ static void	cb_navigation_bar_prev		(FILE *,void *);
 static void	cb_navigation_current		(FILE *,void *);
 static void	cb_navigation_current_url	(FILE *,void *);
 static void	cb_navigation_link		(FILE *,void *);
+static void	cb_navigation_next_title	(FILE *,void *);
 static void	cb_navigation_next_url		(FILE *,void *);
+static void	cb_navigation_prev_title	(FILE *,void *);
 static void	cb_navigation_prev_url		(FILE *,void *);
 static void	cb_now_year			(FILE *,void *);
 static void	cb_overview			(FILE *,void *);
@@ -116,6 +118,7 @@ static void     cb_update_time			(FILE *,void *);
 static void     cb_update_type			(FILE *,void *);
 
 static void	print_nav_url		(FILE *,struct btm *,int);
+static void	print_nav_title		(FILE *,struct btm *,int);
 static void	print_nav_name		(FILE *,struct btm *,int,char);
 static void	fixup_uri		(BlogEntry,HtmlToken,const char *);
 
@@ -177,7 +180,9 @@ const struct chunk_callback  m_callbacks[] =
   { "navigation.link"		, cb_navigation_link		} ,
   { "navigation.link.next"	, cb_navigation_link_next	} ,
   { "navigation.link.prev"	, cb_navigation_link_prev	} ,
+  { "navigation.next.title"	, cb_navigation_next_title	} ,
   { "navigation.next.url"	, cb_navigation_next_url	} ,
+  { "navigation.prev.title"	, cb_navigation_prev_title	} ,
   { "navigation.prev.url"	, cb_navigation_prev_url        } ,
   { "now.year"			, cb_now_year			} ,
   { "overview"			, cb_overview			} ,
@@ -945,6 +950,32 @@ static void cb_navigation_current(FILE *out,void *data)
 
 /********************************************************************/
 
+static void cb_navigation_next_title(FILE *out,void *data)
+{
+  struct btm tmp;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  tmp = gd.next;
+  print_nav_title(out,&tmp,gd.navunit);
+}
+
+/********************************************************************/
+
+static void cb_navigation_prev_title(FILE *out,void *data)
+{
+  struct btm tmp;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  tmp = gd.previous;
+  print_nav_title(out,&tmp,gd.navunit);
+}
+
+/*******************************************************************/
+
 static void cb_navigation_next_url(FILE *out,void *data)
 {
   struct btm tmp;
@@ -982,6 +1013,49 @@ static void cb_navigation_current_url(FILE *out,void *data)
 }
 
 /*********************************************************************/
+
+static void print_nav_title(FILE *out,struct btm *date,int unit)
+{
+  BlogEntry entry;
+  struct tm stm;
+  char      buffer[BUFSIZ];
+  
+  assert(out  != NULL);
+  assert(date != NULL);
+  
+  switch(unit)
+  {
+    case YEAR:
+         fprintf(out,"%04d",date->year);
+         break;
+    case MONTH:
+         tm_init(&stm);
+         stm.tm_year = date->year - 1900;
+         stm.tm_mon  = date->month - 1;
+         mktime(&stm);
+         strftime(buffer,BUFSIZ,"%B %Y",&stm);
+         fputs(buffer,out);
+         break;
+    case DAY:
+         tm_init(&stm);
+         stm.tm_year = date->year - 1900;
+         stm.tm_mon  = date->month - 1;
+         stm.tm_mday = date->day;
+         mktime(&stm);
+         strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&stm);
+         fputs(buffer,out);
+         break;
+    case PART:
+         entry = BlogEntryRead(g_blog,date);
+         fputs(entry->title,out);
+         break;
+    default:
+         assert(0);
+         break;
+  }
+}
+
+/**********************************************************************/
 
 static void print_nav_url(FILE *out,struct btm *date,int unit)
 {
