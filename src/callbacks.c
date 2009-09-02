@@ -97,6 +97,10 @@ static void	cb_navigation_bar_next		(FILE *,void *);
 static void	cb_navigation_bar_prev		(FILE *,void *);
 static void	cb_navigation_current		(FILE *,void *);
 static void	cb_navigation_current_url	(FILE *,void *);
+static void	cb_navigation_first_title	(FILE *,void *);
+static void	cb_navigation_first_url		(FILE *,void *);
+static void	cb_navigation_last_title	(FILE *,void *);
+static void	cb_navigation_last_url		(FILE *,void *);
 static void	cb_navigation_link		(FILE *,void *);
 static void	cb_navigation_next_title	(FILE *,void *);
 static void	cb_navigation_next_url		(FILE *,void *);
@@ -177,6 +181,10 @@ const struct chunk_callback  m_callbacks[] =
   { "navigation.bar.prev"	, cb_navigation_bar_prev	} ,
   { "navigation.current"	, cb_navigation_current		} ,
   { "navigation.current.url"	, cb_navigation_current_url	} ,
+  { "navigation.first.title"	, cb_navigation_first_title	} ,
+  { "navigation.first.url"	, cb_navigation_first_url	} ,
+  { "navigation.last.title"	, cb_navigation_last_title	} ,
+  { "navigation.last.url"	, cb_navigation_last_url	} ,
   { "navigation.link"		, cb_navigation_link		} ,
   { "navigation.link.next"	, cb_navigation_link_next	} ,
   { "navigation.link.prev"	, cb_navigation_link_prev	} ,
@@ -950,6 +958,70 @@ static void cb_navigation_current(FILE *out,void *data)
 
 /********************************************************************/
 
+static void cb_navigation_first_url(FILE *out,void *data)
+{
+  struct btm tmp;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  tmp = gd.begin;
+  if (gd.f.navigation == false)
+    print_nav_url(out,&tmp,PART);
+  else
+    print_nav_url(out,&tmp,gd.navunit);
+}
+
+/********************************************************************/
+
+static void cb_navigation_first_title(FILE *out,void *data)
+{
+  struct btm tmp;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  tmp = gd.begin;
+  if (gd.f.navigation == false)
+    print_nav_title(out,&tmp,PART);
+  else
+    print_nav_title(out,&tmp,gd.navunit);
+}
+
+/*******************************************************************/
+
+static void cb_navigation_last_url(FILE *out,void *data)
+{
+  struct btm tmp;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  tmp = gd.now;
+  if (gd.f.navigation == false)
+    print_nav_url(out,&tmp,PART);
+  else
+    print_nav_url(out,&tmp,gd.navunit);
+}
+
+/******************************************************************/
+
+static void cb_navigation_last_title(FILE *out,void *data)
+{
+  struct btm tmp;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  tmp = gd.now;
+  if (gd.f.navigation == false)
+    print_nav_title(out,&tmp,PART);
+  else
+    print_nav_title(out,&tmp,gd.navunit);
+}
+
+/*****************************************************************/
+
 static void cb_navigation_next_title(FILE *out,void *data)
 {
   struct btm tmp;
@@ -1031,7 +1103,7 @@ static void print_nav_title(FILE *out,struct btm *date,int unit)
     case MONTH:
          tm_init(&stm);
          stm.tm_year = date->year - 1900;
-         stm.tm_mon  = date->month - 1;
+         stm.tm_mon  = date->month;
          mktime(&stm);
          strftime(buffer,BUFSIZ,"%B %Y",&stm);
          fputs(buffer,out);
