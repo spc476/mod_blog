@@ -963,7 +963,6 @@ static void cb_navigation_first_url(FILE *out,void *data)
   struct btm tmp;
   
   assert(out  != NULL);
-  assert(data != NULL);
   
   tmp = gd.begin;
   if (gd.f.navigation == false)
@@ -979,7 +978,6 @@ static void cb_navigation_first_title(FILE *out,void *data)
   struct btm tmp;
   
   assert(out  != NULL);
-  assert(data != NULL);
   
   tmp = gd.begin;
   if (gd.f.navigation == false)
@@ -995,7 +993,6 @@ static void cb_navigation_last_url(FILE *out,void *data)
   struct btm tmp;
   
   assert(out  != NULL);
-  assert(data != NULL);
   
   tmp = gd.now;
   if (gd.f.navigation == false)
@@ -1011,7 +1008,6 @@ static void cb_navigation_last_title(FILE *out,void *data)
   struct btm tmp;
   
   assert(out  != NULL);
-  assert(data != NULL);
   
   tmp = gd.now;
   if (gd.f.navigation == false)
