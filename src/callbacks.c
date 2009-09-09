@@ -59,9 +59,12 @@ static void	cb_atom_entry			(FILE *,void *);
 static void	cb_begin_year			(FILE *,void *);
 static void	cb_blog_adtag			(FILE *,void *);
 static void	cb_blog_adtag_entity		(FILE *,void *);
+static void	cb_blog_author			(FILE *,void *);
+static void	cb_blog_author_email		(FILE *,void *);
 static void	cb_blog_name			(FILE *,void *);
 static void	cb_blog_script			(FILE *,void *);
 static void	cb_blog_url			(FILE *,void *);
+static void	cb_blog_url_home		(FILE *,void *);
 static void	cb_comments			(FILE *,void *);
 static void	cb_comments_body		(FILE *,void *);
 static void	cb_comments_check		(FILE *,void *);
@@ -92,6 +95,7 @@ static void	cb_entry_name			(FILE *,void *);
 static void	cb_entry_pubdate		(FILE *,void *);
 static void	cb_entry_title			(FILE *,void *);
 static void	cb_entry_url			(FILE *,void *);
+static void	cb_generator			(FILE *,void *);
 static void	cb_navigation_bar		(FILE *,void *);
 static void	cb_navigation_bar_next		(FILE *,void *);
 static void	cb_navigation_bar_prev		(FILE *,void *);
@@ -102,6 +106,8 @@ static void	cb_navigation_first_url		(FILE *,void *);
 static void	cb_navigation_last_title	(FILE *,void *);
 static void	cb_navigation_last_url		(FILE *,void *);
 static void	cb_navigation_link		(FILE *,void *);
+static void	cb_navigation_link_next		(FILE *,void *);
+static void	cb_navigation_link_prev		(FILE *,void *);
 static void	cb_navigation_next_title	(FILE *,void *);
 static void	cb_navigation_next_url		(FILE *,void *);
 static void	cb_navigation_prev_title	(FILE *,void *);
@@ -115,11 +121,9 @@ static void	cb_rss_item			(FILE *,void *);
 static void	cb_rss_item_url			(FILE *,void *);
 static void	cb_rss_pubdate			(FILE *,void *);
 static void	cb_rss_url			(FILE *,void *);
+static void	cb_update_time			(FILE *,void *);
+static void	cb_update_type			(FILE *,void *);
 static void	cb_xyzzy			(FILE *,void *);
-static void     cb_navigation_link_next		(FILE *,void *);
-static void     cb_navigation_link_prev		(FILE *,void *);
-static void     cb_update_time			(FILE *,void *);
-static void     cb_update_type			(FILE *,void *);
 
 static void	print_nav_url		(FILE *,struct btm *,int);
 static void	print_nav_title		(FILE *,struct btm *,int);
@@ -143,9 +147,12 @@ const struct chunk_callback  m_callbacks[] =
   { "begin.year"		, cb_begin_year			} ,
   { "blog.adtag"		, cb_blog_adtag			} ,
   { "blog.adtag.entity"		, cb_blog_adtag_entity		} ,
+  { "blog.author"		, cb_blog_author		} ,
+  { "blog.author.email"		, cb_blog_author_email		} ,
   { "blog.name"			, cb_blog_name			} ,
   { "blog.script"		, cb_blog_script		} ,
   { "blog.url"			, cb_blog_url			} ,
+  { "blog.url.home"		, cb_blog_url_home		} ,
   { "comments"			, cb_comments			} ,
   { "comments.body"		, cb_comments_body		} ,
   { "comments.check"		, cb_comments_check		} ,
@@ -176,6 +183,7 @@ const struct chunk_callback  m_callbacks[] =
   { "entry.pubdate"		, cb_entry_pubdate		} ,
   { "entry.title"		, cb_entry_title		} ,
   { "entry.url"			, cb_entry_url			} ,
+  { "generator"			, cb_generator			} ,
   { "navigation.bar"		, cb_navigation_bar		} ,
   { "navigation.bar.next"	, cb_navigation_bar_next	} ,
   { "navigation.bar.prev"	, cb_navigation_bar_prev	} ,
@@ -295,12 +303,39 @@ static void cb_blog_url(FILE *out,void *data)
 
 /*************************************************************************/
 
+static void cb_blog_url_home(FILE *out,void *data)
+{
+  assert(out != NULL);
+  
+  fputs(c_fullbaseurl,out);
+}
+
+/**********************************************************************/
+
 static void cb_blog_name(FILE *out,void *data)
 {
   assert(out  != NULL);
   assert(data != NULL);
   
   fputs(c_name,out);
+}
+
+/*********************************************************************/
+
+static void cb_blog_author(FILE *out,void *data)
+{
+  assert(out != NULL);
+  
+  fputs(c_author,out);
+}
+
+/********************************************************************/
+
+static void cb_blog_author_email(FILE *out,void *data)
+{
+  assert(out != NULL);
+  
+  fputs(c_email,out);
 }
 
 /*********************************************************************/
@@ -1527,4 +1562,13 @@ static void cb_overview_list(FILE *out,void *data)
 }
 
 /**********************************************************************/
+
+static void cb_generator(FILE *out,void *data)
+{
+  assert(out != NULL);
+  
+  fputs(GENERATOR,out);
+}
+
+/*********************************************************************/
 

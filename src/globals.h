@@ -30,6 +30,8 @@
 #include "timeutil.h"
 #include "blog.h"
 
+#define GENERATOR	"mod_blog 3.2"
+
 /*****************************************************************
 *
 * Global variables---some defaults are defined in "globals.c" but
