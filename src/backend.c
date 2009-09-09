@@ -689,28 +689,23 @@ static int rss_page(FILE *out,struct btm *when,int fullurl,int reverse)
 
 static char *tag_collect(List *list)
 {
-  FILE      *stags;
-  BlogEntry  entry;
-  char      *comma = "";
-  char      *tags;
-  size_t     size;
+  BlogEntry entry;
   
-  stags = open_memstream(&tags,&size);
+  /*----------------------------------------------------
+  ; this function used to collect all the class tags
+  ; from all the entries, but I think any advertising
+  ; that's placed near the top of the page will do better
+  ; if it's based off the first entry to be displayed.
+  ;------------------------------------------------------*/
   
-  for
-  (
-    entry = (BlogEntry)ListGetHead(list);
-    NodeValid(&entry->node);
-    entry = (BlogEntry)NodeNext(&entry->node)
-  )
-  {
-    if (empty_string(entry->class)) continue;
-    fprintf(stags,"%s%s",comma,entry->class);
-    comma = ", ";
-  }
-
-  fclose(stags);  
-  return(tags);
+  assert(list != NULL);
+  
+  entry = (BlogEntry)ListGetHead(list);
+  
+  if (!NodeValid(&entry->node) || empty_string(entry->class))
+    return strdup(gd.adtag);
+  else
+    return strdup(entry->class);
 }
 
 /********************************************************************/
