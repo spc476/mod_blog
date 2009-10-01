@@ -25,7 +25,7 @@ SHELL=/bin/sh
 HOSTDIR=build
 SETUID=chmod 4755
 
-CC=gcc -Wall -pedantic -std=c99
+CC=gcc -Wall -pedantic -std=c99 -Wextra
 CINCL=
 
 #CFLAGS=-g -ansi -Wall -pedantic -Wtraditional -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
@@ -35,7 +35,7 @@ CINCL=
 #CFLAGS=-pg -g -DSCREAM -DNOSTATS -O4 $(CINCL)
 #CFLAGS=-g -DDDT $(CINCL)
 #CFLAGS=-g -march=pentium3 -O3 $(CINCL)
-CFLAGS=-g $(CINCL)
+CFLAGS=-g $(CINCL) -DNDEBUG
 #CFLAGS=-g -pg $(CINCL)
 
 LFLAGS=-lgdbm -lcgi6 

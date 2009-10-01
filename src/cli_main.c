@@ -20,6 +20,10 @@
 *
 *************************************************************************/
 
+#ifndef __GNUC__
+#  define __attribute__(x)
+#endif
+
 #define _GNU_SOURCE 1
 
 #include <stddef.h>
@@ -373,7 +377,7 @@ static int mailfile_readdata(Request req)
 
 /***************************************************************************/
 
-static int cli_error(Request req,int level,char *msg, ... )
+static int cli_error(Request req __attribute__((unused)),int level,char *msg, ... )
 {
   va_list args;
   

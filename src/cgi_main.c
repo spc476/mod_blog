@@ -20,6 +20,10 @@
 *
 *************************************************************************/
 
+#ifndef __GNUC__
+#  define __attribute__(x)
+#endif
+
 #define _GNU_SOURCE 1
 
 #include <stddef.h>
@@ -61,7 +65,7 @@ static int	cgi_error		(Request,int,char *, ... );
 
 /*************************************************************************/
 
-int main_cgi_head(Cgi cgi,int argc,char *argv[])
+int main_cgi_head(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attribute__((unused)))
 {
   struct request req;
   int            rc;
@@ -77,7 +81,7 @@ int main_cgi_head(Cgi cgi,int argc,char *argv[])
 
 /**********************************************************************/
 
-int main_cgi_get(Cgi cgi,int argc,char *argv[])
+int main_cgi_get(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attribute__((unused)))
 {
   struct request  req;
   int             rc;
@@ -243,7 +247,7 @@ static int cmd_cgi_get_overview(Request req)
 
 /**********************************************************************/
 
-int main_cgi_post(Cgi cgi,int argc,char *argv[])
+int main_cgi_post(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attribute__((unused)))
 {
   struct request req;
   int            rc;

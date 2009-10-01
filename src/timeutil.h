@@ -27,15 +27,15 @@
 
 struct btm
 {
-  int year;
-  int month;
-  int day;
-  int part;
+  int          year;
+  unsigned int month;
+  unsigned int day;
+  unsigned int part;
 };
 
 /***********************************************************/
 
-int		 max_monthday	(int,int);
+unsigned int	 max_monthday	(int,unsigned int);
 void		 btm_add_day	(struct btm *);
 void		 btm_sub_part	(struct btm *);
 void		 btm_sub_day	(struct btm *);

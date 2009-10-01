@@ -62,7 +62,7 @@ typedef struct tumunit
   Node         node;
   size_t       size;
   enum ttypes  type;
-  int          entry[4];
+  unsigned int entry[4];
   char        *file;  
 } *TumblerUnit;
 

@@ -20,6 +20,10 @@
 *
 ************************************************/
 
+#ifndef __GNUC__
+#  define __attribute__(x)
+#endif
+
 #define _GNU_SOURCE 1
 
 #include <stdio.h>
@@ -62,7 +66,7 @@ static void	   free_entries			(List *);
 
 /************************************************************************/
 
-int generate_pages(Request req)
+int generate_pages(Request req __attribute__((unused)))
 {
   FILE *out;
   int   rc = 0;
@@ -157,13 +161,11 @@ int tumbler_page(FILE *out,Tumbler spec)
 
   if (
        (tu1->entry[YEAR]) 
-       && (tu1->entry[YEAR] < gd.begin.year)
+       && (tu1->entry[YEAR] < (unsigned)gd.begin.year)
      ) 
     return(1);
-  if (tu1->entry[MONTH]  <  0) return(1);
   if (tu1->entry[MONTH]  > 12) return(1);
   if ((tu1->entry[MONTH] == 0) && (tu1->entry[DAY])) return(1);
-  if (tu1->entry[DAY]    <  0) return(1);
   if ((tu1->entry[MONTH]) && (tu1->entry[DAY] > max_monthday(tu1->entry[YEAR],tu1->entry[MONTH])))
     return(1);
 
@@ -173,13 +175,11 @@ int tumbler_page(FILE *out,Tumbler spec)
     
     if (
          (tu2->entry[YEAR] != 0)
-         && (tu2->entry[YEAR] < gd.begin.year)
+         && (tu2->entry[YEAR] < (unsigned)gd.begin.year)
        )
       return(1);
-    if (tu2->entry[MONTH]  <  0) return(1);
     if (tu2->entry[MONTH]  > 12) return(1);
     if ((tu2->entry[MONTH] == 0) && (tu2->entry[DAY])) return(1);
-    if (tu2->entry[DAY]    <  0) return(1);
     if ((tu2->entry[MONTH]) && (tu2->entry[DAY]   > max_monthday(tu2->entry[YEAR],tu2->entry[MONTH])))
       return(1);
       
@@ -239,7 +239,7 @@ int tumbler_page(FILE *out,Tumbler spec)
   start.part  = (tu1->entry[PART]  == 0) ? nu1 = DAY     , 1             : tu1->entry[PART];
   start.day   = (tu1->entry[DAY]   == 0) ? nu1 = MONTH   , 1             : tu1->entry[DAY];
   start.month = (tu1->entry[MONTH] == 0) ? nu1 = YEAR    , 1             : tu1->entry[MONTH];
-  start.year  = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , gd.begin.year : tu1->entry[YEAR];
+  start.year  = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , gd.begin.year : (int)tu1->entry[YEAR];
   
   if (start.day > max_monthday(start.year,start.month))
     return(1);				/* invalid day */
@@ -253,7 +253,7 @@ int tumbler_page(FILE *out,Tumbler spec)
   {
     gd.f.navigation = true;
     nu2        = PART;
-    end.year   = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , gd.now.year                      : tu1->entry[YEAR];
+    end.year   = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , gd.now.year                      : (int)tu1->entry[YEAR];
     end.month  = (tu1->entry[MONTH] == 0) ? nu2 = MONTH , 12                               : tu1->entry[MONTH];
     end.day    = (tu1->entry[DAY]   == 0) ? nu2 = DAY   , max_monthday(end.year,end.month) : tu1->entry[DAY];
     end.part   = (tu1->entry[PART]  == 0) ? nu2 = PART  , 23                               : tu1->entry[PART];
@@ -269,7 +269,7 @@ int tumbler_page(FILE *out,Tumbler spec)
     ; will be set to the their maximum legal value.
     ;-----------------------------------------------------------*/
     
-    end.year  = (tu2->entry[YEAR]  == 0) ? gd.now.year                      : tu2->entry[YEAR];
+    end.year  = (tu2->entry[YEAR]  == 0) ? gd.now.year                      : (int)tu2->entry[YEAR];
     end.month = (tu2->entry[MONTH] == 0) ? 12                               : tu2->entry[MONTH];
     end.day   = (tu2->entry[DAY]   == 0) ? max_monthday(end.year,end.month) : tu2->entry[DAY];
     end.part  = (tu2->entry[PART]  == 0) ? 23                               : tu2->entry[PART];
@@ -596,7 +596,7 @@ static int display_file(FILE * out,Tumbler spec)
 
 /*****************************************************************/
 
-int primary_page(FILE *out,int year,int month,int iday,int part)
+int primary_page(FILE *out,int year,unsigned int month,unsigned int iday,unsigned int part)
 {
   BlogEntry             entry;
   struct btm            thisday;
