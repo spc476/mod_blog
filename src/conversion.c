@@ -371,17 +371,14 @@ static void html_handle_string(struct nested_params *local)
   
   assert(local != NULL);
 
-  /*---------------------------------------------------
-  ; I think is is why my tags sometime run together
-  ;---------------------------------------------------*/
-
-  if (empty_string(text)) return;
-
   if (!local->pre)
   {
     in = fmemopen(text,strlen(text),"r");
-    buff_conversion(in,local->out);
-    fclose(in);
+    if (in != NULL)
+    {
+      buff_conversion(in,local->out);
+      fclose(in);
+    }
   }
   else
     fputs(text,local->out);
