@@ -589,41 +589,7 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
       sprintf(buffer,"%s/%s",baseurl,src->value);
     else
     
-#ifdef PARALLEL_HACK
-    {
-      /*-----------------------------------------------------------
-      ; this hack will work for now since it's not possible	XXX
-      ; (through the configuration file) to select absolute
-      ; URLs, but when that changes, so will this.  The non-hack
-      ; version will work though.
-      ;------------------------------------------------------------*/
-      
-      if (strstr(src->value,"parallel") != NULL)
-      {
-        if (strstr(c_scriptname,"parallel") != NULL)
-	{
-	  char *ps = strchr(src->value,'/');
-	  if (ps)
-	    sprintf(buffer,"%s",ps);
-	  else
-	    sprintf(buffer,"/");
-	}
-	else
-	  sprintf(buffer,"%s/%s",baseurl,src->value);
-      }
-      else
-	sprintf(
-		buffer,
-		"%s/%04d/%02d/%02d/%s",
-		baseurl,
-		entry->when.year,
-		entry->when.month,
-		entry->when.day,
-		src->value
-	);
-    }
-#else
-      sprintf(
+    sprintf(
       	buffer,
 	"%s/%04d/%02d/%02d/%s",
 	baseurl,
@@ -631,8 +597,7 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
 	entry->when.month,
 	entry->when.day,
 	src->value
-      );
-#endif
+    );
 
     np = PairCreate(attrib,buffer);
     NodeInsert(&src->node,&np->node);

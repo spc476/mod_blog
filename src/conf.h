@@ -50,17 +50,6 @@
 
 #define DEFAULT_PERMS	022
 
-/*-----------------------------------------------------
-; the following is to support a demo on 2002/7/23.1
-; wherein I present a different look and feel to the
-; site, *but* links to the parallel site will switch
-; back and forth, depending upon which site you are
-; viewing.  It's a total hack, but I think it's a 
-; pretty cool hack none-the-less.
-;-----------------------------------------------------*/
-	
-#define PARALLEL_HACK
-
 /*-----------------------------------------------------------------------
 ; Define one of the following:
 ;	USE_NONE	- only the author listed in the config can post

@@ -42,9 +42,6 @@
 *
 *******************************************************************/
 
-#ifdef PARALLEL_HACK
-    extern const char   *const c_scriptname;
-#endif
 extern const char *const      c_name;
 extern const char *const      c_basedir;
 extern const char *const      c_webdir;

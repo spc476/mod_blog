@@ -51,10 +51,6 @@ void	set_c_conversion	(char *);
 
 /************************************************************/
 
-#ifdef PARALLEL_HACK
-  const char *c_scriptname;
-#endif
-
 const char    *c_name;
 const char    *c_basedir;
 const char    *c_webdir;
@@ -113,10 +109,6 @@ int GlobalsInit(char *fspec)
 
   ListInit(&headers);
   
-#ifdef PARALLEL_HACK  
-  c_scriptname = strdup(fspec);
-#endif
-
   cfs = strdup(fspec);
   ext = strstr(cfs,".cnf");
 
