@@ -1,0 +1,24 @@
+(xref http://cairnarvon.rotahall.org/2010/05/25/towards-a-better-bbcode/)
+(xref http://cairnarvon.rotahall.org/misc/sexpcode.html)
+
+{b This} is {i {u export} {o mark-up}}
+
+<b>This</b> is <i><u>export</u> <o>mark-up</o></i>
+
+{b.i.o.u EXPERT}
+
+<b><i><o><u>EXPERT</u></o></i></b>
+
+{sup*2 This text is superscripted two levels}
+
+<sup><sup>This text is superscripted two levels</sup></sup>
+
+n{sup 2}
+
+n^2
+
+{b.sup*2.i Way to be a dick, {sub*2.u.o dick}.}
+
+<b><sup><sup><i>Way to be a dick, 
+  <sub><sub><u><o>dick</o></u></sub></sub></i></sup></sup></b>
+
