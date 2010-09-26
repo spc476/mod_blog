@@ -176,9 +176,6 @@ int main_cli(int argc,char *argv[])
     }
   }
 
-  if (config == NULL)
-    return((*req.error)(&req,HTTP_ISERVERERR,"no configuration file specified"));
-  
   rc = GlobalsInit(config);
   if (rc != ERR_OKAY)
     return((*req.error)(&req,HTTP_ISERVERERR,"could not open cofiguration file %s",config));

@@ -31,6 +31,9 @@
 #include <stdbool.h>
 #include <assert.h>
 
+#include <syslog.h>
+#include <unistd.h>
+
 #include <cgilib6/rfc822.h>
 #include <cgilib6/util.h>
 #include <cgilib6/pair.h>
@@ -97,34 +100,37 @@ struct display gd =
 
 /****************************************************/
 
-int GlobalsInit(char *fspec)
+int GlobalsInit(char *conf)
 {
   FILE        *input;
   List         headers;
-  char        *cfs;
-  char        *ext;
   struct pair *ppair;
   
   assert(fspec != NULL);
 
   ListInit(&headers);
   
-  cfs = strdup(fspec);
-  ext = strstr(cfs,".cnf");
-
-  if (ext == NULL)
+  if (conf == NULL)
   {
-    ext = strstr(cfs,".cgi");
-    if (ext == NULL)
-      return(ERR_ERR);
-    ext[2] = 'n';
-    ext[3] = 'f';
+    conf = getenv("REDIRECT_BLOG_CONFIG");
+    if (conf == NULL)
+    {
+      conf = getenv("BLOG_CONFIG");
+      if (conf == NULL)
+      {
+        syslog(LOG_ERR,"env BLOG_CONFIG not defined");
+        return ERR_ERR;
+      }
+    }
   }
-
-  input = fopen(cfs,"r");
+  
+  input = fopen(conf,"r");
   if (input == NULL)
+  {
+    syslog(LOG_ERR,"%s: %s",conf,strerror(errno));
     return(ERR_ERR);
-    
+  }
+  
   RFC822HeadersRead(input,&headers);
 
   for
@@ -312,7 +318,6 @@ int GlobalsInit(char *fspec)
 
   PairListFree(&headers);
   fclose(input);
-  free(cfs);
 
   g_blog = BlogNew(c_basedir,c_lockfile);
   if (g_blog == NULL)

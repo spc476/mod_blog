@@ -490,8 +490,7 @@ static int cgi_error(Request req,int level,char *msg, ... )
 
 static int cgi_init(Cgi cgi,Request req)
 {
-  char *script;
-  int   rc;
+  int rc;
   
   assert(cgi != NULL);
   assert(req != NULL);
@@ -503,10 +502,7 @@ static int cgi_init(Cgi cgi,Request req)
   req->out   = stdout;
   req->cgi   = cgi;
   
-  script = getenv("SCRIPT_FILENAME");
-  assert(script != NULL);
-
-  rc = GlobalsInit(script);
+  rc = GlobalsInit(NULL);
 
   if (rc != ERR_OKAY)
     return rc;
