@@ -100,7 +100,7 @@ struct display gd =
 
 /****************************************************/
 
-int GlobalsInit(char *conf)
+int GlobalsInit(const char *conf)
 {
   FILE        *input;
   List         headers;
@@ -336,7 +336,7 @@ int GlobalsInit(char *conf)
 
 /********************************************************************/
 
-void set_c_updatetype(char *value)
+void set_c_updatetype(const char *const value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;
@@ -357,7 +357,7 @@ void set_c_updatetype(char *value)
 
 /************************************************************************/
 
-void set_gf_emailupdate(char *value)
+void set_gf_emailupdate(const char *const value)
 {
   if (value && !empty_string(value))
   {
@@ -371,7 +371,7 @@ void set_gf_emailupdate(char *value)
 
 /***************************************************************************/
 
-void set_c_conversion(char *value)
+void set_c_conversion(const char *const value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;

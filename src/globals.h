@@ -85,10 +85,10 @@ extern volatile bool          gf_debug;
 extern Blog                   g_blog;
 extern struct display         gd;		/* work on */
 
-int		GlobalsInit		(char *);
-void		set_c_updatetype	(char *);
-void		set_gf_emailupdate	(char *);
-void		set_c_conversion	(char *);
+int		GlobalsInit		(const char *const);
+void		set_c_updatetype	(const char *const);
+void		set_gf_emailupdate	(const char *const);
+void		set_c_conversion	(const char *const);
 void		set_time		(void);
 
 int		main_cgi_head		(Cgi,int,char *[]);
