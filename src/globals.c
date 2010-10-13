@@ -48,9 +48,9 @@
 
 /***********************************************************/
 
-void	set_c_updatetype	(char *);
-void	set_gf_emailupdate	(char *);
-void	set_c_conversion	(char *);
+void	set_c_updatetype	(char *const);
+void	set_gf_emailupdate	(char *const);
+void	set_c_conversion	(char *const);
 
 /************************************************************/
 
@@ -336,7 +336,7 @@ int GlobalsInit(const char *conf)
 
 /********************************************************************/
 
-void set_c_updatetype(const char *const value)
+void set_c_updatetype(char *const value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;
@@ -357,7 +357,7 @@ void set_c_updatetype(const char *const value)
 
 /************************************************************************/
 
-void set_gf_emailupdate(const char *const value)
+void set_gf_emailupdate(char *const value)
 {
   if (value && !empty_string(value))
   {
@@ -371,7 +371,7 @@ void set_gf_emailupdate(const char *const value)
 
 /***************************************************************************/
 
-void set_c_conversion(const char *const value)
+void set_c_conversion(char *const value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;
