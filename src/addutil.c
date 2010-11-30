@@ -140,12 +140,6 @@ void fix_entry(Request req)
 
 /************************************************************************/
 
-void notify_weblogcom(void)
-{
-}
-
-/*************************************************************************/
-
 void notify_emaillist(void)
 {
 #ifdef EMAIL_NOTIFY

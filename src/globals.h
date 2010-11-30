@@ -64,8 +64,6 @@ extern const char *const      c_email;
 extern const char *const      c_authorfile;
 extern const char *const      c_updatetype;
 extern const char *const      c_lockfile;
-extern const int              cf_weblogcom;
-extern const char *const      c_weblogcomurl;
 extern const char            *c_emaildb;
 extern const char *const      c_emailsubject;
 extern const char *const      c_emailmsg;

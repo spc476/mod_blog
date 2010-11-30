@@ -339,7 +339,6 @@ static int cmd_cgi_post_new(Request req)
   if (rc == ERR_OKAY)
   {
     generate_pages(req);
-    if (cf_weblogcom)   notify_weblogcom();
     if (gf_emailupdate) notify_emaillist();
     fprintf(
     	req->out,

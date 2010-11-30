@@ -76,8 +76,6 @@ const char    *c_email;
 const char    *c_authorfile;
 const char    *c_updatetype   = "NewEntry";
 const char    *c_lockfile     = "/tmp/.mod_blog.lock";
-bool           cf_weblogcom   = false;
-const char    *c_weblogcomurl = "http://newhome.weblogs.com/pingSiteForm";
 char          *c_emaildb;
 const char    *c_emailsubject;
 const char    *c_emailmsg;
@@ -258,15 +256,6 @@ int GlobalsInit(const char *conf)
     else if (strcmp(ppair->name,"NAME") == 0)
     {
       c_name = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"WEBLOGCOM") == 0)
-    {
-      down_string(ppair->value);
-     
-      if (strcmp(ppair->value,"true") == 0)
-        cf_weblogcom = true;
-      else if (strcmp(ppair->value,"false") == 0)
-        cf_weblogcom = false;
     }
     else if (strcmp(ppair->name,"EMAIL-LIST") == 0)
     {

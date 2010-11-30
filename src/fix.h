@@ -106,7 +106,6 @@ extern const size_t                m_cbnum;
 char	*get_remote_user		(void);
 int	 authenticate_author		(Request);
 int	 generate_pages			(Request);
-void	 notify_weblogcom		(void);
 void	 notify_emaillist		(void);
 int	 primary_page			(FILE *,int,unsigned int,unsigned int,unsigned int);
 int	 tumbler_page			(FILE *,Tumbler);

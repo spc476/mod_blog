@@ -219,7 +219,6 @@ static int cmd_cli_new(Request req)
   if (rc == ERR_OKAY)
   {
     generate_pages(req);  
-    if (cf_weblogcom)   notify_weblogcom();
     if (gf_emailupdate) notify_emaillist();
   }
   
