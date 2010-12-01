@@ -218,8 +218,9 @@ static int cmd_cli_new(Request req)
   rc = entry_add(req);
   if (rc == ERR_OKAY)
   {
-    generate_pages(req);  
+    if (cf_facebook)    notify_facebook(req);
     if (gf_emailupdate) notify_emaillist();
+    generate_pages(req);  
   }
   
   return(rc);
@@ -324,6 +325,7 @@ static int mailfile_readdata(Request req)
   List    headers;
   char   *email;
   char   *filter;
+  char   *facebook;
   size_t  size;
 
   assert(req     != NULL);
@@ -335,9 +337,11 @@ static int mailfile_readdata(Request req)
   req->author = PairListGetValue(&headers,"AUTHOR");
   req->title  = PairListGetValue(&headers,"TITLE");
   req->class  = PairListGetValue(&headers,"CLASS");
+  req->status = PairListGetValue(&headers,"STATUS");
   req->date   = PairListGetValue(&headers,"DATE");
   email       = PairListGetValue(&headers,"EMAIL");
   filter      = PairListGetValue(&headers,"FILTER");
+  facebook    = PairListGetValue(&headers,"FACEBOOK");
   
   if (req->author != NULL) req->author = strdup(req->author);
 
@@ -351,10 +355,16 @@ static int mailfile_readdata(Request req)
   else
     req->class = strdup("");
 
+  if (req->status != NULL)
+    req->status = strdup(req->status);
+  else
+    req->status = strdup("");
+  
   if (req->date   != NULL) req->date = strdup(req->date);
   if (email       != NULL) set_gf_emailupdate(email);
   if (filter      != NULL) set_c_conversion(filter);
-
+  if (facebook    != NULL) set_cf_facebook(facebook);
+  
   PairListFree(&headers);	/* got everything we need, dump this */
   
   if (authenticate_author(req) == false)

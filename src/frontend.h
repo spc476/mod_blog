@@ -54,6 +54,7 @@ typedef struct request
   char     *name;
   char     *title;
   char     *class;
+  char     *status;
   char     *date;
   char     *origbody;
   char     *body;

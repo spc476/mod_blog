@@ -83,6 +83,10 @@ int            c_tzhour       = -5;	/* Eastern */
 int            c_tzmin        =  0;
 const char    *c_overview;
 void	     (*c_conversion)(FILE *,FILE *) =  html_conversion;
+bool           cf_facebook    = false;
+const char    *c_facebook_ap_id;
+const char    *c_facebook_ap_secret;
+const char    *c_facebook_user;
 
 const char    *g_templates;
 bool           gf_emailupdate = true;
@@ -295,6 +299,18 @@ int GlobalsInit(const char *conf)
       if (strcmp(ppair->value,"true") == 0)
         gf_debug = true;
     }
+    else if (strcmp(ppair->name,"FACEBOOK-AP-ID") == 0)
+    {
+      c_facebook_ap_id = strdup(ppair->value);
+    }
+    else if (strcmp(ppair->name,"FACEBOOK-AP-SECRET") == 0)
+    {
+      c_facebook_ap_secret = strdup(ppair->value);
+    }
+    else if (strcmp(ppair->name,"FACEBOOK-USER") == 0)
+    {
+      c_facebook_user = strdup(ppair->value);
+    }
     else if (strncmp(ppair->name,"_SYSTEM",7) == 0)
     {
       SystemLimit(ppair);
@@ -307,6 +323,14 @@ int GlobalsInit(const char *conf)
 
   PairListFree(&headers);
   fclose(input);
+  
+  /*-----------------------------------------------------
+  ; derive the setting of c_facebook from the given data
+  ;------------------------------------------------------*/
+  
+  cf_facebook =    (c_facebook_ap_id     != NULL)
+                && (c_facebook_ap_secret != NULL)
+                && (c_facebook_user      != NULL);
 
   g_blog = BlogNew(c_basedir,c_lockfile);
   if (g_blog == NULL)
@@ -375,4 +399,25 @@ void set_c_conversion(char *const value)
 }
 
 /**************************************************************************/
+
+void set_cf_facebook(char *const value)
+{
+  if (!emptynull_string(value))
+  {
+    up_string(value);
+    if (strcmp(value,"NO") == 0)
+      cf_facebook = false;
+    else if (strcmp(value,"YES") == 0)
+    {
+      if (
+              (c_facebook_ap_id     != NULL)
+           && (c_facebook_ap_secret != NULL)
+           && (c_facebook_user      != NULL)
+          )
+        cf_facebook = true;
+    }
+  }
+}
+
+/*************************************************************************/
 

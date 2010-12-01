@@ -38,7 +38,7 @@ CINCL=
 CFLAGS=-g $(CINCL) -DNDEBUG
 #CFLAGS=-g -pg $(CINCL)
 
-LFLAGS=-lgdbm -lcgi6 
+LFLAGS=-lgdbm -lcgi6 `curl-config --libs`
 #LFLAGS= lcgi5 
 #LFLAGS=-ldb -lcgi5 -pg
 # For Solaris, use this line
@@ -71,6 +71,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/entity-conversion.o	\
+		$(HOSTDIR)/facebook.o		\
 		$(HOSTDIR)/system.o
 	$(CC) $(CFLAGS) -o $@			\
 		$(HOSTDIR)/addutil.o		\
@@ -87,6 +88,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/system.o		\
+		$(HOSTDIR)/facebook.o		\
 		$(HOSTDIR)/entity-conversion.o	\
 		$(LFLAGS) 
 	$(SETUID) $(HOSTDIR)/boston
@@ -156,6 +158,9 @@ $(HOSTDIR)/blogutil.o : src/blogutil.c src/blogutil.h
 
 $(HOSTDIR)/entity-conversion.o : src/entity-conversion.c
 	$(CC) $(CFLAGS) -c -o $@ src/entity-conversion.c
+
+$(HOSTDIR)/facebook.o : src/facebook.c
+	$(CC) $(CFLAGS) `curl-config --cflags` -c -o $@ src/facebook.c
 
 #######################################################################
 #

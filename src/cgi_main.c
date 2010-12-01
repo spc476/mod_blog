@@ -265,12 +265,14 @@ int main_cgi_post(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attrib
   
   set_c_updatetype 	(CgiListGetValue(cgi,"updatetype"));
   set_gf_emailupdate	(CgiListGetValue(cgi,"email"));
+  set_cf_facebook	(CgiListGetValue(cgi,"facebook"));
   set_c_conversion 	(CgiListGetValue(cgi,"filter"));
   set_m_author     	(CgiListGetValue(cgi,"author"),&req);
   set_m_cgi_post_command(CgiListGetValue(cgi,"cmd"),&req);
   
   req.title     = CgiListGetValue(cgi,"title");
   req.class     = CgiListGetValue(cgi,"class");
+  req.status    = CgiListGetValue(cgi,"status");
   req.date      = CgiListGetValue(cgi,"date");
   req.origbody  = CgiListGetValue(cgi,"body");
   req.body      = strdup(req.origbody);
@@ -338,8 +340,9 @@ static int cmd_cgi_post_new(Request req)
   rc = entry_add(req);
   if (rc == ERR_OKAY)
   {
-    generate_pages(req);
+    if (cf_facebook)    notify_facebook(req);
     if (gf_emailupdate) notify_emaillist();
+    generate_pages(req);
     fprintf(
     	req->out,
 	"Status: %d\r\n"
@@ -394,6 +397,7 @@ static int cmd_cgi_post_show(Request req)
   entry->timestamp = gd.tst;
   entry->title     = req->title;
   entry->class     = req->class;
+  entry->status    = req->status;
   entry->author    = req->author;
   entry->body      = req->body;
   

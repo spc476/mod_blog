@@ -49,6 +49,7 @@ typedef struct blogentry
   char       *title;
   char       *class;
   char       *author;
+  char       *status;
   char       *body;
 } *BlogEntry;
 

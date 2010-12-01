@@ -80,6 +80,7 @@ int entry_add(Request req)
   entry->timestamp = gd.tst;
   entry->title     = req->title;
   entry->class     = req->class;
+  entry->status    = req->status;
   entry->author    = req->author;
   entry->body      = req->body;
   
@@ -121,6 +122,25 @@ void fix_entry(Request req)
   
   req->title = entity_conversion(tmp);
   free(tmp);
+  
+  /*--------------------------------------
+  ; convert the status
+  ;-------------------------------------*/
+  
+  if (req->status)
+  {
+    tmp = NULL;
+    size = 0;
+    out  = open_memstream(&tmp,&size);
+    in   = fmemopen(req->status,strlen(req->status),"r");
+    
+    buff_conversion(in,out);
+    fclose(in);
+    fclose(out);
+    free(req->status);
+    req->status = entity_conversion(tmp);
+    free(tmp);
+  }  
   
   /*-------------------------------------
   ; convert body 

@@ -174,6 +174,7 @@ BlogEntry (BlogEntryNew)(Blog blog)
   pbe->title        = strdup("");
   pbe->class        = strdup("");
   pbe->author       = strdup("");
+  pbe->status       = strdup("");
   pbe->body         = strdup("");
   
   return(pbe);
@@ -344,6 +345,7 @@ int (BlogEntryWrite)(BlogEntry entry)
   FILE  *stitles;
   FILE  *sclass;
   FILE  *sauthors;
+  FILE  *status;
   FILE  *out;
   int    rc;
   size_t i;
@@ -402,11 +404,21 @@ int (BlogEntryWrite)(BlogEntry entry)
     return(ERR_ERR);
   }
   
+  status = open_file_w("status",&blog->cache);
+  if (status == NULL)
+  {
+    fclose(sauthors);
+    fclose(sclass);
+    fclose(stitles);
+    return ERR_ERR;
+  }
+  
   for (i = 0 ; i < blog->idx ; i++)
   {
     fprintf(stitles, "%s\n",blog->entries[i]->title);
     fprintf(sclass,  "%s\n",blog->entries[i]->class);
     fprintf(sauthors,"%s\n",blog->entries[i]->author);
+    fprintf(status,  "%s\n",blog->entries[i]->status);
   }
       
   date_to_part(buffer,&entry->when,entry->when.part);
@@ -414,6 +426,7 @@ int (BlogEntryWrite)(BlogEntry entry)
   fputs(entry->body,out);
   
   fclose(out);
+  fclose(status);
   fclose(sauthors);
   fclose(sclass);
   fclose(stitles);
@@ -428,6 +441,7 @@ int (BlogEntryFree)(BlogEntry entry)
   assert(entry != NULL);
   
   free(entry->body);
+  free(entry->status);
   free(entry->author);
   free(entry->class);
   free(entry->title);
@@ -576,6 +590,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
   FILE      *stitles;
   FILE      *sclass;
   FILE      *sauthors;
+  FILE      *status;
   BlogEntry  entry;
   size_t     i;
   size_t     size;
@@ -620,8 +635,9 @@ static int blog_cache_day(Blog blog,struct btm *date)
   stitles   = open_file_r("titles", date);
   sclass    = open_file_r("class",  date);
   sauthors  = open_file_r("authors",date);
+  status    = open_file_r("status", date);
   
-  while(!feof(stitles) || !feof(sclass) || !feof(sauthors))
+  while(!feof(stitles) || !feof(sclass) || !feof(sauthors) || !feof(status))
   {
     char  pname[FILENAME_MAX];
     char *p;
@@ -635,6 +651,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
     entry->title        = NULL;
     entry->class        = NULL;
     entry->author       = NULL;
+    entry->status       = NULL;
     entry->body         = NULL;
     
     size = 0;
@@ -682,6 +699,21 @@ static int blog_cache_day(Blog blog,struct btm *date)
     
     p = memchr(entry->author,'\n',size); if (p) *p = '\0';
     
+    size = 0;
+    if (!feof(status))
+    {
+      if (getline(&entry->status,&size,status) == -1)
+      {
+        free(entry->status);
+        entry->status = strdup("");
+        size = 0;
+      }
+    }
+    else
+      entry->status = strdup("");
+    
+    p = memchr(entry->status,'\n',size); if (p) *p = '\0';
+    
     date_to_part(pname,date,blog->idx + 1);
     
     {
@@ -721,9 +753,11 @@ static int blog_cache_day(Blog blog,struct btm *date)
     ungetc(fgetc(stitles),stitles);
     ungetc(fgetc(sclass),sclass);
     ungetc(fgetc(sauthors),sauthors);
+    ungetc(fgetc(status),status);
   }
   
   blog->cache = *date;
+  fclose(status);
   fclose(sauthors);
   fclose(sclass);
   fclose(stitles);

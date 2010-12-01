@@ -1,3 +1,8 @@
+2010-11-30T19:14-05:00
+
+	generate_pages() trashes the Request structure.  Never noticed until
+	now ... 
+
 2006-02-04T00:54
 
 	http://boston.conman.org/2005/12/10 defaulted to the default

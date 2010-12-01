@@ -84,7 +84,9 @@ static void	cb_edit_body			(FILE *,void *);
 static void	cb_edit_class			(FILE *,void *);
 static void	cb_edit_date			(FILE *,void *);
 static void	cb_edit_email			(FILE *,void *);
+static void	cb_edit_facebook		(FILE *,void *);
 static void	cb_edit_filter			(FILE *,void *);
+static void	cb_edit_status			(FILE *,void *);
 static void	cb_edit_title			(FILE *,void *);
 static void	cb_entry			(FILE *,void *);
 static void	cb_entry_adtag			(FILE *,void *);
@@ -97,6 +99,7 @@ static void	cb_entry_date			(FILE *,void *);
 static void	cb_entry_id			(FILE *,void *);
 static void	cb_entry_name			(FILE *,void *);
 static void	cb_entry_pubdate		(FILE *,void *);
+static void	cb_entry_status			(FILE *,void *);
 static void	cb_entry_title			(FILE *,void *);
 static void	cb_entry_url			(FILE *,void *);
 static void	cb_generator			(FILE *,void *);
@@ -172,7 +175,9 @@ const struct chunk_callback  m_callbacks[] =
   { "edit.class"		, cb_edit_class			} ,
   { "edit.date"			, cb_edit_date			} ,
   { "edit.email"		, cb_edit_email			} ,
+  { "edit.facebook"		, cb_edit_facebook		} ,
   { "edit.filter"		, cb_edit_filter		} ,
+  { "edit.status"		, cb_edit_status		} ,
   { "edit.title"		, cb_edit_title			} ,
   { "entry"			, cb_entry			} ,
   { "entry.adtag"		, cb_entry_adtag		} ,
@@ -185,6 +190,7 @@ const struct chunk_callback  m_callbacks[] =
   { "entry.id"			, cb_entry_id			} ,
   { "entry.name"		, cb_entry_name			} ,
   { "entry.pubdate"		, cb_entry_pubdate		} ,
+  { "entry.status"		, cb_entry_status		} ,
   { "entry.title"		, cb_entry_title		} ,
   { "entry.url"			, cb_entry_url			} ,
   { "generator"			, cb_generator			} ,
@@ -506,6 +512,18 @@ static void cb_entry_class(FILE *out,void *data)
 }
 
 /***********************************************************************/
+
+static void cb_entry_status(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fputs(cbd->entry->status,out);
+}
+
+/************************************************************************/
 
 static void cb_entry_adtag(FILE *out,void *data __attribute__((unused)))
 {
@@ -1354,6 +1372,17 @@ static void cb_edit_title(FILE *out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
+static void cb_edit_status(FILE *out,void *data __attribute__ ((unused)))
+{
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (gd.req->status != NULL)
+    fputs(gd.req->status,out);
+}
+
+/**********************************************************************/
+
 static void cb_edit_date(FILE *out,void *data __attribute__((unused)))
 {
   time_t     now;
@@ -1393,6 +1422,13 @@ static void cb_edit_email(FILE *out __attribute__((unused)),void *data __attribu
 }
 
 /*******************************************************************/
+
+static void cb_edit_facebook(FILE *out __attribute ((unused)),void *data __attribute__ ((unused)))
+{
+  /* XXX */
+}
+
+/********************************************************************/
 
 static void cb_edit_filter(FILE *out __attribute__((unused)),void *data __attribute__((unused)))
 {
