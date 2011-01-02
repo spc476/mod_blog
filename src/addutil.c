@@ -110,24 +110,26 @@ void fix_entry(Request req)
   ; convert the title
   ;--------------------------------*/
   
-  tmp  = NULL;
-  size = 0;
-  out  = open_memstream(&tmp,&size);
-  in   = fmemopen(req->title,strlen(req->title),"r");
+  if (!empty_string(req->title))
+  {
+    tmp  = NULL;
+    size = 0;
+    out  = open_memstream(&tmp,&size);
+    in   = fmemopen(req->title,strlen(req->title),"r");
   
-  buff_conversion(in,out);
-  fclose(in);
-  fclose(out);
-  free(req->title);
-  
-  req->title = entity_conversion(tmp);
-  free(tmp);
+    buff_conversion(in,out);
+    fclose(in);
+    fclose(out);
+    free(req->title);
+    req->title = entity_conversion(tmp);
+    free(tmp);
+  }
   
   /*--------------------------------------
   ; convert the status
   ;-------------------------------------*/
   
-  if (req->status)
+  if (!empty_string(req->status))
   {
     tmp = NULL;
     size = 0;
@@ -146,16 +148,19 @@ void fix_entry(Request req)
   ; convert body 
   ;--------------------------------------*/
   
-  tmp  = NULL;
-  size = 0;
-  out  = open_memstream(&tmp,&size);
-  in   = fmemopen(req->body,strlen(req->body),"r");
+  if (!empty_string(req->body))
+  {
+    tmp  = NULL;
+    size = 0;
+    out  = open_memstream(&tmp,&size);
+    in   = fmemopen(req->body,strlen(req->body),"r");
   
-  (*c_conversion)(in,out);
-  fclose(in);
-  fclose(out);
-  
-  req->body = tmp;
+    (*c_conversion)(in,out);
+    fclose(in);
+    fclose(out);
+    free(req->body);
+    req->body = tmp;
+  }
 }
 
 /************************************************************************/
