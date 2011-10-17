@@ -28,14 +28,14 @@ SETUID=chmod 4755
 CC=gcc -Wall -pedantic -std=c99 -Wextra
 CINCL=
 
-#CFLAGS=-g -ansi -Wall -pedantic -Wtraditional -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
+#CFLAGS=-g -Wall -pedantic -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
 #CFLAGS=-DSCREAM -O4 -fomit-frame-pointer  $(CINCL)
 #CFLAGS=-O3 -fomit-frame-pointer  -DSCREAM $(CINCL)
 #CFLAGS=-O3 -fomit-frame-pointer  $(CINCL)
 #CFLAGS=-pg -g -DSCREAM -DNOSTATS -O4 $(CINCL)
 #CFLAGS=-g -DDDT $(CINCL)
 #CFLAGS=-g -march=pentium3 -O3 $(CINCL)
-CFLAGS=-g $(CINCL) -DNDEBUG
+#CFLAGS=-g $(CINCL) -DNDEBUG
 #CFLAGS=-g -pg $(CINCL)
 
 LFLAGS=-lgdbm -lcgi6 `curl-config --libs`
