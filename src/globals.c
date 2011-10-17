@@ -108,8 +108,6 @@ int GlobalsInit(const char *conf)
   List         headers;
   struct pair *ppair;
   
-  assert(fspec != NULL);
-
   ListInit(&headers);
   
   if (conf == NULL)
