@@ -34,12 +34,14 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include <cgilib6/rfc822.h>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+
+#include <cgilib6/url.h>
 #include <cgilib6/util.h>
-#include <cgilib6/pair.h>
 
 #include "conf.h"
-#include "system.h"
 #include "conversion.h"
 #include "frontend.h"
 #include "fix.h"
@@ -51,6 +53,13 @@
 void	set_c_updatetype	(char *const);
 void	set_gf_emailupdate	(char *const);
 void	set_c_conversion	(char *const);
+void	set_c_url		(const char *);
+
+static bool	   get_next	(char *,const char **);
+static int	   get_field	(lua_State *const restrict,const char *restrict);
+static const char *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
+static int	   get_int	(lua_State *const restrict,const char *const restrict,const int);
+static bool	   get_bool	(lua_State *const restrict,const char *const restrict,const bool);
 
 /************************************************************/
 
@@ -83,11 +92,12 @@ int            c_tzhour       = -5;	/* Eastern */
 int            c_tzmin        =  0;
 const char    *c_overview;
 void	     (*c_conversion)(FILE *,FILE *) =  html_conversion;
-bool           cf_facebook    = false;
+bool           cf_facebook    = false;	/* set by code */
 const char    *c_facebook_ap_id;
 const char    *c_facebook_ap_secret;
 const char    *c_facebook_user;
 
+lua_State     *g_L;
 const char    *g_templates;
 bool           gf_emailupdate = true;
 volatile bool  gf_debug       = false;
@@ -104,11 +114,7 @@ struct display gd =
 
 int GlobalsInit(const char *conf)
 {
-  FILE        *input;
-  List         headers;
-  struct pair *ppair;
-  
-  ListInit(&headers);
+  int rc;
   
   if (conf == NULL)
   {
@@ -124,204 +130,103 @@ int GlobalsInit(const char *conf)
     }
   }
   
-  input = fopen(conf,"r");
-  if (input == NULL)
+  g_L = luaL_newstate();
+  if (g_L == NULL)
   {
-    syslog(LOG_ERR,"%s: %s",conf,strerror(errno));
-    return(ERR_ERR);
+    syslog(LOG_ERR,"cannot create Lua state");
+    return ERR_ERR;
   }
   
-  RFC822HeadersRead(input,&headers);
-
-  for
-  (
-    ppair = PairListFirst(&headers);
-    NodeValid(&ppair->node);
-    ppair = (struct pair *)NodeNext(&ppair->node)
-  )
+  lua_gc(g_L,LUA_GCSTOP,0);
+  luaL_openlibs(g_L);
+  lua_gc(g_L,LUA_GCRESTART,0);
+  rc = luaL_loadfile(g_L,conf);
+  
+  if (rc != 0)
   {
-    if (strcmp(ppair->name,"BASEDIR") == 0)
+    const char *err = lua_tostring(g_L,-1);
+    syslog(LOG_ERR,"Lua error: (%d) %s",rc,err);
+    return ERR_ERR;
+  }
+  
+  rc = lua_pcall(g_L,0,LUA_MULTRET,0);
+  if (rc != 0)
+  {
+    const char *err = lua_tostring(g_L,-1);
+    syslog(LOG_ERR,"Lua error: (%d) %s",rc,err);
+    return ERR_ERR;
+  }
+  
+  gf_debug   = get_bool(g_L,"debug",false);
+  
+  c_name        = get_string(g_L,"name",NULL);
+  c_basedir     = get_string(g_L,"basedir",NULL);
+  c_webdir      = get_string(g_L,"webdir",NULL);
+  gd.adtag      = get_string(g_L,"adtag","programming");
+  c_lockfile    = get_string(g_L,"lockfile","/tmp/.mod_blog.lock");
+  c_overview    = get_string(g_L,"overview",NULL);
+  gd.f.overview = (c_overview != NULL);
+  
+  c_htmltemplates = get_string(g_L,"templates.html.template",NULL);
+  c_daypage       = get_string(g_L,"templates.html.output",NULL);
+  c_days          = get_int   (g_L,"templates.html.days",7);
+  g_templates     = c_htmltemplates;	/* XXX --- need to fix */
+  
+  c_rsstemplates = get_string(g_L,"templates.rss.template",NULL);
+  c_rssfile      = get_string(g_L,"templates.rss.output",NULL);
+  c_rssitems     = get_int   (g_L,"templates.rss.items",15);
+  cf_rssreverse  = get_bool  (g_L,"templates.rss.reverse",true);
+  
+  c_atomtemplates = get_string(g_L,"templates.atom.template",NULL);
+  c_atomfile      = get_string(g_L,"templates.atom.output",NULL);
+  
+  c_author     = get_string(g_L,"author.name",NULL);
+  c_email      = get_string(g_L,"author.email",NULL);
+  c_authorfile = get_string(g_L,"author.file",NULL);
+  
+  c_emaildb      = get_string(g_L,"email.list",NULL);
+  c_emailsubject = get_string(g_L,"email.subject",NULL);
+  c_emailmsg     = get_string(g_L,"email.message",NULL);
+  gf_emailupdate = get_bool  (g_L,"email.notify",true);
+  
+  c_facebook_ap_id     = get_string(g_L,"facebook.ap_id",NULL);
+  c_facebook_ap_secret = get_string(g_L,"facebook.ap_secret",NULL);
+  c_facebook_user      = get_string(g_L,"facebook.user",NULL);
+  
+  {
+    const char *timezone = get_string(g_L,"timezone","-5:00");
+    char       *p;
+  
+    c_tzhour = strtol(timezone,&p,10);
+    p++;
+    c_tzmin  = strtoul(p,NULL,10);
+    free(timezone);
+  }
+  
+  {
+    const char *conversion = get_string(g_L,"conversion","html");
+    set_c_conversion(conversion);
+    free(conversion);
+  }
+  
+  {
+    const char *url = get_string(g_L,"url",NULL);
+    set_c_url(url);
+    free(url);
+  }
+  
+  {
+    const char *p = get_string(g_L,"startdate",NULL);    
+    if (p)
     {
-      c_basedir = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"WEBDIR") == 0)
-    {
-      c_webdir = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"BASEURL") == 0)
-    {
-      char *p = strrchr(ppair->value,'/');
-      if (p != NULL) *p = '\0';
-      c_baseurl = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"FULLBASEURL") == 0)
-    {
-      /*--------------------------------------------
-      ; FullBaseURL cannot end in a '/' or else bad
-      ; things happen.  We don't check for it, and I
-      ; forgot why, because it wasn't commented, but 
-      ; whatever you do, don't use the commented out
-      ; code.
-      ;--------------------------------------------*/
-#ifdef FIXED_BROKEN_FULLBASEURL
-      char *p = strrchr(ppair->value,'/');
-      if (p != NULL) *p = '\0';
-#endif
-      c_fullbaseurl = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"TEMPLATES") == 0)
-    {
-      c_htmltemplates = strdup(ppair->value);
-      g_templates    = c_htmltemplates;
-    }
-    else if (strcmp(ppair->name,"DAYPAGE") == 0)
-    {
-      c_daypage = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"DAYS") == 0)
-    {
-      c_days = strtoul(ppair->value,NULL,10);
-    }
-    else if (strcmp(ppair->name,"RSSFILE") == 0)
-    {
-      c_rssfile = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"RSSTEMPLATES") == 0)
-    {
-      c_rsstemplates = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"RSSFIRST") == 0)
-    {
-      down_string(ppair->value);
-      if (strcmp(ppair->value,"earliest") == 0)
-        cf_rssreverse = false;
-      else if (strcmp(ppair->value,"latest") == 0)
-        cf_rssreverse = true;
-      else
-        cf_rssreverse = false;
-    }
-    else if (strcmp(ppair->name,"ATOMTEMPLATES") == 0)
-    {
-      c_atomtemplates = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"ATOMFILE") == 0)
-    {
-      c_atomfile = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"TABFILE") == 0)
-    {
-      c_tabfile = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"TABTEMPLATES") == 0)
-    {
-      c_tabtemplates = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"TABFIRST") == 0)
-    {
-      down_string(ppair->value);
-      if (strcmp(ppair->value,"earliest") == 0)
-        cf_tabreverse = false;
-      else if (strcmp(ppair->value,"latest") == 0)
-        cf_tabreverse = true;
-      else
-        cf_tabreverse = false;
-    }
-    else if (strcmp(ppair->name,"STARTDATE") == 0)
-    {
-      char *p = ppair->value;
-      
       gd.begin.year  = strtoul(p,&p,10); p++;
       gd.begin.month = strtoul(p,&p,10); p++;
       gd.begin.day   = strtoul(p,NULL,10);
-      gd.begin.part  = 1;      
+      gd.begin.part  = 1;
+      free(p);
     }
-    else if (strcmp(ppair->name,"AUTHOR") == 0)
-    {
-      c_author = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"AUTHORS") == 0)
-    {
-      c_authorfile = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"LOCKFILE") == 0)
-    {
-      c_lockfile = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"EMAIL-UPDATE") == 0)
-    {
-      set_gf_emailupdate(ppair->value);
-    }
-    else if (strcmp(ppair->name,"EMAIL") == 0)
-    {
-      c_email = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"NAME") == 0)
-    {
-      c_name = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"EMAIL-LIST") == 0)
-    {
-      c_emaildb = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"EMAIL-SUBJECT") == 0)
-    {
-      c_emailsubject = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"EMAIL-MESSAGE") == 0)
-    {
-      c_emailmsg = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"TIMEZONE") == 0)
-    {
-      char *p = ppair->value;
-      
-      c_tzhour = strtol(p,&p,10);
-      p++;	/* skip `:' */
-      c_tzmin  = strtoul(p,NULL,10);
-    }
-    else if (strcmp(ppair->name,"CONVERSION") == 0)
-    {
-      set_c_conversion(ppair->value);
-    }
-    else if (strcmp(ppair->name,"ADTAG") == 0)
-    {
-      gd.adtag = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"OVERVIEW") == 0)
-    {
-      c_overview    = strdup(ppair->value);
-      gd.f.overview = true;
-    }
-    else if (strcmp(ppair->name,"DEBUG") == 0)
-    {
-      if (strcmp(ppair->value,"true") == 0)
-        gf_debug = true;
-    }
-    else if (strcmp(ppair->name,"FACEBOOK-AP-ID") == 0)
-    {
-      c_facebook_ap_id = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"FACEBOOK-AP-SECRET") == 0)
-    {
-      c_facebook_ap_secret = strdup(ppair->value);
-    }
-    else if (strcmp(ppair->name,"FACEBOOK-USER") == 0)
-    {
-      c_facebook_user = strdup(ppair->value);
-    }
-    else if (strncmp(ppair->name,"_SYSTEM",7) == 0)
-    {
-      SystemLimit(ppair);
-    }
-    else if (strcmp(ppair->name,"COMMENT") == 0)
-    {
-      /* just here to ensure comments are available */
-    }
-  }
+  }  
 
-  PairListFree(&headers);
-  fclose(input);
-  
   /*-----------------------------------------------------
   ; derive the setting of c_facebook from the given data
   ;------------------------------------------------------*/
@@ -419,3 +324,149 @@ void set_cf_facebook(char *const value)
 
 /*************************************************************************/
 
+void set_c_url(const char *turl)
+{
+  url__t *url;
+  char    port[7];
+  char    tmp [BUFSIZ];
+  
+  assert(turl         != NULL);
+
+  /*------------------------------------------------------------------------
+  ; Pull out the host portion of the URL, but not the path portion.  So, we
+  ; print the http://hostname:port portion for c_fullbaseurl, then use the
+  ; path portion for c_baseurl.  At least now we no longer need to specify
+  ; two separate things for this.
+  ;------------------------------------------------------------------------*/
+    
+  url = UrlNew(turl);
+  
+  if (url->http.port == 80)
+    port[0] = '\0';
+  else
+    snprintf(port,sizeof(port),":%d",url->http.port);
+    
+  snprintf(
+  	tmp,
+  	sizeof(tmp),
+  	"http://%s%s",
+  	url->http.host,
+  	port
+  );
+
+  c_fullbaseurl = strdup(tmp);
+  c_baseurl     = strdup(url->http.path);  
+  UrlFree(url);
+}
+
+/************************************************************************/
+
+static bool get_next(char *dest,const char **pp)
+{
+  const char *p;
+  
+  assert(dest != NULL);
+  assert(pp   != NULL);
+  assert(*pp  != NULL);
+  
+  p = *pp;
+  
+  if (*p == '\0') return false;
+  while((*p != '\0') && (*p != '.'))
+    *dest++ = *p++;
+  
+  assert((*p == '.') || (*p == '\0'));
+  if (*p) p++;
+  *dest = '\0';
+  *pp = p;
+  return true;
+}
+
+/************************************************************************/
+
+static int get_field(
+	lua_State  *const restrict L,
+	const char *restrict       name
+)
+{
+  size_t len = strlen(name);
+  char   field[len];
+  
+  lua_getglobal(L,"_G");
+  while(get_next(field,&name))
+  {
+    lua_getfield(L,-1,field);
+    lua_remove(L,-2);
+    if (lua_isnil(L,-1)) break;
+  }
+  return lua_type(L,-1);
+}
+
+/***********************************************************************/
+
+static const char *get_string(
+	lua_State  *const restrict L,
+	const char *const restrict name,
+	const char *const restrict def
+)
+{
+  char *val;
+  
+  assert(L    != NULL);
+  assert(name != NULL);
+  
+  if (get_field(L,name) != LUA_TSTRING)
+    val = (def != NULL) ? strdup(def) : NULL;
+  else
+    val = strdup(lua_tostring(L,-1));
+
+  lua_pop(L,1);
+  return val;
+}
+
+/*************************************************************************/
+
+static int get_int(
+	lua_State  *const restrict L,
+	const char *const restrict name,
+	const int                  def
+)
+{
+  int val;
+  
+  assert(L    != NULL);
+  assert(name != NULL);
+  
+
+  if (get_field(L,name) != LUA_TNUMBER)
+    val = def;
+  else
+    val = lua_tointeger(L,-1);
+    
+  lua_pop(L,1);
+  return val;
+}
+
+/*************************************************************************/
+
+static bool get_bool(
+	lua_State  *const restrict L,
+	const char *const restrict name,
+	const bool                 def
+)
+{
+  bool val;
+  
+  assert(L    != NULL);
+  assert(name != NULL);
+  
+  if (get_field(L,name) == LUA_TNIL)
+    val = def;
+  else
+    val = lua_toboolean(L,-1);
+  
+  lua_pop(L,1);
+  return val;
+}
+
+/**************************************************************************/

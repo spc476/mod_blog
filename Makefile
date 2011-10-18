@@ -25,7 +25,7 @@ SHELL=/bin/sh
 HOSTDIR=build
 SETUID=chmod 4755
 
-CC=gcc -Wall -pedantic -std=c99 -Wextra
+CC=gcc -g -Wall -pedantic -std=c99 -Wextra
 CINCL=
 
 #CFLAGS=-g -Wall -pedantic -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
@@ -38,7 +38,7 @@ CINCL=
 #CFLAGS=-g $(CINCL) -DNDEBUG
 #CFLAGS=-g -pg $(CINCL)
 
-LFLAGS=-lgdbm -lcgi6 `curl-config --libs`
+LFLAGS=-rdynamic -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 #LFLAGS= lcgi5 
 #LFLAGS=-ldb -lcgi5 -pg
 # For Solaris, use this line
@@ -71,8 +71,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/entity-conversion.o	\
-		$(HOSTDIR)/facebook.o		\
-		$(HOSTDIR)/system.o
+		$(HOSTDIR)/facebook.o	
 	$(CC) $(CFLAGS) -o $@			\
 		$(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/authenticate.o	\
@@ -87,7 +86,6 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/wbtum.o		\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
-		$(HOSTDIR)/system.o		\
 		$(HOSTDIR)/facebook.o		\
 		$(HOSTDIR)/entity-conversion.o	\
 		$(LFLAGS) 
@@ -149,9 +147,6 @@ $(HOSTDIR)/wbttest.o : src/wbttest.c src/wbtum.h
 
 $(HOSTDIR)/wbtum.o : src/wbtum.c src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/wbtum.c
-
-$(HOSTDIR)/system.o : src/system.c 
-	$(CC) $(CFLAGS) -c -o $@ src/system.c
 
 $(HOSTDIR)/blogutil.o : src/blogutil.c src/blogutil.h
 	$(CC) $(CFLAGS) -c -o $@ src/blogutil.c
