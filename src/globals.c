@@ -327,36 +327,35 @@ void set_cf_facebook(char *const value)
 void set_c_url(const char *turl)
 {
   url__t *url;
-  char    port[7];
-  char    tmp [BUFSIZ];
-  
-  assert(turl         != NULL);
+  size_t  len;
+  char   *fbu;
+  char   *bu;
 
-  /*------------------------------------------------------------------------
-  ; Pull out the host portion of the URL, but not the path portion.  So, we
-  ; print the http://hostname:port portion for c_fullbaseurl, then use the
-  ; path portion for c_baseurl.  At least now we no longer need to specify
-  ; two separate things for this.
-  ;------------------------------------------------------------------------*/
-    
+  assert(turl != NULL);
+
+  fbu = strdup(turl);
   url = UrlNew(turl);
-  
-  if (url->http.port == 80)
-    port[0] = '\0';
-  else
-    snprintf(port,sizeof(port),":%d",url->http.port);
-    
-  snprintf(
-  	tmp,
-  	sizeof(tmp),
-  	"http://%s%s",
-  	url->http.host,
-  	port
-  );
+  bu  = strdup(url->http.path);
 
-  c_fullbaseurl = strdup(tmp);
-  c_baseurl     = strdup(url->http.path);  
-  UrlFree(url);
+  /*-----------------------------------------------------------------------
+  ; because of the way link generation happens, both of these *CAN'T* end
+  ; with a '/'.  So make sure they don't end with a '/'.
+  ;
+  ; The reason we go through an intermediate variable is that c_fullbaseurl
+  ; and c_baseurl are declared as 'const char *' and we can't modify a
+  ; constant memory location.
+  ;-----------------------------------------------------------------------*/
+  
+  len = strlen(fbu);
+  if (len) len--;
+  if (fbu[len] == '/') fbu[len] = '\0';
+  
+  len = strlen(bu);
+  if (len) len--;
+  if (bu[len] == '/') bu[len] = '\0';
+  
+  c_fullbaseurl = fbu;
+  c_baseurl     = bu;  
 }
 
 /************************************************************************/
