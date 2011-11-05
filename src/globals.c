@@ -173,7 +173,32 @@ int GlobalsInit(const char *conf)
   lua_getfield(g_L,-1,"template");
   c_htmltemplates = strdup(lua_tostring(g_L,-1));
   g_templates     = c_htmltemplates;	/* XXX */
-  lua_pop(g_L,3);
+  
+  lua_getfield(g_L,-2,"items");
+  if (lua_isstring(g_L,-1))
+  {
+    const char *x;
+    char       *p;
+    
+    x = lua_tostring(g_L,-1);
+    c_days = strtoul(x,&p,10);
+    switch(*p)
+    {
+      case 'd': break;
+      case 'w': c_days *= 7; break;
+      case 'm': c_days *= 30; break;
+      default: break;
+    }
+  }
+  else if (lua_isnumber(g_L,-1))
+    c_days = lua_tointeger(g_L,-1);
+  else
+  {
+    syslog(LOG_ERR,"wrong type for c_days");
+    c_days = 7;
+  }
+   
+  lua_pop(g_L,4);
   
 #if 0
   c_htmltemplates = get_string(g_L,"templates.html.template",NULL);

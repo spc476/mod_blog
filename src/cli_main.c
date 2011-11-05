@@ -50,6 +50,7 @@
 #include "timeutil.h"
 #include "wbtum.h"
 #include "fix.h"
+#include "backend.h"
 
 enum
 {
@@ -242,6 +243,17 @@ static int cmd_cli_show(Request req)
   else
   {
     if (req->reqtumbler == NULL)
+    {
+      template__t template;
+      
+      template.template = c_htmltemplates;
+      template.items    = c_days;
+      template.pagegen  = pagegen_days;
+      template.reverse  = true;
+      template.fullurl  = false;
+      
+      rc = pagegen_days(&template,req->out,&gd.now);
+#if 0
       rc = primary_page(
       		req->out,
 		gd.now.year,
@@ -249,6 +261,8 @@ static int cmd_cli_show(Request req)
 		gd.now.day,
 		gd.now.part
 	);
+#endif
+    }
     else
     {
       rc = TumblerNew(&req->tumbler,&req->reqtumbler);

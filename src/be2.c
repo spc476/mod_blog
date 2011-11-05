@@ -77,7 +77,7 @@ int page_generation(Request req __attribute__((unused)))
     }
     else if (lua_isnumber(g_L,-1))
     {
-      template.items   = lua_tointeger(g_L,-2);
+      template.items   = lua_tointeger(g_L,-1);
       template.pagegen = pagegen_items;
     }
     else

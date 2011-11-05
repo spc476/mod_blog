@@ -603,6 +603,10 @@ static int display_file(FILE * out,Tumbler spec)
 
 int primary_page(FILE *out,int year,unsigned int month,unsigned int iday,unsigned int part)
 {
+#if 1
+  assert(0);
+  return 0;
+#else
   BlogEntry             entry;
   struct btm            thisday;
   int                   days;
@@ -656,12 +660,17 @@ int primary_page(FILE *out,int year,unsigned int month,unsigned int iday,unsigne
   free_entries(&cbd.list);
   
   return(0);
+#endif
 }
 
 /********************************************************************/
 
 static int rss_page(FILE *out,struct btm *when,int fullurl,int reverse)
 {
+#if 1
+  assert(0);
+  return 0;
+#else
   struct btm            thisday;
   char                 *tags;
   struct callback_data  cbd;
@@ -688,6 +697,7 @@ static int rss_page(FILE *out,struct btm *when,int fullurl,int reverse)
   free_entries(&cbd.list);
 
   return(0);
+#endif
 }
 
 /********************************************************************/
