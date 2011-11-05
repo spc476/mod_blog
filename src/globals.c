@@ -56,7 +56,7 @@ void	set_c_conversion	(char *const);
 void	set_c_url		(const char *);
 
 static bool	   get_next	(char *,const char **);
-static int	   get_field	(lua_State *const restrict,const char *restrict);
+static int	   get_field	(lua_State *const restrict,const char *);
 static const char *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
 static int	   get_int	(lua_State *const restrict,const char *const restrict,const int);
 static bool	   get_bool	(lua_State *const restrict,const char *const restrict,const bool);
@@ -85,7 +85,7 @@ const char    *c_email;
 const char    *c_authorfile;
 const char    *c_updatetype   = "NewEntry";
 const char    *c_lockfile     = "/tmp/.mod_blog.lock";
-char          *c_emaildb;
+const char    *c_emaildb;
 const char    *c_emailsubject;
 const char    *c_emailmsg;
 int            c_tzhour       = -5;	/* Eastern */
@@ -200,26 +200,28 @@ int GlobalsInit(const char *conf)
     c_tzhour = strtol(timezone,&p,10);
     p++;
     c_tzmin  = strtoul(p,NULL,10);
-    free(timezone);
+    free((void *)timezone);
   }
   
   {
     const char *conversion = get_string(g_L,"conversion","html");
-    set_c_conversion(conversion);
-    free(conversion);
+    set_c_conversion((char *)conversion);
+    free((void *)conversion);
   }
   
   {
     const char *url = get_string(g_L,"url",NULL);
     set_c_url(url);
-    free(url);
+    free((void *)url);
   }
   
   {
-    const char *p = get_string(g_L,"startdate",NULL);    
-    if (p)
+    const char *d = get_string(g_L,"startdate",NULL);    
+    char       *p;
+    
+    if (d)
     {
-      gd.begin.year  = strtoul(p,&p,10); p++;
+      gd.begin.year  = strtoul(d,&p,10); p++;
       gd.begin.month = strtoul(p,&p,10); p++;
       gd.begin.day   = strtoul(p,NULL,10);
       gd.begin.part  = 1;
@@ -385,7 +387,7 @@ static bool get_next(char *dest,const char **pp)
 
 static int get_field(
 	lua_State  *const restrict L,
-	const char *restrict       name
+	const char *               name
 )
 {
   size_t len = strlen(name);
