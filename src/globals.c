@@ -166,7 +166,16 @@ int GlobalsInit(const char *conf)
   c_lockfile    = get_string(g_L,"lockfile","/tmp/.mod_blog.lock");
   c_overview    = get_string(g_L,"overview",NULL);
   gd.f.overview = (c_overview != NULL);
+
+  lua_getglobal(g_L,"templates");
+  lua_pushinteger(g_L,1);
+  lua_gettable(g_L,-2);
+  lua_getfield(g_L,-1,"template");
+  c_htmltemplates = strdup(lua_tostring(g_L,-1));
+  g_templates     = c_htmltemplates;	/* XXX */
+  lua_pop(g_L,3);
   
+#if 0
   c_htmltemplates = get_string(g_L,"templates.html.template",NULL);
   c_daypage       = get_string(g_L,"templates.html.output",NULL);
   c_days          = get_int   (g_L,"templates.html.days",7);
@@ -179,7 +188,8 @@ int GlobalsInit(const char *conf)
   
   c_atomtemplates = get_string(g_L,"templates.atom.template",NULL);
   c_atomfile      = get_string(g_L,"templates.atom.output",NULL);
-  
+#endif
+
   c_author     = get_string(g_L,"author.name",NULL);
   c_email      = get_string(g_L,"author.email",NULL);
   c_authorfile = get_string(g_L,"author.file",NULL);
