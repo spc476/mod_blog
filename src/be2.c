@@ -1,15 +1,43 @@
 
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+
+#include <syslog.h>
+
+#include "conf.h"
+#include "blog.h"
+#include "frontend.h"
+#include "backend.h"
+#include "fix.h"
+#include "globals.h"
+
+char *tag_collect (List *);
+char *tag_pick (const char *);
+void  free_entries (List *);
 
 /************************************************************************/
 
 int page_generation(Request req __attribute__((unused)))
 {
+  size_t max;
+  size_t i;
+  
+  syslog(LOG_DEBUG,"generating pages");
   lua_getglobal(g_L,"templates");
   max = lua_objlen(g_L,-1);
   
   for (i = 1 ; i <= max ; i++)
   {
+    template__t  template;
+    FILE        *out;
+    
     lua_pushinteger(g_L,i);
     lua_gettable(g_L,-2);
     
@@ -19,24 +47,24 @@ int page_generation(Request req __attribute__((unused)))
     lua_getfield(g_L,-4,"output");
     lua_getfield(g_L,-5,"items");
     
-    template.template = lua_tostring (L,-5);
-    template.reverse  = lua_toboolean(L,-4);
-    template.fullurl  = lua_toboolean(L,-3);
+    template.template = lua_tostring (g_L,-5);
+    template.reverse  = lua_toboolean(g_L,-4);
+    template.fullurl  = lua_toboolean(g_L,-3);
     
-    out = fopen(lua_tostring(L,-2),"w");
+    out = fopen(lua_tostring(g_L,-2),"w");
     if (out == NULL)
     {
-      syslog(LOG_ERR,"%s: %s",lua_tostring(L,-2),strerror(errno));
-      lua_pop(L,6);
+      syslog(LOG_ERR,"%s: %s",lua_tostring(g_L,-2),strerror(errno));
+      lua_pop(g_L,6);
       continue;
     }
     
-    if (lua_isstring(L,-1))
+    if (lua_isstring(g_L,-1))
     {
       const char *x;
       char       *p;
       
-      x = lua_tostring(L,-1);
+      x = lua_tostring(g_L,-1);
       template.items = strtoul(x,&p,10);
       switch(*p)
       {
@@ -47,24 +75,24 @@ int page_generation(Request req __attribute__((unused)))
       }
       template.pagegen = pagegen_days;
     }
-    else if (lua_isnumber(L,-1))
+    else if (lua_isnumber(g_L,-1))
     {
-      template.items   = lua_tointeger(L,-2);
+      template.items   = lua_tointeger(g_L,-2);
       template.pagegen = pagegen_items;
     }
     else
     {
       syslog(LOG_ERR,"wrong type for items");
-      lua_pop(L,6);
+      lua_pop(g_L,6);
       continue;
     }
     
     (*template.pagegen)(&template,out,&gd.now);
     fclose(out);
-    lua_pop(L,6);
+    lua_pop(g_L,6);
   }
   
-  lua_pop(L,1);
+  lua_pop(g_L,1);
   return 0;
 }
 
@@ -76,14 +104,15 @@ int pagegen_items(
 	const struct btm  *const restrict when
 )
 {
-  struct btm       thisday;
-  char            *tags;
-  struct callback  cbd;
+  struct btm            thisday;
+  char                 *tags;
+  struct callback_data  cbd;
   
   assert(template != NULL);
   assert(out      != NULL);
   assert(when     != NULL);
   
+  syslog(LOG_DEBUG,"items template %s(%lu)",template->template,(unsigned long)template->items);
   g_templates  = template->template;
   gd.f.fullurl = template->fullurl;
   gd.f.reverse = template->reverse;
@@ -122,7 +151,8 @@ int pagegen_days(
   assert(template != NULL);
   assert(out      != NULL);
   assert(when     != NULL);
-  
+
+  syslog(LOG_DEBUG,"days template %s(%lu)",template->template,(unsigned long)template->items);  
   g_templates  = template->template;
   gd.f.fullurl = false;
   gd.f.reverse = true;

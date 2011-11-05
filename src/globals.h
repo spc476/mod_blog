@@ -26,6 +26,10 @@
 #include <stdbool.h>
 #include <cgilib6/cgi.h>
 
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+
 #include "frontend.h"
 #include "timeutil.h"
 #include "blog.h"
@@ -81,6 +85,7 @@ extern const char            *c_facebook_ap_id;
 extern const char            *c_facebook_ap_secret;
 extern const char            *c_facebook_user;
 
+extern lua_State             *g_L;
 extern const char *           g_templates;	/* work on */
 extern bool                   gf_emailupdate;	/* work on */
 extern volatile bool          gf_debug;

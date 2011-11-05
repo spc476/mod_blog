@@ -71,7 +71,8 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/entity-conversion.o	\
-		$(HOSTDIR)/facebook.o	
+		$(HOSTDIR)/facebook.o		\
+		$(HOSTDIR)/be2.o
 	$(CC) $(CFLAGS) -o $@			\
 		$(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/authenticate.o	\
@@ -88,6 +89,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/facebook.o		\
 		$(HOSTDIR)/entity-conversion.o	\
+		$(HOSTDIR)/be2.o		\
 		$(LFLAGS) 
 	$(SETUID) $(HOSTDIR)/boston
 
@@ -156,6 +158,9 @@ $(HOSTDIR)/entity-conversion.o : src/entity-conversion.c
 
 $(HOSTDIR)/facebook.o : src/facebook.c
 	$(CC) $(CFLAGS) `curl-config --cflags` -c -o $@ src/facebook.c
+
+$(HOSTDIR)/be2.o : src/be2.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 #######################################################################
 #

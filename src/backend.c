@@ -52,6 +52,7 @@
 #include "fix.h"
 #include "globals.h"
 #include "blogutil.h"
+#include "backend.h"
 
 /*****************************************************************/
 
@@ -60,14 +61,17 @@ static void	   calculate_next		(struct btm);
 static const char *mime_type			(char *);
 static int	   display_file			(FILE *,Tumbler);
 static int	   rss_page			(FILE *,struct btm *,int,int);
-static char       *tag_collect			(List *);
-static char	  *tag_pick                     (const char *);
-static void	   free_entries			(List *);
+ char       *tag_collect			(List *);
+ char	  *tag_pick                     (const char *);
+ void	   free_entries			(List *);
 
 /************************************************************************/
 
 int generate_pages(Request req __attribute__((unused)))
 {
+#if 1
+  return page_generation(req);
+#else
   FILE *out;
   int   rc = 0;
 
@@ -113,6 +117,7 @@ int generate_pages(Request req __attribute__((unused)))
   }
   
   return(rc);
+#endif
 }
 
 /******************************************************************/
@@ -687,7 +692,7 @@ static int rss_page(FILE *out,struct btm *when,int fullurl,int reverse)
 
 /********************************************************************/
 
-static char *tag_collect(List *list)
+ char *tag_collect(List *list)
 {
   BlogEntry entry;
   
@@ -710,7 +715,7 @@ static char *tag_collect(List *list)
 
 /********************************************************************/
 
-static char *tag_pick(const char *tag)
+ char *tag_pick(const char *tag)
 {
   String *pool;
   size_t  num;
@@ -746,7 +751,7 @@ static char *tag_pick(const char *tag)
  
 /******************************************************************/
 
-static void free_entries(List *list)
+ void free_entries(List *list)
 {
   BlogEntry entry;
   
