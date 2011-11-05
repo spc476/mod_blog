@@ -38,10 +38,9 @@
 ; (that included directories as well as files) since files could 
 ; be created via email, a webpage or locally by the end user.
 ;
-; This might not be desirable so another option is to make both "bp"
-; and "addentry" SETUID.  That will prevent the files from being 
-; world writable, but does leave a pair of SETUID programs lying around
-; that are hopefully secure.
+; This might not be desirable so another option is to make the engine
+; SETUID.  That will prevent the files from being world writable, but does
+; leave a SETUID program lying around that is hopefully secure.
 ;
 ; So, for non-SETUID, set this value to 000
 ; for SETUID operation, set to 022
