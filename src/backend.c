@@ -38,6 +38,7 @@
 
 #include <sys/stat.h>
 #include <unistd.h>
+#include <syslog.h>
 
 #include <cgilib6/htmltok.h>
 #include <cgilib6/util.h>
@@ -60,67 +61,181 @@ static void	   calculate_previous		(struct btm);
 static void	   calculate_next		(struct btm);
 static const char *mime_type			(char *);
 static int	   display_file			(FILE *,Tumbler);
-static int	   rss_page			(FILE *,struct btm *,int,int);
- char       *tag_collect			(List *);
- char	  *tag_pick                     (const char *);
- void	   free_entries			(List *);
+static char       *tag_collect			(List *);
+static char	  *tag_pick                     (const char *);
+static void	   free_entries			(List *);
 
 /************************************************************************/
 
 int generate_pages(Request req __attribute__((unused)))
 {
-#if 1
-  return page_generation(req);
-#else
-  FILE *out;
-  int   rc = 0;
-
-  assert(req != NULL);
-
-  out = fopen(c_daypage,"w");
-  if (out == NULL) 
-  {
-    return(ERR_ERR);
-  }
+  size_t max;
+  size_t i;
   
-  rc = primary_page(out,gd.now.year,gd.now.month,gd.now.day,gd.now.part);
-  fclose(out);
+  syslog(LOG_DEBUG,"generating pages");
+  lua_getglobal(g_L,"templates");
+  max = lua_objlen(g_L,-1);
   
-  if (c_rsstemplates)
+  for (i = 1 ; i <= max ; i++)
   {
-    g_templates = c_rsstemplates;
-    out         = fopen(c_rssfile,"w");
+    template__t  template;
+    FILE        *out;
+    
+    lua_pushinteger(g_L,i);
+    lua_gettable(g_L,-2);
+    
+    lua_getfield(g_L,-1,"template");
+    lua_getfield(g_L,-2,"reverse");
+    lua_getfield(g_L,-3,"fullurl");
+    lua_getfield(g_L,-4,"output");
+    lua_getfield(g_L,-5,"items");
+    
+    template.template = lua_tostring (g_L,-5);
+    template.reverse  = lua_toboolean(g_L,-4);
+    template.fullurl  = lua_toboolean(g_L,-3);
+    
+    out = fopen(lua_tostring(g_L,-2),"w");
     if (out == NULL)
-      return(ERR_ERR);
-    rc = rss_page(out,&gd.now,true,cf_rssreverse);
+    {
+      syslog(LOG_ERR,"%s: %s",lua_tostring(g_L,-2),strerror(errno));
+      lua_pop(g_L,6);
+      continue;
+    }
+    
+    if (lua_isstring(g_L,-1))
+    {
+      const char *x;
+      char       *p;
+      
+      x = lua_tostring(g_L,-1);
+      template.items = strtoul(x,&p,10);
+      switch(*p)
+      {
+        case 'd': break;
+        case 'w': template.items *=  7; break;
+        case 'm': template.items *= 30; break;
+        default: break;
+      }
+      template.pagegen = pagegen_days;
+    }
+    else if (lua_isnumber(g_L,-1))
+    {
+      template.items   = lua_tointeger(g_L,-1);
+      template.pagegen = pagegen_items;
+    }
+    else
+    {
+      syslog(LOG_ERR,"wrong type for items");
+      lua_pop(g_L,6);
+      continue;
+    }
+    
+    (*template.pagegen)(&template,out,&gd.now);
     fclose(out);
-  }
-
-  if (c_atomtemplates)
-  {
-    g_templates = c_atomtemplates;
-    out         = fopen(c_atomfile,"w");
-    if (out == NULL)
-      return(ERR_ERR);
-    rc = rss_page(out,&gd.now,true,cf_rssreverse);
-    fclose(out);
+    lua_pop(g_L,6);
   }
   
-  if (c_tabtemplates)
-  {
-    g_templates = c_tabtemplates;
-    out         = fopen(c_tabfile,"w");
-    if (out == NULL)
-      return(ERR_ERR);
-    rc = rss_page(out,&gd.now,false,cf_tabreverse);
-    fclose(out);
-  }
-  
-  return(rc);
-#endif
+  lua_pop(g_L,1);
+  return 0;
 }
 
 /******************************************************************/
+
+int pagegen_items(
+	const template__t *const restrict template,
+	FILE              *const restrict out,
+	const struct btm  *const restrict when
+)
+{
+  struct btm            thisday;
+  char                 *tags;
+  struct callback_data  cbd;
+  
+  assert(template != NULL);
+  assert(out      != NULL);
+  assert(when     != NULL);
+  
+  syslog(LOG_DEBUG,"items template %s(%lu)",template->template,(unsigned long)template->items);
+  g_templates  = template->template;
+  gd.f.fullurl = template->fullurl;
+  gd.f.reverse = template->reverse;
+  thisday      = *when;
+  
+  memset(&cbd,0,sizeof(struct callback_data));
+  
+  ListInit(&cbd.list);
+  if (template->reverse)
+    BlogEntryReadXD(g_blog,&cbd.list,&thisday,template->items);
+  else
+    BlogEntryReadXU(g_blog,&cbd.list,&thisday,template->items);
+  
+  tags     = tag_collect(&cbd.list);
+  gd.adtag = tag_pick(tags);
+  free(tags);
+  generic_cb("main",out,&cbd);
+  free_entries(&cbd.list);
+  return 0;
+}
+
+/************************************************************************/
+
+int pagegen_days(
+	const template__t *const restrict template,
+	FILE              *const restrict out,
+	const struct btm  *const restrict when
+)
+{
+  struct btm            thisday;
+  size_t                days;
+  char                 *tags;
+  struct callback_data  cbd;
+  bool                  added;
+  
+  assert(template != NULL);
+  assert(out      != NULL);
+  assert(when     != NULL);
+
+  syslog(LOG_DEBUG,"days template %s(%lu)",template->template,(unsigned long)template->items);  
+  g_templates  = template->template;
+  gd.f.fullurl = false;
+  gd.f.reverse = true;
+  thisday      = *when;
+  
+  memset(&cbd,0,sizeof(struct callback_data));
+  
+  for (ListInit(&cbd.list) , days = 0 , added = false ; days < template->items ; )
+  {
+    BlogEntry entry;
+    
+    if (btm_cmp(&thisday,&gd.begin) < 0) break;
+    
+    entry = BlogEntryRead(g_blog,&thisday);
+    if (entry)
+    {
+      ListAddTail(&cbd.list,&entry->node);
+      added = true;
+    }
+    
+    thisday.part--;
+    if (thisday.part == 0)
+    {
+      thisday.part = 23;
+      btm_sub_day(&thisday);
+      if (added)
+        days++;
+      added = false;
+    }
+  }
+  
+  tags = tag_collect(&cbd.list);
+  gd.adtag = tag_pick(tags);
+  free(tags);
+  generic_cb("main",out,&cbd);
+  free_entries(&cbd.list);
+  return 0;
+}
+
+/************************************************************************/
 
 int tumbler_page(FILE *out,Tumbler spec)
 {
@@ -601,108 +716,7 @@ static int display_file(FILE * out,Tumbler spec)
 
 /*****************************************************************/
 
-int primary_page(FILE *out,int year,unsigned int month,unsigned int iday,unsigned int part)
-{
-#if 1
-  assert(0);
-  return 0;
-#else
-  BlogEntry             entry;
-  struct btm            thisday;
-  int                   days;
-  char                 *tags;
-  struct callback_data  cbd;
-  int                   added;
-  
-  assert(out   != NULL);
-  assert(year  >  0);
-  assert(month >  0);
-  assert(month <  13);
-  assert(iday  >  0);
-  assert(iday  <= max_monthday(year,month));
-
-  gd.f.fullurl = false;
-  gd.f.reverse = true;
-    
-  thisday.year  = year;
-  thisday.month = month;
-  thisday.day   = iday;
-  thisday.part  = part;
-  
-  memset(&cbd,0,sizeof(struct callback_data));
-  
-  for (ListInit(&cbd.list) , days = 0 , added = false ; days < c_days ; )
-  {
-    if (btm_cmp(&thisday,&gd.begin) < 0) break;
-    
-    entry = BlogEntryRead(g_blog,&thisday);
-    if (entry)
-    {
-      ListAddTail(&cbd.list,&entry->node);
-      added = true;
-    }
-
-    thisday.part--;
-    if (thisday.part == 0)
-    {
-      thisday.part = 23;
-      btm_sub_day(&thisday);
-      if (added)
-        days++;
-      added = false;
-    }
-  }
-
-  tags = tag_collect(&cbd.list);
-  gd.adtag = tag_pick(tags);
-  free(tags);
-  generic_cb("main",out,&cbd);
-  free_entries(&cbd.list);
-  
-  return(0);
-#endif
-}
-
-/********************************************************************/
-
-static int rss_page(FILE *out,struct btm *when,int fullurl,int reverse)
-{
-#if 1
-  assert(0);
-  return 0;
-#else
-  struct btm            thisday;
-  char                 *tags;
-  struct callback_data  cbd;
-  
-  assert(out   != NULL);
-  assert(when  != NULL);
-  
-  gd.f.fullurl = fullurl;
-  gd.f.reverse = reverse;
-  thisday      = *when;
-  
-  memset(&cbd,0,sizeof(struct callback_data));
-  
-  ListInit(&cbd.list);
-  if (gd.f.reverse)
-    BlogEntryReadXD(g_blog,&cbd.list,&thisday,c_rssitems);
-  else
-    BlogEntryReadXU(g_blog,&cbd.list,&thisday,c_rssitems);
-
-  tags     = tag_collect(&cbd.list);  
-  gd.adtag = tag_pick(tags);
-  free(tags);
-  generic_cb("main",out,&cbd);
-  free_entries(&cbd.list);
-
-  return(0);
-#endif
-}
-
-/********************************************************************/
-
- char *tag_collect(List *list)
+static char *tag_collect(List *list)
 {
   BlogEntry entry;
   
@@ -725,7 +739,7 @@ static int rss_page(FILE *out,struct btm *when,int fullurl,int reverse)
 
 /********************************************************************/
 
- char *tag_pick(const char *tag)
+static char *tag_pick(const char *tag)
 {
   String *pool;
   size_t  num;
@@ -761,7 +775,7 @@ static int rss_page(FILE *out,struct btm *when,int fullurl,int reverse)
  
 /******************************************************************/
 
- void free_entries(List *list)
+static void free_entries(List *list)
 {
   BlogEntry entry;
   

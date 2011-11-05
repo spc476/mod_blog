@@ -108,7 +108,6 @@ int	 authenticate_author		(Request);
 int	 generate_pages			(Request);
 void	 notify_facebook		(Request);
 void	 notify_emaillist		(void);
-int	 primary_page			(FILE *,int,unsigned int,unsigned int,unsigned int);
 int	 tumbler_page			(FILE *,Tumbler);
 int	 BlogDatesInit			(void);
 int	 entry_add			(Request);

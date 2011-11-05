@@ -71,8 +71,7 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/backend.o		\
 		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/entity-conversion.o	\
-		$(HOSTDIR)/facebook.o		\
-		$(HOSTDIR)/be2.o
+		$(HOSTDIR)/facebook.o
 	$(CC) $(CFLAGS) -o $@			\
 		$(HOSTDIR)/addutil.o		\
 		$(HOSTDIR)/authenticate.o	\
@@ -89,7 +88,6 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 		$(HOSTDIR)/blogutil.o		\
 		$(HOSTDIR)/facebook.o		\
 		$(HOSTDIR)/entity-conversion.o	\
-		$(HOSTDIR)/be2.o		\
 		$(LFLAGS) 
 	$(SETUID) $(HOSTDIR)/boston
 
