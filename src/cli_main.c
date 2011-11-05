@@ -253,15 +253,6 @@ static int cmd_cli_show(Request req)
       template.fullurl  = false;
       
       rc = pagegen_days(&template,req->out,&gd.now);
-#if 0
-      rc = primary_page(
-      		req->out,
-		gd.now.year,
-		gd.now.month,
-		gd.now.day,
-		gd.now.part
-	);
-#endif
     }
     else
     {

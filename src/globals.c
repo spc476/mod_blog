@@ -200,21 +200,6 @@ int GlobalsInit(const char *conf)
    
   lua_pop(g_L,4);
   
-#if 0
-  c_htmltemplates = get_string(g_L,"templates.html.template",NULL);
-  c_daypage       = get_string(g_L,"templates.html.output",NULL);
-  c_days          = get_int   (g_L,"templates.html.days",7);
-  g_templates     = c_htmltemplates;	/* XXX --- need to fix */
-  
-  c_rsstemplates = get_string(g_L,"templates.rss.template",NULL);
-  c_rssfile      = get_string(g_L,"templates.rss.output",NULL);
-  c_rssitems     = get_int   (g_L,"templates.rss.items",15);
-  cf_rssreverse  = get_bool  (g_L,"templates.rss.reverse",true);
-  
-  c_atomtemplates = get_string(g_L,"templates.atom.template",NULL);
-  c_atomfile      = get_string(g_L,"templates.atom.output",NULL);
-#endif
-
   c_author     = get_string(g_L,"author.name",NULL);
   c_email      = get_string(g_L,"author.email",NULL);
   c_authorfile = get_string(g_L,"author.file",NULL);
