@@ -76,13 +76,10 @@
 ;
 ;	FEATURE_MULTI_TUMBLER		- support multiple tumbler requests
 ;						(doesn't work)
-;	FIXED_BROKEN_FULLBASEURL	- Bad code fixed. 
-;
 ; At some point, these should all go away.  Hopefully.
 ;----------------------------------------------------------------------*/
 
 #undef  FEATURE_MULTI_TUMBLER
-#undef  FIXED_BROKEN_FULLBASEURL
 
 #endif
 
