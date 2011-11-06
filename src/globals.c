@@ -59,6 +59,7 @@ static bool	   get_next	(char *,const char **);
 static int	   get_field	(lua_State *const restrict,const char *);
 static const char *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
 static bool	   get_bool	(lua_State *const restrict,const char *const restrict,const bool);
+static void	   globals_free	(void);
 
 /************************************************************/
 
@@ -69,23 +70,23 @@ const char    *c_baseurl;
 const char    *c_fullbaseurl;
 const char    *c_htmltemplates;
 const char    *c_daypage;
-int            c_days         = -1;
+int            c_days;
 const char    *c_rssfile;
 const char    *c_atomfile;
-int            c_rssitems     = 15;
+int            c_rssitems;
 const char    *c_author;
 const char    *c_email;
 const char    *c_authorfile;
 const char    *c_updatetype   = "NewEntry";
-const char    *c_lockfile     = "/tmp/.mod_blog.lock";
+const char    *c_lockfile;
 const char    *c_emaildb;
 const char    *c_emailsubject;
 const char    *c_emailmsg;
-int            c_tzhour       = -5;	/* Eastern */
-int            c_tzmin        =  0;
+int            c_tzhour;
+int            c_tzmin;
 const char    *c_overview;
 void	     (*c_conversion)(FILE *,FILE *) =  html_conversion;
-bool           cf_facebook    = false;	/* set by code */
+bool           cf_facebook;		/* set by code */
 const char    *c_facebook_ap_id;
 const char    *c_facebook_ap_secret;
 const char    *c_facebook_user;
@@ -108,6 +109,8 @@ struct display gd =
 int GlobalsInit(const char *conf)
 {
   int rc;
+  
+  atexit(globals_free);
   
   if (conf == NULL)
   {
@@ -461,3 +464,17 @@ static bool get_bool(
 }
 
 /**************************************************************************/
+
+static void globals_free(void)
+{
+  free(c_name);
+  free(c_basedir);
+  free(c_webdir);
+  free(c_baseurl);
+  free(c_fullbaseurl);
+  free(c_htmltemplates);
+  free(c_daypage);
+  free(c_rssfile);
+}
+
+}
