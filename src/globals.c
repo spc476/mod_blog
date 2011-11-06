@@ -183,12 +183,14 @@ int GlobalsInit(const char *conf)
   }
   else if (lua_isnumber(g_L,-1))
     c_days = lua_tointeger(g_L,-1);
+  else if (lua_isnil(g_L,-1))
+    c_days = 7;
   else
   {
     syslog(LOG_ERR,"wrong type for c_days");
     c_days = 7;
   }
-   
+
   lua_pop(g_L,4);
   
   c_author     = get_string(g_L,"author.name",NULL);

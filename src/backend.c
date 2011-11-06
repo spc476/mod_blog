@@ -122,6 +122,11 @@ int generate_pages(Request req __attribute__((unused)))
       template.items   = lua_tointeger(g_L,-1);
       template.pagegen = pagegen_items;
     }
+    else if (lua_isnil(g_L,-1))
+    {
+      template.items   = 15;
+      template.pagegen = pagegen_items;
+    }
     else
     {
       syslog(LOG_ERR,"wrong type for items");
