@@ -463,6 +463,7 @@ static bool get_bool(
 
 static void globals_free(void)
 {
+  /* XXX bug with the following line */
 /*  if (g_blog != NULL) BlogFree(g_blog);*/
   if (g_L    != NULL) lua_close(g_L);
   
