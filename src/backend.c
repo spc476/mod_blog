@@ -72,7 +72,6 @@ int generate_pages(Request req __attribute__((unused)))
   size_t max;
   size_t i;
   
-  syslog(LOG_DEBUG,"generating pages");
   lua_getglobal(g_L,"templates");
   max = lua_objlen(g_L,-1);
   
@@ -155,7 +154,6 @@ int pagegen_items(
   assert(out      != NULL);
   assert(when     != NULL);
   
-  syslog(LOG_DEBUG,"items template %s(%lu)",template->template,(unsigned long)template->items);
   g_templates  = template->template;
   gd.f.fullurl = template->fullurl;
   gd.f.reverse = template->reverse;
@@ -195,7 +193,6 @@ int pagegen_days(
   assert(out      != NULL);
   assert(when     != NULL);
 
-  syslog(LOG_DEBUG,"days template %s(%lu)",template->template,(unsigned long)template->items);  
   g_templates  = template->template;
   gd.f.fullurl = false;
   gd.f.reverse = true;
