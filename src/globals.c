@@ -480,6 +480,7 @@ static void globals_free(void)
   free((void *)c_emaildb);
   free((void *)c_emailsubject);
   free((void *)c_emailmsg);
+  free((void *)c_overview);
   free((void *)c_facebook_ap_id);
   free((void *)c_facebook_ap_secret);
   free((void *)c_facebook_user);
