@@ -71,9 +71,6 @@ const char    *c_fullbaseurl;
 const char    *c_htmltemplates;
 const char    *c_daypage;
 int            c_days;
-const char    *c_rssfile;
-const char    *c_atomfile;
-int            c_rssitems;
 const char    *c_author;
 const char    *c_email;
 const char    *c_authorfile;
@@ -467,14 +464,11 @@ static bool get_bool(
 
 static void globals_free(void)
 {
-  free(c_name);
-  free(c_basedir);
-  free(c_webdir);
-  free(c_baseurl);
-  free(c_fullbaseurl);
-  free(c_htmltemplates);
-  free(c_daypage);
-  free(c_rssfile);
-}
-
+  free((void *)c_name);
+  free((void *)c_basedir);
+  free((void *)c_webdir);
+  free((void *)c_baseurl);
+  free((void *)c_fullbaseurl);
+  free((void *)c_htmltemplates);
+  free((void *)c_daypage);
 }
