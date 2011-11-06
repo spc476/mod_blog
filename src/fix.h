@@ -104,7 +104,7 @@ extern const struct chunk_callback m_callbacks[];
 extern const size_t                m_cbnum;
 
 char	*get_remote_user		(void);
-int	 authenticate_author		(Request);
+bool	 authenticate_author		(Request);
 int	 generate_pages			(Request);
 void	 notify_facebook		(Request);
 void	 notify_emaillist		(void);
