@@ -96,9 +96,7 @@ Blog           g_blog;
 struct display gd =
 {
   { false , false , false , false , true , true , false , false} ,
-  INDEX,
-  "programming",	/* default tag for advertising */
-  NULL
+  INDEX
 };
 
 /****************************************************/
@@ -371,6 +369,7 @@ void set_c_url(const char *turl)
   
   c_fullbaseurl = fbu;
   c_baseurl     = bu;  
+  UrlFree(url);
 }
 
 /************************************************************************/
@@ -464,6 +463,7 @@ static bool get_bool(
 
 static void globals_free(void)
 {
+  BlogFree(g_blog);
   free((void *)c_name);
   free((void *)c_basedir);
   free((void *)c_webdir);
@@ -471,4 +471,18 @@ static void globals_free(void)
   free((void *)c_fullbaseurl);
   free((void *)c_htmltemplates);
   free((void *)c_daypage);
+  free((void *)c_author);
+  free((void *)c_email);
+  free((void *)c_authorfile);
+  free((void *)c_lockfile);
+  free((void *)c_emaildb);
+  free((void *)c_emailsubject);
+  free((void *)c_emailmsg);
+  free((void *)c_facebook_ap_id);
+  free((void *)c_facebook_ap_secret);
+  free((void *)c_facebook_user);
+  free((void *)gd.adtag);	/* XXX Valgrind can't track this */
+  lua_close(g_L);
 }
+
+/***********************************************************************/
