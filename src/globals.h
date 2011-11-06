@@ -57,7 +57,6 @@ extern const int              c_days;
 extern const char *const      c_rssfile;
 extern const char *const      c_atomfile;
 extern const int              c_rssitems;
-extern const bool             cf_rssreverse;
 extern const int              c_styear;
 extern const int              c_stmon;
 extern const int              c_stday;
