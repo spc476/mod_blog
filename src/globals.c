@@ -463,7 +463,9 @@ static bool get_bool(
 
 static void globals_free(void)
 {
-  BlogFree(g_blog);
+  if (g_blog != NULL) BlogFree(g_blog);
+  if (g_L    != NULL) lua_close(g_L);
+  
   free((void *)c_name);
   free((void *)c_basedir);
   free((void *)c_webdir);
@@ -482,7 +484,6 @@ static void globals_free(void)
   free((void *)c_facebook_ap_secret);
   free((void *)c_facebook_user);
   free((void *)gd.adtag);	/* XXX Valgrind can't track this */
-  lua_close(g_L);
 }
 
 /***********************************************************************/
