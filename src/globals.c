@@ -240,7 +240,7 @@ int GlobalsInit(const char *conf)
       gd.begin.month = strtoul(p,&p,10); p++;
       gd.begin.day   = strtoul(p,NULL,10);
       gd.begin.part  = 1;
-      free(p);
+      free(d);
     }
   }  
 
