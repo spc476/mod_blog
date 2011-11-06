@@ -121,7 +121,7 @@ $(HOSTDIR)/array.o : src/array.c
 $(HOSTDIR)/addutil.o : src/addutil.c
 	$(CC) $(CFLAGS) -c -o $@ src/addutil.c
 
-$(HOSTDIR)/callbacks.o : src/callbacks.c
+$(HOSTDIR)/callbacks.o : src/callbacks.c version.h
 	$(CC) $(CFLAGS) -c -o $@ src/callbacks.c
 
 $(HOSTDIR)/bp.o : src/bp.c
