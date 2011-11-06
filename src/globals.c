@@ -58,7 +58,7 @@ void	set_c_url		(const char *);
 static bool	   get_next	(char *,const char **);
 static int	   get_field	(lua_State *const restrict,const char *);
 static const char *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
-static int	   get_int	(lua_State *const restrict,const char *const restrict,const int);
+/*static int	   get_int	(lua_State *const restrict,const char *const restrict,const int);*/
 static bool	   get_bool	(lua_State *const restrict,const char *const restrict,const bool);
 
 /************************************************************/
@@ -74,7 +74,6 @@ int            c_days         = -1;
 const char    *c_rssfile;
 const char    *c_atomfile;
 int            c_rssitems     = 15;
-bool           cf_rssreverse  = true;
 const char    *c_author;
 const char    *c_email;
 const char    *c_authorfile;
@@ -240,7 +239,7 @@ int GlobalsInit(const char *conf)
       gd.begin.month = strtoul(p,&p,10); p++;
       gd.begin.day   = strtoul(p,NULL,10);
       gd.begin.part  = 1;
-      free(d);
+      free((void *)d);
     }
   }  
 
@@ -442,6 +441,7 @@ static const char *get_string(
 
 /*************************************************************************/
 
+#if 0
 static int get_int(
 	lua_State  *const restrict L,
 	const char *const restrict name,
@@ -462,6 +462,7 @@ static int get_int(
   lua_pop(L,1);
   return val;
 }
+#endif
 
 /*************************************************************************/
 
