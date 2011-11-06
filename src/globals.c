@@ -58,7 +58,6 @@ void	set_c_url		(const char *);
 static bool	   get_next	(char *,const char **);
 static int	   get_field	(lua_State *const restrict,const char *);
 static const char *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
-/*static int	   get_int	(lua_State *const restrict,const char *const restrict,const int);*/
 static bool	   get_bool	(lua_State *const restrict,const char *const restrict,const bool);
 
 /************************************************************/
@@ -438,31 +437,6 @@ static const char *get_string(
   lua_pop(L,1);
   return val;
 }
-
-/*************************************************************************/
-
-#if 0
-static int get_int(
-	lua_State  *const restrict L,
-	const char *const restrict name,
-	const int                  def
-)
-{
-  int val;
-  
-  assert(L    != NULL);
-  assert(name != NULL);
-  
-
-  if (get_field(L,name) != LUA_TNUMBER)
-    val = def;
-  else
-    val = lua_tointeger(L,-1);
-    
-  lua_pop(L,1);
-  return val;
-}
-#endif
 
 /*************************************************************************/
 
