@@ -1,7 +1,21 @@
+2011-11-07T05:02-05:00
+
+	globals_free() fails when calling BlogFree()---I think it's due to
+	the way I cache records, using an array.  They're removed later on
+	in the code via BlogEntryFree(), but they aren't marked as being
+	removed from the blog cache.  That's causing the issue.  I wonder if
+	I may have to reference count these things, or think of another way
+	of handling this.
+
 2010-11-30T19:14-05:00
 
 	generate_pages() trashes the Request structure.  Never noticed until
 	now ... 
+
+	2011-11-07T05:05-05:00
+
+	I started looking into this, but seem to have been sidetracked.  I'm
+	not sure if it's such a deal now.  I'll keep the bug open for now.
 
 2006-02-04T00:54
 
