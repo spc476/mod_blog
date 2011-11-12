@@ -308,7 +308,6 @@ int GlobalsInit(const char *conf)
       c_aflinks[i].proto  = strdup(lua_tolstring(g_L,-2,&c_aflinks[i].psize));
       c_aflinks[i].format = strdup(lua_tostring(g_L,-1));
       
-      syslog(LOG_DEBUG,"aflink: %lu %s:%s",(unsigned long)i,c_aflinks[i].proto,c_aflinks[i].format);
       lua_pop(g_L,3);
     }
   }
