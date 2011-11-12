@@ -30,6 +30,8 @@
 
 #include <curl/curl.h>
 
+#include "frontend.h"
+#include "backend.h"
 #include "globals.h"
 
 /*********************************************************************/

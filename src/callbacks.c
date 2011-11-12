@@ -46,10 +46,11 @@
 #include "blog.h"
 #include "timeutil.h"
 #include "wbtum.h"
-#include "globals.h"
 #include "frontend.h"
+#include "backend.h"
 #include "fix.h"
 #include "blogutil.h"
+#include "globals.h"
 
 #define max(a,b)	((a) > (b)) ? (a) : (b)
 

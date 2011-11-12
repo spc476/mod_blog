@@ -47,34 +47,34 @@
 *
 *******************************************************************/
 
-extern const char *const      c_name;
-extern const char *const      c_basedir;
-extern const char *const      c_webdir;
-extern const char *const      c_baseurl;
-extern const char *const      c_fullbaseurl;
-extern const char *const      c_htmltemplates;
-extern const char *const      c_daypage;
-extern const int              c_days;
-extern const char *const      c_author;
-extern const char *const      c_email;
-extern const char *const      c_authorfile;
-extern const char *const      c_updatetype;
-extern const char *const      c_lockfile;
-extern const char            *c_emaildb;
-extern const char *const      c_emailsubject;
-extern const char *const      c_emailmsg;
-extern const int              c_tzhour;
-extern const int              c_tzmin;
-extern       void           (*c_conversion)(FILE *,FILE *);
-extern const struct btm       c_start;
-extern const struct btm       c_now;
-extern const char *const      c_overview;
-extern const bool             cf_facebook;
-extern const char            *c_facebook_ap_id;
-extern const char            *c_facebook_ap_secret;
-extern const char            *c_facebook_user;
-extern const template__t     *const c_templates;
-extern const size_t           c_numtemplates;
+extern const char *const          c_name;
+extern const char *const          c_basedir;
+extern const char *const          c_webdir;
+extern const char *const          c_baseurl;
+extern const char *const          c_fullbaseurl;
+extern const char *const          c_htmltemplates;
+extern const char *const          c_daypage;
+extern const int                  c_days;
+extern const char *const          c_author;
+extern const char *const          c_email;
+extern const char *const          c_authorfile;
+extern const char *const          c_updatetype;
+extern const char *const          c_lockfile;
+extern const char *const          c_emaildb;
+extern const char *const          c_emailsubject;
+extern const char *const          c_emailmsg;
+extern const int                  c_tzhour;
+extern const int                  c_tzmin;
+extern       void               (*const c_conversion)(FILE *,FILE *);
+extern const struct btm           c_start;
+extern const struct btm           c_now;
+extern const char *const          c_overview;
+extern const bool                 cf_facebook;
+extern const char *const          c_facebook_ap_id;
+extern const char *const          c_facebook_ap_secret;
+extern const char *const          c_facebook_user;
+extern const template__t *const   c_templates;
+extern const size_t               c_numtemplates;
 
 extern lua_State             *g_L;
 extern const char *           g_templates;	/* work on */

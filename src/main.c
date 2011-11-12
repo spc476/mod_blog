@@ -28,10 +28,11 @@
 #include <cgilib6/cgi.h>
 
 #include "conf.h"
-#include "globals.h"
 #include "blog.h"
 #include "timeutil.h"
 #include "fix.h"
+#include "backend.h"
+#include "globals.h"
 
 /************************************************************************/
 

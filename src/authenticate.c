@@ -34,8 +34,10 @@
 #include <cgilib6/util.h>
 
 #include "conf.h"
-#include "globals.h"
+#include "timeutil.h"
 #include "frontend.h"
+#include "backend.h"
+#include "globals.h"
 
 #ifdef USE_GDBM
 #  include <gdbm.h>

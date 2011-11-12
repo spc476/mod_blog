@@ -58,38 +58,38 @@ void	set_c_url		(const char *);
 
 static bool	   get_next	(char *,const char **);
 static int	   get_field	(lua_State *const restrict,const char *);
-static const char *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
+static char       *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
 static bool	   get_bool	(lua_State *const restrict,const char *const restrict,const bool);
 static void	   globals_free	(void);
 
 /************************************************************/
 
-const char    *c_name;
-const char    *c_basedir;
-const char    *c_webdir;
-const char    *c_baseurl;
-const char    *c_fullbaseurl;
-const char    *c_htmltemplates;
-const char    *c_daypage;
-int            c_days;
-const char    *c_author;
-const char    *c_email;
-const char    *c_authorfile;
-const char    *c_updatetype   = "NewEntry";
-const char    *c_lockfile;
-const char    *c_emaildb;
-const char    *c_emailsubject;
-const char    *c_emailmsg;
-int            c_tzhour;
-int            c_tzmin;
-const char    *c_overview;
-void	     (*c_conversion)(FILE *,FILE *) =  html_conversion;
-bool           cf_facebook;		/* set by code */
-const char    *c_facebook_ap_id;
-const char    *c_facebook_ap_secret;
-const char    *c_facebook_user;
-template__t   *c_templates;
-size_t         c_numtemplates;
+char         *c_name;
+char         *c_basedir;
+char         *c_webdir;
+char         *c_baseurl;
+char         *c_fullbaseurl;
+char         *c_htmltemplates;
+char         *c_daypage;
+int           c_days;
+char         *c_author;
+char         *c_email;
+char         *c_authorfile;
+const char   *c_updatetype   = "NewEntry";
+char         *c_lockfile;
+char         *c_emaildb;
+char         *c_emailsubject;
+char         *c_emailmsg;
+int           c_tzhour;
+int           c_tzmin;
+char         *c_overview;
+void	    (*c_conversion)(FILE *,FILE *) =  html_conversion;
+bool          cf_facebook;		/* set by code */
+char         *c_facebook_ap_id;
+char         *c_facebook_ap_secret;
+char         *c_facebook_user;
+template__t  *c_templates;
+size_t        c_numtemplates;
 
 lua_State     *g_L;
 const char    *g_templates;
@@ -151,7 +151,7 @@ int GlobalsInit(const char *conf)
     return ERR_ERR;
   }
   
-  gf_debug             = get_bool(g_L,"debug",false);
+  gf_debug             = get_bool  (g_L,"debug",false);
   c_name               = get_string(g_L,"name",NULL);
   c_basedir            = get_string(g_L,"basedir",NULL);
   c_webdir             = get_string(g_L,"webdir",NULL);
@@ -455,7 +455,7 @@ static int get_field(
 
 /***********************************************************************/
 
-static const char *get_string(
+static char *get_string(
 	lua_State  *const restrict L,
 	const char *const restrict name,
 	const char *const restrict def
@@ -513,24 +513,24 @@ static void globals_free(void)
   }
   free(c_templates);
   
-  free((void *)c_name);
-  free((void *)c_basedir);
-  free((void *)c_webdir);
-  free((void *)c_baseurl);
-  free((void *)c_fullbaseurl);
-  free((void *)c_htmltemplates);
-  free((void *)c_daypage);
-  free((void *)c_author);
-  free((void *)c_email);
-  free((void *)c_authorfile);
-  free((void *)c_lockfile);
-  free((void *)c_emaildb);
-  free((void *)c_emailsubject);
-  free((void *)c_emailmsg);
-  free((void *)c_overview);
-  free((void *)c_facebook_ap_id);
-  free((void *)c_facebook_ap_secret);
-  free((void *)c_facebook_user);
+  free(c_name);
+  free(c_basedir);
+  free(c_webdir);
+  free(c_baseurl);
+  free(c_fullbaseurl);
+  free(c_htmltemplates);
+  free(c_daypage);
+  free(c_author);
+  free(c_email);
+  free(c_authorfile);
+  free(c_lockfile);
+  free(c_emaildb);
+  free(c_emailsubject);
+  free(c_emailmsg);
+  free(c_overview);
+  free(c_facebook_ap_id);
+  free(c_facebook_ap_secret);
+  free(c_facebook_user);
   free((void *)gd.adtag);	/* XXX Valgrind can't track this */
 }
 

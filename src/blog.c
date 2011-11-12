@@ -41,6 +41,8 @@
 
 #include "conf.h"
 #include "blog.h"
+#include "frontend.h"
+#include "backend.h"
 #include "globals.h"
 #include "fix.h"
 
