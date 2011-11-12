@@ -75,6 +75,8 @@ extern const char *const          c_facebook_ap_secret;
 extern const char *const          c_facebook_user;
 extern const template__t *const   c_templates;
 extern const size_t               c_numtemplates;
+extern const aflink__t *const     c_aflinks;
+extern const size_t               c_numaflinks;
 
 extern lua_State             *g_L;
 extern const char *           g_templates;	/* work on */

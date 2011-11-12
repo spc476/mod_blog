@@ -90,6 +90,8 @@ char         *c_facebook_ap_secret;
 char         *c_facebook_user;
 template__t  *c_templates;
 size_t        c_numtemplates;
+aflink__t    *c_aflinks;
+size_t        c_numaflinks;
 
 lua_State     *g_L;
 const char    *g_templates;
@@ -222,7 +224,7 @@ int GlobalsInit(const char *conf)
   if (c_templates == NULL)
   {
     syslog(LOG_ERR,"%s",strerror(ENOMEM));
-    return (ERR_ERR);
+    return ERR_ERR;
   }
   
   for (size_t i = 0 ; i < c_numtemplates; i++)
@@ -277,7 +279,40 @@ int GlobalsInit(const char *conf)
   c_htmltemplates = strdup(c_templates[0].template);
   g_templates     = c_htmltemplates;
   c_days          = c_templates[0].items;
+
+  /*----------------------------------------------------
+  ; process affiliate links
+  ;----------------------------------------------------*/
   
+  lua_getglobal(g_L,"affiliate");
+  if (!lua_isnil(g_L,-1))
+  {
+    c_numaflinks = lua_objlen(g_L,-1);
+    c_aflinks    = malloc(sizeof(aflink__t) * c_numaflinks);
+    
+    if (c_aflinks == NULL)
+    {
+      syslog(LOG_ERR,"%s",strerror(ENOMEM));
+      return ERR_ERR;
+    }
+    
+    for (size_t i = 0 ; i < c_numaflinks ; i++)
+    {
+      lua_pushinteger(g_L,i + 1);
+      lua_gettable(g_L,-2);
+      
+      lua_getfield(g_L,-1,"proto");
+      lua_getfield(g_L,-2,"link");
+      
+      c_aflinks[i].proto  = strdup(lua_tostring(g_L,-2));
+      c_aflinks[i].format = strdup(lua_tostring(g_L,-1));
+      
+      syslog(LOG_DEBUG,"aflink: %lu %s:%s",(unsigned long)i,c_aflinks[i].proto,c_aflinks[i].format);
+      lua_pop(g_L,3);
+    }
+  }
+  lua_pop(g_L,1);
+
   /*-----------------------------------------------------
   ; derive the setting of c_facebook from the given data
   ;------------------------------------------------------*/
@@ -505,14 +540,21 @@ static void globals_free(void)
   /*if (g_blog != NULL) BlogFree(g_blog);*/
   
   if (g_L    != NULL) lua_close(g_L);
+
+  for (size_t i = 0 ; i < c_numaflinks ; i++)
+  {
+    free(c_aflinks[i].format);
+    free(c_aflinks[i].proto);
+  }
+  free(c_aflinks);
   
   for (size_t i = 0 ; i < c_numtemplates; i++)
   {
-    free((void *)c_templates[i].template);
-    free((void *)c_templates[i].file);
+    free(c_templates[i].template);
+    free(c_templates[i].file);
   }
   free(c_templates);
-  
+    
   free(c_name);
   free(c_basedir);
   free(c_webdir);
