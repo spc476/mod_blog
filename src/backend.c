@@ -51,9 +51,9 @@
 #include "wbtum.h"
 #include "frontend.h"
 #include "fix.h"
-#include "globals.h"
 #include "blogutil.h"
 #include "backend.h"
+#include "globals.h"
 
 /*****************************************************************/
 
@@ -69,77 +69,21 @@ static void	   free_entries			(List *);
 
 int generate_pages(Request req __attribute__((unused)))
 {
-  size_t max;
-  size_t i;
-  
-  lua_getglobal(g_L,"templates");
-  max = lua_objlen(g_L,-1);
-  
-  for (i = 1 ; i <= max ; i++)
+  for (size_t i = 0 ; i < c_numtemplates; i++)
   {
-    template__t  template;
-    FILE        *out;
+    FILE *out;
     
-    lua_pushinteger(g_L,i);
-    lua_gettable(g_L,-2);
-    
-    lua_getfield(g_L,-1,"template");
-    lua_getfield(g_L,-2,"reverse");
-    lua_getfield(g_L,-3,"fullurl");
-    lua_getfield(g_L,-4,"output");
-    lua_getfield(g_L,-5,"items");
-    
-    template.template = lua_tostring (g_L,-5);
-    template.reverse  = lua_toboolean(g_L,-4);
-    template.fullurl  = lua_toboolean(g_L,-3);
-    
-    out = fopen(lua_tostring(g_L,-2),"w");
+    out = fopen(c_templates[i].file,"w");
     if (out == NULL)
     {
-      syslog(LOG_ERR,"%s: %s",lua_tostring(g_L,-2),strerror(errno));
-      lua_pop(g_L,6);
+      syslog(LOG_ERR,"%s: %s",c_templates[i].file,strerror(errno));
       continue;
     }
     
-    if (lua_isstring(g_L,-1))
-    {
-      const char *x;
-      char       *p;
-      
-      x = lua_tostring(g_L,-1);
-      template.items = strtoul(x,&p,10);
-      switch(*p)
-      {
-        case 'd': break;
-        case 'w': template.items *=  7; break;
-        case 'm': template.items *= 30; break;
-        default: break;
-      }
-      template.pagegen = pagegen_days;
-    }
-    else if (lua_isnumber(g_L,-1))
-    {
-      template.items   = lua_tointeger(g_L,-1);
-      template.pagegen = pagegen_items;
-    }
-    else if (lua_isnil(g_L,-1))
-    {
-      template.items   = 15;
-      template.pagegen = pagegen_items;
-    }
-    else
-    {
-      syslog(LOG_ERR,"wrong type for items");
-      lua_pop(g_L,6);
-      continue;
-    }
-    
-    (*template.pagegen)(&template,out,&gd.now);
+    (*c_templates[i].pagegen)(&c_templates[i],out,&gd.now);
     fclose(out);
-    lua_pop(g_L,6);
   }
   
-  lua_pop(g_L,1);
   return 0;
 }
 

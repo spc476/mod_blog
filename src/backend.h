@@ -26,6 +26,7 @@
 typedef struct template
 {
   const char  *template;
+  const char  *file;
   size_t       items;
   int        (*pagegen)(const struct template *const restrict,FILE *const restrict,const struct btm *const restrict);
   bool         reverse;

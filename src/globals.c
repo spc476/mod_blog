@@ -44,6 +44,7 @@
 #include "conf.h"
 #include "conversion.h"
 #include "frontend.h"
+#include "backend.h"
 #include "fix.h"
 #include "timeutil.h"
 #include "blog.h"
@@ -87,6 +88,8 @@ bool           cf_facebook;		/* set by code */
 const char    *c_facebook_ap_id;
 const char    *c_facebook_ap_secret;
 const char    *c_facebook_user;
+template__t   *c_templates;
+size_t         c_numtemplates;
 
 lua_State     *g_L;
 const char    *g_templates;
@@ -148,60 +151,21 @@ int GlobalsInit(const char *conf)
     return ERR_ERR;
   }
   
-  gf_debug   = get_bool(g_L,"debug",false);
-  
-  c_name        = get_string(g_L,"name",NULL);
-  c_basedir     = get_string(g_L,"basedir",NULL);
-  c_webdir      = get_string(g_L,"webdir",NULL);
-  gd.adtag      = get_string(g_L,"adtag","programming");
-  c_lockfile    = get_string(g_L,"lockfile","/tmp/.mod_blog.lock");
-  c_overview    = get_string(g_L,"overview",NULL);
-  gd.f.overview = (c_overview != NULL);
-
-  lua_getglobal(g_L,"templates");
-  lua_pushinteger(g_L,1);
-  lua_gettable(g_L,-2);
-  lua_getfield(g_L,-1,"template");
-  c_htmltemplates = strdup(lua_tostring(g_L,-1));
-  g_templates     = c_htmltemplates;	/* XXX */
-  
-  lua_getfield(g_L,-2,"items");
-  if (lua_isstring(g_L,-1))
-  {
-    const char *x;
-    char       *p;
-    
-    x = lua_tostring(g_L,-1);
-    c_days = strtoul(x,&p,10);
-    switch(*p)
-    {
-      case 'd': break;
-      case 'w': c_days *= 7; break;
-      case 'm': c_days *= 30; break;
-      default: break;
-    }
-  }
-  else if (lua_isnumber(g_L,-1))
-    c_days = lua_tointeger(g_L,-1);
-  else if (lua_isnil(g_L,-1))
-    c_days = 7;
-  else
-  {
-    syslog(LOG_ERR,"wrong type for c_days");
-    c_days = 7;
-  }
-
-  lua_pop(g_L,4);
-  
-  c_author     = get_string(g_L,"author.name",NULL);
-  c_email      = get_string(g_L,"author.email",NULL);
-  c_authorfile = get_string(g_L,"author.file",NULL);
-  
-  c_emaildb      = get_string(g_L,"email.list",NULL);
-  c_emailsubject = get_string(g_L,"email.subject",NULL);
-  c_emailmsg     = get_string(g_L,"email.message",NULL);
-  gf_emailupdate = get_bool  (g_L,"email.notify",true);
-  
+  gf_debug             = get_bool(g_L,"debug",false);
+  c_name               = get_string(g_L,"name",NULL);
+  c_basedir            = get_string(g_L,"basedir",NULL);
+  c_webdir             = get_string(g_L,"webdir",NULL);
+  gd.adtag             = get_string(g_L,"adtag","programming");
+  c_lockfile           = get_string(g_L,"lockfile","/tmp/.mod_blog.lock");
+  c_overview           = get_string(g_L,"overview",NULL);
+  gd.f.overview        = (c_overview != NULL);
+  c_author             = get_string(g_L,"author.name",NULL);
+  c_email              = get_string(g_L,"author.email",NULL);
+  c_authorfile         = get_string(g_L,"author.file",NULL);
+  c_emaildb            = get_string(g_L,"email.list",NULL);
+  c_emailsubject       = get_string(g_L,"email.subject",NULL);
+  c_emailmsg           = get_string(g_L,"email.message",NULL);
+  gf_emailupdate       = get_bool  (g_L,"email.notify",true);
   c_facebook_ap_id     = get_string(g_L,"facebook.ap_id",NULL);
   c_facebook_ap_secret = get_string(g_L,"facebook.ap_secret",NULL);
   c_facebook_user      = get_string(g_L,"facebook.user",NULL);
@@ -240,8 +204,80 @@ int GlobalsInit(const char *conf)
       gd.begin.part  = 1;
       free((void *)d);
     }
+  }
+  
+  /*------------------------------------------------
+  ; process the templates array
+  ;-------------------------------------------------*/
+  
+  lua_getglobal(g_L,"templates");
+  if (lua_isnil(g_L,-1))
+  {
+    syslog(LOG_ERR,"missing templates section");
+    return ERR_ERR;
+  }
+  
+  c_numtemplates = lua_objlen(g_L,-1);
+  c_templates   = malloc(sizeof(template__t) * c_numtemplates);
+  if (c_templates == NULL)
+  {
+    syslog(LOG_ERR,"%s",strerror(ENOMEM));
+    return (ERR_ERR);
+  }
+  
+  for (size_t i = 0 ; i < c_numtemplates; i++)
+  {
+    lua_pushinteger(g_L,i + 1);
+    lua_gettable(g_L,-2);
+    
+    lua_getfield(g_L,-1,"template");
+    lua_getfield(g_L,-2,"reverse");
+    lua_getfield(g_L,-3,"fullurl");
+    lua_getfield(g_L,-4,"output");
+    lua_getfield(g_L,-5,"items");
+    
+    c_templates[i].template = strdup(lua_tostring(g_L,-5));
+    c_templates[i].reverse  = lua_toboolean(g_L,-4);
+    c_templates[i].fullurl  = lua_toboolean(g_L,-3);
+    c_templates[i].file     = strdup(lua_tostring(g_L,-2));
+    
+    if (lua_isstring(g_L,-1))
+    {
+      const char *x;
+      char       *p;
+      
+      x = lua_tostring(g_L,-1);
+      c_templates[i].items = strtoul(x,&p,10);
+      switch(*p)
+      {
+        case 'd': break;
+        case 'w': c_templates[i].items *=  7; break;
+        case 'm': c_templates[i].items *= 30; break;
+        default:  break;
+      }
+      c_templates[i].pagegen = pagegen_days;
+    }
+    else if (lua_isnumber(g_L,-1))
+    {
+      c_templates[i].items = lua_tointeger(g_L,-1);
+      c_templates[i].pagegen = pagegen_items;
+    }
+    else if (lua_isnil(g_L,-1))
+    {
+      c_templates[i].items   = 15;
+      c_templates[i].pagegen = pagegen_items;
+    }
+    else
+      syslog(LOG_ERR,"wrong type for items");
+    
+    lua_pop(g_L,6);
   }  
-
+  lua_pop(g_L,1);
+  
+  c_htmltemplates = strdup(c_templates[0].template);
+  g_templates     = c_htmltemplates;
+  c_days          = c_templates[0].items;
+  
   /*-----------------------------------------------------
   ; derive the setting of c_facebook from the given data
   ;------------------------------------------------------*/
@@ -466,8 +502,16 @@ static bool get_bool(
 static void globals_free(void)
 {
   /* XXX bug with the following line */
-/*  if (g_blog != NULL) BlogFree(g_blog);*/
+  /*if (g_blog != NULL) BlogFree(g_blog);*/
+  
   if (g_L    != NULL) lua_close(g_L);
+  
+  for (size_t i = 0 ; i < c_numtemplates; i++)
+  {
+    free((void *)c_templates[i].template);
+    free((void *)c_templates[i].file);
+  }
+  free(c_templates);
   
   free((void *)c_name);
   free((void *)c_basedir);
