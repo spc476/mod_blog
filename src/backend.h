@@ -35,8 +35,9 @@ typedef struct template
 
 typedef struct aflink
 {
-  char *proto;
-  char *format;
+  char   *proto;
+  size_t  psize;
+  char   *format;
 } aflink__t;
 
 /************************************************/

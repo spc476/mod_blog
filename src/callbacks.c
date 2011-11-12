@@ -137,6 +137,7 @@ static void	print_nav_url		(FILE *,struct btm *,int);
 static void	print_nav_title		(FILE *,struct btm *,int);
 static void	print_nav_name		(FILE *,struct btm *,int,char);
 static void	fixup_uri		(BlogEntry,HtmlToken,const char *);
+static void	handle_aflinks		(HtmlToken,const char *);
 
 /************************************************************************/
 
@@ -548,6 +549,41 @@ static void cb_entry_author(FILE *out,void *data)
 
 /*************************************************************************/
 
+static void handle_aflinks(HtmlToken token,const char *attrib)
+{
+  struct pair *src;
+  
+  assert(token  != NULL);
+  assert(attrib != NULL);
+  
+  src = HtmlParseGetPair(token,attrib);
+  if (src != NULL)
+  {
+    for (size_t i = 0 ; i < c_numaflinks ; i++)
+    {
+      if (strncmp(src->value,c_aflinks[i].proto,c_aflinks[i].psize) == 0)
+      {
+        char buffer[BUFSIZ];
+        struct pair *np;
+        
+        snprintf(
+        	buffer,
+        	sizeof(buffer),
+        	c_aflinks[i].format,
+        	&src->value[c_aflinks[i].psize + 1]
+        );
+        np = PairCreate(attrib,buffer);
+        NodeInsert(&src->node,&np->node);
+        NodeRemove(&src->node);
+        PairFree(src);
+        return;
+      }
+    }
+  }
+}
+
+/*************************************************************************/
+
 static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
 {
   struct pair *src;
@@ -555,6 +591,8 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
   
   assert(token  != NULL);
   assert(attrib != NULL);
+  
+  handle_aflinks(token,attrib);
   
   src = HtmlParseGetPair(token,attrib);
   if (
