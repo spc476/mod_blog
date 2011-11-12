@@ -152,25 +152,26 @@ int GlobalsInit(const char *conf)
     syslog(LOG_ERR,"Lua error: (%d) %s",rc,err);
     return ERR_ERR;
   }
-  
-  gf_debug             = get_bool  (g_L,"debug",false);
+
   c_name               = get_string(g_L,"name",NULL);
   c_basedir            = get_string(g_L,"basedir",NULL);
   c_webdir             = get_string(g_L,"webdir",NULL);
-  gd.adtag             = get_string(g_L,"adtag","programming");
   c_lockfile           = get_string(g_L,"lockfile","/tmp/.mod_blog.lock");
   c_overview           = get_string(g_L,"overview",NULL);
-  gd.f.overview        = (c_overview != NULL);
   c_author             = get_string(g_L,"author.name",NULL);
   c_email              = get_string(g_L,"author.email",NULL);
   c_authorfile         = get_string(g_L,"author.file",NULL);
   c_emaildb            = get_string(g_L,"email.list",NULL);
   c_emailsubject       = get_string(g_L,"email.subject",NULL);
   c_emailmsg           = get_string(g_L,"email.message",NULL);
-  gf_emailupdate       = get_bool  (g_L,"email.notify",true);
   c_facebook_ap_id     = get_string(g_L,"facebook.ap_id",NULL);
   c_facebook_ap_secret = get_string(g_L,"facebook.ap_secret",NULL);
   c_facebook_user      = get_string(g_L,"facebook.user",NULL);
+  
+  gd.adtag             = get_string(g_L,"adtag","programming");  
+  gf_debug             = get_bool  (g_L,"debug",false);  
+  gf_emailupdate       = get_bool  (g_L,"email.notify",true);  
+  gd.f.overview        = (c_overview != NULL);  
   
   {
     const char *timezone = get_string(g_L,"timezone","-5:00");
