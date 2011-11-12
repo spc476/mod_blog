@@ -42,8 +42,7 @@
 * Global variables---some defaults are defined in "globals.c" but
 * these can be overwritten (or defined for those without a default)
 * by the configuration file.  If any are added here, add them to
-* "globals.c" and add don't forget to update GlobalsInit() or
-* SystemLimit() as appropriate.
+* "globals.c" and add don't forget to update GlobalsInit()
 *
 *******************************************************************/
 
