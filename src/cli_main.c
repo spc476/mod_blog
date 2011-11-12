@@ -246,7 +246,7 @@ static int cmd_cli_show(Request req)
     {
       template__t template;
       
-      template.template = c_htmltemplates;
+      template.template = (char *)c_htmltemplates;
       template.items    = c_days;
       template.pagegen  = pagegen_days;
       template.reverse  = true;
