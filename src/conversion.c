@@ -406,15 +406,14 @@ void buff_conversion(FILE *in,FILE *out)
   assert(in  != NULL);
   assert(out != NULL);
 
-  /*----------------------------------------------------------------
+  /*------------------------------------------------------------------------
   ; XXX
-  ; how to handle using '"' for smart quotes, or regular
-  ; quotes.  I'd rather not have to do logic, but anything else
-  ; might require more coupling than I want.  Have to think
-  ; on this.  Also, add in some logic to handle '&' in strings.
-  ; look for something like &[^\s]+; and if so, then pass
-  ; it through unchanged; if not, then convert '&' to "&amp;".
-  ;---------------------------------------------------------------*/
+  ; how to handle using '"' for smart quotes, or regular quotes.  I'd rather
+  ; not have to do logic, but anything else might require more coupling than
+  ; I want.  Have to think on this.  Also, add in some logic to handle '&'
+  ; in strings.  look for something like &[^\s]+; and if so, then pass it
+  ; through unchanged; if not, then convert '&' to "&amp;".
+  ;------------------------------------------------------------------------*/
     
   while(!feof(in))
   {

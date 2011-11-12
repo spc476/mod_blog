@@ -40,12 +40,12 @@ unsigned int max_monthday(int year,unsigned int month)
 
   if (month == 2)
   {
-    /*---------------------------------------------------
-    ; in case you didn't know, leap years are those years
-    ; that are divisible by 4, except if it's divisible by 
-    ; 100, then it's not, unless it's divisible by 400, then
-    ; it is.  1800 and 1900 were NOT leap years, but 2000 is.
-    ;------------------------------------------------------*/
+    /*----------------------------------------------------------------------
+    ; in case you didn't know, leap years are those years that are divisible
+    ; by 4, except if it's divisible by 100, then it's not, unless it's
+    ; divisible by 400, then it is.  1800 and 1900 were NOT leap years, but
+    ; 2000 is.
+    ;----------------------------------------------------------------------*/
     
     if ((year % 400) == 0) return(29);
     if ((year % 100) == 0) return(28);

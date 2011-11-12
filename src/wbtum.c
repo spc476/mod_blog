@@ -567,11 +567,10 @@ static State state_e(Tumbler t,TumblerUnit *ptu,char **pstr)
 
   if (isdigit(*s))
   {
-    /*------------------------------------------------
-    ; Canonical URLs do not have leading zeros in the
-    ; part section of the tumbler.  If so, mark it as
-    ; non-canonical.
-    ;-----------------------------------------------*/
+    /*---------------------------------------------------------------------
+    ; Canonical URLs do not have leading zeros in the part section of the
+    ; tumbler.  If so, mark it as non-canonical.
+    ;--------------------------------------------------------------------*/
     
     if (*s == '0')
       t->flags.redirect = true;
@@ -645,14 +644,13 @@ static int tumbler_normalize(Tumbler t)
     if (current->size >= base->size)
       base = current;
     
-    /*------------------------------------------------------------
-    ; if the number of segments are the same, we're done.
-    ; If the number of segments in the base are larger, then the
-    ; current is a subset of the base, so move the indicies down and
-    ; copy down the major portion.  
-    ; If the current side is larger, then we're already done.
-    ;-------------------------------------------------------------*/
-                                
+    /*----------------------------------------------------------------------
+    ; if the number of segments are the same, we're done.  If the number of
+    ; segments in the base are larger, then the current is a subset of the
+    ; base, so move the indicies down and copy down the major portion.  If
+    ; the current side is larger, then we're already done.
+    ;---------------------------------------------------------------------*/
+    
     if (base->size > current->size)
     {
       size_t diff;

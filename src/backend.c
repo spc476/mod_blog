@@ -249,10 +249,9 @@ int tumbler_page(FILE *out,Tumbler spec)
     if ((tu2->entry[MONTH]) && (tu2->entry[DAY]   > max_monthday(tu2->entry[YEAR],tu2->entry[MONTH])))
       return(1);
       
-    /*--------------------------------------------------
-    ; swap the tumblers if we can---it'll save us a crap
-    ; of work later.
-    ;--------------------------------------------------*/
+    /*-------------------------------------------------------------------
+    ; swap the tumblers if we can---it'll save us a crap of work later.
+    ;-------------------------------------------------------------------*/
     
     if (tu1->entry[YEAR] > tu2->entry[YEAR])
     {
@@ -292,14 +291,14 @@ int tumbler_page(FILE *out,Tumbler spec)
     }
   }
 
-  /*--------------------------------------------------------------
-  ; I junked the use of struct tm as it was just too error
-  ; prone.  I defined a struct btm with only the fields I need,
-  ; and with the definitions I required.
+  /*------------------------------------------------------------------------
+  ; I junked the use of struct tm as it was just too error prone.  I defined
+  ; a struct btm with only the fields I need, and with the definitions I
+  ; required.
   ;
-  ; The tumbler code will set unspecified fields to 0.  In this 
-  ; case, we want to start with minimum legal values.
-  ;------------------------------------------------------------*/
+  ; The tumbler code will set unspecified fields to 0.  In this case, we
+  ; want to start with minimum legal values.
+  ;-----------------------------------------------------------------------*/
 
   nu1         = PART;
   start.part  = (tu1->entry[PART]  == 0) ? nu1 = DAY     , 1             : tu1->entry[PART];
@@ -310,10 +309,10 @@ int tumbler_page(FILE *out,Tumbler spec)
   if (start.day > max_monthday(start.year,start.month))
     return(1);				/* invalid day */
 
-  /*----------------------------------------------------------
-  ; Make some things easier if for a single request, we set a 
-  ; range and let the result fall out of normal processing.
-  ;-----------------------------------------------------------*/
+  /*------------------------------------------------------------------------
+  ; Make some things easier if for a single request, we set a range and let
+  ; the result fall out of normal processing.
+  ;-----------------------------------------------------------------------*/
   
   if (tu1->type == TUMBLER_SINGLE)
   {
@@ -330,10 +329,10 @@ int tumbler_page(FILE *out,Tumbler spec)
   }
   else
   {
-    /*-----------------------------------------------------------
-    ; fix the ending date.  In this case, the unspecified fields
-    ; will be set to the their maximum legal value.
-    ;-----------------------------------------------------------*/
+    /*----------------------------------------------------------------------
+    ; fix the ending date.  In this case, the unspecified fields will be set
+    ; to the their maximum legal value.
+    ;---------------------------------------------------------------------*/
     
     end.year  = (tu2->entry[YEAR]  == 0) ? gd.now.year                      : (int)tu2->entry[YEAR];
     end.month = (tu2->entry[MONTH] == 0) ? 12                               : tu2->entry[MONTH];
@@ -344,11 +343,10 @@ int tumbler_page(FILE *out,Tumbler spec)
   if (end.day > max_monthday(end.year,end.month))
     return(1);
 
-  /*------------------------------------------------
-  ; Okay, sanity checking here ... 
-  ; These should be true once we hit this spot of the
-  ; code.
-  ;------------------------------------------------*/
+  /*---------------------------------------------------------------------
+  ; Okay, sanity checking here ... These should be true once we hit this
+  ; spot of the code.
+  ;---------------------------------------------------------------------*/
   
   assert(start.year  >= 1);
   assert(start.month >= 1);
@@ -362,27 +360,25 @@ int tumbler_page(FILE *out,Tumbler spec)
   assert(end.day   >= 1);
   assert(end.day   <= max_monthday(end.year,end.month));
   
-  /*--------------------------------------------------------------
-  ; okay, resume processing ... bound against the starting time of
-  ; the blog, and the current time.
-  ;-------------------------------------------------------------*/
+  /*-------------------------------------------------------------------------
+  ; okay, resume processing ... bound against the starting time of the blog,
+  ; and the current time.
+  ;------------------------------------------------------------------------*/
   
   if (btm_cmp(&start,&gd.begin) < 0)
     start = gd.begin;
   if (btm_cmp(&end,&gd.now) > 0)
     end = gd.now;
   
-  /*----------------------------------------------------
-  ; From here on out, it's pretty straight forward.
-  ; read a day, if it has entries, add it to the list, 
-  ; otherwise, continue on, advancing (or retreading) the
-  ; days as we go ... 
-  ;-------------------------------------------------------*/
+  /*-----------------------------------------------------------------------
+  ; From here on out, it's pretty straight forward.  read a day, if it has
+  ; entries, add it to the list, otherwise, continue on, advancing (or
+  ; retreading) the days as we go ...
+  ;----------------------------------------------------------------------*/
 
-  /*----------------------------------------------------
-  ; these four lines replaced 65 very confused lines
-  ; of code.
-  ;----------------------------------------------------*/
+  /*-----------------------------------------------------------
+  ; these four lines replaced 65 very confused lines of code.
+  ;-----------------------------------------------------------*/
   
   if (gd.f.reverse)
     BlogEntryReadBetweenD(g_blog,&cbd.list,&end,&start);
@@ -666,12 +662,11 @@ static char *tag_collect(List *list)
 {
   BlogEntry entry;
   
-  /*----------------------------------------------------
-  ; this function used to collect all the class tags
-  ; from all the entries, but I think any advertising
-  ; that's placed near the top of the page will do better
-  ; if it's based off the first entry to be displayed.
-  ;------------------------------------------------------*/
+  /*-----------------------------------------------------------------------
+  ; this function used to collect all the class tags from all the entries,
+  ; but I think any advertising that's placed near the top of the page will
+  ; do better if it's based off the first entry to be displayed.
+  ;-----------------------------------------------------------------------*/
   
   assert(list != NULL);
   
@@ -699,12 +694,10 @@ static char *tag_pick(const char *tag)
   
   pool = tag_split(&num,tag);
 
-  /*-------------------------------------
-  ; if num is 0, then the tag string was
-  ; malformed (basically, started with
-  ; a ',') and therefore, we fall back to
-  ; the default adtag.
-  ;-------------------------------------*/
+  /*------------------------------------------------------------------------
+  ; if num is 0, then the tag string was malformed (basically, started with
+  ; a ',') and therefore, we fall back to the default adtag.
+  ;-----------------------------------------------------------------------*/
 
   if (num)
   {
