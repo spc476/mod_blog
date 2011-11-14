@@ -162,15 +162,19 @@ int main_cli(int argc,char *argv[])
 		"usage: %s --options... \n"
 		"\t--config file\n"
 		"\t--regenerate | --regen\n"
-		"\t--cmd ('new' | 'show')\n"
+		"\t--cmd ('new' | 'show' *)\n"
 		"\t--file file\n"
 		"\t--email\n"
-		"\t--update ('new' | 'modify' | 'template' | 'other')\n"
+		"\t--update ('new' * | 'modify' | 'template' | 'other')\n"
 		"\t--entry <tumbler>\n"
 		"\t--stdin\n"
 		"\t--force-notify\n"
 		"\t--help\n"
-		"\t--debug\n",
+		"\t--debug\n"
+		"\n"
+		"\tVersion: " GENERATOR "\n"
+		"\t* default value\n"
+		"",
 		argv[0]
 	      );
 	   return(EXIT_FAILURE);

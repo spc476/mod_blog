@@ -106,7 +106,7 @@ $(HOSTDIR)/main.o : src/main.c
 $(HOSTDIR)/backend.o : src/backend.c
 	$(CC) $(CFLAGS) -c -o $@ src/backend.c
 
-$(HOSTDIR)/cli_main.o : src/cli_main.c
+$(HOSTDIR)/cli_main.o : src/cli_main.c version.h
 	$(CC) $(CFLAGS) -c -o $@ src/cli_main.c
 
 $(HOSTDIR)/cgi_main.o : src/cgi_main.c
