@@ -97,40 +97,122 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 #
 ########################################################################
 
-$(HOSTDIR)/main.o : src/main.c
+$(HOSTDIR)/main.o : src/main.c		\
+		src/backend.h		\
+		src/blog.h		\
+		src/conf.h		\
+		src/fix.h		\
+		src/frontend.h		\
+		src/globals.h		\
+		src/timeutil.h		\
+		src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/main.c
 
-$(HOSTDIR)/backend.o : src/backend.c
+$(HOSTDIR)/backend.o : src/backend.c	\
+		src/backend.h		\
+		src/blog.h		\
+		src/blogutil.h		\
+		src/conf.h		\
+		src/fix.h		\
+		src/frontend.h		\
+		src/globals.h		\
+		src/timeutil.h		\
+		src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/backend.c
 
-$(HOSTDIR)/cli_main.o : src/cli_main.c version.h
+$(HOSTDIR)/cli_main.o : src/cli_main.c	\
+		src/backend.h		\
+		src/blog.h		\
+		src/conf.h		\
+		src/fix.h		\
+		src/frontend.h		\
+		src/globals.h		\
+		src/timeutil.h		\
+		src/wbtum.h		\
+		version.h
 	$(CC) $(CFLAGS) -c -o $@ src/cli_main.c
 
-$(HOSTDIR)/cgi_main.o : src/cgi_main.c
+$(HOSTDIR)/cgi_main.o : src/cgi_main.c	\
+		src/backend.h		\
+		src/blog.h		\
+		src/conf.h		\
+		src/fix.h		\
+		src/frontend.h		\
+		src/globals.h		\
+		src/timeutil.h		\
+		src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/cgi_main.c
 
-$(HOSTDIR)/authenticate.o : src/authenticate.c
+$(HOSTDIR)/authenticate.o : src/authenticate.c	\
+		src/backend.h		\
+		src/blog.h		\
+		src/conf.h		\
+		src/frontend.h		\
+		src/globals.h		\
+		src/timeutil.h		\
+		src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/authenticate.c
 
-$(HOSTDIR)/addutil.o : src/addutil.c
+$(HOSTDIR)/addutil.o : src/addutil.c	\
+		src/backend.h		\
+		src/blog.h		\
+		src/conf.h		\
+		src/conversion.h	\
+		src/fix.h		\
+		src/frontend.h		\
+		src/globals.h		\
+		src/timeutil.h		\
+		src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/addutil.c
 
-$(HOSTDIR)/callbacks.o : src/callbacks.c version.h
+$(HOSTDIR)/callbacks.o : src/callbacks.c	\
+		src/backend.h		\
+		src/blog.h		\
+		src/blogutil.h		\
+		src/conf.h		\
+		src/fix.h		\
+		src/frontend.h		\
+		src/globals.h		\
+		src/timeutil.h		\
+		src/wbtum.h		\
+		version.h
 	$(CC) $(CFLAGS) -c -o $@ src/callbacks.c
 
-$(HOSTDIR)/globals.o : src/globals.c src/conf.h
+$(HOSTDIR)/globals.o : src/globals.c	\
+		src/backend.h		\
+		src/blog.h		\
+		src/conf.h		\
+		src/conversion.h	\
+		src/fix.h		\
+		src/frontend.h		\
+		src/timeutil.h		\
+		src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/globals.c
 
-$(HOSTDIR)/blog.o : src/blog.c src/blog.h src/conf.h 
+$(HOSTDIR)/blog.o : src/blog.c		\
+		src/backend.h		\
+		src/blog.h		\
+		src/conf.h 		\
+		src/fix.h		\
+		src/frontend.h		\
+		src/globals.h		\
+		src/timeutil.h		\
+		src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/blog.c
 
-$(HOSTDIR)/conversion.o : src/conversion.c src/conversion.h
+$(HOSTDIR)/conversion.o : src/conversion.c	\
+		src/blog.h		\
+		src/conversion.h	\
+		src/fix.h		\
+		src/frontend.h		\
+		src/timeutil.h		\
+		src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/conversion.c
 
 $(HOSTDIR)/timeutil.o : src/timeutil.c src/timeutil.h
 	$(CC) $(CFLAGS) -c -o $@ src/timeutil.c
 
-$(HOSTDIR)/wbtum.o : src/wbtum.c src/wbtum.h
+$(HOSTDIR)/wbtum.o : src/wbtum.c src/wbtum.h src/conf.h
 	$(CC) $(CFLAGS) -c -o $@ src/wbtum.c
 
 $(HOSTDIR)/blogutil.o : src/blogutil.c src/blogutil.h
@@ -139,7 +221,13 @@ $(HOSTDIR)/blogutil.o : src/blogutil.c src/blogutil.h
 $(HOSTDIR)/entity-conversion.o : src/entity-conversion.c
 	$(CC) $(CFLAGS) -c -o $@ src/entity-conversion.c
 
-$(HOSTDIR)/facebook.o : src/facebook.c
+$(HOSTDIR)/facebook.o : src/facebook.c	\
+		src/backend.h		\
+		src/blog.h		\
+		src/frontend.h		\
+		src/globals.h		\
+		src/timeutil.h		\
+		src/wbtum.h
 	$(CC) $(CFLAGS) `curl-config --cflags` -c -o $@ src/facebook.c
 
 #######################################################################
