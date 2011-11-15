@@ -97,9 +97,6 @@ $(HOSTDIR)/boston : $(HOSTDIR)/addutil.o	\
 #
 ########################################################################
 
-$(HOSTDIR)/test_main.o : src/test_main.c
-	$(CC) $(CFLAGS) -c -o $@ src/test_main.c
-
 $(HOSTDIR)/main.o : src/main.c
 	$(CC) $(CFLAGS) -c -o $@ src/main.c
 
@@ -115,20 +112,11 @@ $(HOSTDIR)/cgi_main.o : src/cgi_main.c
 $(HOSTDIR)/authenticate.o : src/authenticate.c
 	$(CC) $(CFLAGS) -c -o $@ src/authenticate.c
 
-$(HOSTDIR)/array.o : src/array.c
-	$(CC) $(CFLAGS) -c -o $@ src/array.c
-
 $(HOSTDIR)/addutil.o : src/addutil.c
 	$(CC) $(CFLAGS) -c -o $@ src/addutil.c
 
 $(HOSTDIR)/callbacks.o : src/callbacks.c version.h
 	$(CC) $(CFLAGS) -c -o $@ src/callbacks.c
-
-$(HOSTDIR)/bp.o : src/bp.c
-	$(CC) $(CFLAGS) -c -o $@ src/bp.c
-
-$(HOSTDIR)/addentry.o : src/addentry.c
-	$(CC) $(CFLAGS) -c -o $@ src/addentry.c
 
 $(HOSTDIR)/globals.o : src/globals.c src/conf.h
 	$(CC) $(CFLAGS) -c -o $@ src/globals.c
@@ -142,9 +130,6 @@ $(HOSTDIR)/conversion.o : src/conversion.c src/conversion.h
 $(HOSTDIR)/timeutil.o : src/timeutil.c src/timeutil.h
 	$(CC) $(CFLAGS) -c -o $@ src/timeutil.c
 
-$(HOSTDIR)/wbttest.o : src/wbttest.c src/wbtum.h
-	$(CC) $(CFLAGS) -c -o $@ src/wbttest.c
-
 $(HOSTDIR)/wbtum.o : src/wbtum.c src/wbtum.h
 	$(CC) $(CFLAGS) -c -o $@ src/wbtum.c
 
@@ -156,9 +141,6 @@ $(HOSTDIR)/entity-conversion.o : src/entity-conversion.c
 
 $(HOSTDIR)/facebook.o : src/facebook.c
 	$(CC) $(CFLAGS) `curl-config --cflags` -c -o $@ src/facebook.c
-
-$(HOSTDIR)/be2.o : src/be2.c
-	$(CC) $(CFLAGS) -c -o $@ $<
 
 #######################################################################
 #
