@@ -243,8 +243,13 @@ int GlobalsInit(const char *conf)
     c_templates[i].reverse  = lua_toboolean(g_L,-4);
     c_templates[i].fullurl  = lua_toboolean(g_L,-3);
     c_templates[i].file     = strdup(lua_tostring(g_L,-2));
-    
-    if (lua_isstring(g_L,-1))
+
+    if (lua_isnumber(g_L,-1))
+    {
+      c_templates[i].items = lua_tointeger(g_L,-1);
+      c_templates[i].pagegen = pagegen_items;
+    }
+    else if (lua_isstring(g_L,-1))
     {
       const char *x;
       char       *p;
@@ -259,11 +264,6 @@ int GlobalsInit(const char *conf)
         default:  break;
       }
       c_templates[i].pagegen = pagegen_days;
-    }
-    else if (lua_isnumber(g_L,-1))
-    {
-      c_templates[i].items = lua_tointeger(g_L,-1);
-      c_templates[i].pagegen = pagegen_items;
     }
     else if (lua_isnil(g_L,-1))
     {
