@@ -565,6 +565,7 @@ static const char *mime_type(char *filename)
     { ".css"		, "text/css"	},
     { ".mp4"		, "video/mp4"	},
     { ".mov"		, "video/quicktime" },
+    { ".gz"		, "application/x-gzip" },
     { NULL		, NULL		}
   };
   
