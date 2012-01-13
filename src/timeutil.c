@@ -30,7 +30,7 @@
 
 /*************************************************************************/
 
-unsigned int max_monthday(int year,unsigned int month)
+unsigned int max_monthday(const int year,const unsigned int month)
 {
   static const int days[] = { 31,0,31,30,31,30,31,31,30,31,30,31 } ;
   
@@ -58,7 +58,7 @@ unsigned int max_monthday(int year,unsigned int month)
 
 /***************************************************************************/
 
-void btm_add_day(struct btm *d)
+void btm_add_day(struct btm *const d)
 {
   assert(d != NULL);
   
@@ -72,7 +72,7 @@ void btm_add_day(struct btm *d)
 
 /*************************************************************************/
 
-void btm_sub_part(struct btm *d)
+void btm_sub_part(struct btm *const d)
 {
   assert(d != NULL);
   
@@ -86,7 +86,7 @@ void btm_sub_part(struct btm *d)
 
 /************************************************************************/
 
-void btm_sub_day(struct btm *d)
+void btm_sub_day(struct btm *const d)
 {
   assert(d != NULL);
   d->day--;
@@ -99,7 +99,7 @@ void btm_sub_day(struct btm *d)
 
 /***********************************************************************/
 
-void btm_add_month(struct btm *d)
+void btm_add_month(struct btm *const d)
 {
   assert(d != NULL);
   
@@ -113,7 +113,7 @@ void btm_add_month(struct btm *d)
 
 /***********************************************************************/
 
-void btm_sub_month(struct btm *d)
+void btm_sub_month(struct btm *const d)
 {
   assert(d != NULL);
   
@@ -127,7 +127,10 @@ void btm_sub_month(struct btm *d)
 
 /***********************************************************************/
 
-int btm_cmp(const struct btm *d1,const struct btm *d2)
+int btm_cmp(
+	const struct btm *const restrict d1,
+	const struct btm *const restrict d2
+)
 {
   int rc;
   
@@ -144,7 +147,10 @@ int btm_cmp(const struct btm *d1,const struct btm *d2)
 
 /***********************************************************************/
 
-int btm_cmp_date(const struct btm *d1,const struct btm *d2)
+int btm_cmp_date(
+	const struct btm *const restrict d1,
+	const struct btm *const restrict d2
+)
 {
   int rc;
   
@@ -160,7 +166,7 @@ int btm_cmp_date(const struct btm *d1,const struct btm *d2)
 
 /***************************************************************************/
 
-void tm_init(struct tm *ptm)
+void tm_init(struct tm *const ptm)
 {
   memset(ptm,0,sizeof(struct tm));
   ptm->tm_isdst = -1;
