@@ -27,7 +27,6 @@ SETUID=chmod 4755
 
 CC     = gcc -std=c99
 CFLAGS = -g -Wall -Wextra -pedantic
-CINCL=
 
 #CFLAGS=-g -Wall -pedantic -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
 #CFLAGS=-DSCREAM -O4 -fomit-frame-pointer  $(CINCL)
