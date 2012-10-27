@@ -21,28 +21,13 @@
 #
 ########################################################################
 
-SHELL=/bin/sh
-HOSTDIR=build
-SETUID=chmod 4755
+SHELL   = /bin/sh
+HOSTDIR = build
+SETUID  = chmod 4755
 
-CC     = gcc -std=c99
-CFLAGS = -g -Wall -Wextra -pedantic
-
-#CFLAGS=-g -Wall -pedantic -Wpointer-arith -Wshadow -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wcast-qual -Waggregate-return -Wmissing-declarations -Wnested-externs -Winline -W $(CINCL)
-#CFLAGS=-DSCREAM -O4 -fomit-frame-pointer  $(CINCL)
-#CFLAGS=-O3 -fomit-frame-pointer  -DSCREAM $(CINCL)
-#CFLAGS=-O3 -fomit-frame-pointer  $(CINCL)
-#CFLAGS=-pg -g -DSCREAM -DNOSTATS -O4 $(CINCL)
-#CFLAGS=-g -DDDT $(CINCL)
-#CFLAGS=-g -march=pentium3 -O3 $(CINCL)
-#CFLAGS=-g $(CINCL) -DNDEBUG
-#CFLAGS=-g -pg $(CINCL)
-
-LFLAGS=-rdynamic -lgdbm -lcgi6 `curl-config --libs` -llua -lm
-#LFLAGS= lcgi5 
-#LFLAGS=-ldb -lcgi5 -pg
-# For Solaris, use this line
-#LFLAGS=-ldb -lcgi5 -lsocket -lnsl
+CC      = gcc -std=c99
+CFLAGS  = -g -Wall -Wextra -pedantic
+LFLAGS  =-rdynamic -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 
 ###################################
 # some notes
