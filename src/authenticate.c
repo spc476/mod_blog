@@ -29,7 +29,6 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#include <cgilib6/errors.h>
 #include <cgilib6/cgi.h>
 #include <cgilib6/util.h>
 

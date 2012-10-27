@@ -29,6 +29,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <stdbool.h>
+#include <errno.h>
 #include <assert.h>
 
 #include <syslog.h>
@@ -121,7 +122,7 @@ int GlobalsInit(const char *conf)
       if (conf == NULL)
       {
         syslog(LOG_ERR,"env BLOG_CONFIG not defined");
-        return ERR_ERR;
+        return ENOMSG;
       }
     }
   }
@@ -130,7 +131,7 @@ int GlobalsInit(const char *conf)
   if (g_L == NULL)
   {
     syslog(LOG_ERR,"cannot create Lua state");
-    return ERR_ERR;
+    return ENOMEM;
   }
   
   lua_gc(g_L,LUA_GCSTOP,0);
@@ -142,7 +143,7 @@ int GlobalsInit(const char *conf)
   {
     const char *err = lua_tostring(g_L,-1);
     syslog(LOG_ERR,"Lua error: (%d) %s",rc,err);
-    return ERR_ERR;
+    return -1;
   }
   
   rc = lua_pcall(g_L,0,LUA_MULTRET,0);
@@ -150,7 +151,7 @@ int GlobalsInit(const char *conf)
   {
     const char *err = lua_tostring(g_L,-1);
     syslog(LOG_ERR,"Lua error: (%d) %s",rc,err);
-    return ERR_ERR;
+    return -1;
   }
 
   c_name               = get_string(g_L,"name",NULL);
@@ -217,7 +218,7 @@ int GlobalsInit(const char *conf)
   if (lua_isnil(g_L,-1))
   {
     syslog(LOG_ERR,"missing templates section");
-    return ERR_ERR;
+    return ENOENT;
   }
   
   c_numtemplates = lua_objlen(g_L,-1);
@@ -225,7 +226,7 @@ int GlobalsInit(const char *conf)
   if (c_templates == NULL)
   {
     syslog(LOG_ERR,"%s",strerror(ENOMEM));
-    return ERR_ERR;
+    return ENOMEM;
   }
   
   for (size_t i = 0 ; i < c_numtemplates; i++)
@@ -294,7 +295,7 @@ int GlobalsInit(const char *conf)
     if (c_aflinks == NULL)
     {
       syslog(LOG_ERR,"%s",strerror(ENOMEM));
-      return ERR_ERR;
+      return ENOMEM;
     }
     
     for (size_t i = 0 ; i < c_numaflinks ; i++)
@@ -323,7 +324,7 @@ int GlobalsInit(const char *conf)
 
   g_blog = BlogNew(c_basedir,c_lockfile);
   if (g_blog == NULL)
-    return(ERR_ERR);
+    return(ENOMEM);
 
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting
@@ -333,7 +334,7 @@ int GlobalsInit(const char *conf)
   
   setlocale(LC_COLLATE,"C");
 
-  return(ERR_OKAY);
+  return(0);
 }
 
 /********************************************************************/

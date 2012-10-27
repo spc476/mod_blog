@@ -28,7 +28,6 @@
 #include <stdarg.h>
 #include <time.h>
 
-#include <cgilib6/errors.h>
 #include <cgilib6/nodelist.h>
 #include <cgilib6/htmltok.h>
 #include <cgilib6/util.h>
@@ -93,7 +92,7 @@ int entry_add(Request req)
 
   BlogDatesInit();
 
-  return(ERR_OKAY);    
+  return(0);    
 }
 
 /************************************************************************/

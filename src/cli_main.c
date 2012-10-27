@@ -32,12 +32,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <time.h>
+#include <errno.h>
 #include <assert.h>
 
 #include <getopt.h>
 
 #include <cgilib6/pair.h>
-#include <cgilib6/errors.h>
 #include <cgilib6/htmltok.h>
 #include <cgilib6/rfc822.h>
 #include <cgilib6/cgi.h>
@@ -182,11 +182,11 @@ int main_cli(int argc,char *argv[])
   }
 
   rc = GlobalsInit(config);
-  if (rc != ERR_OKAY)
+  if (rc != 0)
     return((*req.error)(&req,HTTP_ISERVERERR,"could not open cofiguration file %s",config));
   
   rc = BlogDatesInit();
-  if (rc != ERR_OKAY)
+  if (rc != 0)
     return((*req.error)(&req,HTTP_ISERVERERR,"could not initialize dates"));
   
   if (forcenotify)
@@ -217,11 +217,11 @@ static int cmd_cli_new(Request req)
   else
     rc = mailfile_readdata(req);
   
-  if (rc != ERR_OKAY)
+  if (rc != 0)
     return(EXIT_FAILURE);
 
   rc = entry_add(req);
-  if (rc == ERR_OKAY)
+  if (rc == 0)
   {
     if (cf_facebook)    notify_facebook(req);
     if (gf_emailupdate) notify_emaillist();
@@ -261,7 +261,7 @@ static int cmd_cli_show(Request req)
     else
     {
       rc = TumblerNew(&req->tumbler,&req->reqtumbler);
-      if (rc == ERR_OKAY)
+      if (rc == 0)
       {
         if (req->tumbler->flags.redirect)
         {
@@ -379,7 +379,7 @@ static int mailfile_readdata(Request req)
   if (authenticate_author(req) == false)
   {
     fclose(req->in);
-    return(ERR_ERR);
+    return(EPERM);
   }
   
   output = open_memstream(&req->origbody,&size);
@@ -387,7 +387,7 @@ static int mailfile_readdata(Request req)
   fclose(output);
 
   req->body     = strdup(req->origbody);
-  return(ERR_OKAY);
+  return(0);
 }
 
 /***************************************************************************/
@@ -404,7 +404,7 @@ static int cli_error(Request req __attribute__((unused)),int level,char *msg, ..
 
   fputc('\n',stderr);
   
-  return ERR_ERR;
+  return -1;
 }
 
 /**************************************************************************/

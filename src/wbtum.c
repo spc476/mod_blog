@@ -53,7 +53,6 @@
 #include <stdarg.h>
 
 #include <cgilib6/nodelist.h>
-#include <cgilib6/errors.h>
 #include <cgilib6/util.h>
 
 #include "conf.h"
@@ -105,7 +104,7 @@ int (TumblerNew)(Tumbler *pt,char **pstr)
   if (t->flags.error)
   {
     TumblerFree(&t);
-    return(ERR_ERR);
+    return(-1);
   }
 
   /*------------------------------------------
@@ -118,7 +117,7 @@ int (TumblerNew)(Tumbler *pt,char **pstr)
     t->flags.redirect = false;
  
   *pt = t;
-  return(ERR_OKAY);  
+  return(0);  
 }
 
 /************************************************************************/
@@ -194,7 +193,7 @@ int (TumblerFree)(Tumbler *pt)
   }
   free(t);
   *pt = NULL;
-  return(ERR_OKAY);
+  return(0);
 }
 
 /**********************************************************************/
@@ -633,10 +632,10 @@ static int tumbler_normalize(Tumbler t)
   
   assert(t != NULL);
   
-  if (t->flags.file) return(ERR_OKAY);
+  if (t->flags.file) return(0);
   
   base    = last = (TumblerUnit)ListGetHead(&t->units);
-  if ((base->type == TUMBLER_SINGLE) && (t->pairs == 1)) return(ERR_OKAY);
+  if ((base->type == TUMBLER_SINGLE) && (t->pairs == 1)) return(0);
   current = (TumblerUnit)NodeNext(&last->node);
 
   while(NodeValid(&current->node))
@@ -681,7 +680,7 @@ static int tumbler_normalize(Tumbler t)
     last    = current;
     current = (TumblerUnit)NodeNext(&current->node);
   }
-  return(ERR_OKAY);
+  return(0);
 }
 
 /*********************************************************************/

@@ -24,7 +24,6 @@
 #define BLOG_MKENTRY
 
 #include <cgilib6/nodelist.h>
-#include <cgilib6/errors.h>
 
 #include "timeutil.h"
 

@@ -33,7 +33,6 @@
 #include <time.h>
 #include <assert.h>
 
-#include <cgilib6/errors.h>
 #include <cgilib6/cgi.h>
 #include <cgilib6/util.h>
 
@@ -74,7 +73,7 @@ int main_cgi_head(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attrib
   assert(cgi != NULL);
   
   rc = cgi_init(cgi,&req);
-  if (rc != ERR_OKAY)
+  if (rc != 0)
     return((*req.error)(&req,HTTP_ISERVERERR,"cgi_init() failed"));
   
   return((*req.error)(&req,HTTP_METHODNOTALLOWED,"HEAD method not supported"));
@@ -90,7 +89,7 @@ int main_cgi_get(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attribu
   assert(cgi != NULL);
 
   rc = cgi_init(cgi,&req);
-  if (rc != ERR_OKAY)
+  if (rc != 0)
     return((*req.error)(&req,HTTP_ISERVERERR,"cgi_init() failed"));
 
   req.command    = cmd_cgi_get_show;
@@ -169,7 +168,7 @@ static int cmd_cgi_get_show(Request req)
   {
     req->reqtumbler++;
     rc = TumblerNew(&req->tumbler,&req->reqtumbler);
-    if (rc == ERR_OKAY)
+    if (rc == 0)
     {
 
       if (req->tumbler->flags.redirect)
@@ -191,7 +190,7 @@ static int cmd_cgi_get_show(Request req)
         );
         free(tum);
 	free(status);
-	return(ERR_OKAY);
+	return(0);
       }
 
       if (req->tumbler->flags.file == false)
@@ -256,7 +255,7 @@ int main_cgi_post(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attrib
   assert(cgi != NULL);
   
   rc = cgi_init(cgi,&req);
-  if (rc != ERR_OKAY)
+  if (rc != 0)
     return((*req.error)(&req,HTTP_ISERVERERR,"cgi_init() failed"));
   
   req.command = cmd_cgi_post_new;  
@@ -339,7 +338,7 @@ static int cmd_cgi_post_new(Request req)
   assert(req != NULL);
   
   rc = entry_add(req);
-  if (rc == ERR_OKAY)
+  if (rc == 0)
   {
     if (cf_facebook)    notify_facebook(req);
     if (gf_emailupdate) notify_emaillist();
@@ -485,7 +484,7 @@ static int cgi_error(Request req,int level,char *msg, ... )
   free(file);
   free(errmsg);
   
-  return(ERR_OKAY);
+  return(0);
 }
 
 /**********************************************************************/
@@ -506,11 +505,11 @@ static int cgi_init(Cgi cgi,Request req)
   
   rc = GlobalsInit(NULL);
 
-  if (rc != ERR_OKAY)
+  if (rc != 0)
     return rc;
   
   BlogDatesInit();
-  return(ERR_OKAY);
+  return(0);
 }
 
 /***********************************************************************/

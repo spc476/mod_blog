@@ -212,7 +212,7 @@ int tumbler_page(FILE *out,Tumbler spec)
   if (spec->flags.file)
   {
     display_file(out,spec);
-    return(ERR_OKAY);	/* XXX hack for now */
+    return 0;	/* XXX hack for now */
   }
 
   memset(&cbd,0,sizeof(struct callback_data));
@@ -654,7 +654,7 @@ static int display_file(FILE * out,Tumbler spec)
   else
     fprintf(out,"File to open: %s\n",fname);
 
-  return(ERR_OKAY);
+  return(0);
 }
 
 /*****************************************************************/

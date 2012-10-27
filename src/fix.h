@@ -23,7 +23,6 @@
 #ifndef FIX_H
 #define FIX_H
 
-#include <cgilib6/errors.h>
 #include <cgilib6/chunk.h>
 
 #include "frontend.h"

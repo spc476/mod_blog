@@ -83,7 +83,7 @@ int BlogDatesInit(void)
   while(true)
   {
     if (btm_cmp_date(&gd.now,&gd.begin) < 0)
-      return(ERR_OKAY);	/* XXX - this may not be an error */
+      return(0);	/* XXX - this may not be an error */
     
     entry = BlogEntryRead(g_blog,&gd.now);
     if (entry == NULL)
@@ -95,7 +95,7 @@ int BlogDatesInit(void)
     break;
   }
   gd.now.part = g_blog->idx;
-  return(ERR_OKAY);
+  return(0);
 }
   
 /***********************************************************************/

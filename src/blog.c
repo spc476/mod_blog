@@ -35,7 +35,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <cgilib6/errors.h>
 #include <cgilib6/util.h>
 #include <cgilib6/nodelist.h>
 
@@ -154,7 +153,7 @@ int (BlogFree)(Blog blog)
   
   free(blog->lockfile);
   free(blog);
-  return(ERR_OKAY);
+  return(0);
 }
 
 /************************************************************************/
@@ -362,7 +361,7 @@ int (BlogEntryWrite)(BlogEntry entry)
   
   blog = entry->blog;
   rc   = blog_cache_day(blog,&entry->when);
-  if (rc != ERR_OKAY)
+  if (rc != 0)
     return(rc);
     
   /*---------------------------------------------
@@ -384,18 +383,18 @@ int (BlogEntryWrite)(BlogEntry entry)
   ;--------------------------------------------*/
   
   rc = date_checkcreate(&entry->when);
-  if (rc != ERR_OKAY)
+  if (rc != 0)
     return(rc);
   
   stitles = open_file_w("titles",&blog->cache);
   if (stitles == NULL)
-    return(ERR_ERR);
+    return ENOENT;
   
   sclass = open_file_w("class",&blog->cache);
   if (sclass == NULL)
   {
     fclose(stitles);
-    return(ERR_ERR);
+    return ENOENT;
   }
   
   sauthors = open_file_w("authors",&blog->cache);
@@ -403,7 +402,7 @@ int (BlogEntryWrite)(BlogEntry entry)
   {
     fclose(sclass);
     fclose(stitles);
-    return(ERR_ERR);
+    return ENOENT;
   }
   
   status = open_file_w("status",&blog->cache);
@@ -412,7 +411,7 @@ int (BlogEntryWrite)(BlogEntry entry)
     fclose(sauthors);
     fclose(sclass);
     fclose(stitles);
-    return ERR_ERR;
+    return ENOENT;
   }
   
   for (i = 0 ; i < blog->idx ; i++)
@@ -433,7 +432,7 @@ int (BlogEntryWrite)(BlogEntry entry)
   fclose(sclass);
   fclose(stitles);
   
-  return(ERR_OKAY);
+  return(0);
 }
 
 /***********************************************************************/
@@ -448,7 +447,7 @@ int (BlogEntryFree)(BlogEntry entry)
   free(entry->class);
   free(entry->title);
   free(entry);
-  return(ERR_OKAY);
+  return(0);
 }
 
 /***********************************************************************/
@@ -554,10 +553,10 @@ static int date_checkcreate(struct btm *date)
   if (rc != 0)
   {
     if (errno != ENOENT)
-      return(ERR_ERR);
+      return(errno);
     rc = mkdir(tname,0777);
     if (rc != 0)
-      return(ERR_ERR);
+      return(errno);
   }
   
   sprintf(tname,"%04d/%02d",date->year,date->month);
@@ -565,10 +564,10 @@ static int date_checkcreate(struct btm *date)
   if (rc != 0)
   {
     if (errno != ENOENT)
-      return(ERR_ERR);
+      return(errno);
     rc = mkdir(tname,0777);
     if (rc != 0)
-      return(ERR_ERR);
+      return(errno);
   }
   
   sprintf(tname,"%04d/%02d/%02d",date->year,date->month,date->day);
@@ -576,13 +575,13 @@ static int date_checkcreate(struct btm *date)
   if (rc != 0)
   {
     if (errno != ENOENT)
-      return(ERR_ERR);
+      return(errno);
     rc = mkdir(tname,0777);
     if (rc != 0)
-      return(ERR_ERR);
+      return(errno);
   }
   
-  return(ERR_OKAY);
+  return(0);
 }
 
 /********************************************************************/
@@ -607,7 +606,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
   ;--------------------------------------------*/
   
   if (btm_cmp_date(&blog->cache,date) == 0)
-    return(ERR_OKAY);
+    return(0);
   
   /*------------------------------------------
   ; free any nodes not in use, so we don't
@@ -763,7 +762,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
   fclose(sauthors);
   fclose(sclass);
   fclose(stitles);
-  return(ERR_OKAY);
+  return(0);
 }
 
 /************************************************************************/
