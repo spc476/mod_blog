@@ -678,6 +678,8 @@ static void cb_entry_body(FILE *out,void *data)
 
   entry = cbd->entry;
   in    = fmemopen(entry->body,strlen(entry->body),"r");
+  if (in == NULL) return;
+  
   token = HtmlParseNew(in);
   
   if (token == NULL)
