@@ -29,7 +29,7 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <assert.h>
-
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -149,7 +149,10 @@ int (BlogFree)(Blog blog)
     BlogUnlock(blog);
   
   for (i = 0 ; i < blog->idx ; i++)
+  {
+    assert(blog->entries[i]->valid);
     BlogEntryFree(blog->entries[i]);
+  }
   
   free(blog->lockfile);
   free(blog);
@@ -167,6 +170,7 @@ BlogEntry (BlogEntryNew)(Blog blog)
   pbe               = malloc(sizeof(struct blogentry));
   pbe->node.ln_Succ = NULL;
   pbe->node.ln_Pred = NULL;
+  pbe->valid        = true;
   pbe->blog         = blog;
   pbe->when.year    = gd.now.year;
   pbe->when.month   = gd.now.month;
@@ -190,7 +194,7 @@ BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
   assert(blog                          != NULL);
   assert(which                         != NULL);
   assert(which->part                   >  0);
-/*  assert(btm_cmp_date(which,&gd.begin) >= 0);*/
+  assert(btm_cmp_date(which,&gd.begin) >= 0);
   
   if (date_check(which) == false)
     return(NULL);
@@ -206,6 +210,7 @@ BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
         return(NULL);
       
       assert(btm_cmp(&blog->entries[which->part - 1]->when,which) == 0);
+      assert(blog->entries[which->part - 1]->valid);
       return(blog->entries[which->part - 1]);
     }
   
@@ -299,7 +304,13 @@ void (BlogEntryReadXD)(Blog blog,List *list,struct btm *start,size_t num)
       start->part = 1;
       do 
       {
-        if (btm_cmp_date(start,&gd.begin) < 0)
+        fprintf(
+        	stderr,
+        	"%4d/%02d/%02d %4d/%02d/%02d\n",
+        	start->year,start->month,start->day,
+        	gd.begin.year,gd.begin.month,gd.begin.day
+        );
+        if (btm_cmp_date(start,&gd.begin) <= 0)
           return;
             
         btm_sub_day(start);
@@ -440,7 +451,9 @@ int (BlogEntryWrite)(BlogEntry entry)
 int (BlogEntryFree)(BlogEntry entry)
 {
   assert(entry != NULL);
+  assert(entry->valid);
   
+  entry->valid = false;
   free(entry->body);
   free(entry->status);
   free(entry->author);
@@ -618,15 +631,16 @@ static int blog_cache_day(Blog blog,struct btm *date)
   
   for (i = 0 ; i < blog->idx ; i++)
   {
-    /* if (!NodeValid(&blog->entries[i]->node)) */
-    if (
-         (blog->entries[i]->node.ln_Succ == NULL)
-	 && (blog->entries[i]->node.ln_Pred == NULL)
-       )
-    {
-      BlogEntryFree(blog->entries[i]);
-    }
-  } 
+    if (NodeValid(&blog->entries[i]->node))
+      NodeRemove(&blog->entries[i]->node);
+    BlogEntryFree(blog->entries[i]);
+    blog->entries[i] = NULL;
+  }
+
+#ifndef NDEBUG
+  for (i = 0 ; i < 100 ; i++)
+    assert(blog->entries[i] == NULL);
+#endif
   
   /*--------------------------------------------
   ; read in the day's entries 
@@ -646,6 +660,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
     entry               = malloc(sizeof(struct blogentry));
     entry->node.ln_Succ = NULL;
     entry->node.ln_Pred = NULL;
+    entry->valid        = true;
     entry->when.year    = date->year;
     entry->when.month   = date->month;
     entry->when.day     = date->day;

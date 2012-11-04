@@ -253,6 +253,8 @@ static void cb_ad(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
+  assert(cbd->entry->valid);
+  
   sprintf(
   	fname,
   	"%04d/%02d/%02d/%d.ad",
@@ -407,6 +409,7 @@ static void cb_entry(FILE *out,void *data)
     entry = (BlogEntry)ListRemHead(&cbd->list)
   )
   {
+    assert(entry->valid);
     cbd->entry = entry;
     generic_cb("entry",out,data);
     cbd->last = entry->when;
@@ -427,6 +430,7 @@ static void cb_entry_url(FILE *out,void *data)
   assert(data != NULL);
 
   entry = cbd->entry;
+  assert(entry->valid);
   print_nav_url(out,&entry->when,PART);
 }
 
@@ -441,6 +445,7 @@ static void cb_entry_id(FILE *out,void *data)
   assert(data != NULL);
 
   entry = cbd->entry;
+  assert(entry->valid);
   print_nav_name(out,&entry->when,DAY,'-');
 }
 
@@ -470,6 +475,7 @@ static void cb_entry_pubdate(FILE *out,void *data)
   assert(data != NULL);
   
   entry = cbd->entry;
+  assert(entry->valid);
   ts    = entry->timestamp;
   ptm   = localtime(&ts);
   
@@ -589,6 +595,8 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
   struct pair *src;
   struct pair *np;
   
+  assert(entry  != NULL);
+  assert(entry->valid);
   assert(token  != NULL);
   assert(attrib != NULL);
   
@@ -677,6 +685,7 @@ static void cb_entry_body(FILE *out,void *data)
   assert(data != NULL);
 
   entry = cbd->entry;
+  assert(entry->valid);
   in    = fmemopen(entry->body,strlen(entry->body),"r");
   if (in == NULL) return;
   
@@ -789,6 +798,7 @@ static void cb_cond_hr(FILE *out,void *data)
     return;
 
   entry = cbd->entry;
+  assert(entry->valid);
   if (btm_cmp_date(&entry->when,&cbd->last) == 0)
   {
     if (entry->when.part != cbd->last.part)
@@ -808,6 +818,7 @@ static void cb_cond_blog_title(FILE *out,void *data)
   if (gd.navunit == PART)
   {
     entry = (BlogEntry)ListGetHead(plist);
+    assert(entry->valid);
     fprintf(out,"%s - ",entry->title);
   }
 }
@@ -855,6 +866,7 @@ static void cb_rss_item(FILE *out,void *data)
     entry = (BlogEntry)ListRemHead(&cbd->list)
   )
   {
+    assert(entry->valid);
     cbd->entry = entry;
     generic_cb("item",out,data);
     cbd->last = entry->when;
@@ -896,6 +908,7 @@ static void cb_atom_entry(FILE *out,void *data)
     entry = (BlogEntry)ListRemHead(&cbd->list)
   )
   {
+    assert(entry->valid);
     cbd->entry = entry;
     generic_cb("entry",out,data);
     cbd->last = entry->when;
@@ -1178,7 +1191,11 @@ static void print_nav_title(FILE *out,struct btm *date,int unit)
          break;
     case PART:
          entry = BlogEntryRead(g_blog,date);
-         fputs(entry->title,out);
+         if (entry)
+         {
+           assert(entry->valid);
+           fputs(entry->title,out);
+         }
          break;
     default:
          assert(0);
@@ -1508,6 +1525,7 @@ static void cb_date_day(FILE *out,void *data)
   assert(data != NULL);
   
   entry = cbd->entry;
+  assert(entry->valid);
   print_nav_name(out,&entry->when,DAY,'-');
 }
 
@@ -1522,6 +1540,7 @@ static void cb_date_day_url(FILE *out,void *data)
   assert(data != NULL);
   
   entry = cbd->entry;
+  assert(entry->valid);
   print_nav_url(out,&entry->when,DAY);
 }
 
@@ -1539,6 +1558,7 @@ static void cb_date_day_normal(FILE *out,void *data)
   
   tm_init(&day);
   entry       = cbd->entry;
+  assert(entry->valid);
   day.tm_year = entry->when.year - 1900;
   day.tm_mon  = entry->when.month - 1;
   day.tm_mday = entry->when.day;
@@ -1560,6 +1580,7 @@ static void cb_entry_cond_date(FILE *out,void *data)
   assert(data != NULL);
 
   entry = cbd->entry;  
+  assert(entry->valid);
   
   if (btm_cmp_date(&entry->when,&cbd->last) != 0)
     generic_cb("entry.cond.date",out,data);
@@ -1576,6 +1597,7 @@ static void cb_entry_name(FILE *out,void *data)
   assert(data != NULL);
   
   entry = cbd->entry;
+  assert(entry->valid);
   print_nav_name(out,&entry->when,PART,'-');
 }
 

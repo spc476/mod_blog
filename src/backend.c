@@ -148,8 +148,9 @@ int pagegen_days(
   thisday      = *when;
   
   memset(&cbd,0,sizeof(struct callback_data));
+  ListInit(&cbd.list);
   
-  for (ListInit(&cbd.list) , days = 0 , added = false ; days < template->items ; )
+  for (days = 0 , added = false ; days < template->items ; )
   {
     BlogEntry entry;
     
@@ -158,6 +159,7 @@ int pagegen_days(
     entry = BlogEntryRead(g_blog,&thisday);
     if (entry)
     {
+      assert(entry->valid);
       ListAddTail(&cbd.list,&entry->node);
       added = true;
     }
@@ -434,7 +436,7 @@ static void calculate_previous(struct btm start)
                btm_sub_day(&gd.previous);
                continue;
              }
-             
+             assert(entry->valid);
              return;
            }
                       
@@ -458,7 +460,7 @@ static void calculate_previous(struct btm start)
 	       btm_sub_part(&gd.previous);
                continue;
              }
-             
+             assert(entry->valid);
              return;
            }
            
@@ -511,7 +513,7 @@ static void calculate_next(struct btm end)
                btm_add_day(&gd.next);
                continue;
              }
-             
+             assert(entry->valid);
              return;
            }
            
@@ -536,7 +538,7 @@ static void calculate_next(struct btm end)
                btm_add_day(&gd.next);
                continue;
              }
-             
+             assert(entry->valid);
              return;
            }
            gd.f.navnext = false;
@@ -672,6 +674,7 @@ static char *tag_collect(List *list)
   assert(list != NULL);
   
   entry = (BlogEntry)ListGetHead(list);
+  assert(entry->valid);
   
   if (!NodeValid(&entry->node) || empty_string(entry->class))
     return strdup(gd.adtag);
@@ -726,6 +729,7 @@ static void free_entries(List *list)
     entry = (BlogEntry)ListRemHead(list)
   )
   {
+    assert(entry->valid);
     BlogEntryFree(entry);
   }
 }

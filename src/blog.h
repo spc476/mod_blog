@@ -23,6 +23,7 @@
 #ifndef BLOG_MKENTRY
 #define BLOG_MKENTRY
 
+#include <stdbool.h>
 #include <cgilib6/nodelist.h>
 
 #include "timeutil.h"
@@ -42,6 +43,7 @@ typedef struct blog
 typedef struct blogentry
 {
   Node        node;
+  bool        valid;
   Blog        blog;
   time_t      timestamp;
   struct btm  when;
