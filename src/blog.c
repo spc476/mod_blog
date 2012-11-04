@@ -190,7 +190,7 @@ BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
   assert(blog                          != NULL);
   assert(which                         != NULL);
   assert(which->part                   >  0);
-  assert(btm_cmp_date(which,&gd.begin) >= 0);
+/*  assert(btm_cmp_date(which,&gd.begin) >= 0);*/
   
   if (date_check(which) == false)
     return(NULL);
