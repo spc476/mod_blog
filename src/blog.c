@@ -172,6 +172,7 @@ BlogEntry (BlogEntryNew)(Blog blog)
   pbe->node.ln_Succ = NULL;
   pbe->node.ln_Pred = NULL;
   pbe->blog         = blog;
+  pbe->valid        = true;
   pbe->when.year    = gd.now.year;
   pbe->when.month   = gd.now.month;
   pbe->when.day     = gd.now.day;
