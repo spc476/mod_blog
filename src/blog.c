@@ -411,7 +411,7 @@ int (BlogEntryWrite)(BlogEntry entry)
     class  [maxnum]  = strdup(entry->class);
     status [maxnum]  = strdup(entry->status);
     titles [maxnum]  = strdup(entry->title);
-    entry->when.part = maxnum++;
+    entry->when.part = ++maxnum;
   }
   else
   {
