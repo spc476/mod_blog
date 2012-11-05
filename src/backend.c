@@ -674,7 +674,6 @@ static char *tag_collect(List *list)
   assert(list != NULL);
   
   entry = (BlogEntry)ListGetHead(list);
-  assert(entry->valid);
   
   if (!NodeValid(&entry->node) || empty_string(entry->class))
     return strdup(gd.adtag);
