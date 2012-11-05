@@ -56,6 +56,7 @@ static FILE	*open_file_r		(const char *,struct btm *);
 static FILE	*open_file_w		(const char *,struct btm *);
 static int	 date_check		(struct btm *);
 static int	 date_checkcreate	(struct btm *);
+static char     *blog_meta_entry	(const char *,struct btm *,size_t);
 static int	 blog_cache_day		(Blog,struct btm *);
 
 /***********************************************************************/
@@ -187,12 +188,22 @@ BlogEntry (BlogEntryNew)(Blog blog)
 
 BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
 {
-  int part;
+  BlogEntry *entry;
 
   assert(blog                          != NULL);
   assert(which                         != NULL);
   assert(which->part                   >  0);
   assert(btm_cmp_date(which,&gd.begin) >= 0);
+  
+  entry = malloc(sizeof(struct blogentry));
+  entry->node.ln_Succ = NULL;
+  entry->node.ln_Pred = NULL;
+  entry->
+  
+  
+  
+  
+  
   
   if (date_check(which) == false)
     return(NULL);
@@ -599,6 +610,35 @@ static int date_checkcreate(struct btm *date)
   }
   
   return(0);
+}
+
+/********************************************************************/
+
+static char *blog_meta_entry(const char *name,struct btm *date,size_t num)
+{
+  FILE   *fp;
+  char   *text;
+  size_t  size;
+  
+  assert(name != NULL);
+  assert(date != NULL);
+  
+  text = NULL;
+  size = 0;
+  fp   = open_file_r(name,date);
+  
+  do
+  {
+    bytes = getline(&text,&size,fp);
+    if (bytes == -1)
+    {
+      fclose(fp);
+      free(text);
+      return strdup("");
+    }
+  } while (--num);
+  
+  return text;
 }
 
 /********************************************************************/
