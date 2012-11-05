@@ -196,20 +196,6 @@ int GlobalsInit(const char *conf)
     free((void *)url);
   }
   
-  {
-    const char *d = get_string(g_L,"startdate",NULL);    
-    char       *p;
-    
-    if (d)
-    {
-      gd.begin.year  = strtoul(d,&p,10); p++;
-      gd.begin.month = strtoul(p,&p,10); p++;
-      gd.begin.day   = strtoul(p,NULL,10);
-      gd.begin.part  = 1;
-      free((void *)d);
-    }
-  }
-  
   /*------------------------------------------------
   ; process the templates array
   ;-------------------------------------------------*/

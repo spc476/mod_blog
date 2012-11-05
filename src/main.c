@@ -25,6 +25,7 @@
 #include <time.h>
 #include <stdarg.h>
 
+#include <syslog.h>
 #include <cgilib6/cgi.h>
 
 #include "conf.h"
@@ -68,34 +69,55 @@ int main(int argc,char *argv[])
 
 int BlogDatesInit(void)
 {
-  BlogEntry  entry;
-  struct tm *today;
+  FILE      *fp;
+  time_t     now;
+  struct tm *ptm;
+  char       buffer[128];
+  char      *p;
   
-  gd.tst       = time(NULL);
-  today        = localtime(&gd.tst);
-  gd.stmst     = *today;
-  gd.now.year  = gd.updatetime.year  = today->tm_year + 1900;
-  gd.now.month = gd.updatetime.month = today->tm_mon + 1;
-  gd.now.day   = gd.updatetime.day   = today->tm_mday;
-  gd.now.part  = gd.updatetime.part  = 1;
-  srand(gd.tst);
-
-  while(true)
+  fp = fopen(".first","r");
+  if (fp == NULL)
   {
-    if (btm_cmp_date(&gd.now,&gd.begin) < 0)
-      return(0);	/* XXX - this may not be an error */
-    
-    entry = BlogEntryRead(g_blog,&gd.now);
-    if (entry == NULL)
-    {
-      btm_sub_day(&gd.now);
-      continue;
-    }
-
-    break;
+    syslog(LOG_DEBUG,".first does not exist");
+    now            = time(NULL);
+    ptm            = localtime(&now);
+    gd.begin.year  = ptm->tm_year + 1900;
+    gd.begin.month = ptm->tm_mon  + 1;
+    gd.begin.day   = ptm->tm_mday;
+    gd.begin.part  = 1;
   }
-  gd.now.part = g_blog->idx;
-  return(0);
+  else
+  {
+    fgets(buffer,sizeof(buffer),fp);
+    gd.begin.year  = strtoul(buffer,&p,10); p++;
+    gd.begin.month = strtoul(p,&p,10); p++;
+    gd.begin.day   = strtoul(p,&p,10); p++;
+    gd.begin.part  = strtoul(p,&p,10);
+    fclose(fp);
+  }
+  
+  fp = fopen(".last","r");
+  if (fp == NULL)
+  {
+    syslog(LOG_DEBUG,".last does not exist");
+    now          = time(NULL);
+    ptm          = localtime(&now);
+    gd.now.year  = ptm->tm_year + 1900;
+    gd.now.month = ptm->tm_mon  + 1;
+    gd.now.day   = ptm->tm_mday;
+    gd.now.part  = 1;
+  }
+  else
+  {
+    fgets(buffer,sizeof(buffer),fp);
+    gd.now.year  = strtoul(buffer,&p,10); p++;
+    gd.now.month = strtoul(p,&p,10); p++;
+    gd.now.day   = strtoul(p,&p,10); p++;
+    gd.now.part  = strtoul(p,&p,10);
+    fclose(fp);
+  }
+  
+  return 0;
 }
   
 /***********************************************************************/
