@@ -54,7 +54,7 @@ static void	 date_to_filename	(char *,struct btm *,const char *);
 static void	 date_to_part		(char *,struct btm *,int);
 static FILE	*open_file_r		(const char *,struct btm *);
 static FILE	*open_file_w		(const char *,struct btm *);
-static int	 date_check		(struct btm *);
+static bool	 date_check		(struct btm *);
 static int	 date_checkcreate	(struct btm *);
 static char     *blog_meta_entry	(const char *,struct btm *);
 static size_t	 blog_meta_read		(char ***,const char *,struct btm *);
@@ -575,15 +575,14 @@ static FILE *open_file_w(const char *name,struct btm *date)
 
 /*********************************************************************/
 
-static int date_check(struct btm *date)
+static bool date_check(struct btm *date)
 {
   int rc;
   char tname[FILENAME_MAX];
   struct stat status;
   
   date_to_dir(tname,date);
-  rc = stat(tname,&status);
-  return(rc == 0);
+  return stat(tname,&status) == 0;
 }
 
 /************************************************************************/
