@@ -57,7 +57,7 @@ static FILE	*open_file_w		(const char *,struct btm *);
 static int	 date_check		(struct btm *);
 static int	 date_checkcreate	(struct btm *);
 static char     *blog_meta_entry	(const char *,struct btm *);
-static size_t	 blog_meta_data		(char ***,const char *,struct btm *);
+static size_t	 blog_meta_read		(char ***,const char *,struct btm *);
 static void	 blog_meta_adjust	(char ***,size_t,size_t);
 static int	 blog_meta_write	(const char *,struct btm *,char **,size_t);
 
@@ -378,11 +378,18 @@ int (BlogEntryWrite)(BlogEntry entry)
   rc = date_checkcreate(&entry->when);
   if (rc != 0)
     return rc;
-    
-  numa   = blog_meta_data(&authors,"authors",&entry->when);
-  numc   = blog_meta_data(&class,  "class",  &entry->when);
-  nums   = blog_meta_data(&status, "status", &entry->when);
-  numt   = blog_meta_data(&titles, "titles", &entry->when);
+  
+  /*---------------------------------------------------------------------
+  ; The meta-data for the entries are stored in separate files.  When
+  ; updating an entry (or adding an entry), we need to rewrite these
+  ; metafiles.  So, we read them all in, make the adjustments required and
+  ; write them out.
+  ;------------------------------------------------------------------------*/
+  
+  numa   = blog_meta_read(&authors,"authors",&entry->when);
+  numc   = blog_meta_read(&class,  "class",  &entry->when);
+  nums   = blog_meta_read(&status, "status", &entry->when);
+  numt   = blog_meta_read(&titles, "titles", &entry->when);
   maxnum = max(numa,max(numc,max(nums,numt)));
   
   blog_meta_adjust(&authors,numa,maxnum);
@@ -419,10 +426,18 @@ int (BlogEntryWrite)(BlogEntry entry)
   blog_meta_write("status" ,&entry->when,status, maxnum);
   blog_meta_write("titles" ,&entry->when,titles, maxnum);
   
+  /*-------------------------------
+  ; update the actual entry body
+  ;---------------------------------*/
+  
   date_to_part(filename,&entry->when,entry->when.part);
   out = fopen(filename,"w");
   fputs(entry->body,out);
   fclose(out);
+  
+  /*-----------------
+  ; clean up
+  ;------------------*/
   
   for(size_t i = 0 ; i < maxnum ; i++)
   {
@@ -436,6 +451,11 @@ int (BlogEntryWrite)(BlogEntry entry)
   free(class);
   free(status);
   free(titles);
+  
+  /*------------------------------------------------------------------------
+  ; Oh, and if this is the latest entry to be added, update the .last file
+  ; to reflect that.
+  ;------------------------------------------------------------------------*/
   
   if (btm_cmp(&entry->when,&gd.now) > 0)
   {
@@ -650,7 +670,7 @@ static char *blog_meta_entry(const char *name,struct btm *date)
 
 /********************************************************************/
 
-static size_t blog_meta_data(
+static size_t blog_meta_read(
 	char       ***plines,
 	const char   *name,
 	struct btm   *date
