@@ -201,7 +201,11 @@ BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
   
   if (!date_check(which))
     return NULL;
-    
+  
+  date_to_part(pname,which,which->part);
+  if (access(pname,R_OK) != 0)
+    return NULL;
+  
   entry               = malloc(sizeof(struct blogentry));
   entry->node.ln_Succ = NULL;
   entry->node.ln_Pred = NULL;
