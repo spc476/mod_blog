@@ -21,6 +21,8 @@
 *************************************************************************/
 
 #include <stddef.h>
+#include <string.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <time.h>
 #include <stdarg.h>
@@ -87,6 +89,21 @@ int BlogDatesInit(void)
   {
     syslog(LOG_DEBUG,".first does not exist");
     gd.begin = gd.updatetime;
+    fp = fopen(".first","w");
+    if (fp)
+    {
+      fprintf(
+      	       fp,
+      	       "%4d/%02d/%02d.%d\n",
+      	       gd.begin.year,
+      	       gd.begin.month,
+      	       gd.begin.day,
+      	       gd.begin.part
+      	     );
+      fclose(fp);
+    }
+    else
+      syslog(LOG_ERR,".first: %s",strerror(errno));
   }
   else
   {
@@ -103,6 +120,21 @@ int BlogDatesInit(void)
   {
     syslog(LOG_DEBUG,".last does not exist");
     gd.now = gd.updatetime;
+    fp = fopen(".last","w");
+    if (fp)
+    {
+      fprintf(
+               fp,
+               "%4d/%02d/%02d.%d\n",
+               gd.now.year,
+               gd.now.month,
+               gd.now.day,
+               gd.now.part
+             );
+      fclose(fp);
+    }
+    else
+      syslog(LOG_ERR,".last: %s",strerror(errno));
   }
   else
   {
