@@ -174,6 +174,9 @@ int GlobalsInit(const char *conf)
   gf_emailupdate       = get_bool  (g_L,"email.notify",true);  
   gd.f.overview        = (c_overview != NULL);  
   
+  if (c_emaildb == NULL)
+    gf_emailupdate = false;
+
   {
     const char *timezone = get_string(g_L,"timezone","-5:00");
     char       *p;
