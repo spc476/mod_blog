@@ -504,6 +504,7 @@ static void cb_entry_title(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
 
+  assert(cbd->entry->valid);
   fputs(cbd->entry->title,out);
 }
 
@@ -550,6 +551,7 @@ static void cb_entry_author(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
 
+  assert(cbd->entry->valid);
   fputs(cbd->entry->author,out);
 }
 
@@ -885,6 +887,7 @@ static void cb_rss_item_url(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
+  assert(cbd->entry->valid);
   fprintf(out,"%s",c_fullbaseurl);
   print_nav_url(out,&cbd->entry->when,PART);
 }

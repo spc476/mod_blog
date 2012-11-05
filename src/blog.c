@@ -35,6 +35,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <syslog.h>
+
 #include <cgilib6/util.h>
 #include <cgilib6/nodelist.h>
 
@@ -149,10 +151,7 @@ int (BlogFree)(Blog blog)
     BlogUnlock(blog);
   
   for (i = 0 ; i < blog->idx ; i++)
-  {
-    assert(blog->entries[i]->valid);
     BlogEntryFree(blog->entries[i]);
-  }
   
   free(blog->lockfile);
   free(blog);
@@ -170,7 +169,6 @@ BlogEntry (BlogEntryNew)(Blog blog)
   pbe               = malloc(sizeof(struct blogentry));
   pbe->node.ln_Succ = NULL;
   pbe->node.ln_Pred = NULL;
-  pbe->valid        = true;
   pbe->blog         = blog;
   pbe->when.year    = gd.now.year;
   pbe->when.month   = gd.now.month;
@@ -210,7 +208,6 @@ BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
         return(NULL);
       
       assert(btm_cmp(&blog->entries[which->part - 1]->when,which) == 0);
-      assert(blog->entries[which->part - 1]->valid);
       return(blog->entries[which->part - 1]);
     }
   
@@ -290,6 +287,8 @@ void (BlogEntryReadXD)(Blog blog,List *list,struct btm *start,size_t num)
   assert(start != NULL);
   assert(num   >  0);
   
+  memset(&entry,0,sizeof(entry));
+  
   while(num)
   {
     entry = BlogEntryRead(blog,start);
@@ -314,6 +313,7 @@ void (BlogEntryReadXD)(Blog blog,List *list,struct btm *start,size_t num)
           return;
             
         btm_sub_day(start);
+        memset(&entry,0,sizeof(entry));
         entry = BlogEntryRead(blog,start);
       } while(entry == NULL);
       start->part = blog->idx;
@@ -451,9 +451,13 @@ int (BlogEntryWrite)(BlogEntry entry)
 int (BlogEntryFree)(BlogEntry entry)
 {
   assert(entry != NULL);
-  assert(entry->valid);
   
-  entry->valid = false;
+  if (!entry->valid)
+  {
+    syslog(LOG_DEBUG,"invalid entry being freed");
+    return 0;
+  }
+  
   free(entry->body);
   free(entry->status);
   free(entry->author);
@@ -631,16 +635,15 @@ static int blog_cache_day(Blog blog,struct btm *date)
   
   for (i = 0 ; i < blog->idx ; i++)
   {
-    if (NodeValid(&blog->entries[i]->node))
-      NodeRemove(&blog->entries[i]->node);
-    BlogEntryFree(blog->entries[i]);
-    blog->entries[i] = NULL;
-  }
-
-#ifndef NDEBUG
-  for (i = 0 ; i < 100 ; i++)
-    assert(blog->entries[i] == NULL);
-#endif
+    /* if (!NodeValid(&blog->entries[i]->node)) */
+    if (
+         (blog->entries[i]->node.ln_Succ == NULL)
+	 && (blog->entries[i]->node.ln_Pred == NULL)
+       )
+    {
+      BlogEntryFree(blog->entries[i]);
+    }
+  } 
   
   /*--------------------------------------------
   ; read in the day's entries 
@@ -661,6 +664,7 @@ static int blog_cache_day(Blog blog,struct btm *date)
     entry->node.ln_Succ = NULL;
     entry->node.ln_Pred = NULL;
     entry->valid        = true;
+    entry->blog         = blog;
     entry->when.year    = date->year;
     entry->when.month   = date->month;
     entry->when.day     = date->day;
