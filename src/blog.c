@@ -56,8 +56,7 @@ static FILE	*open_file_r		(const char *,struct btm *);
 static FILE	*open_file_w		(const char *,struct btm *);
 static int	 date_check		(struct btm *);
 static int	 date_checkcreate	(struct btm *);
-static char     *blog_meta_entry	(const char *,struct btm *,size_t);
-static int	 blog_cache_day		(Blog,struct btm *);
+static char     *blog_meta_entry	(const char *,struct btm *);
 
 /***********************************************************************/
 
@@ -74,15 +73,9 @@ Blog (BlogNew)(const char *location,const char *lockfile)
   if (rc != 0)
     return(NULL);
   
-  blog           = malloc(sizeof(struct blog));
+  blog = malloc(sizeof(struct blog));
   memset(blog,0,sizeof(struct blog));
   blog->lockfile = strdup(lockfile);
-  blog->lock     = 0;
-  blog->max      = 100;
-  blog->idx      = 0;
-  
-  memset(&blog->cache,0,sizeof(struct btm));
-  
   return(blog);
 }
 
@@ -144,16 +137,11 @@ int (BlogUnlock)(Blog blog)
 
 int (BlogFree)(Blog blog)
 {
-  size_t    i;
-  
   assert(blog != NULL);
   
   if (blog->lock > 0)
     BlogUnlock(blog);
-  
-  for (i = 0 ; i < blog->idx ; i++)
-    BlogEntryFree(blog->entries[i]);
-  
+
   free(blog->lockfile);
   free(blog);
   return(0);
@@ -175,58 +163,62 @@ BlogEntry (BlogEntryNew)(Blog blog)
   pbe->when.month   = gd.now.month;
   pbe->when.day     = gd.now.day;
   pbe->when.part    = 0;
-  pbe->title        = strdup("");
-  pbe->class        = strdup("");
-  pbe->author       = strdup("");
-  pbe->status       = strdup("");
-  pbe->body         = strdup("");
+  pbe->title        = NULL;
+  pbe->class        = NULL;
+  pbe->author       = NULL;
+  pbe->status       = NULL;
+  pbe->body         = NULL;
   
-  return(pbe);
+  return pbe;
 }
 
 /***********************************************************************/
 
 BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
 {
-  BlogEntry *entry;
-
+  BlogEntry    entry;
+  char         pname[FILENAME_MAX];
+  FILE        *sinbody;
+  struct stat  status;
+  
   assert(blog                          != NULL);
   assert(which                         != NULL);
   assert(which->part                   >  0);
   assert(btm_cmp_date(which,&gd.begin) >= 0);
   
-  entry = malloc(sizeof(struct blogentry));
+  entry               = malloc(sizeof(struct blogentry));
   entry->node.ln_Succ = NULL;
   entry->node.ln_Pred = NULL;
-  entry->
-  
-  
-  
-  
-  
-  
-  if (date_check(which) == false)
-    return(NULL);
+  entry->valid        = true;
+  entry->blog         = blog;
+  entry->when.year    = which->year;
+  entry->when.month   = which->month;
+  entry->when.day     = which->day;
+  entry->when.part    = which->part;
+  entry->title        = blog_meta_entry("titles",which);
+  entry->class        = blog_meta_entry("class",which);
+  entry->author       = blog_meta_entry("authors",which);
+  entry->status       = blog_meta_entry("status",which);
 
-  while(1)
-  {    
-    if (btm_cmp_date(which,&blog->cache) == 0)
-    {
-      if (blog->idx == 0)
-        return(NULL);
-      
-      if (which->part > blog->idx)
-        return(NULL);
-      
-      assert(btm_cmp(&blog->entries[which->part - 1]->when,which) == 0);
-      return(blog->entries[which->part - 1]);
-    }
+  date_to_part(pname,which,which->part);
   
-    part = which->part;
-    which->part = 1;
-    blog_cache_day(blog,which);
-    which->part = part;
+  if (stat(pname,&status) == 0)
+    entry->timestamp = status.st_mtime;
+  else
+    entry->timestamp = gd.tst;
+      
+  sinbody = fopen(pname,"r");
+  if (sinbody == NULL)
+    entry->body = strdup("");
+  else
+  {
+    entry->body = malloc(status.st_size + 1);
+    fread(entry->body,1,status.st_size,sinbody);
+    fclose(sinbody);
+    entry->body[status.st_size] = '\0';
   }
+
+  return entry;  
 }
 
 /**********************************************************************/
@@ -311,23 +303,8 @@ void (BlogEntryReadXD)(Blog blog,List *list,struct btm *start,size_t num)
     start->part--;
     if (start->part == 0)
     {
-      start->part = 1;
-      do 
-      {
-        fprintf(
-        	stderr,
-        	"%4d/%02d/%02d %4d/%02d/%02d\n",
-        	start->year,start->month,start->day,
-        	gd.begin.year,gd.begin.month,gd.begin.day
-        );
-        if (btm_cmp_date(start,&gd.begin) <= 0)
-          return;
-            
-        btm_sub_day(start);
-        memset(&entry,0,sizeof(entry));
-        entry = BlogEntryRead(blog,start);
-      } while(entry == NULL);
-      start->part = blog->idx;
+      start->part = 23;
+      btm_sub_day(start);
     }
   }
 }
@@ -361,8 +338,9 @@ void (BlogEntryReadXU)(Blog blog,List *list,struct btm *start,size_t num)
 
 /**************************************************************************/
 
-int (BlogEntryWrite)(BlogEntry entry)
+int (BlogEntryWrite)(BlogEntry entry __attribute__((unused)))
 {
+#if 0
   Blog   blog;
   char   buffer[FILENAME_MAX];
   FILE  *stitles;
@@ -453,7 +431,8 @@ int (BlogEntryWrite)(BlogEntry entry)
   fclose(sauthors);
   fclose(sclass);
   fclose(stitles);
-  
+#endif
+
   return(0);
 }
 
@@ -614,17 +593,20 @@ static int date_checkcreate(struct btm *date)
 
 /********************************************************************/
 
-static char *blog_meta_entry(const char *name,struct btm *date,size_t num)
+static char *blog_meta_entry(const char *name,struct btm *date)
 {
-  FILE   *fp;
-  char   *text;
-  size_t  size;
+  FILE         *fp;
+  char         *text;
+  size_t        size;
+  ssize_t       bytes;
+  unsigned int  num;
   
   assert(name != NULL);
   assert(date != NULL);
   
   text = NULL;
   size = 0;
+  num  = date->part;
   fp   = open_file_r(name,date);
   
   do
@@ -642,187 +624,4 @@ static char *blog_meta_entry(const char *name,struct btm *date,size_t num)
 }
 
 /********************************************************************/
-
-static int blog_cache_day(Blog blog,struct btm *date)
-{
-  FILE      *stitles;
-  FILE      *sclass;
-  FILE      *sauthors;
-  FILE      *status;
-  BlogEntry  entry;
-  size_t     i;
-  size_t     size;
-
-  assert(blog != NULL);
-  assert(date != NULL);
-  
-  /*---------------------------------------------
-  ; trivial check---if we already have the data
-  ; for this date, then don't bother re-reading
-  ; anything.
-  ;--------------------------------------------*/
-  
-  if (btm_cmp_date(&blog->cache,date) == 0)
-    return(0);
-  
-  /*------------------------------------------
-  ; free any nodes not in use, so we don't
-  ; leak memory.
-  ;
-  ; Note, there's some suble bug somewhere that's
-  ; causing the nodes to get bogus node pointers.
-  ;-----------------------------------------------*/
-  
-  for (i = 0 ; i < blog->idx ; i++)
-  {
-    /* if (!NodeValid(&blog->entries[i]->node)) */
-    if (
-         (blog->entries[i]->node.ln_Succ == NULL)
-	 && (blog->entries[i]->node.ln_Pred == NULL)
-       )
-    {
-      BlogEntryFree(blog->entries[i]);
-    }
-  } 
-  
-  /*--------------------------------------------
-  ; read in the day's entries 
-  ;-------------------------------------------*/
-  
-  blog->idx = 0;
-  stitles   = open_file_r("titles", date);
-  sclass    = open_file_r("class",  date);
-  sauthors  = open_file_r("authors",date);
-  status    = open_file_r("status", date);
-  
-  while(!feof(stitles) || !feof(sclass) || !feof(sauthors) || !feof(status))
-  {
-    char  pname[FILENAME_MAX];
-    char *p;
-    
-    entry               = malloc(sizeof(struct blogentry));
-    entry->node.ln_Succ = NULL;
-    entry->node.ln_Pred = NULL;
-    entry->valid        = true;
-    entry->blog         = blog;
-    entry->when.year    = date->year;
-    entry->when.month   = date->month;
-    entry->when.day     = date->day;
-    entry->title        = NULL;
-    entry->class        = NULL;
-    entry->author       = NULL;
-    entry->status       = NULL;
-    entry->body         = NULL;
-    
-    size = 0;
-    if (!feof(stitles))
-    {
-      if (getline(&entry->title,&size,stitles) == -1)
-      {
-        free(entry->title);
-        entry->title = strdup("");
-	size = 0;
-      }
-    }
-    else
-      entry->title = strdup("");
-    
-    p = memchr(entry->title,'\n',size); if (p) *p = '\0';
-    
-    size = 0;
-    if (!feof(sclass))
-    {
-      if (getline(&entry->class,&size,sclass) == -1)
-      {
-        free(entry->class);
-        entry->class = strdup("");
-	size = 0;
-      }
-    }
-    else
-      entry->class = strdup("");
-    
-    p = memchr(entry->class,'\n',size); if (p) *p = '\0';
-    
-    size = 0;
-    if (!feof(sauthors))
-    {
-      if (getline(&entry->author,&size,sauthors) == -1)
-      {
-        free(entry->author);
-        entry->author = strdup("");
-	size = 0;
-      }
-    }
-    else
-      entry->author = strdup("");
-    
-    p = memchr(entry->author,'\n',size); if (p) *p = '\0';
-    
-    size = 0;
-    if (!feof(status))
-    {
-      if (getline(&entry->status,&size,status) == -1)
-      {
-        free(entry->status);
-        entry->status = strdup("");
-        size = 0;
-      }
-    }
-    else
-      entry->status = strdup("");
-    
-    p = memchr(entry->status,'\n',size); if (p) *p = '\0';
-    
-    date_to_part(pname,date,blog->idx + 1);
-    
-    {
-      FILE        *sinbody;
-      struct stat  status;
-      int          rc;
-      
-      rc = stat(pname,&status);
-      if (rc == 0)
-        entry->timestamp = status.st_mtime;
-      else
-        entry->timestamp = gd.tst;
-      
-      sinbody = fopen(pname,"r");
-      if (sinbody == NULL)
-        entry->body = strdup("");
-      else
-      {
-        entry->body = malloc(status.st_size + 1);
-        fread(entry->body,1,status.st_size,sinbody);
-        fclose(sinbody);
-        entry->body[status.st_size] = '\0';
-      }
-    }
-    
-    blog->entries[blog->idx++] = entry;
-    entry->when.part           = blog->idx;
-    
-    /*-------------------------------------------------
-    ; Sigh.  SCL (Standard C Library) doesn't set end-of-file
-    ; until you actually attempt to READ, even if it
-    ; is indeed at the end of the file.  So this lovely
-    ; little bit of code reads and unreads some data
-    ; from each file to trigger the eof condition.
-    ;--------------------------------------------------*/
-    
-    ungetc(fgetc(stitles),stitles);
-    ungetc(fgetc(sclass),sclass);
-    ungetc(fgetc(sauthors),sauthors);
-    ungetc(fgetc(status),status);
-  }
-  
-  blog->cache = *date;
-  fclose(status);
-  fclose(sauthors);
-  fclose(sclass);
-  fclose(stitles);
-  return(0);
-}
-
-/************************************************************************/
 

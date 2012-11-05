@@ -34,10 +34,6 @@ typedef struct blog
 {
   char             *lockfile;
   int               lock;
-  struct btm        cache;
-  size_t            max;
-  size_t            idx;
-  struct blogentry *entries[100];
 } *Blog;
   
 typedef struct blogentry
