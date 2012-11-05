@@ -490,7 +490,7 @@ int (BlogEntryFree)(BlogEntry entry)
   
   if (!entry->valid)
   {
-    syslog(LOG_DEBUG,"invalid entry being freed");
+    syslog(LOG_ERR,"invalid entry being freed");
     return 0;
   }
   
