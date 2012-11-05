@@ -57,6 +57,19 @@ static FILE	*open_file_w		(const char *,struct btm *);
 static int	 date_check		(struct btm *);
 static int	 date_checkcreate	(struct btm *);
 static char     *blog_meta_entry	(const char *,struct btm *);
+static size_t	 blog_meta_data		(char ***,const char *,struct btm *);
+static void	 blog_meta_adjust	(char ***,size_t,size_t);
+static int	 blog_meta_write	(const char *,struct btm *,char **,size_t);
+
+/***********************************************************************/
+
+static inline size_t max(size_t a,size_t b)
+{
+  if (a > b)
+    return a;
+  else
+    return b;
+}
 
 /***********************************************************************/
 
@@ -186,6 +199,9 @@ BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
   assert(which->part                   >  0);
   assert(btm_cmp_date(which,&gd.begin) >= 0);
   
+  if (!date_check(which))
+    return NULL;
+    
   entry               = malloc(sizeof(struct blogentry));
   entry->node.ln_Succ = NULL;
   entry->node.ln_Pred = NULL;
@@ -338,102 +354,104 @@ void (BlogEntryReadXU)(Blog blog,List *list,struct btm *start,size_t num)
 
 /**************************************************************************/
 
-int (BlogEntryWrite)(BlogEntry entry __attribute__((unused)))
+int (BlogEntryWrite)(BlogEntry entry)
 {
-#if 0
-  Blog   blog;
-  char   buffer[FILENAME_MAX];
-  FILE  *stitles;
-  FILE  *sclass;
-  FILE  *sauthors;
-  FILE  *status;
-  FILE  *out;
-  int    rc;
-  size_t i;
+  char   **authors;
+  char   **class;
+  char   **status;
+  char   **titles;
+  size_t   numa;
+  size_t   numc;
+  size_t   nums;
+  size_t   numt;
+  size_t   maxnum;
+  char     filename[FILENAME_MAX];
+  FILE    *out;
+  int      rc;
   
   assert(entry != NULL);
-  
-  /*-----------------------------------------------
-  ; cache the day the entry is to be added to.  We
-  ; need this information when we add the entry
-  ; (since the anciliary files need to be recreated).
-  ;-------------------------------------------------*/
-  
-  blog = entry->blog;
-  rc   = blog_cache_day(blog,&entry->when);
-  if (rc != 0)
-    return(rc);
-    
-  /*---------------------------------------------
-  ; if when.part is 0, then this is a new entry
-  ; to be added.  Otherwise, add to the apropriate
-  ; spot in the day.
-  ;---------------------------------------------*/
-  
-  if (entry->when.part == 0)
-  {
-    blog->entries[blog->idx++] = entry;
-    entry->when.part           = blog->idx;
-  }
-  else
-    blog->entries[entry->when.part - 1] = entry;
-  
-  /*---------------------------------------------
-  ; now update all the information.
-  ;--------------------------------------------*/
+  assert(entry->valid);
   
   rc = date_checkcreate(&entry->when);
   if (rc != 0)
-    return(rc);
+    return rc;
+    
+  numa   = blog_meta_data(&authors,"authors",&entry->when);
+  numc   = blog_meta_data(&class,  "class",  &entry->when);
+  nums   = blog_meta_data(&status, "status", &entry->when);
+  numt   = blog_meta_data(&titles, "titles", &entry->when);
+  maxnum = max(numa,max(numc,max(nums,numt)));
   
-  stitles = open_file_w("titles",&blog->cache);
-  if (stitles == NULL)
-    return ENOENT;
+  blog_meta_adjust(&authors,numa,maxnum);
+  blog_meta_adjust(&class,  numc,maxnum);
+  blog_meta_adjust(&status, nums,maxnum);
+  blog_meta_adjust(&titles, numt,maxnum);
   
-  sclass = open_file_w("class",&blog->cache);
-  if (sclass == NULL)
+  if (entry->when.part == 0)
   {
-    fclose(stitles);
-    return ENOENT;
+    if (maxnum == 99)
+      return ENOMEM;
+    
+    authors[maxnum]  = strdup(entry->author);
+    class  [maxnum]  = strdup(entry->class);
+    status [maxnum]  = strdup(entry->status);
+    titles [maxnum]  = strdup(entry->title);
+    entry->when.part = maxnum++;
+  }
+  else
+  {
+    free(authors[entry->when.part]);
+    free(class  [entry->when.part]);
+    free(status [entry->when.part]);
+    free(titles [entry->when.part]);
+    
+    authors[entry->when.part] = strdup(entry->author);
+    class  [entry->when.part] = strdup(entry->class);
+    status [entry->when.part] = strdup(entry->status);
+    titles [entry->when.part] = strdup(entry->title);
   }
   
-  sauthors = open_file_w("authors",&blog->cache);
-  if (sauthors == NULL)
-  {
-    fclose(sclass);
-    fclose(stitles);
-    return ENOENT;
-  }
+  blog_meta_write("authors",&entry->when,authors,maxnum);
+  blog_meta_write("class"  ,&entry->when,class,  maxnum);
+  blog_meta_write("status" ,&entry->when,status, maxnum);
+  blog_meta_write("titles" ,&entry->when,titles, maxnum);
   
-  status = open_file_w("status",&blog->cache);
-  if (status == NULL)
-  {
-    fclose(sauthors);
-    fclose(sclass);
-    fclose(stitles);
-    return ENOENT;
-  }
-  
-  for (i = 0 ; i < blog->idx ; i++)
-  {
-    fprintf(stitles, "%s\n",blog->entries[i]->title);
-    fprintf(sclass,  "%s\n",blog->entries[i]->class);
-    fprintf(sauthors,"%s\n",blog->entries[i]->author);
-    fprintf(status,  "%s\n",blog->entries[i]->status);
-  }
-      
-  date_to_part(buffer,&entry->when,entry->when.part);
-  out = fopen(buffer,"w");
+  date_to_part(filename,&entry->when,entry->when.part);
+  out = fopen(filename,"w");
   fputs(entry->body,out);
-  
   fclose(out);
-  fclose(status);
-  fclose(sauthors);
-  fclose(sclass);
-  fclose(stitles);
-#endif
-
-  return(0);
+  
+  for(size_t i = 0 ; i < maxnum ; i++)
+  {
+    free(authors[i]);
+    free(class[i]);
+    free(status[i]);
+    free(titles[i]);
+  }
+  
+  free(authors);
+  free(class);
+  free(status);
+  free(titles);
+  
+  if (btm_cmp(&entry->when,&gd.now) > 0)
+  {
+    out = fopen(".last","w");
+    if (out)
+    {
+      fprintf(
+      		out,
+      		"%d/%02d/%02d.%d\n",
+      		entry->when.year,
+      		entry->when.month,
+      		entry->when.day,
+      		entry->when.part
+      	);
+      fclose(out);
+    }
+  }
+  
+  return 0;  
 }
 
 /***********************************************************************/
@@ -600,6 +618,7 @@ static char *blog_meta_entry(const char *name,struct btm *date)
   size_t        size;
   ssize_t       bytes;
   unsigned int  num;
+  char         *nl;
   
   assert(name != NULL);
   assert(date != NULL);
@@ -620,8 +639,92 @@ static char *blog_meta_entry(const char *name,struct btm *date)
     }
   } while (--num);
   
+  nl = strchr(text,'\n');
+  if (nl) *nl = '\0';
+  
   return text;
 }
 
 /********************************************************************/
 
+static size_t blog_meta_data(
+	char       ***plines,
+	const char   *name,
+	struct btm   *date
+)
+{
+  char   **lines;
+  size_t   i;
+  size_t   size;
+  FILE    *fp;
+  
+  assert(plines != NULL);
+  assert(name   != NULL);
+  assert(date   != NULL);
+  
+  lines = malloc(100 * sizeof(char *));
+  if (lines == NULL)
+  {
+    *plines = NULL;
+    return 0;
+  }
+  
+  fp = open_file_r(name,date);
+  
+  for(i = 0 ; i < 100 ; i++)
+  {
+    ssize_t bytes;
+    
+    lines[i] = NULL;
+    size     = 0;
+    bytes     = getline(&lines[i],&size,fp);
+    if (bytes == -1)
+      break;
+  }
+  
+  fclose(fp);
+  *plines = lines;
+  return i + 1;
+}
+
+/************************************************************************/
+
+static void blog_meta_adjust(char ***plines,size_t num,size_t maxnum)
+{
+  char **lines;
+  
+  assert(plines  != NULL);
+  assert(*plines != NULL);
+  assert(num     <= maxnum);
+  assert(num     <= 100);
+  assert(maxnum  <= 100);
+  
+  lines = *plines;
+  
+  while(num < maxnum)
+    lines[num++] = strdup("");
+}
+
+/************************************************************************/
+
+static int blog_meta_write(
+	const char  *name,
+	struct btm  *date,
+	char       **list,
+	size_t       num
+)
+{
+  FILE   *fp;
+  
+  fp = open_file_w(name,date);
+  if (fp == NULL)
+    return errno;
+  
+  for (size_t i = 0 ; i < num ; i++)
+    fprintf(fp,"%s\n",list[i]);
+  
+  fclose(fp);
+  return 0;
+}
+
+/************************************************************************/
