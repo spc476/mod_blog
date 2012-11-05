@@ -310,6 +310,9 @@ void (BlogEntryReadXD)(Blog blog,List *list,struct btm *start,size_t num)
   
   while(num)
   {
+    if (btm_cmp_date(start,&gd.begin) < 0)
+      return;
+      
     entry = BlogEntryRead(blog,start);
     if (entry != NULL)
     {
