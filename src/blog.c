@@ -581,7 +581,6 @@ static FILE *open_file_w(const char *name,struct btm *date)
 
 static bool date_check(struct btm *date)
 {
-  int rc;
   char tname[FILENAME_MAX];
   struct stat status;
   
