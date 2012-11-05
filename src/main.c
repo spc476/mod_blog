@@ -75,16 +75,18 @@ int BlogDatesInit(void)
   char       buffer[128];
   char      *p;
   
+  now                 = time(NULL);
+  ptm                 = localtime(&now);
+  gd.updatetime.year  = ptm->tm_year + 1900;
+  gd.updatetime.month = ptm->tm_mon + 1;
+  gd.updatetime.day   = ptm->tm_mday;
+  gd.updatetime.part  = 1;
+  
   fp = fopen(".first","r");
   if (fp == NULL)
   {
     syslog(LOG_DEBUG,".first does not exist");
-    now            = time(NULL);
-    ptm            = localtime(&now);
-    gd.begin.year  = ptm->tm_year + 1900;
-    gd.begin.month = ptm->tm_mon  + 1;
-    gd.begin.day   = ptm->tm_mday;
-    gd.begin.part  = 1;
+    gd.begin = gd.updatetime;
   }
   else
   {
@@ -100,12 +102,7 @@ int BlogDatesInit(void)
   if (fp == NULL)
   {
     syslog(LOG_DEBUG,".last does not exist");
-    now          = time(NULL);
-    ptm          = localtime(&now);
-    gd.now.year  = ptm->tm_year + 1900;
-    gd.now.month = ptm->tm_mon  + 1;
-    gd.now.day   = ptm->tm_mday;
-    gd.now.part  = 1;
+    gd.now = gd.updatetime;
   }
   else
   {
