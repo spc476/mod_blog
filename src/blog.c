@@ -663,11 +663,16 @@ static char *blog_meta_entry(const char *name,struct btm *date)
       free(text);
       return strdup("");
     }
-  } while (--num);
+  };
   
-  nl = strchr(text,'\n');
-  if (nl) *nl = '\0';
-  
+  if (text)
+  {
+    nl = strchr(text,'\n');
+    if (nl) *nl = '\0';
+  }
+  else
+    return strdup("");
+    
   return text;
 }
 
@@ -683,6 +688,7 @@ static size_t blog_meta_read(
   size_t   i;
   size_t   size;
   FILE    *fp;
+  char    *nl;
   
   assert(plines != NULL);
   assert(name   != NULL);
@@ -712,6 +718,8 @@ static size_t blog_meta_read(
     bytes     = getline(&lines[i],&size,fp);
     if (bytes == -1)
       break;
+    nl = strchr(lines[i],'\n');
+    if (nl) *nl = '\0';
   }
   
   fclose(fp);
