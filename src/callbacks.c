@@ -296,7 +296,6 @@ static void cb_blog_script(FILE *out,void *data __attribute__((unused)))
   char *script;
   
   assert(out  != NULL);
-  assert(data != NULL);
   
   script = getenv("SCRIPT_NAME");
   if (script)
@@ -329,7 +328,6 @@ static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   fputs(c_name,out);
 }
@@ -372,7 +370,6 @@ static void cb_blog_adtag_entity(FILE *out,void *data __attribute__((unused)))
   FILE *entityout;
 
   assert(out  != NULL);
-  assert(data != NULL);
   
   entityout = fentity_encode_onwrite(out);
   if (entityout == NULL) return;
@@ -537,7 +534,6 @@ static void cb_entry_status(FILE *out,void *data)
 static void cb_entry_adtag(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   fputs("Soon young Skywalker.  Soon.",out);
 }
@@ -833,7 +829,6 @@ static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
   char       buffer[BUFSIZ];
   
   assert(out  != NULL);
-  assert(data != NULL);
   
   ptm = gmtime(&gd.tst);
   strftime(buffer,BUFSIZ,"%a, %d %b %Y %H:%M:%S GMT",ptm);
@@ -1102,7 +1097,6 @@ static void cb_navigation_next_title(FILE *out,void *data __attribute__((unused)
   struct btm tmp;
   
   assert(out  != NULL);
-  assert(data != NULL);
   
   tmp = gd.next;
   print_nav_title(out,&tmp,gd.navunit);
@@ -1115,7 +1109,6 @@ static void cb_navigation_prev_title(FILE *out,void *data __attribute__((unused)
   struct btm tmp;
   
   assert(out  != NULL);
-  assert(data != NULL);
   
   tmp = gd.previous;
   print_nav_title(out,&tmp,gd.navunit);
@@ -1128,7 +1121,6 @@ static void cb_navigation_next_url(FILE *out,void *data __attribute__((unused)))
   struct btm tmp;
 
   assert(out  != NULL);
-  assert(data != NULL);
 
   tmp = gd.next;
   print_nav_url(out,&tmp,gd.navunit);
@@ -1141,7 +1133,6 @@ static void cb_navigation_prev_url(FILE *out,void *data __attribute__((unused)))
   struct btm tmp;
 
   assert(out  != NULL);
-  assert(data != NULL);
   
   tmp = gd.previous;
   print_nav_url(out,&tmp,gd.navunit);
@@ -1291,7 +1282,6 @@ static void cb_update_time(FILE *out,void *data __attribute__((unused)))
 static void cb_update_type(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   fputs(c_updatetype,out);
 }
@@ -1408,7 +1398,6 @@ static void cb_edit_author(FILE *out,void *data __attribute__((unused)))
   char *name;
   
   assert(out  != NULL);
-  assert(data != NULL);
 
   if (gd.req->origauthor != NULL)
     fputs(gd.req->origauthor,out);
@@ -1425,7 +1414,6 @@ static void cb_edit_author(FILE *out,void *data __attribute__((unused)))
 static void cb_edit_title(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   if (gd.req->title != NULL)
     fputs(gd.req->title,out);
@@ -1436,7 +1424,6 @@ static void cb_edit_title(FILE *out,void *data __attribute__((unused)))
 static void cb_edit_status(FILE *out,void *data __attribute__ ((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   if (gd.req->status != NULL)
     fputs(gd.req->status,out);
@@ -1451,7 +1438,6 @@ static void cb_edit_date(FILE *out,void *data __attribute__((unused)))
   char       buffer[BUFSIZ];
 
   assert(out  != NULL);
-  assert(data != NULL);
 
   if (gd.req->date != NULL)
     fputs(gd.req->date,out);
@@ -1469,7 +1455,6 @@ static void cb_edit_date(FILE *out,void *data __attribute__((unused)))
 static void cb_edit_class(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   if (gd.req->class)
     fputs(gd.req->class,out);
@@ -1501,7 +1486,6 @@ static void cb_edit_filter(FILE *out __attribute__((unused)),void *data __attrib
 static void cb_edit_body(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   if (gd.req->origbody)
     fputs(gd.req->origbody,out);
@@ -1512,7 +1496,6 @@ static void cb_edit_body(FILE *out,void *data __attribute__((unused)))
 static void cb_xyzzy(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   fputs("Nothing happens.",out);
 }
@@ -1617,7 +1600,6 @@ static void cb_overview(FILE *out __attribute__((unused)),void *data __attribute
 static void cb_overview_date(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   fputs("DATE",out);
 }
@@ -1627,7 +1609,6 @@ static void cb_overview_date(FILE *out,void *data __attribute__((unused)))
 static void cb_overview_list(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
-  assert(data != NULL);
   
   fputs("<li>OVERVIEW</li>",out);
 }
