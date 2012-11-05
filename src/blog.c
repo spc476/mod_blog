@@ -654,7 +654,7 @@ static char *blog_meta_entry(const char *name,struct btm *date)
   num  = date->part;
   fp   = open_file_r(name,date);
   
-  do
+  while(!feof(fp) && (num--))
   {
     bytes = getline(&text,&size,fp);
     if (bytes == -1)
@@ -696,6 +696,12 @@ static size_t blog_meta_read(
   }
   
   fp = open_file_r(name,date);
+  if (feof(fp))
+  {
+    fclose(fp);
+    *plines = lines;
+    return 0;
+  }
   
   for(i = 0 ; i < 100 ; i++)
   {
