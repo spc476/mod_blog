@@ -716,7 +716,7 @@ static size_t blog_meta_read(
   
   fclose(fp);
   *plines = lines;
-  return i + 1;
+  return i;
 }
 
 /************************************************************************/
