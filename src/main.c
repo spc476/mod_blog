@@ -87,7 +87,6 @@ int BlogDatesInit(void)
   fp = fopen(".first","r");
   if (fp == NULL)
   {
-    syslog(LOG_DEBUG,".first does not exist");
     gd.begin = gd.updatetime;
     fp = fopen(".first","w");
     if (fp)
@@ -118,7 +117,6 @@ int BlogDatesInit(void)
   fp = fopen(".last","r");
   if (fp == NULL)
   {
-    syslog(LOG_DEBUG,".last does not exist");
     gd.now = gd.updatetime;
     fp = fopen(".last","w");
     if (fp)
