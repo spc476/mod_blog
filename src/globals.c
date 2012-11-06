@@ -270,7 +270,10 @@ int GlobalsInit(const char *conf)
       c_templates[i].pagegen = pagegen_items;
     }
     else
+    {
       syslog(LOG_ERR,"wrong type for items");
+      return EINVAL;
+    }
     
     lua_pop(g_L,6);
   }  
