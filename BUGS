@@ -7,6 +7,11 @@
 	I may have to reference count these things, or think of another way
 	of handling this.
 
+	2012-11-05T19:41-05:00
+
+	This is no longer a bug.  It has been fixed by rewriting the core
+	routines to read/write blog entries.
+
 2010-11-30T19:14-05:00
 
 	generate_pages() trashes the Request structure.  Never noticed until
@@ -16,6 +21,13 @@
 
 	I started looking into this, but seem to have been sidetracked.  I'm
 	not sure if it's such a deal now.  I'll keep the bug open for now.
+
+	2012-11-05T19:41-05:00
+
+	I'm not sure if this is still happening or not.  I suspect it was
+	happening due to the BlogFree()/BlogEntryFree() issue.  Unless it
+	shows itself, I think I'm going to consider this bug squashed for
+	now.
 
 2006-02-04T00:54
 
