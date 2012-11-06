@@ -406,14 +406,7 @@ static int cmd_cgi_post_show(Request req)
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
   generic_cb("main",req->out,&cbd);
 
-  /*----------------------------------------------------------------------
-  ; we don't free entry because in doing so, we get a segfault.  I'm not
-  ; sure what exactly is causing it (it's on the entry->body field) but we
-  ; can prevent it from happening if we skip the BlogEntryFree() call.
-  ;
-  ; Lame, I know.
-  ;---------------------------------------------------------------------*/
-
+  BlogEntryFree(entry);
   return(0);  
 }
 
