@@ -1,3 +1,14 @@
+2012-11-06T15:00-05:00
+
+	scan-build (static analysis program) found that nu2 (in
+	tumbler_page()) was being set, but not used.  I have a feeling that
+	this indicates a bug, but one that hasn't manefested itself in over
+	twelve years of use.  Or it could be that the feature this is
+	intended to support is *so* esoteric that it never was an issue to
+	begin with.
+
+	I may have to use the tumbler code I wrote in Lua.
+
 2011-11-07T05:02-05:00
 
 	globals_free() fails when calling BlogFree()---I think it's due to
