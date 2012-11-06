@@ -72,13 +72,12 @@ int main(int argc,char *argv[])
 int BlogDatesInit(void)
 {
   FILE      *fp;
-  time_t     now;
   struct tm *ptm;
   char       buffer[128];
   char      *p;
   
-  now                 = time(NULL);
-  ptm                 = localtime(&now);
+  gd.tst              = time(NULL);
+  ptm                 = localtime(&gd.tst);
   gd.stmst            = *ptm;
   gd.updatetime.year  = ptm->tm_year + 1900;
   gd.updatetime.month = ptm->tm_mon + 1;
