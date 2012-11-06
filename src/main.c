@@ -79,6 +79,7 @@ int BlogDatesInit(void)
   
   now                 = time(NULL);
   ptm                 = localtime(&now);
+  gd.stmst            = *ptm;
   gd.updatetime.year  = ptm->tm_year + 1900;
   gd.updatetime.month = ptm->tm_mon + 1;
   gd.updatetime.day   = ptm->tm_mday;
