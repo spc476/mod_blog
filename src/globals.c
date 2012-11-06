@@ -211,12 +211,21 @@ int GlobalsInit(const char *conf)
   }
   
   c_numtemplates = lua_objlen(g_L,-1);
+  
+  if (c_numtemplates == 0)
+  {
+    syslog(LOG_ERR,"no templates");
+    return ENOENT;
+  }
+  
   c_templates   = malloc(sizeof(template__t) * c_numtemplates);
   if (c_templates == NULL)
   {
     syslog(LOG_ERR,"%s",strerror(ENOMEM));
     return ENOMEM;
   }
+  
+  assert(c_numtemplates >= 1);
   
   for (size_t i = 0 ; i < c_numtemplates; i++)
   {
