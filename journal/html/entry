@@ -1,0 +1,11 @@
+%{entry.cond.date}%
+
+%{cond.hr}%
+
+<h3><a class="local" rel="bookmark" name="%{entry.name}%" href="%{entry.url}%">%{entry.title}%</a></h3>
+
+<!-- %{entry.class}% -->
+
+%{entry.body}%
+
+%{ad}%

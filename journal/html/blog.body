@@ -1,0 +1,6 @@
+
+<h2><a class="local" name="%{blog.date}%" href="%{blog.url}%">%{blog.date.normal}%</a></h2>
+
+%{entry}%
+
+

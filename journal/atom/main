@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>%{blog.name}%</title>
+  <updated>%{update.time}%</updated>
+  <id>%{blog.url.home}%</id>
+
+  <link
+	rel      = "self"
+	type     = "application/atom+xml"
+	hreflang = "en-US"
+	href     = "%{blog.url.home}%/index.atom"
+	title    = "%{blog.name}%"
+  />
+
+  <link
+	rel	 = "alternate"
+	type	 = "text/html"
+	hreflang = "en-US"
+	href	 = "%{blog.url.home}%"
+	title	 = "%{blog.name}%"
+  />
+
+  <author>
+    <name>%{blog.author}%</name>
+    <email>%{blog.author.email}%</email>
+    <uri>%{blog.url.home}%</uri>
+  </author>
+
+  <generator uri="http://boston.conman.org/about/" version="%{generator}%">mod_blog</generator>
+  <rights>&#169; %{begin.year}%-%{now.year}% by %{blog.author}%.  All Rights Reserved</rights>
+
+  %{atom.entry}%
+
+</feed>
+

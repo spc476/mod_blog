@@ -1,0 +1,3 @@
+<div class="paid_ad">
+%{ad.content}%
+</div>

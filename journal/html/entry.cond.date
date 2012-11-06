@@ -1,0 +1,3 @@
+
+<h2><a class="local" name="%{date.day}%" href="%{date.day.url}%">%{date.day.normal}%</a></h2>
+

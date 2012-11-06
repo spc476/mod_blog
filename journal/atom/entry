@@ -1,0 +1,9 @@
+  <entry>
+    <id>tag:www.example.net/blog,%{entry.id}%:%{entry.url}%</id>
+    <title type="text">%{entry.title}%</title>
+    <updated>%{entry.pubdate}%</updated>
+    <link rel="alternate" hreflang="en-US" href="%{rss.item.url}%" />
+%{atom.categories}%
+    <content type="html">%{entry.body.entified}%</content>
+  </entry>
+

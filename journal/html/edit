@@ -1,0 +1,30 @@
+
+<div id="edit">
+
+  <form method="POST" action="/blog/blog.cgi">
+
+  <div class="metacontent">
+    <table>
+      <tr><th><label for="author">Author</label></th>            <td><input id="author"   name="author"   type="text"     value="%{edit.author}%"></td></tr>
+      <tr><th><label for="title">Title</label></th>              <td><input id="title"    name="title"    type="text"     value="%{edit.title}%"></td></tr>
+      <tr><th><label for="date">Date</label></th>                <td><input id="date"     name="date"     type="text"     value="%{edit.date}%"></td></tr>
+      <tr><th><label for="class">Class</label></th>              <td><input id="class"    name="class"    type="text"     value="%{edit.class}%"></td></tr>
+      <tr><th><label for="status">Status</label></th>            <td><input id="status"   name="status"   type="text"     value="%{edit.status}%"></td></tr>
+      <tr><th><label for="email">Send Email</label></th>         <td><input id="email"    name="email"    type="checkbox" value="%{edit.email}%"></td></tr>
+      <tr><th><label for="facebook">Update Facebook</label></th> <td><input id="facebook" name="facebook" type="checkbox" value="%{edit.facebook}%"></td></tr>
+      <tr><th>Filter</th>                                        <td><input id="filter1"  name="filter"   type="radio"    value="text"><label for="filter1">Text</label><br>
+                                  <input id="filter2" name="filter" type="radio"    value="mixed"><label for="filter2">Mixed</label><br>
+                                  <input id="filter3" name="filter" type="radio"    value="html"><label for="filter3">HTML</label></td></tr>
+      <tr><th>&nbsp;</th>     <td><input name="cmd"    type="submit"   value="New"></td></tr>
+      <tr><th>&nbsp;</th>     <td><input name="cmd"    type="submit"   value="Show"></td></tr>
+      <tr><th>&nbsp;</th>     <td><input               type="reset"    value="Reset"></td></tr>
+    </table>
+  </div>
+
+  <div class="content">
+    <textarea name="body" rows="20" cols="60">%{edit.body}%</textarea>
+  </div>
+
+  </form>
+
+</div>

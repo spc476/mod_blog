@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="0.91">
+<channel>
+  <title>%{blog.name}%</title>
+  <link>%{rss.url}%</link>
+  <description>
+	Yada yada blah blah yada yada.
+  </description>
+  <language>en-us</language>
+  <pubDate>%{rss.pubdate}%</pubDate>
+  <managingEditor>sean@conman.org</managingEditor>
+  <webMaster>%{blog.author.email}%</webMaster>
+  <copyright>
+        Copyright %{begin.year}%-%{now.year}% by %{blog.author}%.  All Rights Reserved.
+  </copyright>
+
+%{rss.item}%
+</channel>
+</rss>

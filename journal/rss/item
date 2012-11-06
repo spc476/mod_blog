@@ -1,0 +1,11 @@
+  <item>
+    <title>%{entry.title}%</title>
+    <!-- <author>%{entry.author}%</author> -->
+    <link>%{rss.item.url}%</link>
+    <description>
+      <![CDATA[
+        %{entry.body}%
+      ]]>
+    </description>
+  </item>
+

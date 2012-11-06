@@ -1,0 +1,37 @@
+RewriteEngine on
+RewriteBase /blog/
+
+RewriteRule     ^([0-9][0-9])(.*)	blog.cgi/$1$2 [L]
+
+###########################################################
+#
+# You can also feed partial HTML files through the blog
+# engine.  Any content there will appear as the main content
+# in the page.
+#
+##########################################################
+
+RewriteRule	^about/$	blog.cgi/about/index.html [L]
+RewriteRule	^about/(.*)	blog.cgi/about/$1	[L]
+
+###########################################################
+#
+# You may want to password protect the following.  You
+# can do this by limiting the POST method to require 
+# authentication, or by protecting the location.
+#
+###########################################################
+
+RewriteRule	^addentry.html$	blog.cgi?cmd=new	[L]
+
+###########################################################
+#
+# I also pump the error messages through the blogging engine
+# so they have the same look and feel
+#
+############################################################
+
+ErrorDocument	403	/blog/blog.cgi/errors/403.html?status=403
+ErrorDocument	404	/blog/blog.cgi/errors/404.html?status=404
+ErrorDocument	500	/blog/blog.cgi/errors/500.html?status=500
+
