@@ -39,7 +39,7 @@ LFLAGS  =-rdynamic -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 #
 ################################################
 
-all: build/boston
+all: build build/boston
 
 build/boston : build/addutil.o	\
 		build/authenticate.o	\
@@ -219,6 +219,9 @@ build/facebook.o : src/facebook.c	\
 # Misc targets
 #
 #######################################################################
+
+build :
+	mkdir -p build
 
 clean :
 	/bin/rm -rf build/*.o
