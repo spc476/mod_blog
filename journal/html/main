@@ -7,7 +7,6 @@
   <meta name="generator"             content="%{generator}% (http://boston.conman.org/about/)">
 
   <meta http-equiv="Content-Type"    content="text/html; charset=UTF-8">
-  <meta http-equiv="X-XRDS-Location" content="http://spc476.livejournal.com/data/yadis">
 
   <link rel="Content"	    href="#content">
   %{navigation.link}% 
@@ -16,13 +15,9 @@
   <link rel="Up"	    href="http://www.example.com/">
   <link rel="Top"	    href="http://www.example.com/">
   <link rel="Home"	    href="%{blog.url.home}%">
-  <link rel="About"	    href="/about/">
-  <link rel="SHORTCUT ICON" href="/favicon.ico"          type="image/x-icon">
-  <link rel="icon"	    href="/favicon.ico"          type="image/x-icon">
   <link rel="alternate"     href="/index.atom"           type="application/atom+xml"    title="Atom 1.0">
   <link rel="alternate"	    href="/index.rss"            type="application/rss+xml"     title="RSS 0.91">
   <link rev="Made"	    href="%{blog.author.email}%" title="%{blog.author}%">
-  <link rel="stylesheet"    href="/CSS/screen.css"	 type="text/css" media="screen" title="Default Style">
 
   <title>%{cond.blog.title}%%{blog.name}%</title>
 
@@ -51,7 +46,6 @@
     <li><a href="%{navigation.last.url}%"  title="%{navigation.last.title}%">Last</a></li>
     <li><a href="http://www.example.com/">Top</a></li>
     <li><a href="%{blog.url.home}%">Home</a></li>
-    <li><a href="/about/">About</a></li>
   </ul>
 </div>
 
