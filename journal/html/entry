@@ -8,7 +8,11 @@
 
 %{entry.body}%
 
-%{ad}%
+<!-- if you want ads, uncomment this bit and remove -->
+<!-- the spaces between the '%' and the braces      -->
+<!-- % {ad} % -->
 
-%{comments}%
-
+<!-- if you want comments and you can puzzle this out, well ... -->
+<!-- uncomment below and remove the spaces between the '%'      -->
+<!-- and the braces                                             -->
+<!-- % {comments} % -->
