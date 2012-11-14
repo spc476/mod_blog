@@ -136,7 +136,8 @@ build/authenticate.o : src/authenticate.c	\
 		src/frontend.h		\
 		src/globals.h		\
 		src/timeutil.h		\
-		src/wbtum.h
+		src/wbtum.h		\
+		version.h
 	$(CC) $(CFLAGS) -c -o $@ src/authenticate.c
 
 build/addutil.o : src/addutil.c	\
@@ -148,7 +149,8 @@ build/addutil.o : src/addutil.c	\
 		src/frontend.h		\
 		src/globals.h		\
 		src/timeutil.h		\
-		src/wbtum.h
+		src/wbtum.h		\
+		version.h
 	$(CC) $(CFLAGS) -c -o $@ src/addutil.c
 
 build/callbacks.o : src/callbacks.c	\
