@@ -216,6 +216,9 @@ build/facebook.o : src/facebook.c	\
 		src/wbtum.h
 	$(CC) $(CFLAGS) `curl-config --cflags` -c -o $@ src/facebook.c
 
+version.h :
+	scripts/post-commit
+
 #######################################################################
 #
 # Misc targets
