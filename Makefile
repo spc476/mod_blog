@@ -226,7 +226,7 @@ build :
 	mkdir -p build
 
 clean :
-	/bin/rm -rf build/*.o
+	/bin/rm -rf build/*
 	/bin/rm -rf *~ src/*~
 
 tarball:
