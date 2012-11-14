@@ -1,0 +1,24 @@
+
+<h4>A Comment!</h4>
+
+<p>Posted by <a href="http://boston.conman.org/">Sean Conner</a></p>
+
+<p>This is a comment.  <code>mod_blog</code> doesn't support comments
+directly, but if there is a file with the name
+<code><em>entrynumber</em>.comments</code> that file will be displayed along
+with the entry (placed accordindly to the template).  You'll need an
+external script that can create such files though.</p>
+
+<hr>
+
+<h4>A Comment!</h4>
+
+<p>Posted by <a href="http://boston.conman.org/">Sean Conner</a></p>
+
+<p>As you can see, it's a very basic comment system that I haven't even
+bothered to implement!</p>
+
+<p>Sigh.</p>
+
+<hr>
+

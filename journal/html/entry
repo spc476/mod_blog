@@ -9,3 +9,6 @@
 %{entry.body}%
 
 %{ad}%
+
+%{comments}%
+
