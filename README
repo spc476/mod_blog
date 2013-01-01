@@ -1,8 +1,8 @@
 
 Finally, an update to the very outdated mod_blog that's been available since
-September 3, 2009.  There still isn't much documentation because, as of yet,
-I've yet to write the documentation.  And I doubt what's here is enough but
-for the most dedicated to go through the code to see how this works.  
+September 3, 2009.  There still isn't much documentation because, as of yet.
+I doubt what's here is enough but for the most dedicated to go through the
+code to see how this works.
 
 REQUIREMENTS
 
@@ -23,6 +23,10 @@ COMPILATION
 	software.  You can install it from
 
 		https://github.com/spc476/CGILib
+
+	or
+
+		http://www.conman.org/software/cgilib/cgilib.tar.gz
 
 	To install it once it's downloaded, all it should take is "make" and
 	then "make install" as root.  The library assumes a POSIX
