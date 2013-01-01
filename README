@@ -1,0 +1,82 @@
+
+Finally, an update to the very outdated mod_blog that's been available since
+September 3, 2009.  There still isn't much documentation because, as of yet,
+I've yet to write the documentation.  And I doubt what's here is enough but
+for the most dedicated to go through the code to see how this works.  
+
+REQUIREMENTS
+
+	If you don't meet these requirements, then you probably won't get
+	very far.  The software was written in C (don't bother asking for
+	Perl code---there isn't any, and there won't be any) and as such,
+	makes certain assumptions, such as:
+	
+		* Linux (or any POSIX compilant UNIX system)
+		* GCC	(or any C99 compiler that may come with your system)
+		* Apache
+
+	The code right now assumes you'll be running this under Apache.
+
+COMPILATION
+
+	You'll need to install my CGILIB library to compile this blog
+	software.  You can install it from
+
+		https://github.com/spc476/CGILib
+
+	To install it once it's downloaded, all it should take is "make" and
+	then "make install" as root.  The library assumes a POSIX
+	environment and should compile as is on most modern Unix systems.
+
+	Once that is installed, you should be able to do a "make" and
+	generate the blog engine.  It's built as a setuid program to avoid
+	having a world-writable directory, but if that is a concern, you can
+	certain remove the setuid'ness of it, but make sure the data
+	directories are writable by Apache.
+
+
+INSTALLATION
+
+	The assumption on the blog engine is that the executable resides in
+	a directory visible to Apache and runnable from within Apache's
+	docroot for the the site in question.  I have my copy named as
+	"boston.cgi" and Apache configured to execute such programs via CGI. 
+	The htdocs/ subdirectory contains a sample website to run the blog. 
+	There's also a sample htaccess file that shows the method I use to
+	run the blog engine.
+
+	In the journal/ subdirectory is out-of-band files (which should not
+	be served up by Apache).  There you will find a sample configuration
+	file and a sample entry to see how the data is stored (each entry is
+	a separate file, stored under a Year/Month/Day directory structure).
+
+	Yes, there is Facebook integration.  No, I'm not telling you how to
+	use that as I use a private "app" for that that was never fully
+	finished.  More power to you if you can get it to work.
+
+	And yes, there is code to do email notifications, but it's not
+	enabled by default.  I only left the code in to support the half
+	dozen people that did sign up to receive email notifications.
+	
+	The HTML entry form works, but it's not my primary method for new
+	entries---for that, I use email.  I have the following line in
+	'/etc/aliases':
+
+		myjournal: "/path/to/boston.cgi --config /path/to/config --email --cmd new"
+
+	To make an entry, I format an email to the journal address as:
+
+		+-----[top of file]----------------------------
+		|author: [who you set at author---exact match]
+		|title: [title of entry]
+		|class: [keywords]
+		|status: [status repeated on Facebook]
+		|
+		|body of entry, usually including HTML
+		| ...
+		+----------------------------------------------
+
+	And that's pretty much it.  
+
+	Good luck.
+
