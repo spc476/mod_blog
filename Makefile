@@ -43,38 +43,22 @@ LFLAGS  =-rdynamic -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 
 all: build build/boston
 
-build/boston : build/addutil.o	\
-		build/authenticate.o	\
-		build/blog.o		\
+build/boston : build/addutil.o			\
+		build/authenticate.o		\
+		build/blog.o			\
 		build/cgi_main.o		\
 		build/cli_main.o		\
-		build/globals.o		\
-		build/main.o		\
+		build/globals.o			\
+		build/main.o			\
 		build/timeutil.o		\
 		build/conversion.o		\
 		build/callbacks.o		\
-		build/wbtum.o		\
-		build/backend.o		\
+		build/wbtum.o			\
+		build/backend.o			\
 		build/blogutil.o		\
 		build/entity-conversion.o	\
 		build/facebook.o
-	$(CC) $(CFLAGS) -o $@			\
-		build/addutil.o		\
-		build/authenticate.o	\
-		build/blog.o		\
-		build/cgi_main.o		\
-		build/cli_main.o		\
-		build/globals.o		\
-		build/main.o		\
-		build/timeutil.o		\
-		build/conversion.o		\
-		build/callbacks.o		\
-		build/wbtum.o		\
-		build/backend.o		\
-		build/blogutil.o		\
-		build/facebook.o		\
-		build/entity-conversion.o	\
-		$(LFLAGS) 
+	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
 	$(SETUID) build/boston
 
 #######################################################################
@@ -92,7 +76,7 @@ build/main.o : src/main.c		\
 		src/globals.h		\
 		src/timeutil.h		\
 		src/wbtum.h
-	$(CC) $(CFLAGS) -c -o $@ src/main.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/backend.o : src/backend.c	\
 		src/backend.h		\
@@ -104,7 +88,7 @@ build/backend.o : src/backend.c	\
 		src/globals.h		\
 		src/timeutil.h		\
 		src/wbtum.h
-	$(CC) $(CFLAGS) -c -o $@ src/backend.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/cli_main.o : src/cli_main.c	\
 		src/backend.h		\
@@ -116,7 +100,7 @@ build/cli_main.o : src/cli_main.c	\
 		src/timeutil.h		\
 		src/wbtum.h		\
 		version.h
-	$(CC) $(CFLAGS) -c -o $@ src/cli_main.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/cgi_main.o : src/cgi_main.c	\
 		src/backend.h		\
@@ -127,7 +111,7 @@ build/cgi_main.o : src/cgi_main.c	\
 		src/globals.h		\
 		src/timeutil.h		\
 		src/wbtum.h
-	$(CC) $(CFLAGS) -c -o $@ src/cgi_main.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/authenticate.o : src/authenticate.c	\
 		src/backend.h		\
@@ -138,7 +122,7 @@ build/authenticate.o : src/authenticate.c	\
 		src/timeutil.h		\
 		src/wbtum.h		\
 		version.h
-	$(CC) $(CFLAGS) -c -o $@ src/authenticate.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/addutil.o : src/addutil.c	\
 		src/backend.h		\
@@ -151,7 +135,7 @@ build/addutil.o : src/addutil.c	\
 		src/timeutil.h		\
 		src/wbtum.h		\
 		version.h
-	$(CC) $(CFLAGS) -c -o $@ src/addutil.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/callbacks.o : src/callbacks.c	\
 		src/backend.h		\
@@ -164,7 +148,7 @@ build/callbacks.o : src/callbacks.c	\
 		src/timeutil.h		\
 		src/wbtum.h		\
 		version.h
-	$(CC) $(CFLAGS) -c -o $@ src/callbacks.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/globals.o : src/globals.c	\
 		src/backend.h		\
@@ -175,7 +159,7 @@ build/globals.o : src/globals.c	\
 		src/frontend.h		\
 		src/timeutil.h		\
 		src/wbtum.h
-	$(CC) $(CFLAGS) -c -o $@ src/globals.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/blog.o : src/blog.c		\
 		src/backend.h		\
@@ -186,7 +170,7 @@ build/blog.o : src/blog.c		\
 		src/globals.h		\
 		src/timeutil.h		\
 		src/wbtum.h
-	$(CC) $(CFLAGS) -c -o $@ src/blog.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/conversion.o : src/conversion.c	\
 		src/blog.h		\
@@ -195,19 +179,19 @@ build/conversion.o : src/conversion.c	\
 		src/frontend.h		\
 		src/timeutil.h		\
 		src/wbtum.h
-	$(CC) $(CFLAGS) -c -o $@ src/conversion.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/timeutil.o : src/timeutil.c src/timeutil.h
-	$(CC) $(CFLAGS) -c -o $@ src/timeutil.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/wbtum.o : src/wbtum.c src/wbtum.h src/conf.h
-	$(CC) $(CFLAGS) -c -o $@ src/wbtum.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/blogutil.o : src/blogutil.c src/blogutil.h
-	$(CC) $(CFLAGS) -c -o $@ src/blogutil.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/entity-conversion.o : src/entity-conversion.c
-	$(CC) $(CFLAGS) -c -o $@ src/entity-conversion.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/facebook.o : src/facebook.c	\
 		src/backend.h		\
@@ -216,7 +200,7 @@ build/facebook.o : src/facebook.c	\
 		src/globals.h		\
 		src/timeutil.h		\
 		src/wbtum.h
-	$(CC) $(CFLAGS) `curl-config --cflags` -c -o $@ src/facebook.c
+	$(CC) $(CFLAGS) `curl-config --cflags` -c -o $@ $<
 
 version.h :
 	scripts/post-commit
