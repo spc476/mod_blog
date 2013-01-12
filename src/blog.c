@@ -251,7 +251,6 @@ void (BlogEntryReadBetweenU)(Blog blog,List *list,struct btm *start,struct btm *
   assert(blog               != NULL);
   assert(start              != NULL);
   assert(end                != NULL);
-  assert(btm_cmp(start,end) <= 0);
   
   while(btm_cmp(start,end) <= 0)
   {
