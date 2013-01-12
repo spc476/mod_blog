@@ -808,16 +808,16 @@ static void cb_cond_hr(FILE *out,void *data)
 
 static void cb_cond_blog_title(FILE *out,void *data)
 {
-  List *plist = data;
+  struct callback_data *cbd = data;
   BlogEntry     entry;
   
   assert(out != NULL);
   
   if (gd.navunit == PART)
   {
-    entry = (BlogEntry)ListGetHead(plist);
-    assert(entry->valid);
-    fprintf(out,"%s - ",entry->title);
+    entry = (BlogEntry)ListGetHead(&cbd->list);
+    if (entry->valid)
+      fprintf(out,"%s - ",entry->title);
   }
 }
 
