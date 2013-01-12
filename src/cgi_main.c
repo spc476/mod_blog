@@ -129,14 +129,16 @@ static void set_m_cgi_get_command(char *value,Request req)
 
 static int cmd_cgi_get_new(Request req)
 {
+  struct callback_data cbd;
   List days;
 
   assert(req != NULL);
   
-  ListInit(&days);
+  memset(&cbd,0,sizeof(struct callback_data));
+  ListInit(&cbd.list);
   gd.f.edit = 1;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
-  generic_cb("main",req->out,&days);
+  generic_cb("main",req->out,&cbd);
   return(0);
 }
 
