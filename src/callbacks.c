@@ -816,7 +816,7 @@ static void cb_cond_blog_title(FILE *out,void *data)
   if (gd.navunit == PART)
   {
     entry = (BlogEntry)ListGetHead(&cbd->list);
-    if (entry->valid)
+    if (NodeValid(&entry->node) && entry->valid)
       fprintf(out,"%s - ",entry->title);
   }
 }
