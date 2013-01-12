@@ -26,9 +26,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdarg.h>
+#include <signal.h>
 
 #include <syslog.h>
 #include <cgilib6/cgi.h>
+#include <cgilib6/crashreport.h>
 
 #include "conf.h"
 #include "blog.h"
@@ -43,6 +45,42 @@ int main(int argc,char *argv[])
 {
   Cgi cgi;
   int rc;
+  
+  /*-----------------------------------------------------------------------
+  ; due to a crash for no apparent reason, I decided to log a bit more
+  ; infomration when it does happen.  Here are the possible signals I want
+  ; more information from when it happens.
+  ;-----------------------------------------------------------------------*/
+
+  /*---------------------
+  ; Defined in ANSI C
+  ;-----------------------*/
+  
+  crashreport(SIGABRT);
+  crashreport(SIGFPE);
+  crashreport(SIGILL);
+  crashreport(SIGINT);
+  crashreport(SIGSEGV);
+
+  /*---------------------------
+  ; others we're interested in 
+  ;----------------------------*/
+
+#ifdef SIGBUG
+  crashreport(SIGBUS);
+#endif
+#ifdef SIGQUIT
+  crashreport(SIGQUIT);
+#endif
+#ifdef SIGSYS
+  crashreport(SIGSYS);
+#endif
+#ifdef SIGEMT
+  crashreport(SIGEMT);
+#endif
+#ifdef SIGTKFLT
+  crashreport(SIGTKFLT);
+#endif
   
   /*-----------------------------------------------------------------------
   ; WTF?  This isn't a WTF.  This is a debugging techique.  While gf_debug
