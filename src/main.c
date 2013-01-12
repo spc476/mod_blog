@@ -41,7 +41,7 @@
 
 /************************************************************************/
 
-int main(int argc,char *argv[])
+int main(int argc,char *argv[],char *envp[])
 {
   Cgi cgi;
   int rc;
@@ -52,6 +52,8 @@ int main(int argc,char *argv[])
   ; more information from when it happens.
   ;-----------------------------------------------------------------------*/
 
+  crashreport_with(argc,argv,envp);
+  
   /*---------------------
   ; Defined in ANSI C
   ;-----------------------*/
