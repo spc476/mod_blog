@@ -278,7 +278,6 @@ void (BlogEntryReadBetweenD)(Blog blog,List *listb,struct btm *end,struct btm *s
   assert(blog               != NULL);
   assert(start              != NULL);
   assert(end                != NULL);
-  assert(btm_cmp(end,start) >= 0);
   
   ListInit(&lista);
   
