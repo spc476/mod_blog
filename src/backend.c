@@ -239,8 +239,6 @@ int tumbler_page(FILE *out,Tumbler spec)
 
   if (tu1->type == TUMBLER_RANGE)
   {
-    TumblerUnit tmp;
-    
     if (
          (tu2->entry[YEAR] != 0)
          && (tu2->entry[YEAR] < (unsigned)gd.begin.year)
@@ -250,47 +248,6 @@ int tumbler_page(FILE *out,Tumbler spec)
     if ((tu2->entry[MONTH] == 0) && (tu2->entry[DAY])) return(1);
     if ((tu2->entry[MONTH]) && (tu2->entry[DAY]   > max_monthday(tu2->entry[YEAR],tu2->entry[MONTH])))
       return(1);
-      
-    /*-------------------------------------------------------------------
-    ; swap the tumblers if we can---it'll save us a crap of work later.
-    ;-------------------------------------------------------------------*/
-    
-    if (tu1->entry[YEAR] > tu2->entry[YEAR])
-    {
-      gd.f.reverse = true;
-      tmp = tu1;
-      tu1 = tu2;
-      tu2 = tmp;
-      tu1->type = TUMBLER_RANGE;
-      tu2->type = TUMBLER_SINGLE;
-    }
-    else if (tu1->entry[MONTH] > tu2->entry[MONTH])
-    {
-      gd.f.reverse = true;
-      tmp = tu1;
-      tu1 = tu2;
-      tu2 = tmp;
-      tu1->type = TUMBLER_RANGE;
-      tu2->type = TUMBLER_SINGLE;
-    }
-    else if (tu1->entry[DAY] > tu2->entry[DAY])
-    {
-      gd.f.reverse = true;
-      tmp = tu1;
-      tu1 = tu2;
-      tu2 = tmp;
-      tu1->type = TUMBLER_RANGE;
-      tu2->type = TUMBLER_SINGLE;
-    }
-    else if (tu1->entry[PART] > tu2->entry[PART])
-    {
-      gd.f.reverse = true;
-      tmp = tu1;
-      tu1 = tu2;
-      tu2 = tmp;
-      tu1->type = TUMBLER_RANGE;
-      tu2->type = TUMBLER_SINGLE;
-    }
   }
 
   /*------------------------------------------------------------------------
@@ -340,6 +297,35 @@ int tumbler_page(FILE *out,Tumbler spec)
     end.month = (tu2->entry[MONTH] == 0) ? 12                               : tu2->entry[MONTH];
     end.day   = (tu2->entry[DAY]   == 0) ? max_monthday(end.year,end.month) : tu2->entry[DAY];
     end.part  = (tu2->entry[PART]  == 0) ? 23                               : tu2->entry[PART];
+    
+    /*------------------------------------------------------------------------
+    ; swap tumblers if required.  If the parts are the default values, swap
+    ; them, as they probably weren't specified and need swapping as well.
+    ;
+    ; Example:
+    ;
+    ;     2000/02/04    - 01/26 
+    ;  -> 2000/02/04.1  - 2000/01/26.23
+    ;  -> 2000/01/26.23 - 2000/02/04.1
+    ;  -> 2000/01/26.1  - 2000/02/04.23
+    ;
+    ;-----------------------------------------------------------------------*/
+    
+    if (btm_cmp(&start,&end) > 0)
+    {
+      struct btm tmp;
+      
+      gd.f.reverse = true;
+      tmp   = start;
+      start = end;
+      end   = tmp;
+      
+      if ((start.part == 23) && (end.part == 1))
+      {
+        start.part = 1;
+        end.part = 23;
+      }
+    }
   }
 
   if (end.day > max_monthday(end.year,end.month))
