@@ -61,7 +61,6 @@ enum
   OPT_EMAIL,
   OPT_UPDATE,
   OPT_ENTRY,
-  OPT_STDIN,
   OPT_REGENERATE,
   OPT_FORCENOTIFY,
   OPT_HELP,
@@ -89,7 +88,6 @@ static const struct option coptions[] =
   { "email"	   , no_argument	, NULL	, OPT_EMAIL  	  } ,
   { "update"	   , required_argument	, NULL	, OPT_UPDATE 	  } ,
   { "entry"	   , required_argument	, NULL	, OPT_ENTRY  	  } ,
-  { "stdin"        , no_argument        , NULL	, OPT_STDIN  	  } ,
   { "force-notify" , no_argument 	, NULL  , OPT_FORCENOTIFY } ,
   { "help"	   , no_argument	, NULL	, OPT_HELP   	  } ,
   { "debug"	   , no_argument	, NULL  , OPT_DEBUG  	  } ,
@@ -128,13 +126,9 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_FILE:
            req.in = fopen(optarg,"r");
-           req.f.filein = true;
            break;
       case OPT_EMAIL:
            req.f.emailin = true;
-           break;
-      case OPT_STDIN:
-           req.f.std_in = true;
            break;
       case OPT_UPDATE:
            req.f.update = true;
@@ -167,7 +161,6 @@ int main_cli(int argc,char *argv[])
 		"\t--email\n"
 		"\t--update ('new' * | 'modify' | 'template' | 'other')\n"
 		"\t--entry <tumbler>\n"
-		"\t--stdin\n"
 		"\t--force-notify\n"
 		"\t--help\n"
 		"\t--debug\n"
@@ -208,10 +201,6 @@ static int cmd_cli_new(Request req)
   assert(req         != NULL);
   assert(req->f.cgiin == false);
 
-  /*-------------------------------------------------
-  ; req.f.stdin and req.f.filein may be uneeded
-  ;-------------------------------------------------*/
-  
   if (req->f.emailin)
     rc = mail_setup_data(req);
   else
@@ -239,7 +228,6 @@ static int cmd_cli_show(Request req)
   
   assert(req            != NULL);
   assert(req->f.emailin == false);
-  assert(req->f.filein  == false);
   assert(req->f.update  == false);
 
   if (req->f.regenerate)
