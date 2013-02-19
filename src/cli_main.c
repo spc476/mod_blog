@@ -198,8 +198,7 @@ static int cmd_cli_new(Request req)
 {
   int rc;
   
-  assert(req         != NULL);
-  assert(req->f.cgiin == false);
+  assert(req != NULL);
 
   if (req->f.emailin)
     rc = mail_setup_data(req);

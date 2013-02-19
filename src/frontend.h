@@ -32,7 +32,6 @@
 typedef struct rflags
 {
   unsigned int emailin    : 1;
-  unsigned int cgiin      : 1;
   unsigned int update     : 1;
   unsigned int preview    : 1;
   unsigned int regenerate : 1;
@@ -64,7 +63,6 @@ typedef struct dflags
 {
   unsigned int fullurl    : 1;
   unsigned int reverse    : 1;
-  unsigned int cgi        : 1;
   unsigned int navigation : 1;
   unsigned int navprev    : 1;
   unsigned int navnext    : 1;
