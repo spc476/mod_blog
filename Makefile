@@ -28,7 +28,8 @@ SETUID  = chmod 4755
 
 CC      = gcc -std=c99
 CFLAGS  = -g -Wall -Wextra -pedantic
-LFLAGS  =-rdynamic -lgdbm -lcgi6 `curl-config --libs` -llua -lm
+LDFLAGS = -g -rdynamic
+LDLIBS  = -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 
 ###################################
 # some notes
@@ -58,7 +59,7 @@ build/boston : build/addutil.o			\
 		build/blogutil.o		\
 		build/entity-conversion.o	\
 		build/facebook.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 	$(SETUID) build/boston
 
 #######################################################################
