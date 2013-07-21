@@ -73,7 +73,7 @@ static inline size_t max(size_t a,size_t b)
 
 /***********************************************************************/
 
-Blog (BlogNew)(const char *location,const char *lockfile)
+Blog BlogNew(const char *location,const char *lockfile)
 {
   Blog blog;
   int  rc;
@@ -94,7 +94,7 @@ Blog (BlogNew)(const char *location,const char *lockfile)
 
 /***********************************************************************/
 
-int (BlogLock)(Blog blog)
+int BlogLock(Blog blog)
 {
   struct flock lockdata;
   int          rc;
@@ -122,7 +122,7 @@ int (BlogLock)(Blog blog)
 
 /***********************************************************************/
 
-int (BlogUnlock)(Blog blog)
+int BlogUnlock(Blog blog)
 {
   struct flock lockdata;
   int          rc;
@@ -148,7 +148,7 @@ int (BlogUnlock)(Blog blog)
 
 /***********************************************************************/
 
-int (BlogFree)(Blog blog)
+int BlogFree(Blog blog)
 {
   assert(blog != NULL);
   
@@ -162,7 +162,7 @@ int (BlogFree)(Blog blog)
 
 /************************************************************************/
 
-BlogEntry (BlogEntryNew)(Blog blog)
+BlogEntry BlogEntryNew(Blog blog)
 {
   BlogEntry pbe;
 
@@ -188,7 +188,7 @@ BlogEntry (BlogEntryNew)(Blog blog)
 
 /***********************************************************************/
 
-BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
+BlogEntry BlogEntryRead(Blog blog,struct btm *which)
 {
   BlogEntry    entry;
   char         pname[FILENAME_MAX];
@@ -244,7 +244,7 @@ BlogEntry (BlogEntryRead)(Blog blog,struct btm *which)
 
 /**********************************************************************/
 
-void (BlogEntryReadBetweenU)(Blog blog,List *list,struct btm *start,struct btm *end)
+void BlogEntryReadBetweenU(Blog blog,List *list,struct btm *start,struct btm *end)
 {
   BlogEntry entry;
   
@@ -270,7 +270,7 @@ void (BlogEntryReadBetweenU)(Blog blog,List *list,struct btm *start,struct btm *
 
 /************************************************************************/
 
-void (BlogEntryReadBetweenD)(Blog blog,List *listb,struct btm *end,struct btm *start)
+void BlogEntryReadBetweenD(Blog blog,List *listb,struct btm *end,struct btm *start)
 {
   List  lista;
   Node *node;
@@ -301,7 +301,7 @@ void (BlogEntryReadBetweenD)(Blog blog,List *listb,struct btm *end,struct btm *s
 
 /*******************************************************************/
   
-void (BlogEntryReadXD)(Blog blog,List *list,struct btm *start,size_t num)
+void BlogEntryReadXD(Blog blog,List *list,struct btm *start,size_t num)
 {
   BlogEntry entry;
   
@@ -333,7 +333,7 @@ void (BlogEntryReadXD)(Blog blog,List *list,struct btm *start,size_t num)
 
 /*******************************************************************/
 
-void (BlogEntryReadXU)(Blog blog,List *list,struct btm *start,size_t num)
+void BlogEntryReadXU(Blog blog,List *list,struct btm *start,size_t num)
 {
   BlogEntry entry;
   
@@ -360,7 +360,7 @@ void (BlogEntryReadXU)(Blog blog,List *list,struct btm *start,size_t num)
 
 /**************************************************************************/
 
-int (BlogEntryWrite)(BlogEntry entry)
+int BlogEntryWrite(BlogEntry entry)
 {
   char   **authors;
   char   **class;
@@ -482,7 +482,7 @@ int (BlogEntryWrite)(BlogEntry entry)
 
 /***********************************************************************/
 
-int (BlogEntryFree)(BlogEntry entry)
+int BlogEntryFree(BlogEntry entry)
 {
   assert(entry != NULL);
   

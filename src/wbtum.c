@@ -76,7 +76,7 @@ static int 		tumbler_normalize	(Tumbler t);
 
 /*********************************************************************/
 
-int (TumblerNew)(Tumbler *pt,char **pstr)
+int TumblerNew(Tumbler *pt,char **pstr)
 {
   Tumbler         t;
   TumblerUnit     tu;
@@ -122,7 +122,7 @@ int (TumblerNew)(Tumbler *pt,char **pstr)
 
 /************************************************************************/
 
-char *(TumblerCanonical)(Tumbler t)
+char *TumblerCanonical(Tumbler t)
 {
   TumblerUnit  tu;
   char        *text = NULL;
@@ -172,7 +172,7 @@ static void tumblerunit_canonize(char **ptext,TumblerUnit tu)
 
 /************************************************************************/
 
-int (TumblerFree)(Tumbler *pt)
+int TumblerFree(Tumbler *pt)
 {
   Tumbler     t;
   TumblerUnit tu;
