@@ -84,17 +84,17 @@ extern volatile bool          gf_debug;
 extern Blog                   g_blog;
 extern struct display         gd;		/* work on */
 
-int		GlobalsInit		(const char *const);
-void		set_c_updatetype	(const char *const);
-void		set_gf_emailupdate	(const char *const);
-void		set_cf_facebook		(const char *const);
-void		set_c_conversion	(char *const);
-void		set_time		(void);
+extern int		GlobalsInit		(const char *const);
+extern void		set_c_updatetype	(const char *const);
+extern void		set_gf_emailupdate	(const char *const);
+extern void		set_cf_facebook		(const char *const);
+extern void		set_c_conversion	(char *const);
+extern void		set_time		(void);
 
-int		main_cgi_head		(Cgi,int,char *[]);
-int		main_cgi_get		(Cgi,int,char *[]);
-int		main_cgi_post		(Cgi,int,char *[]);
-int		main_cli		(int,char *[]);
+extern int		main_cgi_head		(Cgi,int,char *[]);
+extern int		main_cgi_get		(Cgi,int,char *[]);
+extern int		main_cgi_post		(Cgi,int,char *[]);
+extern int		main_cli		(int,char *[]);
 
 #endif
 

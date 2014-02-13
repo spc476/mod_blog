@@ -102,22 +102,22 @@
 extern const struct chunk_callback m_callbacks[];
 extern const size_t                m_cbnum;
 
-char	*get_remote_user		(void);
-bool	 authenticate_author		(Request);
-int	 generate_pages			(Request);
-void	 notify_facebook		(Request);
-void	 notify_emaillist		(void);
-int	 tumbler_page			(FILE *,Tumbler);
-int	 BlogDatesInit			(void);
-int	 entry_add			(Request);
-void	 fix_entry			(Request);
-void	 generic_cb			(const char *,FILE *,void *);
-void	 dbcritical			(char *);
-char	*entity_conversion		(const char *);
-char	*entity_encode			(const char *);
-FILE	*fentity_encode_onread		(FILE *);
-FILE	*fentity_encode_onwrite		(FILE *);
-size_t	 fcopy				(FILE *,FILE *);
+extern char	*get_remote_user		(void);
+extern bool	 authenticate_author		(Request);
+extern int	 generate_pages			(Request);
+extern void	 notify_facebook		(Request);
+extern void	 notify_emaillist		(void);
+extern int	 tumbler_page			(FILE *,Tumbler);
+extern int	 BlogDatesInit			(void);
+extern int	 entry_add			(Request);
+extern void	 fix_entry			(Request);
+extern void	 generic_cb			(const char *,FILE *,void *);
+extern void	 dbcritical			(char *);
+extern char	*entity_conversion		(const char *);
+extern char	*entity_encode			(const char *);
+extern FILE	*fentity_encode_onread		(FILE *);
+extern FILE	*fentity_encode_onwrite		(FILE *);
+extern size_t	 fcopy				(FILE *,FILE *);
 
 #endif
 

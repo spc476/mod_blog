@@ -25,9 +25,9 @@
 
 #include <stdio.h>
 
-void		text_conversion		(FILE *,FILE *);
-void		mixed_conversion	(FILE *,FILE *);
-void		html_conversion		(FILE *,FILE *);
-void		buff_conversion		(FILE *,FILE *);
+extern void		text_conversion		(FILE *,FILE *);
+extern void		mixed_conversion	(FILE *,FILE *);
+extern void		html_conversion		(FILE *,FILE *);
+extern void		buff_conversion		(FILE *,FILE *);
 
 #endif

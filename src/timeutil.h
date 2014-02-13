@@ -35,15 +35,15 @@ struct btm
 
 /***********************************************************/
 
-unsigned int	 max_monthday	(const int,const unsigned int);
-void		 btm_add_day	(struct btm *const);
-void		 btm_sub_part	(struct btm *const);
-void		 btm_sub_day	(struct btm *const);
-void		 btm_add_month	(struct btm *const);
-void		 btm_sub_month	(struct btm *const);
-int		 btm_cmp	(const struct btm *const restrict,const struct btm *const restrict);
-int		 btm_cmp_date	(const struct btm *const restrict,const struct btm *const restrict);
-void		 tm_init	(struct tm *const);
+extern unsigned int	 max_monthday	(const int,const unsigned int);
+extern void		 btm_add_day	(struct btm *const);
+extern void		 btm_sub_part	(struct btm *const);
+extern void		 btm_sub_day	(struct btm *const);
+extern void		 btm_add_month	(struct btm *const);
+extern void		 btm_sub_month	(struct btm *const);
+extern int		 btm_cmp	(const struct btm *const restrict,const struct btm *const restrict);
+extern int		 btm_cmp_date	(const struct btm *const restrict,const struct btm *const restrict);
+extern void		 tm_init	(struct tm *const);
 
 #endif
 

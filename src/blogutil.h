@@ -33,8 +33,8 @@ typedef struct mystring
 
 /*********************************************************************/
 
-String 	*tag_split	(size_t *,const char *);
-char	*fromstring	(String);
+extern String 	*tag_split	(size_t *,const char *);
+extern char	*fromstring	(String);
 
 #endif
 

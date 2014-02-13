@@ -68,9 +68,9 @@ typedef struct tumunit
 
 /***********************************************************************/
 
-int		 TumblerNew		(Tumbler *,char **);
-char		*TumblerCanonical	(Tumbler);
-int		 TumblerFree		(Tumbler *);
+extern int	 TumblerNew		(Tumbler *,char **);
+extern char	*TumblerCanonical	(Tumbler);
+extern int	 TumblerFree		(Tumbler *);
 
 #endif
 

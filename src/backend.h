@@ -42,8 +42,8 @@ typedef struct aflink
 
 /************************************************/
 
-int page_generation	(Request);
-int pagegen_items	(const template__t *const restrict,FILE *const restrict,const struct btm *const restrict);
-int pagegen_days	(const template__t *const restrict,FILE *const restrict,const struct btm *const restrict);
+extern int page_generation	(Request);
+extern int pagegen_items	(const template__t *const restrict,FILE *const restrict,const struct btm *const restrict);
+extern int pagegen_days		(const template__t *const restrict,FILE *const restrict,const struct btm *const restrict);
 
 #endif
