@@ -358,12 +358,17 @@ static void cb_blog_adtag(FILE *out,void *data)
   char                 *tag;
 
   assert(out  != NULL);
-  assert(data != NULL);
 
-  cbd = data;
-  tag = UrlEncodeString(cbd->adtag);
+  if (data == NULL)
+    tag = UrlEncodeString(c_adtag);
+  else
+  {
+    cbd = data;
+    tag = UrlEncodeString(cbd->adtag);
+  }
+  
   fputs(tag,out);
-  free(tag);
+  free(tag);  
 }
 
 /*********************************************************************/
@@ -372,14 +377,21 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
 {
   struct callback_data *cbd;
   FILE                 *entityout;
+  const char           *tag;
 
   assert(out  != NULL);
-  assert(data != NULL);
   
-  cbd       = data;
+  if (data == NULL)
+    tag = c_adtag;
+  else
+  {
+    cbd = data;
+    tag = cbd->adtag;
+  }
+  
   entityout = fentity_encode_onwrite(out);
   if (entityout == NULL) return;
-  fputs(cbd->adtag,entityout);
+  fputs(tag,entityout);
   fclose(entityout);
 }
 
