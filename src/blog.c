@@ -86,8 +86,7 @@ Blog BlogNew(const char *location,const char *lockfile)
   if (rc != 0)
     return(NULL);
   
-  blog = malloc(sizeof(struct blog));
-  memset(blog,0,sizeof(struct blog));
+  blog = calloc(1,sizeof(struct blog));
   blog->lockfile = strdup(lockfile);
   return(blog);
 }
