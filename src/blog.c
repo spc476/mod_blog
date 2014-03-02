@@ -168,6 +168,15 @@ Blog BlogNew(const char *location,const char *lockfile)
     fclose(fp);
   }
   
+  if (
+          (blog->last.year  == blog->now.year)
+       && (blog->last.month == blog->now.month)
+       && (blog->last.day   == blog->now.day)
+     )
+  {
+    blog->now.part = blog->last.part;
+  }
+  
   return(blog);
 }
 
