@@ -333,9 +333,8 @@ int GlobalsInit(const char *conf)
   ; and searching only.
   ;--------------------------------------------------------*/
   
-  setlocale(LC_COLLATE,"C");
-
-  return(0);
+  setlocale(LC_COLLATE,"C");  
+  return BlogDatesInit();
 }
 
 /********************************************************************/

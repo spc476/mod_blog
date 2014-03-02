@@ -485,8 +485,6 @@ static int cgi_error(Request req,int level,char *msg, ... )
 
 static int cgi_init(Cgi cgi,Request req)
 {
-  int rc;
-  
   assert(cgi != NULL);
   assert(req != NULL);
   
@@ -497,13 +495,7 @@ static int cgi_init(Cgi cgi,Request req)
   req->out   = stdout;
   req->cgi   = cgi;
   
-  rc = GlobalsInit(NULL);
-
-  if (rc != 0)
-    return rc;
-  
-  BlogDatesInit();
-  return(0);
+  return GlobalsInit(NULL);
 }
 
 /***********************************************************************/

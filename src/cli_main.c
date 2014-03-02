@@ -176,11 +176,7 @@ int main_cli(int argc,char *argv[])
 
   rc = GlobalsInit(config);
   if (rc != 0)
-    return((*req.error)(&req,HTTP_ISERVERERR,"could not open cofiguration file %s",config));
-  
-  rc = BlogDatesInit();
-  if (rc != 0)
-    return((*req.error)(&req,HTTP_ISERVERERR,"could not initialize dates"));
+    return((*req.error)(&req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config));
   
   if (forcenotify)
   {
