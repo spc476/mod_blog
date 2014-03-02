@@ -93,6 +93,7 @@ template__t  *c_templates;
 size_t        c_numtemplates;
 aflink__t    *c_aflinks;
 size_t        c_numaflinks;
+char         *c_adtag;
 
 lua_State     *g_L;
 const char    *g_templates;
@@ -168,8 +169,8 @@ int GlobalsInit(const char *conf)
   c_facebook_ap_id     = get_string(g_L,"facebook.ap_id",NULL);
   c_facebook_ap_secret = get_string(g_L,"facebook.ap_secret",NULL);
   c_facebook_user      = get_string(g_L,"facebook.user",NULL);
+  c_adtag              = get_string(g_L,"adtag","programming");  
   
-  gd.adtag             = get_string(g_L,"adtag","programming");  
   gf_debug             = get_bool  (g_L,"debug",false);  
   gf_emailupdate       = get_bool  (g_L,"email.notify",true);  
   gd.f.overview        = (c_overview != NULL);  
@@ -572,7 +573,7 @@ static void globals_free(void)
   free(c_facebook_ap_id);
   free(c_facebook_ap_secret);
   free(c_facebook_user);
-  free((void *)gd.adtag);	/* XXX Valgrind can't track this */
+  free(c_adtag);
 }
 
 /***********************************************************************/

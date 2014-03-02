@@ -76,6 +76,7 @@ extern const template__t *const   c_templates;
 extern const size_t               c_numtemplates;
 extern const aflink__t *const     c_aflinks;
 extern const size_t               c_numaflinks;
+extern const char *const          c_adtag;
 
 extern lua_State             *g_L;
 extern const char *           g_templates;	/* work on */

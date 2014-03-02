@@ -74,7 +74,6 @@ typedef struct display
 {
   DFlags      f;
   int         navunit;
-  const char *adtag;
   FILE       *htmldump;
   Cgi         cgi;
   Request     req;
@@ -88,6 +87,7 @@ struct callback_data
   struct btm last;	/* timestamp of previous entry */
   BlogEntry  entry;	/* current entry being processed */
   FILE      *ad;	/* file containing ad */
+  char      *adtag;
 };
 
 #endif

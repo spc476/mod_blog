@@ -116,11 +116,12 @@ int pagegen_items(
   else
     BlogEntryReadXU(g_blog,&cbd.list,&thisday,template->items);
   
-  tags     = tag_collect(&cbd.list);
-  gd.adtag = tag_pick(tags);
+  tags      = tag_collect(&cbd.list);
+  cbd.adtag = tag_pick(tags);
   free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
+  free(cbd.adtag);
   return 0;
 }
 
@@ -175,11 +176,12 @@ int pagegen_days(
     }
   }
   
-  tags = tag_collect(&cbd.list);
-  gd.adtag = tag_pick(tags);
+  tags      = tag_collect(&cbd.list);
+  cbd.adtag = tag_pick(tags);
   free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
+  free(cbd.adtag);
   return 0;
 }
 
@@ -373,12 +375,12 @@ int tumbler_page(FILE *out,Tumbler spec)
   else
     BlogEntryReadBetweenU(g_blog,&cbd.list,&start,&end);
   
-  tags     = tag_collect(&cbd.list);  
-  gd.adtag = tag_pick(tags);
+  tags      = tag_collect(&cbd.list);  
+  cbd.adtag = tag_pick(tags);
   free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
-
+  free(cbd.adtag);
   return(0);
 }
 
@@ -662,7 +664,7 @@ static char *tag_collect(List *list)
   entry = (BlogEntry)ListGetHead(list);
   
   if (!NodeValid(&entry->node) || empty_string(entry->class))
-    return strdup(gd.adtag);
+    return strdup(c_adtag);
   else
     return strdup(entry->class);
 }
@@ -679,7 +681,7 @@ static char *tag_pick(const char *tag)
   assert(tag != NULL);
 
   if (empty_string(tag))
-    return(strdup(gd.adtag));
+    return(strdup(c_adtag));
   
   pool = tag_split(&num,tag);
 
@@ -695,7 +697,7 @@ static char *tag_pick(const char *tag)
     pick = fromstring(pool[r]);
   }
   else
-    pick = strdup(gd.adtag);
+    pick = strdup(c_adtag);
   
   free(pool);
   return(pick);

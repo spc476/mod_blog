@@ -352,28 +352,34 @@ static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
 
 /*********************************************************************/
 
-static void cb_blog_adtag(FILE *out,void *data __attribute__((unused)))
+static void cb_blog_adtag(FILE *out,void *data)
 {
-  char *tag;
+  struct callback_data *cbd;
+  char                 *tag;
 
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
 
-  tag = UrlEncodeString(gd.adtag);
+  cbd = data;
+  tag = UrlEncodeString(cbd->adtag);
   fputs(tag,out);
   free(tag);
 }
 
 /*********************************************************************/
 
-static void cb_blog_adtag_entity(FILE *out,void *data __attribute__((unused)))
+static void cb_blog_adtag_entity(FILE *out,void *data)
 {
-  FILE *entityout;
+  struct callback_data *cbd;
+  FILE                 *entityout;
 
   assert(out  != NULL);
+  assert(data != NULL);
   
+  cbd       = data;
   entityout = fentity_encode_onwrite(out);
   if (entityout == NULL) return;
-  fputs(gd.adtag,entityout);
+  fputs(cbd->adtag,entityout);
   fclose(entityout);
 }
 
