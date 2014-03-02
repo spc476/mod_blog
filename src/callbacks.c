@@ -830,7 +830,7 @@ static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
   
   assert(out  != NULL);
   
-  ptm = gmtime(&gd.tst);
+  ptm = gmtime(&g_blog->tnow);
   strftime(buffer,BUFSIZ,"%a, %d %b %Y %H:%M:%S GMT",ptm);
   fputs(buffer,out);
 }
@@ -1257,24 +1257,10 @@ static void cb_now_year(FILE *out,void *data __attribute__((unused)))
 
 static void cb_update_time(FILE *out,void *data __attribute__((unused)))
 {
-  char buffer[BUFSIZ];
+  char tmpbuf[20];
   
-  assert(out != NULL);
-  
-  sprintf(
-  	buffer,
-  	"%04d-%02d-%02dT%02d:%02d:%02d%+03d:%02d",
-  	gd.stmst.tm_year + 1900,
-  	gd.stmst.tm_mon  + 1,
-  	gd.stmst.tm_mday,
-	gd.stmst.tm_hour,
-	gd.stmst.tm_min,
-	gd.stmst.tm_sec,
-	c_tzhour,
-	c_tzmin
-  );
-  
-  fputs(buffer,out);
+  strftime(tmpbuf,sizeof(tmpbuf),"%Y-%m-%dT%H:%M:%S",localtime(&g_blog->tnow));
+  fprintf(out,"%s%+03d:%02d",tmpbuf,c_tzhour,c_tzmin);
 }
 
 /*******************************************************************/

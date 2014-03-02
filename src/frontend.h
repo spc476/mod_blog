@@ -80,8 +80,6 @@ typedef struct display
   Request     req;
   struct btm  previous;
   struct btm  next;
-  time_t      tst;	/* Time_t based Start Time */
-  struct tm   stmst;	/* Struct TM based Start Time */
 } *Display;
 
 struct callback_data

@@ -77,7 +77,7 @@ int entry_add(Request req)
   }
   
   entry->when.part = 0;
-  entry->timestamp = gd.tst;
+  entry->timestamp = g_blog->tnow;
   entry->title     = req->title;
   entry->class     = req->class;
   entry->status    = req->status;

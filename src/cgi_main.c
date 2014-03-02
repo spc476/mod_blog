@@ -395,7 +395,7 @@ static int cmd_cgi_post_show(Request req)
   }
   
   entry->when.part = 1;	/* doesn't matter what this is */
-  entry->timestamp = gd.tst;
+  entry->timestamp = g_blog->tnow;
   entry->title     = req->title;
   entry->class     = req->class;
   entry->status    = req->status;
