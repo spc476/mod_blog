@@ -108,7 +108,6 @@ extern int	 generate_pages			(Request);
 extern void	 notify_facebook		(Request);
 extern void	 notify_emaillist		(void);
 extern int	 tumbler_page			(FILE *,Tumbler);
-extern int	 BlogDatesInit			(void);
 extern int	 entry_add			(Request);
 extern void	 fix_entry			(Request);
 extern void	 generic_cb			(const char *,FILE *,void *);

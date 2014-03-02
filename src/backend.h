@@ -28,7 +28,7 @@ typedef struct template
   char    *template;
   char    *file;
   size_t   items;
-  int    (*pagegen)(const struct template *const restrict,FILE *const restrict,const struct btm *const restrict);
+  int    (*pagegen)(const struct template *const restrict,FILE *const restrict,Blog const restrict);
   bool     reverse;
   bool     fullurl;
 } template__t;
@@ -42,7 +42,7 @@ typedef struct aflink
 
 /************************************************/
 
-extern int pagegen_items	(const template__t *const restrict,FILE *const restrict,const struct btm *const restrict);
-extern int pagegen_days		(const template__t *const restrict,FILE *const restrict,const struct btm *const restrict);
+extern int pagegen_items	(const template__t *const restrict,FILE *const restrict,Blog const restrict);
+extern int pagegen_days		(const template__t *const restrict,FILE *const restrict,Blog const restrict);
 
 #endif

@@ -78,9 +78,6 @@ typedef struct display
   FILE       *htmldump;
   Cgi         cgi;
   Request     req;
-  struct btm  begin;
-  struct btm  now;
-  struct btm  updatetime;
   struct btm  previous;
   struct btm  next;
   time_t      tst;	/* Time_t based Start Time */

@@ -32,10 +32,14 @@
 
 typedef struct blog
 {
-  char             *lockfile;
-  int               lock;
+  char       *lockfile;
+  int         lock;
+  struct btm  first;
+  struct btm  last;
+  struct btm  now;
+  time_t      tnow;
 } *Blog;
-  
+
 typedef struct blogentry
 {
   Node        node;

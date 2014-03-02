@@ -239,7 +239,7 @@ static int cmd_cli_show(Request req)
       template.reverse  = true;
       template.fullurl  = false;
       
-      rc = pagegen_days(&template,req->out,&gd.now);
+      rc = pagegen_days(&template,req->out,g_blog);
     }
     else
     {

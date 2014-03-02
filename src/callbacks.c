@@ -1038,7 +1038,7 @@ static void cb_navigation_first_url(FILE *out,void *data __attribute__((unused))
   
   assert(out  != NULL);
   
-  tmp = gd.begin;
+  tmp = g_blog->first;
   if (gd.f.navigation == false)
     print_nav_url(out,&tmp,PART);
   else
@@ -1053,7 +1053,7 @@ static void cb_navigation_first_title(FILE *out,void *data __attribute__((unused
   
   assert(out  != NULL);
   
-  tmp = gd.begin;
+  tmp = g_blog->first;
   if (gd.f.navigation == false)
     print_nav_title(out,&tmp,PART);
   else
@@ -1068,7 +1068,7 @@ static void cb_navigation_last_url(FILE *out,void *data __attribute__((unused)))
   
   assert(out  != NULL);
   
-  tmp = gd.now;
+  tmp = g_blog->now;
   if (gd.f.navigation == false)
     print_nav_url(out,&tmp,PART);
   else
@@ -1083,7 +1083,7 @@ static void cb_navigation_last_title(FILE *out,void *data __attribute__((unused)
   
   assert(out  != NULL);
   
-  tmp = gd.now;
+  tmp = g_blog->now;
   if (gd.f.navigation == false)
     print_nav_title(out,&tmp,PART);
   else
@@ -1146,7 +1146,7 @@ static void cb_navigation_current_url(FILE *out,void *data __attribute__((unused
 
   assert(out != NULL);
   
-  tmp = gd.now;
+  tmp = g_blog->now;
   print_nav_url(out,&tmp,MONTH);
 }
 
@@ -1241,7 +1241,7 @@ static void cb_begin_year(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  fprintf(out,"%04d",gd.begin.year);
+  fprintf(out,"%04d",g_blog->first.year);
 }
 
 /*******************************************************************/
@@ -1250,7 +1250,7 @@ static void cb_now_year(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
  
-  fprintf(out,"%04d",gd.now.year);
+  fprintf(out,"%04d",g_blog->now.year);
 }
 
 /*******************************************************************/

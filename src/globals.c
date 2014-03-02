@@ -101,8 +101,8 @@ volatile bool  gf_debug       = false;
 Blog           g_blog;
 struct display gd =
 {
-  { false , false , false , true , true , false , false} ,
-  INDEX
+  .f       = { false , false , false , true , true , false , false} ,
+  .navunit = INDEX,
 };
 
 /****************************************************/
@@ -334,98 +334,10 @@ int GlobalsInit(const char *conf)
   ;--------------------------------------------------------*/
   
   setlocale(LC_COLLATE,"C");  
-  return BlogDatesInit();
+  return 0;
 }
 
 /********************************************************************/
-
-int BlogDatesInit(void)
-{
-  FILE      *fp;
-  struct tm *ptm;
-  char       buffer[128];
-  char      *p;
-  
-  gd.tst              = time(NULL);
-  ptm                 = localtime(&gd.tst);
-  gd.stmst            = *ptm;
-  gd.updatetime.year  = ptm->tm_year + 1900;
-  gd.updatetime.month = ptm->tm_mon + 1;
-  gd.updatetime.day   = ptm->tm_mday;
-  gd.updatetime.part  = 1;
-  
-  fp = fopen(".first","r");
-  if (fp == NULL)
-  {
-    gd.begin = gd.updatetime;
-    fp = fopen(".first","w");
-    if (fp)
-    {
-      fprintf(
-      	       fp,
-      	       "%4d/%02d/%02d.%d\n",
-      	       gd.begin.year,
-      	       gd.begin.month,
-      	       gd.begin.day,
-      	       gd.begin.part
-      	     );
-      fclose(fp);
-    }
-    else
-    {
-      int err = errno;
-      syslog(LOG_ERR,".first: %s",strerror(errno));
-      return err;
-    }
-  }
-  else
-  {
-    fgets(buffer,sizeof(buffer),fp);
-    gd.begin.year  = strtoul(buffer,&p,10); p++;
-    gd.begin.month = strtoul(p,&p,10); p++;
-    gd.begin.day   = strtoul(p,&p,10); p++;
-    gd.begin.part  = strtoul(p,&p,10);
-    fclose(fp);
-  }
-  
-  fp = fopen(".last","r");
-  if (fp == NULL)
-  {
-    gd.now = gd.updatetime;
-    fp = fopen(".last","w");
-    if (fp)
-    {
-      fprintf(
-               fp,
-               "%4d/%02d/%02d.%d\n",
-               gd.now.year,
-               gd.now.month,
-               gd.now.day,
-               gd.now.part
-             );
-      fclose(fp);
-    }
-    else
-    {
-      int err = errno;
-      syslog(LOG_ERR,".last: %s",strerror(errno));
-      return err;
-    }
-  }
-  else
-  {
-    fgets(buffer,sizeof(buffer),fp);
-    gd.now.year  = strtoul(buffer,&p,10); p++;
-    gd.now.month = strtoul(p,&p,10); p++;
-    gd.now.day   = strtoul(p,&p,10); p++;
-    gd.now.part  = strtoul(p,&p,10);
-    fclose(fp);
-  }
-  
-  return 0;
-}
-  
-/***********************************************************************/
 
 void set_c_updatetype(char *const value)
 {

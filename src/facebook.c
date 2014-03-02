@@ -96,10 +96,10 @@ void notify_facebook(Request req)
   	req->status,
   	c_fullbaseurl,
   	c_baseurl,
-  	gd.now.year,
-  	gd.now.month,
-  	gd.now.day,
-  	gd.now.part
+  	g_blog->now.year,
+  	g_blog->now.month,
+  	g_blog->now.day,
+  	g_blog->now.part
   );
   fclose(out);
   

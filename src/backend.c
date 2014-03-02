@@ -80,7 +80,7 @@ int generate_pages(Request req __attribute__((unused)))
       continue;
     }
     
-    (*c_templates[i].pagegen)(&c_templates[i],out,&gd.now);
+    (*c_templates[i].pagegen)(&c_templates[i],out,g_blog);
     fclose(out);
   }
   
@@ -92,7 +92,7 @@ int generate_pages(Request req __attribute__((unused)))
 int pagegen_items(
 	const template__t *const restrict template,
 	FILE              *const restrict out,
-	const struct btm  *const restrict when
+	Blog               const restrict blog
 )
 {
   struct btm            thisday;
@@ -101,12 +101,12 @@ int pagegen_items(
   
   assert(template != NULL);
   assert(out      != NULL);
-  assert(when     != NULL);
+  assert(blog     != NULL);
   
   g_templates  = template->template;
   gd.f.fullurl = template->fullurl;
   gd.f.reverse = template->reverse;
-  thisday      = *when;
+  thisday      = blog->now;
   
   memset(&cbd,0,sizeof(struct callback_data));
   
@@ -129,7 +129,7 @@ int pagegen_items(
 int pagegen_days(
 	const template__t *const restrict template,
 	FILE              *const restrict out,
-	const struct btm  *const restrict when
+	Blog               const restrict blog
 )
 {
   struct btm            thisday;
@@ -140,12 +140,12 @@ int pagegen_days(
   
   assert(template != NULL);
   assert(out      != NULL);
-  assert(when     != NULL);
+  assert(blog     != NULL);
 
   g_templates  = template->template;
   gd.f.fullurl = false;
   gd.f.reverse = true;
-  thisday      = *when;
+  thisday      = blog->now;
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
@@ -154,7 +154,7 @@ int pagegen_days(
   {
     BlogEntry entry;
     
-    if (btm_cmp(&thisday,&gd.begin) < 0) break;
+    if (btm_cmp(&thisday,&g_blog->first) < 0) break;
     
     entry = BlogEntryRead(g_blog,&thisday);
     if (entry)
@@ -229,7 +229,7 @@ int tumbler_page(FILE *out,Tumbler spec)
 
   if (
        (tu1->entry[YEAR]) 
-       && (tu1->entry[YEAR] < (unsigned)gd.begin.year)
+       && (tu1->entry[YEAR] < (unsigned)g_blog->first.year)
      ) 
     return(1);
   if (tu1->entry[MONTH]  > 12) return(1);
@@ -241,7 +241,7 @@ int tumbler_page(FILE *out,Tumbler spec)
   {
     if (
          (tu2->entry[YEAR] != 0)
-         && (tu2->entry[YEAR] < (unsigned)gd.begin.year)
+         && (tu2->entry[YEAR] < (unsigned)g_blog->first.year)
        )
       return(1);
     if (tu2->entry[MONTH]  > 12) return(1);
@@ -260,10 +260,10 @@ int tumbler_page(FILE *out,Tumbler spec)
   ;-----------------------------------------------------------------------*/
 
   nu1         = PART;
-  start.part  = (tu1->entry[PART]  == 0) ? nu1 = DAY     , 1             : tu1->entry[PART];
-  start.day   = (tu1->entry[DAY]   == 0) ? nu1 = MONTH   , 1             : tu1->entry[DAY];
-  start.month = (tu1->entry[MONTH] == 0) ? nu1 = YEAR    , 1             : tu1->entry[MONTH];
-  start.year  = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , gd.begin.year : (int)tu1->entry[YEAR];
+  start.part  = (tu1->entry[PART]  == 0) ? nu1 = DAY     , 1                  : tu1->entry[PART];
+  start.day   = (tu1->entry[DAY]   == 0) ? nu1 = MONTH   , 1                  : tu1->entry[DAY];
+  start.month = (tu1->entry[MONTH] == 0) ? nu1 = YEAR    , 1                  : tu1->entry[MONTH];
+  start.year  = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , g_blog->first.year : (int)tu1->entry[YEAR];
   
   if (start.day > max_monthday(start.year,start.month))
     return(1);				/* invalid day */
@@ -277,7 +277,7 @@ int tumbler_page(FILE *out,Tumbler spec)
   {
     gd.f.navigation = true;
     nu2        = PART;
-    end.year   = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , gd.now.year                      : (int)tu1->entry[YEAR];
+    end.year   = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , g_blog->now.year                 : (int)tu1->entry[YEAR];
     end.month  = (tu1->entry[MONTH] == 0) ? nu2 = MONTH , 12                               : tu1->entry[MONTH];
     end.day    = (tu1->entry[DAY]   == 0) ? nu2 = DAY   , max_monthday(end.year,end.month) : tu1->entry[DAY];
     end.part   = (tu1->entry[PART]  == 0) ? nu2 = PART  , 23                               : tu1->entry[PART];
@@ -293,7 +293,7 @@ int tumbler_page(FILE *out,Tumbler spec)
     ; to the their maximum legal value.
     ;---------------------------------------------------------------------*/
     
-    end.year  = (tu2->entry[YEAR]  == 0) ? gd.now.year                      : (int)tu2->entry[YEAR];
+    end.year  = (tu2->entry[YEAR]  == 0) ? g_blog->now.year                 : (int)tu2->entry[YEAR];
     end.month = (tu2->entry[MONTH] == 0) ? 12                               : tu2->entry[MONTH];
     end.day   = (tu2->entry[DAY]   == 0) ? max_monthday(end.year,end.month) : tu2->entry[DAY];
     end.part  = (tu2->entry[PART]  == 0) ? 23                               : tu2->entry[PART];
@@ -353,10 +353,10 @@ int tumbler_page(FILE *out,Tumbler spec)
   ; and the current time.
   ;------------------------------------------------------------------------*/
   
-  if (btm_cmp(&start,&gd.begin) < 0)
-    start = gd.begin;
-  if (btm_cmp(&end,&gd.now) > 0)
-    end = gd.now;
+  if (btm_cmp(&start,&g_blog->first) < 0)
+    start = g_blog->first;
+  if (btm_cmp(&end,&g_blog->now) > 0)
+    end = g_blog->now;
   
   /*-----------------------------------------------------------------------
   ; From here on out, it's pretty straight forward.  read a day, if it has
@@ -391,28 +391,28 @@ static void calculate_previous(struct btm start)
   switch(gd.navunit)
   {
     case YEAR:
-         if (start.year == gd.begin.year)
+         if (start.year == g_blog->first.year)
            gd.f.navprev = false;
          else
            gd.previous.year = start.year - 1;
          break;
     case MONTH:
          if (
-              (start.year == gd.begin.year) 
-              && (start.month == gd.begin.month)
+              (start.year == g_blog->first.year) 
+              && (start.month == g_blog->first.month)
             )
            gd.f.navprev = false;
          else
 	   btm_sub_month(&gd.previous);
          break;
     case DAY:
-         if (btm_cmp_date(&start,&gd.begin) == 0)
+         if (btm_cmp_date(&start,&g_blog->first) == 0)
            gd.f.navprev = false;
          else
          {
            btm_sub_day(&gd.previous);
            
-           while(btm_cmp(&gd.previous,&gd.begin) > 0)
+           while(btm_cmp(&gd.previous,&g_blog->first) > 0)
            {
              BlogEntry entry;
              
@@ -430,13 +430,13 @@ static void calculate_previous(struct btm start)
          }
          break;
     case PART:
-         if (btm_cmp(&start,&gd.begin) == 0)
+         if (btm_cmp(&start,&g_blog->first) == 0)
            gd.f.navprev = false;
          else
          {
 	   btm_sub_part(&gd.previous);
 
-           while(btm_cmp(&gd.previous,&gd.begin) > 0)
+           while(btm_cmp(&gd.previous,&g_blog->first) > 0)
            {
              BlogEntry entry;
              
@@ -467,29 +467,29 @@ static void calculate_next(struct btm end)
   switch(gd.navunit)
   {
     case YEAR:
-         if (end.year == gd.now.year)
+         if (end.year == g_blog->now.year)
            gd.f.navnext = false;
          else
            gd.next.year  = end.year + 1;
          break;
     case MONTH:
          if (
-              (end.year == gd.now.year) 
-              && (end.month == gd.now.month)
+              (end.year == g_blog->now.year) 
+              && (end.month == g_blog->now.month)
             )
            gd.f.navnext = false;
          else
            btm_add_month(&gd.next);
          break;
     case DAY:
-         if (btm_cmp_date(&end,&gd.now) == 0)
+         if (btm_cmp_date(&end,&g_blog->now) == 0)
            gd.f.navnext = false;
          else
          {
            btm_add_day(&gd.next);
 	   gd.next.part = 1;
            
-           while(btm_cmp(&gd.next,&gd.now) <= 0)
+           while(btm_cmp(&gd.next,&g_blog->now) <= 0)
            {
              BlogEntry entry;
              
@@ -507,13 +507,13 @@ static void calculate_next(struct btm end)
          }
          break;
     case PART:
-         if (btm_cmp(&end,&gd.now) == 0)
+         if (btm_cmp(&end,&g_blog->now) == 0)
            gd.f.navnext = false;
 	 else
 	 {
 	   gd.next.part++;
          
-           while(btm_cmp(&gd.next,&gd.now) <= 0)
+           while(btm_cmp(&gd.next,&g_blog->now) <= 0)
            {
              BlogEntry entry;
              

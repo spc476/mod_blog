@@ -44,7 +44,6 @@
 #include "blog.h"
 #include "frontend.h"
 #include "backend.h"
-#include "globals.h"
 #include "fix.h"
 
 /**********************************************************************/
@@ -75,8 +74,12 @@ static inline size_t max(size_t a,size_t b)
 
 Blog BlogNew(const char *location,const char *lockfile)
 {
-  Blog blog;
-  int  rc;
+  Blog       blog;
+  FILE      *fp;
+  struct tm *ptm;
+  char       buffer[128];
+  char      *p;
+  int        rc;
   
   assert(location != NULL);
   assert(lockfile != NULL);
@@ -84,10 +87,87 @@ Blog BlogNew(const char *location,const char *lockfile)
   umask(DEFAULT_PERMS);
   rc = chdir(location);
   if (rc != 0)
+  {
+    syslog(LOG_ERR,"%s: %s",location,strerror(errno));
     return(NULL);
+  }
   
   blog = calloc(1,sizeof(struct blog));
   blog->lockfile = strdup(lockfile);
+  
+  blog->tnow      = time(NULL);
+  ptm             = localtime(&blog->tnow);
+  blog->now.year  = ptm->tm_year + 1900;
+  blog->now.month = ptm->tm_mon  + 1;
+  blog->now.day   = ptm->tm_mday;
+  blog->now.part  = 1;
+  
+  fp = fopen(".first","r");
+  if (fp == NULL)
+  {
+    fp = fopen(".first","w");
+    if (fp)
+    {
+      fprintf(
+      	fp,
+      	"%4d/%02d/%02d.%d\n",
+      	blog->now.year,
+      	blog->now.month,
+      	blog->now.day,
+      	blog->now.part
+      );
+      fclose(fp);
+    }
+    else
+    {
+      syslog(LOG_ERR,".first: %s",strerror(errno));
+      BlogFree(blog);
+      return NULL;
+    }
+  }
+  else
+  {
+    fgets(buffer,sizeof(buffer),fp);
+    blog->first.year  = strtoul(buffer,&p,10); p++;
+    blog->first.month = strtoul(p,&p,10); p++;
+    blog->first.day   = strtoul(p,&p,10); p++;
+    blog->first.part  = strtoul(p,&p,10);
+    fclose(fp);
+  }
+  
+  fp = fopen(".last","r");
+  if (fp == NULL)
+  {
+    fp = fopen(".last","w");
+    if (fp)
+    {
+      fprintf(
+      	fp,
+      	"%4d/%02d/%02d.%d\n",
+      	blog->now.year,
+      	blog->now.month,
+      	blog->now.day,
+      	blog->now.part
+      );
+      fclose(fp);
+    }
+    else
+    {
+      syslog(LOG_ERR,".last: %s",strerror(errno));
+      BlogFree(blog);
+      return NULL;
+    }
+  }
+  else
+  {
+    fgets(buffer,sizeof(buffer),fp);
+    blog->last.year  = strtoul(buffer,&p,10); p++;
+    blog->last.month = strtoul(p,&p,10); p++;
+    blog->last.day   = strtoul(p,&p,10); p++;
+    blog->last.part  = strtoul(p,&p,10);
+    fclose(fp);
+  }
+  
   return(blog);
 }
 
@@ -101,7 +181,11 @@ int BlogLock(Blog blog)
   assert(blog != NULL);
   
   blog->lock = open(blog->lockfile,O_CREAT | O_RDWR, 0666);
-  if (blog->lock == -1) return(false);
+  if (blog->lock == -1) 
+  {
+    syslog(LOG_ERR,"%s: %s",blog->lockfile,strerror(errno));
+    return(false);
+  }
   
   lockdata.l_type   = F_WRLCK;
   lockdata.l_start  = 0;
@@ -112,6 +196,7 @@ int BlogLock(Blog blog)
 
   if (rc < 0)
   {
+    syslog(LOG_ERR,"SETLOCK %s: %s",blog->lockfile,strerror(errno));
     close(blog->lock);
     return(false);
   }
@@ -137,6 +222,7 @@ int BlogUnlock(Blog blog)
   rc = fcntl(blog->lock,F_SETLK,&lockdata);
   if (rc == 0)
   {
+    syslog(LOG_ERR,"UNLOCK %s: %s",blog->lockfile,strerror(errno));
     close(blog->lock);
     blog->lock = 0;
     return(true);
@@ -172,9 +258,9 @@ BlogEntry BlogEntryNew(Blog blog)
   pbe->node.ln_Pred = NULL;
   pbe->blog         = blog;
   pbe->valid        = true;
-  pbe->when.year    = gd.now.year;
-  pbe->when.month   = gd.now.month;
-  pbe->when.day     = gd.now.day;
+  pbe->when.year    = blog->now.year;
+  pbe->when.month   = blog->now.month;
+  pbe->when.day     = blog->now.day;
   pbe->when.part    = 0;
   pbe->title        = NULL;
   pbe->class        = NULL;
@@ -194,10 +280,10 @@ BlogEntry BlogEntryRead(Blog blog,struct btm *which)
   FILE        *sinbody;
   struct stat  status;
   
-  assert(blog                          != NULL);
-  assert(which                         != NULL);
-  assert(which->part                   >  0);
-  assert(btm_cmp_date(which,&gd.begin) >= 0);
+  assert(blog                             != NULL);
+  assert(which                            != NULL);
+  assert(which->part                      >  0);
+  assert(btm_cmp_date(which,&blog->first) >= 0);
   
   if (!date_check(which))
     return NULL;
@@ -225,7 +311,7 @@ BlogEntry BlogEntryRead(Blog blog,struct btm *which)
   if (stat(pname,&status) == 0)
     entry->timestamp = status.st_mtime;
   else
-    entry->timestamp = gd.tst;
+    entry->timestamp = blog->tnow;
       
   sinbody = fopen(pname,"r");
   if (sinbody == NULL)
@@ -312,7 +398,7 @@ void BlogEntryReadXD(Blog blog,List *list,struct btm *start,size_t num)
   
   while(num)
   {
-    if (btm_cmp_date(start,&gd.begin) < 0)
+    if (btm_cmp_date(start,&blog->first) < 0)
       return;
       
     entry = BlogEntryRead(blog,start);
@@ -340,7 +426,7 @@ void BlogEntryReadXU(Blog blog,List *list,struct btm *start,size_t num)
   assert(start != NULL);
   assert(num   >  0);
   
-  while((num) && (btm_cmp_date(start,&gd.now) <= 0))
+  while((num) && (btm_cmp_date(start,&blog->now) <= 0))
   {
     entry = BlogEntryRead(blog,start);
     if (entry != NULL)
@@ -459,9 +545,11 @@ int BlogEntryWrite(BlogEntry entry)
   ; to reflect that.
   ;------------------------------------------------------------------------*/
   
-  if (btm_cmp(&entry->when,&gd.now) > 0)
+  if (btm_cmp(&entry->when,&entry->blog->now) > 0)
   {
+    entry->blog->last = entry->when;
     out = fopen(".last","w");
+    
     if (out)
     {
       fprintf(

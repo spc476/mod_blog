@@ -386,7 +386,7 @@ static int cmd_cgi_post_show(Request req)
   entry = BlogEntryNew(g_blog);
   
   if (emptynull_string(req->date))
-    entry->when = gd.updatetime;
+    entry->when = g_blog->now;
   else
   {
     entry->when.year  = strtoul(req->date,&p,10); p++;

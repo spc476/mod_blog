@@ -67,7 +67,7 @@ int entry_add(Request req)
     ; content properly.
     ;---------------------------------------------------------------------*/
     
-    entry->when = gd.updatetime;
+    entry->when = g_blog->now;
   }
   else
   {
@@ -89,8 +89,6 @@ int entry_add(Request req)
     BlogEntryWrite(entry);
 
   if (c_authorfile) BlogUnlock(g_blog);
-
-  BlogDatesInit();
 
   return(0);    
 }
