@@ -548,6 +548,8 @@ int BlogEntryWrite(BlogEntry entry)
   if (btm_cmp(&entry->when,&entry->blog->now) > 0)
   {
     entry->blog->last = entry->when;
+    entry->blog->now  = entry->when;
+    
     out = fopen(".last","w");
     
     if (out)
