@@ -372,7 +372,11 @@ int BlogDatesInit(void)
       fclose(fp);
     }
     else
+    {
+      int err = errno;
       syslog(LOG_ERR,".first: %s",strerror(errno));
+      return err;
+    }
   }
   else
   {
@@ -402,7 +406,11 @@ int BlogDatesInit(void)
       fclose(fp);
     }
     else
+    {
+      int err = errno;
       syslog(LOG_ERR,".last: %s",strerror(errno));
+      return err;
+    }
   }
   else
   {
