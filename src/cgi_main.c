@@ -135,6 +135,7 @@ static int cmd_cgi_get_new(Request req)
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
+  cbd.adtag = (char *)c_adtag;
   gd.f.edit = 1;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
   generic_cb("main",req->out,&cbd);
@@ -382,6 +383,7 @@ static int cmd_cgi_post_show(Request req)
 
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
+  cbd.adtag = (char *)c_adtag;
   fix_entry(req);
   entry = BlogEntryNew(g_blog);
   
