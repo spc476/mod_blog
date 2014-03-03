@@ -89,7 +89,8 @@ int entry_add(Request req)
     BlogEntryWrite(entry);
 
   if (c_authorfile) BlogUnlock(g_blog);
-
+  
+  free(entry);
   return(0);    
 }
 

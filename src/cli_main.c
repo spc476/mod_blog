@@ -185,6 +185,20 @@ int main_cli(int argc,char *argv[])
   }
 
   rc = (*req.command)(&req);
+  
+  if (req.in != stdin) fclose(req.in);
+  
+  free(req.update);
+  free(req.origauthor);
+  free(req.author);
+  free(req.name);
+  free(req.title);
+  free(req.class);
+  free(req.status);
+  free(req.date);
+  free(req.origbody);
+  free(req.body);
+  free(req.reqtumbler);
   return(rc);  
 }
 

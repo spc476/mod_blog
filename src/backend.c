@@ -425,6 +425,7 @@ static void calculate_previous(struct btm start)
                continue;
              }
              assert(entry->valid);
+             BlogEntryFree(entry);
              return;
            }
                       
@@ -449,6 +450,7 @@ static void calculate_previous(struct btm start)
                continue;
              }
              assert(entry->valid);
+             BlogEntryFree(entry);
              return;
            }
            
@@ -502,6 +504,7 @@ static void calculate_next(struct btm end)
                continue;
              }
              assert(entry->valid);
+             BlogEntryFree(entry);
              return;
            }
            
@@ -527,6 +530,7 @@ static void calculate_next(struct btm end)
                continue;
              }
              assert(entry->valid);
+             BlogEntryFree(entry);
              return;
            }
            gd.f.navnext = false;
