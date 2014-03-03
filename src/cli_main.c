@@ -221,7 +221,7 @@ static int cmd_cli_new(Request req)
   if (rc == 0)
   {
     if (cf_facebook)    notify_facebook(req);
-    if (gf_emailupdate) notify_emaillist();
+    if (cf_emailupdate) notify_emaillist();
     generate_pages(req);  
   }
   
@@ -366,7 +366,7 @@ static int mailfile_readdata(Request req)
     req->status = strdup("");
   
   if (req->date   != NULL) req->date = strdup(req->date);
-  if (email       != NULL) set_gf_emailupdate(email);
+  if (email       != NULL) set_cf_emailupdate(email);
   if (filter      != NULL) set_c_conversion(filter);
   if (facebook    != NULL) set_cf_facebook(facebook);
   

@@ -69,6 +69,7 @@ extern const struct btm           c_start;
 extern const struct btm           c_now;
 extern const char *const          c_overview;
 extern const bool                 cf_facebook;
+extern const bool                 cf_emailupdate;
 extern const char *const          c_facebook_ap_id;
 extern const char *const          c_facebook_ap_secret;
 extern const char *const          c_facebook_user;
@@ -80,14 +81,13 @@ extern const char *const          c_adtag;
 
 extern lua_State             *g_L;
 extern const char *           g_templates;	/* work on */
-extern bool                   gf_emailupdate;	/* work on */
 extern volatile bool          gf_debug;
 extern Blog                   g_blog;
 extern struct display         gd;		/* work on */
 
 extern int		GlobalsInit		(const char *const);
 extern void		set_c_updatetype	(const char *const);
-extern void		set_gf_emailupdate	(const char *const);
+extern void		set_cf_emailupdate	(const char *const);
 extern void		set_cf_facebook		(const char *const);
 extern void		set_c_conversion	(char *const);
 extern void		set_time		(void);

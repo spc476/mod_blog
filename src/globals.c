@@ -86,6 +86,7 @@ int           c_tzmin;
 char         *c_overview;
 void	    (*c_conversion)(FILE *,FILE *) =  html_conversion;
 bool          cf_facebook;		/* set by code */
+bool          cf_emailupdate = true;
 char         *c_facebook_ap_id;
 char         *c_facebook_ap_secret;
 char         *c_facebook_user;
@@ -97,7 +98,6 @@ char         *c_adtag;
 
 lua_State     *g_L;
 const char    *g_templates;
-bool           gf_emailupdate = true;
 volatile bool  gf_debug       = false;
 Blog           g_blog;
 struct display gd =
@@ -170,13 +170,13 @@ int GlobalsInit(const char *conf)
   c_facebook_ap_secret = get_string(g_L,"facebook.ap_secret",NULL);
   c_facebook_user      = get_string(g_L,"facebook.user",NULL);
   c_adtag              = get_string(g_L,"adtag","programming");  
-  
+  cf_emailupdate       = get_bool  (g_L,"email.notify",true);    
+
   gf_debug             = get_bool  (g_L,"debug",false);  
-  gf_emailupdate       = get_bool  (g_L,"email.notify",true);  
   gd.f.overview        = (c_overview != NULL);  
   
   if (c_emaildb == NULL)
-    gf_emailupdate = false;
+    cf_emailupdate = false;
 
   {
     const char *timezone = get_string(g_L,"timezone","-5:00");
@@ -361,15 +361,15 @@ void set_c_updatetype(char *const value)
 
 /************************************************************************/
 
-void set_gf_emailupdate(char *const value)
+void set_cf_emailupdate(char *const value)
 {
   if (value && !empty_string(value))
   {
     up_string(value);
     if (strcmp(value,"NO") == 0)
-      gf_emailupdate = false;
+      cf_emailupdate = false;
     else if (strcmp(value,"YES") == 0)
-      gf_emailupdate = true;
+      cf_emailupdate = true;
   }
 }
 

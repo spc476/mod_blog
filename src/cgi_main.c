@@ -266,7 +266,7 @@ int main_cgi_post(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attrib
   CgiListMake(cgi);
   
   set_c_updatetype 	(CgiListGetValue(cgi,"updatetype"));
-  set_gf_emailupdate	(CgiListGetValue(cgi,"email"));
+  set_cf_emailupdate	(CgiListGetValue(cgi,"email"));
   set_cf_facebook	(CgiListGetValue(cgi,"facebook"));
   set_c_conversion 	(CgiListGetValue(cgi,"filter"));
   set_m_author     	(CgiListGetValue(cgi,"author"),&req);
@@ -343,7 +343,7 @@ static int cmd_cgi_post_new(Request req)
   if (rc == 0)
   {
     if (cf_facebook)    notify_facebook(req);
-    if (gf_emailupdate) notify_emaillist();
+    if (cf_emailupdate) notify_emaillist();
     generate_pages(req);
     fprintf(
     	req->out,
