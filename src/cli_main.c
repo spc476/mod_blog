@@ -198,7 +198,6 @@ int main_cli(int argc,char *argv[])
   free(req.date);
   free(req.origbody);
   free(req.body);
-  free(req.reqtumbler);
   return(rc);  
 }
 
