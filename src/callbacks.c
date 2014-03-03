@@ -1207,8 +1207,8 @@ static void print_nav_title(FILE *out,struct btm *date,int unit)
          {
            assert(entry->valid);
            fputs(entry->title,out);
+           BlogEntryFree(entry);
          }
-         BlogEntryFree(entry);
          break;
     default:
          assert(0);
