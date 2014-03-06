@@ -283,6 +283,14 @@ int tumbler_page(FILE *out,Tumbler spec)
     end.month  = (tu1->entry[MONTH] == 0) ? nu2 = MONTH , 12                               : tu1->entry[MONTH];
     end.day    = (tu1->entry[DAY]   == 0) ? nu2 = DAY   , max_monthday(end.year,end.month) : tu1->entry[DAY];
     end.part   = (tu1->entry[PART]  == 0) ? nu2 = PART  , 23                               : tu1->entry[PART];
+    
+    /*---------------------------------------------------------------------
+    ; XXX---scan-build revealed that nu2 is not used, so it could be
+    ; removed.  But, in looking over the code, I think we want to set
+    ; gd.navunit to nu2 (which would make nu1 redundant).  I have to think
+    ; about this.
+    ;----------------------------------------------------------------------*/
+    
     gd.navunit = nu1;
     
     calculate_previous(start);
