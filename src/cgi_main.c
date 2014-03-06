@@ -101,6 +101,7 @@ int main_cgi_get(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attribu
   set_m_cgi_get_command(CgiListGetValue(cgi,"cmd"),&req);
   
   rc = (*req.command)(&req);
+  gd.req = NULL;	/* make sure we don't have a dangling reference */
   return(rc);
 }
 
@@ -285,6 +286,7 @@ int main_cgi_post(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attrib
        || (emptynull_string(req.body))
      )
   {
+    gd.req = NULL; /* no dangling references */
     return((*req.error)(&req,HTTP_BADREQ,"errors-missing"));
   }
 
@@ -293,10 +295,12 @@ int main_cgi_post(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attrib
   
   if (authenticate_author(&req) == false)
   {
+    gd.req = NULL;
     return((*req.error)(&req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",req.author,CgiListGetValue(cgi,"author")));
   }
 
   rc = (*req.command)(&req);
+  gd.req = NULL;
   return(rc);  
 }
 

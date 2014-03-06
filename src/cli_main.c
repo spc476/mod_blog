@@ -170,17 +170,22 @@ int main_cli(int argc,char *argv[])
 		"",
 		argv[0]
 	      );
+	   gd.req = NULL;
 	   return(EXIT_FAILURE);
     }
   }
 
   rc = GlobalsInit(config);
   if (rc != 0)
+  {
+    gd.req = NULL;
     return((*req.error)(&req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config));
+  }
   
   if (forcenotify)
   {
     notify_emaillist();
+    gd.req = NULL;
     return(0);
   }
 
@@ -198,6 +203,7 @@ int main_cli(int argc,char *argv[])
   free(req.date);
   free(req.origbody);
   free(req.body);
+  gd.req = NULL;
   return(rc);  
 }
 
