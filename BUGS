@@ -2,6 +2,11 @@
 
 	Wrong post being posted to Facebook.
 
+	2014-03-12T23:37:00-05:00
+
+	Fixed.  I was comparing the wrong time fields when updating the
+	.last file.
+
 2012-11-06T15:00-05:00
 
 	scan-build (static analysis program) found that nu2 (in

@@ -90,11 +90,6 @@ void notify_facebook(Request req)
   out    = open_memstream(&status,&size);
   if (out == NULL) return;
   
-  /*-----------------------------------------------------------------------
-  ; XXX - if predate the post, then we need to use blog->last, otherwise, we
-  ; need to use blog->now.  Sigh.
-  ;-------------------------------------------------------------------------*/
-  
   fprintf(
         out,
   	"%s: %s%s/%04d/%02d/%02d.%d",

@@ -554,7 +554,7 @@ int BlogEntryWrite(BlogEntry entry)
   ; to reflect that.
   ;------------------------------------------------------------------------*/
   
-  if (btm_cmp(&entry->when,&entry->blog->now) > 0)
+  if (btm_cmp(&entry->when,&entry->blog->last) > 0)
   {
     entry->blog->last = entry->when;
     entry->blog->now  = entry->when;
