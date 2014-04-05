@@ -27,8 +27,8 @@ SHELL   = /bin/sh
 SETUID  = chmod 4755
 
 CC      = gcc -std=c99 -pedantic -Wall -Wextra
-CFLAGS  = -g -ffunction-sections -fdata-sections
-LDFLAGS = -g -rdynamic -Wl,--gc-sections
+CFLAGS  = -g
+LDFLAGS = -g -rdynamic
 LDLIBS  = -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 
 ###################################
