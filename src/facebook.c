@@ -71,9 +71,9 @@ void notify_facebook(Request req)
   
   token = NULL;
   size  = 0;
-  out   = fopen("/dev/null","w");
-
+  out   = open_memstream(&token,&size);
   if (out == NULL) goto notify_facebook_error;
+
   curl_easy_setopt(curl,CURLOPT_VERBOSE,0L);
   curl_easy_setopt(curl,CURLOPT_URL,"https://graph.facebook.com/oauth/access_token");
   curl_easy_setopt(curl,CURLOPT_POSTFIELDS,credentials);
@@ -81,6 +81,7 @@ void notify_facebook(Request req)
   curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
   curl_easy_setopt(curl,CURLOPT_WRITEDATA,out);
   rc = curl_easy_perform(curl);
+
   fclose(out);
 
   curl_easy_cleanup(curl);
