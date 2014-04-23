@@ -45,10 +45,11 @@ void notify_facebook(Request req)
 {
   FILE    *out;
   CURL    *curl;
-  char    *credentials;
-  char    *token;
+  char    *credentials = NULL;
+  char    *token       = NULL;
   char    *status      = NULL;
   char    *post        = NULL;
+  char    *result      = NULL;
   char     url[BUFSIZ];
   size_t   size;
   CURLcode rc;
@@ -56,12 +57,11 @@ void notify_facebook(Request req)
   assert(req != NULL);
   
   curl_global_init(CURL_GLOBAL_ALL);
-  curl  = curl_easy_init();
+  curl = curl_easy_init();
   if (curl == NULL) return;
 
-  credentials = NULL;
-  size        = 0;
-  out         = open_memstream(&credentials,&size);
+  size = 0;
+  out  = open_memstream(&credentials,&size);
   if (out == NULL) goto notify_facebook_error;
   
   add_post_variable(out,"grant_type"    ,"client_credentials",true);
@@ -69,9 +69,8 @@ void notify_facebook(Request req)
   add_post_variable(out,"client_secret" ,c_facebook_ap_secret,false);
   fclose(out);
   
-  token = NULL;
-  size  = 0;
-  out   = open_memstream(&token,&size);
+  size = 0;
+  out  = open_memstream(&token,&size);
   if (out == NULL) goto notify_facebook_error;
 
   curl_easy_setopt(curl,CURLOPT_VERBOSE,0L);
@@ -81,9 +80,7 @@ void notify_facebook(Request req)
   curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
   curl_easy_setopt(curl,CURLOPT_WRITEDATA,out);
   rc = curl_easy_perform(curl);
-
   fclose(out);
-
   curl_easy_cleanup(curl);
   
   if (rc != 0)
@@ -95,9 +92,8 @@ void notify_facebook(Request req)
   
   snprintf(url,sizeof(url),"https://graph.facebook.com/%s/feed",c_facebook_user);
   
-  status = NULL;
-  size   = 0;
-  out    = open_memstream(&status,&size);
+  size = 0;
+  out  = open_memstream(&status,&size);
   if (out == NULL) goto notify_facebook_error;
   
   fprintf(
@@ -113,16 +109,17 @@ void notify_facebook(Request req)
   );
   fclose(out);
   
-  post   = NULL;
-  size   = 0;
-  out    = open_memstream(&post,&size);
+  size = 0;
+  out  = open_memstream(&post,&size);
   
   if (out == NULL) goto notify_facebook_error;
   fprintf(out,"%s&",token);
   add_post_variable(out,"message",status,false);
   fclose(out);
 
-  out = fopen("/dev/null","w");
+  size = 0;
+  out  = open_memstream(&result,&size);
+  
   if (out == NULL) goto notify_facebook_error;
   
   curl = curl_easy_init();
@@ -137,8 +134,13 @@ void notify_facebook(Request req)
   rc = curl_easy_perform(curl);
   if (rc != 0)
     syslog(LOG_ERR,"curl_easy_perform(POST) = %s",curl_easy_strerror(rc));
-
+  
+  curl_easy_cleanup(curl);
+  fclose(out);
+  syslog(LOG_DEBUG,"%s",result);
+  
 notify_facebook_error:
+  free(result);
   free(post);
   free(status);
   free(token);
