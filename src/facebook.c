@@ -73,18 +73,22 @@ void notify_facebook(Request req)
   size  = 0;
   out   = fopen("/dev/null","w");
 
-  if (out == NULL) return;
+  if (out == NULL) goto notify_facebook_error;
   curl_easy_setopt(curl,CURLOPT_VERBOSE,0L);
   curl_easy_setopt(curl,CURLOPT_URL,"https://graph.facebook.com/oauth/access_token");
   curl_easy_setopt(curl,CURLOPT_POSTFIELDS,credentials);
   curl_easy_setopt(curl,CURLOPT_NOPROGRESS,1L);
+  curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
   curl_easy_setopt(curl,CURLOPT_WRITEDATA,out);
   rc = curl_easy_perform(curl);
   fclose(out);
 
+  curl_easy_cleanup(curl);
+  
   if (rc != 0)
   {
     syslog(LOG_ERR,"curl_easy_perform(AUTH) = %s",curl_easy_strerror(rc));
+    
     goto notify_facebook_error;
   }
   
@@ -117,8 +121,17 @@ void notify_facebook(Request req)
   add_post_variable(out,"message",status,false);
   fclose(out);
 
+  out = fopen("/dev/null","w");
+  if (out == NULL) goto notify_facebook_error;
+  
+  curl = curl_easy_init();
+  if (curl == NULL) goto notify_facebook_error;
+  
+  curl_easy_setopt(curl,CURLOPT_VERBOSE,0L);
   curl_easy_setopt(curl,CURLOPT_URL,url);
   curl_easy_setopt(curl,CURLOPT_POSTFIELDS,post);
+  curl_easy_setopt(curl,CURLOPT_NOPROGRESS,1L);
+  curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
   curl_easy_setopt(curl,CURLOPT_WRITEDATA,out);
   rc = curl_easy_perform(curl);
   if (rc != 0)
@@ -129,7 +142,6 @@ notify_facebook_error:
   free(status);
   free(token);
   free(credentials);
-  curl_easy_cleanup(curl);
 }
 
 /*************************************************************************/
