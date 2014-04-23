@@ -57,22 +57,29 @@ void notify_facebook(Request req)
   assert(req != NULL);
   
   curl_global_init(CURL_GLOBAL_ALL);
-  curl = curl_easy_init();
-  if (curl == NULL) return;
 
+  /*-----------------------------------------------------------
+  ; Generate the POST data for the oauth/access_token API call
+  ;------------------------------------------------------------*/
+  
   size = 0;
   out  = open_memstream(&credentials,&size);
-  if (out == NULL) goto notify_facebook_error;
-  
+  if (out == NULL) goto notify_facebook_error; 
   add_post_variable(out,"grant_type"    ,"client_credentials",true);
   add_post_variable(out,"client_id"     ,c_facebook_ap_id    ,true);
   add_post_variable(out,"client_secret" ,c_facebook_ap_secret,false);
   fclose(out);
   
+  /*--------------------------------------------------------------
+  ; create buffer for the auth token, then call the API end point
+  ;---------------------------------------------------------------*/
+  
   size = 0;
   out  = open_memstream(&token,&size);
   if (out == NULL) goto notify_facebook_error;
 
+  curl = curl_easy_init();
+  if (curl == NULL) return;
   curl_easy_setopt(curl,CURLOPT_VERBOSE,0L);
   curl_easy_setopt(curl,CURLOPT_URL,"https://graph.facebook.com/oauth/access_token");
   curl_easy_setopt(curl,CURLOPT_POSTFIELDS,credentials);
@@ -85,12 +92,15 @@ void notify_facebook(Request req)
   
   if (rc != 0)
   {
-    syslog(LOG_ERR,"curl_easy_perform(AUTH) = %s",curl_easy_strerror(rc));
-    
+    syslog(LOG_ERR,"curl_easy_perform(AUTH) = %s",curl_easy_strerror(rc));    
     goto notify_facebook_error;
   }
   
   snprintf(url,sizeof(url),"https://graph.facebook.com/%s/feed",c_facebook_user);
+  
+  /*-----------------------------------------------------
+  ; Generate the message we're going to send to Facebook
+  ;------------------------------------------------------*/
   
   size = 0;
   out  = open_memstream(&status,&size);
@@ -109,6 +119,10 @@ void notify_facebook(Request req)
   );
   fclose(out);
   
+  /*---------------------------------------------------
+  ; Generate the POST data for the post API call
+  ;----------------------------------------------------*/
+  
   size = 0;
   out  = open_memstream(&post,&size);
   
@@ -117,14 +131,16 @@ void notify_facebook(Request req)
   add_post_variable(out,"message",status,false);
   fclose(out);
 
+  /*------------------------------------------------------------------------
+  ; create the buffer for the API call results, then call the API end point
+  ;------------------------------------------------------------------------*/
+  
   size = 0;
   out  = open_memstream(&result,&size);
-  
   if (out == NULL) goto notify_facebook_error;
   
   curl = curl_easy_init();
-  if (curl == NULL) goto notify_facebook_error;
-  
+  if (curl == NULL) goto notify_facebook_error;  
   curl_easy_setopt(curl,CURLOPT_VERBOSE,0L);
   curl_easy_setopt(curl,CURLOPT_URL,url);
   curl_easy_setopt(curl,CURLOPT_POSTFIELDS,post);
