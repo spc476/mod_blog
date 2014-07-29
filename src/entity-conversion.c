@@ -52,7 +52,7 @@ static __ssize_t	few_write	(void *,const char *,size_t);
 	; that locale for collation is set at the beginning of the program.
 	;------------------------------------------------------------------*/
 
-const struct entity_conv m_table[] =
+static const struct entity_conv m_table[] =
 {
   { "AElig" 	,  198 },
   { "Aacute" 	,  193 },

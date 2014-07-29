@@ -146,7 +146,7 @@ static void	handle_aflinks		(HtmlToken,const char *);
 	; be in alphabetical order
 	;--------------------------------*/
 	
-const struct chunk_callback  m_callbacks[] =
+static const struct chunk_callback  m_callbacks[] =
 {  
   { "ad"			, cb_ad				} ,
   { "ad.content"		, cb_ad_content			} ,
@@ -226,7 +226,7 @@ const struct chunk_callback  m_callbacks[] =
   { "xyzzy"			, cb_xyzzy			} 
 };
 
-const size_t m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
+static const size_t m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
 
 /*************************************************************************/
 
