@@ -25,9 +25,10 @@
 
 SHELL   = /bin/sh
 SETUID  = chmod 4755
+MB_CURL_VERSION = $(shell curl-config --version)
 
 CC      = gcc -std=c99 -pedantic -Wall -Wextra
-CFLAGS  = -g
+CFLAGS  = -g -DMBCURL_VERSION='"$(MB_CURL_VERSION)"'
 LDFLAGS = -g -rdynamic
 LDLIBS  = -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 

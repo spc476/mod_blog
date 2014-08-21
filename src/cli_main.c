@@ -36,7 +36,10 @@
 #include <assert.h>
 
 #include <getopt.h>
+#include <lua.h>
+#include <gdbm.h>
 
+#include <cgilib6/conf.h>
 #include <cgilib6/pair.h>
 #include <cgilib6/htmltok.h>
 #include <cgilib6/rfc822.h>
@@ -166,9 +169,17 @@ int main_cli(int argc,char *argv[])
 		"\t--debug\n"
 		"\n"
 		"\tVersion: " GENERATOR "\n"
+		"\t\t%s\n"
+		"\t\t%s\n"
+		"\t\t%s\n"
+		"\t\t%s\n"
 		"\t* default value\n"
 		"",
-		argv[0]
+		argv[0],
+		CGIVERSION,
+		LUA_RELEASE,
+		gdbm_version,
+		MBCURL_VERSION
 	      );
 	   gd.req = NULL;
 	   return(EXIT_FAILURE);

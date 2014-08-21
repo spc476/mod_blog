@@ -37,6 +37,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <lua.h>
+#include <gdbm.h>
+
+#include <cgilib6/conf.h>
 #include <cgilib6/htmltok.h>
 #include <cgilib6/util.h>
 #include <cgilib6/cgi.h>
@@ -1624,7 +1628,16 @@ static void cb_generator(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  fputs(GENERATOR,out);
+  fprintf(
+    out,
+    "mod_blog %s, %s, %s, %s, %s"
+    "",
+    PROG_VERSION,
+    CGIVERSION,
+    LUA_RELEASE,
+    gdbm_version,
+    MBCURL_VERSION
+  );
 }
 
 /*********************************************************************/
