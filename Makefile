@@ -43,155 +43,14 @@ LDLIBS  = -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 #
 ################################################
 
-all: build build/boston
+all: build build/src build/boston
 
-build/boston : build/addutil.o			\
-		build/authenticate.o		\
-		build/blog.o			\
-		build/cgi_main.o		\
-		build/cli_main.o		\
-		build/globals.o			\
-		build/main.o			\
-		build/timeutil.o		\
-		build/conversion.o		\
-		build/callbacks.o		\
-		build/wbtum.o			\
-		build/backend.o			\
-		build/blogutil.o		\
-		build/entity-conversion.o	\
-		build/facebook.o
+build/boston : $(addprefix build/,$(patsubst %.c,%.o,$(wildcard src/*.c)))
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 	$(SETUID) build/boston
 
-#######################################################################
-#
-# Individual files
-#
-########################################################################
-
-build/%.o : src/%.c
+build/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
-
-build/main.o : src/main.c		\
-		src/backend.h		\
-		src/blog.h		\
-		src/conf.h		\
-		src/fix.h		\
-		src/frontend.h		\
-		src/globals.h		\
-		src/timeutil.h		\
-		src/wbtum.h
-
-build/backend.o : src/backend.c	\
-		src/backend.h		\
-		src/blog.h		\
-		src/blogutil.h		\
-		src/conf.h		\
-		src/fix.h		\
-		src/frontend.h		\
-		src/globals.h		\
-		src/timeutil.h		\
-		src/wbtum.h
-
-build/cli_main.o : src/cli_main.c	\
-		src/backend.h		\
-		src/blog.h		\
-		src/conf.h		\
-		src/fix.h		\
-		src/frontend.h		\
-		src/globals.h		\
-		src/timeutil.h		\
-		src/wbtum.h		\
-		version.h
-
-build/cgi_main.o : src/cgi_main.c	\
-		src/backend.h		\
-		src/blog.h		\
-		src/conf.h		\
-		src/fix.h		\
-		src/frontend.h		\
-		src/globals.h		\
-		src/timeutil.h		\
-		src/wbtum.h
-
-build/authenticate.o : src/authenticate.c	\
-		src/backend.h		\
-		src/blog.h		\
-		src/conf.h		\
-		src/frontend.h		\
-		src/globals.h		\
-		src/timeutil.h		\
-		src/wbtum.h		\
-		version.h
-
-build/addutil.o : src/addutil.c	\
-		src/backend.h		\
-		src/blog.h		\
-		src/conf.h		\
-		src/conversion.h	\
-		src/fix.h		\
-		src/frontend.h		\
-		src/globals.h		\
-		src/timeutil.h		\
-		src/wbtum.h		\
-		version.h
-
-build/callbacks.o : src/callbacks.c	\
-		src/backend.h		\
-		src/blog.h		\
-		src/blogutil.h		\
-		src/conf.h		\
-		src/fix.h		\
-		src/frontend.h		\
-		src/globals.h		\
-		src/timeutil.h		\
-		src/wbtum.h		\
-		version.h
-
-build/globals.o : src/globals.c	\
-		src/backend.h		\
-		src/blog.h		\
-		src/conf.h		\
-		src/conversion.h	\
-		src/fix.h		\
-		src/frontend.h		\
-		src/timeutil.h		\
-		src/wbtum.h
-
-build/blog.o : src/blog.c		\
-		src/backend.h		\
-		src/blog.h		\
-		src/conf.h 		\
-		src/fix.h		\
-		src/frontend.h		\
-		src/globals.h		\
-		src/timeutil.h		\
-		src/wbtum.h
-
-build/conversion.o : src/conversion.c	\
-		src/blog.h		\
-		src/conversion.h	\
-		src/fix.h		\
-		src/frontend.h		\
-		src/timeutil.h		\
-		src/wbtum.h
-
-build/timeutil.o : src/timeutil.c src/timeutil.h
-
-build/wbtum.o : src/wbtum.c src/wbtum.h src/conf.h
-
-build/blogutil.o : src/blogutil.c src/blogutil.h
-
-build/entity-conversion.o : src/entity-conversion.c
-
-build/facebook.o : src/facebook.c	\
-		src/backend.h		\
-		src/blog.h		\
-		src/frontend.h		\
-		src/globals.h		\
-		src/timeutil.h		\
-		src/wbtum.h
-	$(CC) $(CFLAGS) `curl-config --cflags` -c -o $@ $<
 
 version.h :
 	scripts/post-commit
@@ -202,13 +61,18 @@ version.h :
 #
 #######################################################################
 
-build :
-	mkdir -p build
+build build/src :
+	mkdir -p $@
 
 clean :
-	/bin/rm -rf build/*
+	/bin/rm -rf build
 	/bin/rm -rf *~ src/*~
+	/bin/rm -rf depend
 
 tarball:
 	(cd .. ; tar czvf /tmp/boston.tar.gz -X boston/.exclude boston/ )
 
+depend:
+	makedepend -pbuild/ -f- -I/usr/local/include -- $(CFLAGS) `curl-config --cflags` -- src/*.c >depend
+	
+include depend
