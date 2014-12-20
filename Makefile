@@ -26,11 +26,15 @@
 SHELL   = /bin/sh
 SETUID  = chmod 4755
 MB_CURL_VERSION = $(shell curl-config --version)
+VERSION = $(shell git describe --tag)
 
 CC      = gcc -std=c99 -pedantic -Wall -Wextra
-CFLAGS  = -g -DMBCURL_VERSION='"$(MB_CURL_VERSION)"'
-LDFLAGS = -g -rdynamic
+CFLAGS  = -g 
+LDFLAGS = -g
 LDLIBS  = -lgdbm -lcgi6 `curl-config --libs` -llua -lm
+
+override CFLAGS  += -DMBCURL_VERSION='"$(MB_CURL_VERSION)"' -DPROG_VERSION='"$(VERSION)"'
+override LDFLAGS += -rdynamic
 
 ###################################
 # some notes
@@ -51,9 +55,6 @@ build/boston : $(addprefix build/,$(patsubst %.c,%.o,$(wildcard src/*.c)))
 
 build/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
-
-version.h :
-	scripts/post-commit
 
 #######################################################################
 #
