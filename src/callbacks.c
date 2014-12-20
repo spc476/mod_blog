@@ -1633,7 +1633,7 @@ static void cb_generator(FILE *out,void *data __attribute__((unused)))
     "mod_blog %s, %s, %s, %s, %s"
     "",
     PROG_VERSION,
-    CGIVERSION,
+    cgilib_version,
     LUA_RELEASE,
     gdbm_version,
     MBCURL_VERSION

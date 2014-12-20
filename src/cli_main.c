@@ -176,7 +176,7 @@ int main_cli(int argc,char *argv[])
 		"\t* default value\n"
 		"",
 		argv[0],
-		CGIVERSION,
+		cgilib_version,
 		LUA_RELEASE,
 		gdbm_version,
 		MBCURL_VERSION
