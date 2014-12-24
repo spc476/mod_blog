@@ -23,15 +23,14 @@
 
 .PHONY:	all clean tarball
 
-SHELL   = /bin/sh
-SETUID  = chmod 4755
 MB_CURL_VERSION = $(shell curl-config --version)
-VERSION = $(shell git describe --tag)
+VERSION         = $(shell git describe --tag)
 
 CC      = gcc -std=c99 -pedantic -Wall -Wextra
 CFLAGS  = -g 
 LDFLAGS = -g
 LDLIBS  = -lgdbm -lcgi6 `curl-config --libs` -llua -lm
+SETUID  = /bin/chmod
 
 override CFLAGS  += -DMBCURL_VERSION='"$(MB_CURL_VERSION)"' -DPROG_VERSION='"$(VERSION)"'
 override LDFLAGS += -rdynamic
@@ -51,7 +50,7 @@ all: build build/src build/boston
 
 build/boston : $(addprefix build/,$(patsubst %.c,%.o,$(wildcard src/*.c)))
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-	$(SETUID) build/boston
+	$(SETUID) 4755 build/boston
 
 build/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -66,9 +65,7 @@ build build/src :
 	mkdir -p $@
 
 clean :
-	/bin/rm -rf build
-	/bin/rm -rf *~ src/*~
-	/bin/rm -rf depend
+	$(RM) -r build *~ src/*~ depend
 
 tarball:
 	(cd .. ; tar czvf /tmp/boston.tar.gz -X boston/.exclude boston/ )
