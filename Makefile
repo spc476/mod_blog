@@ -27,8 +27,8 @@ MB_CURL_VERSION = $(shell curl-config --version)
 MB_CURL_FLAGS   = $(shell curl-config --cflags)
 VERSION         = $(shell git describe --tag)
 
-CC      = gcc -std=c99 -pedantic -Wall -Wextra
-CFLAGS  = -g 
+CC      = gcc -std=c99
+CFLAGS  = -g -Wall -Wextra -pedantic
 LDFLAGS = -g
 LDLIBS  = -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 SETUID  = /bin/chmod
