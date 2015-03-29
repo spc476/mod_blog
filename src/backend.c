@@ -619,6 +619,7 @@ static const char *mime_type(const char *filename)
     { ".lha"		, "application/octet-stream"		} ,
     { ".lzh"		, "application/octet-stream"		} ,
     { ".m3u"		, "audio/x-mpegurl"			} ,
+    { ".m4v"		, "video/x-m4v"				} ,
     { ".man"		, "application/x-troff-man"		} ,
     { ".mathml"		, "application/mathml+xml"		} ,
     { ".me"		, "application/x-troff-me"		} ,
