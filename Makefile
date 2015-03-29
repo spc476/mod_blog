@@ -24,6 +24,7 @@
 .PHONY:	all clean tarball
 
 MB_CURL_VERSION = $(shell curl-config --version)
+MB_CURL_FLAGS   = $(shell curl-config --cflags)
 VERSION         = $(shell git describe --tag)
 
 CC      = gcc -std=c99 -pedantic -Wall -Wextra
@@ -32,7 +33,7 @@ LDFLAGS = -g
 LDLIBS  = -lgdbm -lcgi6 `curl-config --libs` -llua -lm
 SETUID  = /bin/chmod
 
-override CFLAGS  += -DMBCURL_VERSION='"$(MB_CURL_VERSION)"' -DPROG_VERSION='"$(VERSION)"'
+override CFLAGS  += -DMBCURL_VERSION='"$(MB_CURL_VERSION)"' -DPROG_VERSION='"$(VERSION)"' $(MB_CURL_FLAGS)
 override LDFLAGS += -rdynamic
 
 ###################################
@@ -71,6 +72,6 @@ tarball:
 	(cd .. ; tar czvf /tmp/boston.tar.gz -X boston/.exclude boston/ )
 
 depend:
-	makedepend -pbuild/ -f- -I/usr/local/include -- $(CFLAGS) `curl-config --cflags` -- src/*.c >depend
+	makedepend -pbuild/ -f- -I/usr/local/include -- $(CFLAGS) -- src/*.c >depend
 	
 include depend
