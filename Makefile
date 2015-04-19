@@ -24,16 +24,17 @@
 .PHONY:	all clean tarball
 
 MB_CURL_VERSION = $(shell curl-config --version)
-MB_CURL_FLAGS   = $(shell curl-config --cflags)
+MB_CURL_CFLAGS  = $(shell curl-config --cflags)
+MB_CURL_LDLIBS  = $(shell curl-config --libs)
 VERSION         = $(shell git describe --tag)
 
 CC      = gcc -std=c99
 CFLAGS  = -g -Wall -Wextra -pedantic
 LDFLAGS = -g
-LDLIBS  = -lgdbm -lcgi6 `curl-config --libs` -llua -lm
+LDLIBS  = -lgdbm -lcgi6 $(MB_CURL_LDLIBS) -llua -lm
 SETUID  = /bin/chmod
 
-override CFLAGS  += -DMBCURL_VERSION='"$(MB_CURL_VERSION)"' -DPROG_VERSION='"$(VERSION)"' $(MB_CURL_FLAGS)
+override CFLAGS  += -DMBCURL_VERSION='"$(MB_CURL_VERSION)"' -DPROG_VERSION='"$(VERSION)"' $(MB_CURL_CFLAGS)
 override LDFLAGS += -rdynamic
 
 ###################################
