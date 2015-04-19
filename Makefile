@@ -21,7 +21,7 @@
 #
 ########################################################################
 
-.PHONY:	all clean tarball
+.PHONY:	all clean tarball depend
 
 MB_CURL_VERSION = $(shell curl-config --version)
 MB_CURL_CFLAGS  = $(shell curl-config --cflags)
@@ -67,12 +67,41 @@ build build/src :
 	mkdir -p $@
 
 clean :
-	$(RM) -r build *~ src/*~ depend
+	$(RM) -r build *~ src/*~
 
 tarball:
 	(cd .. ; tar czvf /tmp/boston.tar.gz -X boston/.exclude boston/ )
 
 depend:
-	makedepend -pbuild/ -f- -I/usr/local/include -- $(CFLAGS) -- src/*.c >depend
-	
-include depend
+	makedepend -pbuild/ -Y -- $(CFLAGS) -- src/*.c 2>/dev/null
+
+# DO NOT DELETE
+
+build/src/addutil.o: src/conf.h src/blog.h src/timeutil.h src/conversion.h
+build/src/addutil.o: src/frontend.h src/wbtum.h src/backend.h src/globals.h
+build/src/addutil.o: src/fix.h
+build/src/authenticate.o: src/conf.h src/timeutil.h src/frontend.h
+build/src/authenticate.o: src/wbtum.h src/blog.h src/backend.h src/globals.h
+build/src/backend.o: src/conf.h src/blog.h src/timeutil.h src/wbtum.h
+build/src/backend.o: src/frontend.h src/fix.h src/blogutil.h src/backend.h
+build/src/backend.o: src/globals.h
+build/src/blog.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
+build/src/blog.o: src/wbtum.h src/backend.h src/fix.h
+build/src/blogutil.o: src/blogutil.h
+build/src/callbacks.o: src/conf.h src/blog.h src/timeutil.h src/wbtum.h
+build/src/callbacks.o: src/frontend.h src/backend.h src/fix.h src/blogutil.h
+build/src/callbacks.o: src/globals.h
+build/src/cgi_main.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
+build/src/cgi_main.o: src/wbtum.h src/backend.h src/fix.h src/globals.h
+build/src/cli_main.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
+build/src/cli_main.o: src/wbtum.h src/fix.h src/backend.h src/globals.h
+build/src/conversion.o: src/conversion.h src/fix.h src/frontend.h src/wbtum.h
+build/src/conversion.o: src/timeutil.h src/blog.h
+build/src/facebook.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
+build/src/facebook.o: src/backend.h src/globals.h
+build/src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
+build/src/globals.o: src/timeutil.h src/blog.h src/backend.h src/fix.h
+build/src/main.o: src/conf.h src/blog.h src/timeutil.h src/fix.h
+build/src/main.o: src/frontend.h src/wbtum.h src/backend.h src/globals.h
+build/src/timeutil.o: src/timeutil.h
+build/src/wbtum.o: src/conf.h src/wbtum.h
