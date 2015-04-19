@@ -67,7 +67,7 @@ build build/src :
 	mkdir -p $@
 
 clean :
-	$(RM) -r build *~ src/*~
+	$(RM) -r build *~ src/*~ *.bak
 
 tarball:
 	(cd .. ; tar czvf /tmp/boston.tar.gz -X boston/.exclude boston/ )
