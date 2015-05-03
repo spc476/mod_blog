@@ -102,7 +102,6 @@
 extern char	*get_remote_user		(void);
 extern bool	 authenticate_author		(Request);
 extern int	 generate_pages			(Request);
-extern void	 notify_facebook		(Request);
 extern void	 notify_emaillist		(void);
 extern int	 tumbler_page			(FILE *,Tumbler);
 extern int	 entry_add			(Request);

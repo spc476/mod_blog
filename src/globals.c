@@ -85,11 +85,7 @@ int           c_tzhour;
 int           c_tzmin;
 char         *c_overview;
 void	    (*c_conversion)(FILE *,FILE *) =  html_conversion;
-bool          cf_facebook;		/* set by code */
 bool          cf_emailupdate = true;
-char         *c_facebook_ap_id;
-char         *c_facebook_ap_secret;
-char         *c_facebook_user;
 template__t  *c_templates;
 size_t        c_numtemplates;
 aflink__t    *c_aflinks;
@@ -166,9 +162,6 @@ int GlobalsInit(const char *conf)
   c_emaildb            = get_string(g_L,"email.list",NULL);
   c_emailsubject       = get_string(g_L,"email.subject",NULL);
   c_emailmsg           = get_string(g_L,"email.message",NULL);
-  c_facebook_ap_id     = get_string(g_L,"facebook.ap_id",NULL);
-  c_facebook_ap_secret = get_string(g_L,"facebook.ap_secret",NULL);
-  c_facebook_user      = get_string(g_L,"facebook.user",NULL);
   c_adtag              = get_string(g_L,"adtag","programming");  
   cf_emailupdate       = get_bool  (g_L,"email.notify",true);    
 
@@ -316,14 +309,6 @@ int GlobalsInit(const char *conf)
   }
   lua_pop(g_L,1);
 
-  /*-----------------------------------------------------
-  ; derive the setting of c_facebook from the given data
-  ;------------------------------------------------------*/
-  
-  cf_facebook =    (c_facebook_ap_id     != NULL)
-                && (c_facebook_ap_secret != NULL)
-                && (c_facebook_user      != NULL);
-
   g_blog = BlogNew(c_basedir,c_lockfile);
   if (g_blog == NULL)
     return(ENOMEM);
@@ -390,27 +375,6 @@ void set_c_conversion(char *const value)
 }
 
 /**************************************************************************/
-
-void set_cf_facebook(char *const value)
-{
-  if (!emptynull_string(value))
-  {
-    up_string(value);
-    if (strcmp(value,"NO") == 0)
-      cf_facebook = false;
-    else if (strcmp(value,"YES") == 0)
-    {
-      if (
-              (c_facebook_ap_id     != NULL)
-           && (c_facebook_ap_secret != NULL)
-           && (c_facebook_user      != NULL)
-          )
-        cf_facebook = true;
-    }
-  }
-}
-
-/*************************************************************************/
 
 void set_c_url(const char *turl)
 {
@@ -570,9 +534,6 @@ static void globals_free(void)
   free(c_emailsubject);
   free(c_emailmsg);
   free(c_overview);
-  free(c_facebook_ap_id);
-  free(c_facebook_ap_secret);
-  free(c_facebook_user);
   free(c_adtag);
 }
 

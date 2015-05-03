@@ -89,7 +89,6 @@ static void	cb_edit_body			(FILE *,void *);
 static void	cb_edit_class			(FILE *,void *);
 static void	cb_edit_date			(FILE *,void *);
 static void	cb_edit_email			(FILE *,void *);
-static void	cb_edit_facebook		(FILE *,void *);
 static void	cb_edit_filter			(FILE *,void *);
 static void	cb_edit_status			(FILE *,void *);
 static void	cb_edit_title			(FILE *,void *);
@@ -181,7 +180,6 @@ static const struct chunk_callback  m_callbacks[] =
   { "edit.class"		, cb_edit_class			} ,
   { "edit.date"			, cb_edit_date			} ,
   { "edit.email"		, cb_edit_email			} ,
-  { "edit.facebook"		, cb_edit_facebook		} ,
   { "edit.filter"		, cb_edit_filter		} ,
   { "edit.status"		, cb_edit_status		} ,
   { "edit.title"		, cb_edit_title			} ,
@@ -1478,13 +1476,6 @@ static void cb_edit_email(FILE *out __attribute__((unused)),void *data __attribu
 
 /*******************************************************************/
 
-static void cb_edit_facebook(FILE *out __attribute ((unused)),void *data __attribute__ ((unused)))
-{
-  /* XXX */
-}
-
-/********************************************************************/
-
 static void cb_edit_filter(FILE *out __attribute__((unused)),void *data __attribute__((unused)))
 {
   /* XXX */
@@ -1630,13 +1621,12 @@ static void cb_generator(FILE *out,void *data __attribute__((unused)))
   
   fprintf(
     out,
-    "mod_blog %s, %s, %s, %s, %s"
+    "mod_blog %s, %s, %s, %s"
     "",
     PROG_VERSION,
     cgilib_version,
     LUA_RELEASE,
-    gdbm_version,
-    MBCURL_VERSION
+    gdbm_version
   );
 }
 

@@ -23,18 +23,15 @@
 
 .PHONY:	all clean tarball depend
 
-MB_CURL_VERSION = $(shell curl-config --version)
-MB_CURL_CFLAGS  = $(shell curl-config --cflags)
-MB_CURL_LDLIBS  = $(shell curl-config --libs)
 VERSION         = $(shell git describe --tag)
 
 CC      = gcc -std=c99
 CFLAGS  = -g -Wall -Wextra -pedantic
 LDFLAGS = -g
-LDLIBS  = -lgdbm -lcgi6 $(MB_CURL_LDLIBS) -llua -lm
+LDLIBS  = -lgdbm -lcgi6 -llua -lm -ldl
 SETUID  = /bin/chmod
 
-override CFLAGS  += -DMBCURL_VERSION='"$(MB_CURL_VERSION)"' -DPROG_VERSION='"$(VERSION)"' $(MB_CURL_CFLAGS)
+override CFLAGS  += -DPROG_VERSION='"$(VERSION)"' 
 override LDFLAGS += -rdynamic
 
 ###################################
@@ -97,8 +94,6 @@ build/src/cli_main.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
 build/src/cli_main.o: src/wbtum.h src/fix.h src/backend.h src/globals.h
 build/src/conversion.o: src/conversion.h src/fix.h src/frontend.h src/wbtum.h
 build/src/conversion.o: src/timeutil.h src/blog.h
-build/src/facebook.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
-build/src/facebook.o: src/backend.h src/globals.h
 build/src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
 build/src/globals.o: src/timeutil.h src/blog.h src/backend.h src/fix.h
 build/src/main.o: src/conf.h src/blog.h src/timeutil.h src/fix.h

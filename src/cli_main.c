@@ -172,14 +172,12 @@ int main_cli(int argc,char *argv[])
 		"\t\t%s\n"
 		"\t\t%s\n"
 		"\t\t%s\n"
-		"\t\t%s\n"
 		"\t* default value\n"
 		"",
 		argv[0],
 		cgilib_version,
 		LUA_RELEASE,
-		gdbm_version,
-		MBCURL_VERSION
+		gdbm_version
 	      );
 	   gd.req = NULL;
 	   return(EXIT_FAILURE);
@@ -237,7 +235,6 @@ static int cmd_cli_new(Request req)
   rc = entry_add(req);
   if (rc == 0)
   {
-    if (cf_facebook)    notify_facebook(req);
     if (cf_emailupdate) notify_emaillist();
     generate_pages(req);  
   }
@@ -347,7 +344,6 @@ static int mailfile_readdata(Request req)
   List    headers;
   char   *email;
   char   *filter;
-  char   *facebook;
   size_t  size;
 
   assert(req     != NULL);
@@ -363,7 +359,6 @@ static int mailfile_readdata(Request req)
   req->date   = PairListGetValue(&headers,"DATE");
   email       = PairListGetValue(&headers,"EMAIL");
   filter      = PairListGetValue(&headers,"FILTER");
-  facebook    = PairListGetValue(&headers,"FACEBOOK");
   
   if (req->author != NULL) req->author = strdup(req->author);
 
@@ -385,7 +380,6 @@ static int mailfile_readdata(Request req)
   if (req->date   != NULL) req->date = strdup(req->date);
   if (email       != NULL) set_cf_emailupdate(email);
   if (filter      != NULL) set_c_conversion(filter);
-  if (facebook    != NULL) set_cf_facebook(facebook);
   
   PairListFree(&headers);	/* got everything we need, dump this */
   
