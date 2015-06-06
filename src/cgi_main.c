@@ -411,7 +411,6 @@ static int cmd_cgi_post_show(Request req)
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
   generic_cb("main",req->out,&cbd);
 
-  BlogEntryFree(entry);
   return(0);  
 }
 
