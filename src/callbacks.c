@@ -38,7 +38,6 @@
 #include <unistd.h>
 
 #include <lua.h>
-#include <gdbm.h>
 
 #include <cgilib6/conf.h>
 #include <cgilib6/htmltok.h>
@@ -55,6 +54,10 @@
 #include "fix.h"
 #include "blogutil.h"
 #include "globals.h"
+
+#ifdef EMAIL_NOTIFY
+#  include <gdbm.h>
+#endif
 
 #define max(a,b)	((a) > (b)) ? (a) : (b)
 
@@ -1618,7 +1621,8 @@ static void cb_overview_list(FILE *out,void *data __attribute__((unused)))
 static void cb_generator(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
+
+#ifdef EMAIL_NOTIFY  
   fprintf(
     out,
     "mod_blog %s, %s, %s, %s"
@@ -1628,6 +1632,16 @@ static void cb_generator(FILE *out,void *data __attribute__((unused)))
     LUA_RELEASE,
     gdbm_version
   );
+#else
+  fprintf(
+    out,
+    "mod_blog %s, %s, %s"
+    "",
+    PROG_VERSION,
+    cgilib_version,
+    LUA_RELEASE
+  );
+#endif
 }
 
 /*********************************************************************/

@@ -37,7 +37,6 @@
 
 #include <getopt.h>
 #include <lua.h>
-#include <gdbm.h>
 
 #include <cgilib6/conf.h>
 #include <cgilib6/pair.h>
@@ -54,6 +53,10 @@
 #include "fix.h"
 #include "backend.h"
 #include "globals.h"
+
+#ifdef EMAIL_NOTIFY
+#  include <gdbm.h>
+#endif
 
 enum
 {
@@ -171,13 +174,17 @@ int main_cli(int argc,char *argv[])
 		"\tVersion: " GENERATOR "\n"
 		"\t\t%s\n"
 		"\t\t%s\n"
+#ifdef EMAIL_NOTIFY
 		"\t\t%s\n"
+#endif
 		"\t* default value\n"
 		"",
 		argv[0],
 		cgilib_version,
-		LUA_RELEASE,
-		gdbm_version
+		LUA_RELEASE
+#ifdef EMAIL_NOTIFY
+		,gdbm_version
+#endif
 	      );
 	   gd.req = NULL;
 	   return(EXIT_FAILURE);
