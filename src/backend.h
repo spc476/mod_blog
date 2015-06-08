@@ -25,19 +25,19 @@
 
 typedef struct template
 {
-  char    *template;
-  char    *file;
-  size_t   items;
-  int    (*pagegen)(const struct template *const restrict,FILE *const restrict,Blog const restrict);
-  bool     reverse;
-  bool     fullurl;
+  const char  *template;
+  const char  *file;
+  size_t       items;
+  int        (*pagegen)(const struct template *const restrict,FILE *const restrict,Blog const restrict);
+  bool         reverse;
+  bool         fullurl;
 } template__t;
 
 typedef struct aflink
 {
-  char   *proto;
-  size_t  psize;
-  char   *format;
+  const char *proto;
+  size_t      psize;
+  const char *format;
 } aflink__t;
 
 /************************************************/

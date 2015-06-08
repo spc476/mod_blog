@@ -52,44 +52,44 @@
 
 /***********************************************************/
 
-void	set_c_updatetype	(char *const);
-void	set_gf_emailupdate	(char *const);
-void	set_c_conversion	(char *const);
+void	set_c_updatetype	(const char *);
+void	set_gf_emailupdate	(const char *);
+void	set_c_conversion	(const char *);
 void	set_c_url		(const char *);
 
 static bool	   get_next	(char *,const char **);
 static int	   get_field	(lua_State *const restrict,const char *);
-static char       *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
+static const char *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
 static bool	   get_bool	(lua_State *const restrict,const char *const restrict,const bool);
 static void	   globals_free	(void);
 
 /************************************************************/
 
-char         *c_name;
-char         *c_basedir;
-char         *c_webdir;
+const char   *c_name;
+const char   *c_basedir;
+const char   *c_webdir;
 char         *c_baseurl;
 char         *c_fullbaseurl;
 char         *c_htmltemplates;
 int           c_days;
-char         *c_author;
-char         *c_email;
-char         *c_authorfile;
+const char   *c_author;
+const char   *c_email;
+const char   *c_authorfile;
 const char   *c_updatetype   = "NewEntry";
-char         *c_lockfile;
-char         *c_emaildb;
-char         *c_emailsubject;
-char         *c_emailmsg;
+const char   *c_lockfile;
+const char   *c_emaildb;
+const char   *c_emailsubject;
+const char   *c_emailmsg;
 int           c_tzhour;
 int           c_tzmin;
-char         *c_overview;
+const char  *c_overview;
 void	    (*c_conversion)(FILE *,FILE *) =  html_conversion;
 bool          cf_emailupdate = true;
 template__t  *c_templates;
 size_t        c_numtemplates;
 aflink__t    *c_aflinks;
 size_t        c_numaflinks;
-char         *c_adtag;
+const char   *c_adtag;
 
 lua_State     *g_L;
 const char    *g_templates;
@@ -150,22 +150,22 @@ int GlobalsInit(const char *conf)
     return -1;
   }
 
-  c_name               = get_string(g_L,"name",NULL);
-  c_basedir            = get_string(g_L,"basedir",NULL);
-  c_webdir             = get_string(g_L,"webdir",NULL);
-  c_lockfile           = get_string(g_L,"lockfile","/tmp/.mod_blog.lock");
-  c_overview           = get_string(g_L,"overview",NULL);
-  c_author             = get_string(g_L,"author.name",NULL);
-  c_email              = get_string(g_L,"author.email",NULL);
-  c_authorfile         = get_string(g_L,"author.file",NULL);
-  c_emaildb            = get_string(g_L,"email.list",NULL);
-  c_emailsubject       = get_string(g_L,"email.subject",NULL);
-  c_emailmsg           = get_string(g_L,"email.message",NULL);
-  c_adtag              = get_string(g_L,"adtag","programming");  
-  cf_emailupdate       = get_bool  (g_L,"email.notify",true);    
+  c_name         = get_string(g_L,"name",NULL);
+  c_basedir      = get_string(g_L,"basedir",NULL);
+  c_webdir       = get_string(g_L,"webdir",NULL);
+  c_lockfile     = get_string(g_L,"lockfile","/tmp/.mod_blog.lock");
+  c_overview     = get_string(g_L,"overview",NULL);
+  c_author       = get_string(g_L,"author.name",NULL);
+  c_email        = get_string(g_L,"author.email",NULL);
+  c_authorfile   = get_string(g_L,"author.file",NULL);
+  c_emaildb      = get_string(g_L,"email.list",NULL);
+  c_emailsubject = get_string(g_L,"email.subject",NULL);
+  c_emailmsg     = get_string(g_L,"email.message",NULL);
+  c_adtag        = get_string(g_L,"adtag","programming");  
+  cf_emailupdate = get_bool  (g_L,"email.notify",true);    
 
-  gf_debug             = get_bool  (g_L,"debug",false);  
-  gd.f.overview        = (c_overview != NULL);  
+  gf_debug       = get_bool  (g_L,"debug",false);  
+  gd.f.overview  = (c_overview != NULL);  
   
   if (c_emaildb == NULL)
     cf_emailupdate = false;
@@ -177,20 +177,10 @@ int GlobalsInit(const char *conf)
     c_tzhour = strtol(timezone,&p,10);
     p++;
     c_tzmin  = strtoul(p,NULL,10);
-    free((void *)timezone);
   }
   
-  {
-    const char *conversion = get_string(g_L,"conversion","html");
-    set_c_conversion((char *)conversion);
-    free((void *)conversion);
-  }
-  
-  {
-    const char *url = get_string(g_L,"url",NULL);
-    set_c_url(url);
-    free((void *)url);
-  }
+  set_c_conversion(get_string(g_L,"conversion","html"));
+  set_c_url       (get_string(g_L,"url",NULL));
   
   /*------------------------------------------------
   ; process the templates array
@@ -231,10 +221,10 @@ int GlobalsInit(const char *conf)
     lua_getfield(g_L,-4,"output");
     lua_getfield(g_L,-5,"items");
     
-    c_templates[i].template = strdup(lua_tostring(g_L,-5));
+    c_templates[i].template = lua_tostring(g_L,-5);
     c_templates[i].reverse  = lua_toboolean(g_L,-4);
     c_templates[i].fullurl  = lua_toboolean(g_L,-3);
-    c_templates[i].file     = strdup(lua_tostring(g_L,-2));
+    c_templates[i].file     = lua_tostring(g_L,-2);
 
     if (lua_isnumber(g_L,-1))
     {
@@ -300,8 +290,8 @@ int GlobalsInit(const char *conf)
       lua_getfield(g_L,-1,"proto");
       lua_getfield(g_L,-2,"link");
       
-      c_aflinks[i].proto  = strdup(lua_tolstring(g_L,-2,&c_aflinks[i].psize));
-      c_aflinks[i].format = strdup(lua_tostring(g_L,-1));
+      c_aflinks[i].proto  = lua_tolstring(g_L,-2,&c_aflinks[i].psize);
+      c_aflinks[i].format = lua_tostring(g_L,-1);
       
       lua_pop(g_L,3);
     }
@@ -324,20 +314,18 @@ int GlobalsInit(const char *conf)
 
 /********************************************************************/
 
-void set_c_updatetype(char *const value)
+void set_c_updatetype(const char *value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;
   
-  up_string(value);
-  
-  if (strcmp(value,"NEW") == 0)
+  if (strcmp(value,"new") == 0)
     c_updatetype = "NewEntry";
-  else if (strcmp(value,"MODIFY") == 0)
+  else if (strcmp(value,"modify") == 0)
     c_updatetype = "ModifiedEntry";
-  else if (strcmp(value,"EDIT") == 0)
+  else if (strcmp(value,"exit") == 0)
     c_updatetype = "ModifiedEntry";
-  else if (strcmp(value,"TEMPLATE") == 0)
+  else if (strcmp(value,"template") == 0)
     c_updatetype = "TemplateChange";
   else 
     c_updatetype = "Other";
@@ -345,31 +333,29 @@ void set_c_updatetype(char *const value)
 
 /************************************************************************/
 
-void set_cf_emailupdate(char *const value)
+void set_cf_emailupdate(const char *value)
 {
   if (value && !empty_string(value))
   {
-    up_string(value);
-    if (strcmp(value,"NO") == 0)
+    if (strcmp(value,"no") == 0)
       cf_emailupdate = false;
-    else if (strcmp(value,"YES") == 0)
+    else if (strcmp(value,"yes") == 0)
       cf_emailupdate = true;
   }
 }
 
 /***************************************************************************/
 
-void set_c_conversion(char *const value)
+void set_c_conversion(const char *value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;
-  up_string(value);
   
-  if (strcmp(value,"TEXT") == 0)
+  if (strcmp(value,"text") == 0)
     c_conversion = text_conversion;
-  else if (strcmp(value,"MIXED") == 0)
+  else if (strcmp(value,"mixed") == 0)
     c_conversion = mixed_conversion;
-  else if (strcmp(value,"HTML") == 0)
+  else if (strcmp(value,"html") == 0)
     c_conversion = html_conversion;
 }
 
@@ -455,21 +441,21 @@ static int get_field(
 
 /***********************************************************************/
 
-static char *get_string(
+static const char *get_string(
 	lua_State  *const restrict L,
 	const char *const restrict name,
 	const char *const restrict def
 )
 {
-  char *val;
+  const char *val;
   
   assert(L    != NULL);
   assert(name != NULL);
   
   if (get_field(L,name) != LUA_TSTRING)
-    val = (def != NULL) ? strdup(def) : NULL;
+    val = def;
   else
-    val = strdup(lua_tostring(L,-1));
+    val = lua_tostring(L,-1);
 
   lua_pop(L,1);
   return val;
@@ -504,36 +490,11 @@ static void globals_free(void)
   if (g_blog != NULL) BlogFree(g_blog);
   if (g_L    != NULL) lua_close(g_L);
 
-  for (size_t i = 0 ; i < c_numaflinks ; i++)
-  {
-    free(c_aflinks[i].format);
-    free(c_aflinks[i].proto);
-  }
-  free(c_aflinks);
-  
-  for (size_t i = 0 ; i < c_numtemplates; i++)
-  {
-    free(c_templates[i].template);
-    free(c_templates[i].file);
-  }
-  free(c_templates);
-    
-  free(c_name);
-  free(c_basedir);
-  free(c_webdir);
+  free(c_aflinks);  
+  free(c_templates);    
   free(c_baseurl);
   free(c_fullbaseurl);
   free(c_htmltemplates);
-  free(c_daypage);
-  free(c_author);
-  free(c_email);
-  free(c_authorfile);
-  free(c_lockfile);
-  free(c_emaildb);
-  free(c_emailsubject);
-  free(c_emailmsg);
-  free(c_overview);
-  free(c_adtag);
 }
 
 /***********************************************************************/
