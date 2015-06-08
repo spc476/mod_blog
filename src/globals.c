@@ -71,7 +71,6 @@ char         *c_webdir;
 char         *c_baseurl;
 char         *c_fullbaseurl;
 char         *c_htmltemplates;
-char         *c_daypage;
 int           c_days;
 char         *c_author;
 char         *c_email;

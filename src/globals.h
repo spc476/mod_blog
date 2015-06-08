@@ -51,7 +51,6 @@ extern const char *const          c_webdir;
 extern const char *const          c_baseurl;
 extern const char *const          c_fullbaseurl;
 extern const char *const          c_htmltemplates;
-extern const char *const          c_daypage;
 extern const int                  c_days;
 extern const char *const          c_author;
 extern const char *const          c_email;
