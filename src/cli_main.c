@@ -35,6 +35,7 @@
 #include <errno.h>
 #include <assert.h>
 
+#include <syslog.h>
 #include <getopt.h>
 #include <lua.h>
 
@@ -333,11 +334,39 @@ static int mail_setup_data(Request req)
   getline(&line,&size,req->in);	/* skip Unix 'From ' line */
   free(line);  
   
-  /*----------------------------------------------
-  ; skip the header section for now---just ignore it
-  ;-------------------------------------------------*/
+  /*----------------------------------------------------------------------
+  ; Recently in the past two months, entries have been sent that have been
+  ; encoded as "quoted-printable".  I'm not sure the exact conditions that
+  ; cause it (recents tests with known non-7bit clean content have been
+  ; passed through unencoded) but it is happening now that I've somewhat
+  ; changed how I write entries with quoted material.
+  ;
+  ; For now, check for the existence of the Content-Transfer-Encoding header
+  ; and if it's not '7bit', '8bit' or 'binary' (which are identity
+  ; encodings) then stop further processing and signal an error.
+  ;
+  ; At some future point, we might want to decode encoded entries sent via
+  ; email.
+  ;-----------------------------------------------------------------------*/
 
   RFC822HeadersRead(req->in,&headers);
+  
+  char *encoding = PairListGetValue(&headers,"CONTENT-TRANSFER-ENCODING");
+  if (encoding)
+  {
+    down_string(encoding);
+    if (
+            (strcmp(encoding,"7bit")   != 0)
+         && (strcmp(encoding,"8bit")   != 0)
+         && (strcmp(encoding,"binary") != 0)
+       )
+    {
+      syslog(LOG_ERR,"Content-Transfer-Encoding of '%s' not allowed!",encoding);
+      PairListFree(&headers);
+      return EINVAL;
+    }
+  }
+
   PairListFree(&headers);
 
   return(mailfile_readdata(req));
