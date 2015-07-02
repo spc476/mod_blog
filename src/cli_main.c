@@ -421,7 +421,7 @@ static int mailfile_readdata(Request req)
   
   if (authenticate_author(req) == false)
   {
-    fclose(req->in);
+    syslog(LOG_ERR,"'%s' not authorized to post",req->author);
     return(EPERM);
   }
   

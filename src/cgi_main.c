@@ -33,6 +33,7 @@
 #include <time.h>
 #include <assert.h>
 
+#include <syslog.h>
 #include <cgilib6/cgi.h>
 #include <cgilib6/util.h>
 
@@ -295,6 +296,7 @@ int main_cgi_post(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attrib
   if (authenticate_author(&req) == false)
   {
     gd.req = NULL;
+    syslog(LOG_ERR,"'%s' not authorized to post",req.author);
     return((*req.error)(&req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",req.author,CgiListGetValue(cgi,"author")));
   }
 
