@@ -1,3 +1,12 @@
+2015-07-04T01:19:00-05:00
+
+	Doing a "GET /boston.cgi HTTP/1.1" caused a crash in
+	cmd_cgi_get_show() because req->reqtumbler was NULL.  I fixed that
+	with a call to emptynull_string(), but now that causes the cached
+	pages to be regenerated, which is not correct.
+
+	I'll have to think on this a bit more.
+
 2015-07-02T00:32:00-05:00
 
 	author: Sean Connner

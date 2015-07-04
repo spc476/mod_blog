@@ -157,7 +157,7 @@ static int cmd_cgi_get_show(Request req)
   if (emptynull_string(status))
     status = strdup("200");
   
-  if ((empty_string(req->reqtumbler)) || (strcmp(req->reqtumbler,"/") == 0))
+  if ((emptynull_string(req->reqtumbler)) || (strcmp(req->reqtumbler,"/") == 0))
   {
     fprintf(
     	req->out,
