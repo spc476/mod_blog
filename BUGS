@@ -7,6 +7,11 @@
 
 	I'll have to think on this a bit more.
 
+	2015-07-06T17:52:00-05:00
+
+	Fixed.  When we get a NULL tumbler, an empty tumbler, or a tumbler
+	to '/', redirect to the base URL.
+
 2015-07-02T00:32:00-05:00
 
 	author: Sean Connner

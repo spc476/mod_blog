@@ -161,12 +161,19 @@ static int cmd_cgi_get_show(Request req)
   {
     fprintf(
     	req->out,
-	"Status: %s\r\n"
-    	"Content-type: text/html\r\n"
-    	"\r\n",
-    	status
-    );
-    rc = generate_pages(req);
+	"Status: %d\r\n"
+	"Location: %s\r\n"
+	"Content-type: text/html\r\n"
+	"\r\n"
+	"<HTML>\n"
+	"  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
+	"  <BODY><A HREF='%s'>Go here<A></BODY>\n"
+	"</HTML>\n",
+	HTTP_MOVEPERM,
+	c_fullbaseurl,
+	c_fullbaseurl
+      );
+    rc = 0;
   }
   else
   {
