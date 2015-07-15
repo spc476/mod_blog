@@ -651,22 +651,15 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
       baseurl = c_baseurl;
       
     /*---------------------------------------------------------
-    ; all this to reassign the value, without ``knowing'' how
-    ; the pair stuff actually works.  Perhaps add a PairReValue()
-    ; call or something?
-    ;-------------------------------------------------------------*/
-
-    /*---------------------------------------------------
-    ; check to see if baseurl ends in a '/', and if not, 
-    ; we then add one, otherwise, don't.
-    ;--------------------------------------------------*/
-
-    /*---------------------------------------------------------
-    ; XXX - Okay, isolated the bug.  If baseurl ends in a '/', and
-    ; src->value does not start with a '/', we end up with
-    ; a double '//'.  We need to make sure we canonicalize
-    ; all partial urls to either end in a '/', or not end in a
-    ; '/'.
+    ; all this to reassign the value, without ``knowing'' how the pair stuff
+    ; actually works.  Perhaps add a PairReValue() call or something?
+    ;
+    ; Anyway, check to see if baseurl ends in a '/', and if not, we then add
+    ; one, otherwise, don't.
+    ;
+    ; If baseurl ends in a '/', and src->value does not start with a '/', we
+    ; end up with a double '//'.  We need to make sure we canonicalize all
+    ; partial urls to either end in a '/', or not end in a '/'.
     ;----------------------------------------------------------*/
     
     if (src->value[0] == '/')
