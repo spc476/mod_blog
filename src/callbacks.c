@@ -870,8 +870,6 @@ static void cb_rss_item(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  /* XXX really?  This works?! */
-  
   for
   (
     entry = (BlogEntry)ListRemHead(&cbd->list);
