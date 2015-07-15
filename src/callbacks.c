@@ -911,7 +911,10 @@ static void cb_atom_entry(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  /* XXX really? What's going on here? */
+  /*----------------------------------------------------------------------
+  ; XXX---this code is identical to cb_rss_item(), except for which template
+  ; is being used.  Could possibly use some refactoring here ...
+  ;-----------------------------------------------------------------------*/
   
   for
   (
