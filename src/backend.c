@@ -284,12 +284,34 @@ int tumbler_page(FILE *out,Tumbler spec)
     end.day    = (tu1->entry[DAY]   == 0) ? nu2 = DAY   , max_monthday(end.year,end.month) : tu1->entry[DAY];
     end.part   = (tu1->entry[PART]  == 0) ? nu2 = PART  , 23                               : tu1->entry[PART];
     
-    /*---------------------------------------------------------------------
-    ; XXX---scan-build revealed that nu2 is not used, so it could be
-    ; removed.  But, in looking over the code, I think we want to set
-    ; gd.navunit to nu2 (which would make nu1 redundant).  I have to think
-    ; about this.
-    ;----------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------
+    ; XXX---scan-build (static analysis program) found that nu2 was not
+    ; being used.  By that metric, it should be removed, but I think I
+    ; finally figured out what I might have been thinking when I originally
+    ; wrote this code.
+    ; 
+    ; The whole point is to figure out what starting and ending points to
+    ; use.  nu1 is used to determine the starting segment, a YEAR, a MONTH,
+    ; a DAY, a PART, etc.  nu2 is used simularly, but for the ending point. 
+    ; What I do how is just use the part in the starting point for
+    ; pagination when thinking about it, I should use the smallest unit of
+    ; the two.  I'm not doing it now, as I'm not ready to debug this section
+    ; right yet.  Right now I'm just cleaning up some files, and as this is
+    ; the only outstanding problem left in the BUGS file, expanding this
+    ; comment means I can now get rid of the BUGS file.
+    ;
+    ; Besides, the remaining bugs in the codebase are marked with triple-X
+    ; so I can find the other problematic spots, and no longer use the BUGS
+    ; file (which may be a bad idea, but since I'm the only one using this,
+    ; hey, I can do what I want).
+    ;
+    ; Anyway, getting back to the bug---at some point, I'll test
+    ;
+    ;	gd.navunit = max(nu1,nu2);
+    ;
+    ; which may fix some outstanding "issues" with this code.  But not
+    ; today.
+    ;--------------------------------------------------------------------*/
     
     gd.navunit = nu1;
     
