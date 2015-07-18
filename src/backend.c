@@ -169,7 +169,7 @@ int pagegen_days(
     if (thisday.part == 0)
     {
       thisday.part = 23;
-      btm_sub_day(&thisday);
+      btm_dec_day(&thisday);
       if (added)
         days++;
       added = false;
@@ -435,14 +435,14 @@ static void calculate_previous(struct btm start)
             )
            gd.f.navprev = false;
          else
-	   btm_sub_month(&gd.previous);
+	   btm_dec_month(&gd.previous);
          break;
     case DAY:
          if (btm_cmp_date(&start,&g_blog->first) == 0)
            gd.f.navprev = false;
          else
          {
-           btm_sub_day(&gd.previous);
+           btm_dec_day(&gd.previous);
            
            while(btm_cmp(&gd.previous,&g_blog->first) > 0)
            {
@@ -451,7 +451,7 @@ static void calculate_previous(struct btm start)
              entry = BlogEntryRead(g_blog,&gd.previous);
              if (entry == NULL)
              {
-               btm_sub_day(&gd.previous);
+               btm_dec_day(&gd.previous);
                continue;
              }
              assert(entry->valid);
@@ -467,7 +467,7 @@ static void calculate_previous(struct btm start)
            gd.f.navprev = false;
          else
          {
-	   btm_sub_part(&gd.previous);
+	   btm_dec_part(&gd.previous);
 
            while(btm_cmp(&gd.previous,&g_blog->first) > 0)
            {
@@ -476,7 +476,7 @@ static void calculate_previous(struct btm start)
              entry = BlogEntryRead(g_blog,&gd.previous);
              if (entry == NULL)
              {
-	       btm_sub_part(&gd.previous);
+	       btm_dec_part(&gd.previous);
                continue;
              }
              assert(entry->valid);
@@ -513,14 +513,14 @@ static void calculate_next(struct btm end)
             )
            gd.f.navnext = false;
          else
-           btm_add_month(&gd.next);
+           btm_inc_month(&gd.next);
          break;
     case DAY:
          if (btm_cmp_date(&end,&g_blog->now) == 0)
            gd.f.navnext = false;
          else
          {
-           btm_add_day(&gd.next);
+           btm_inc_day(&gd.next);
 	   gd.next.part = 1;
            
            while(btm_cmp(&gd.next,&g_blog->now) <= 0)
@@ -530,7 +530,7 @@ static void calculate_next(struct btm end)
              entry = BlogEntryRead(g_blog,&gd.next);
              if (entry == NULL)
              {
-               btm_add_day(&gd.next);
+               btm_inc_day(&gd.next);
                continue;
              }
              assert(entry->valid);
@@ -556,7 +556,7 @@ static void calculate_next(struct btm end)
              if (entry == NULL)
              {
                gd.next.part = 1;
-               btm_add_day(&gd.next);
+               btm_inc_day(&gd.next);
                continue;
              }
              assert(entry->valid);

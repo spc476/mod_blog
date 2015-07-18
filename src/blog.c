@@ -357,7 +357,7 @@ void BlogEntryReadBetweenU(Blog blog,List *list,struct btm *start,struct btm *en
     else
     {
       start->part = 1;
-      btm_add_day(start);
+      btm_inc_day(start);
     }
   }
 }
@@ -420,7 +420,7 @@ void BlogEntryReadXD(Blog blog,List *list,struct btm *start,size_t num)
     if (start->part == 0)
     {
       start->part = 23;
-      btm_sub_day(start);
+      btm_dec_day(start);
     }
   }
 }
@@ -447,7 +447,7 @@ void BlogEntryReadXU(Blog blog,List *list,struct btm *start,size_t num)
     else
     {
       start->part = 1;
-      btm_add_day(start);
+      btm_inc_day(start);
     }
   }
 }

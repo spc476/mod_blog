@@ -36,11 +36,11 @@ struct btm
 /***********************************************************/
 
 extern int	max_monthday	(const int,const int);
-extern void	btm_add_day	(struct btm *const);
-extern void	btm_sub_part	(struct btm *const);
-extern void	btm_sub_day	(struct btm *const);
-extern void	btm_add_month	(struct btm *const);
-extern void	btm_sub_month	(struct btm *const);
+extern void	btm_inc_day	(struct btm *const);
+extern void	btm_dec_part	(struct btm *const);
+extern void	btm_dec_day	(struct btm *const);
+extern void	btm_dec_month	(struct btm *const);
+extern void	btm_inc_month	(struct btm *const);
 extern int	btm_cmp		(const struct btm *const restrict,const struct btm *const restrict);
 extern int	btm_cmp_date	(const struct btm *const restrict,const struct btm *const restrict);
 extern void	tm_init		(struct tm *const);

@@ -58,7 +58,7 @@ int max_monthday(const int year,const int month)
 
 /***************************************************************************/
 
-void btm_add_day(struct btm *const d)
+void btm_inc_day(struct btm *const d)
 {
   assert(d != NULL);
   
@@ -66,13 +66,13 @@ void btm_add_day(struct btm *const d)
   if (d->day > max_monthday(d->year,d->month))
   {
     d->day = 1;
-    btm_add_month(d);
+    btm_inc_month(d);
   }
 }
 
 /*************************************************************************/
 
-void btm_sub_part(struct btm *const d)
+void btm_dec_part(struct btm *const d)
 {
   assert(d != NULL);
   
@@ -80,26 +80,26 @@ void btm_sub_part(struct btm *const d)
   if (d->part == 0)
   {
     d->part = 23;
-    btm_sub_day(d);
+    btm_dec_day(d);
   }
 }
 
 /************************************************************************/
 
-void btm_sub_day(struct btm *const d)
+void btm_dec_day(struct btm *const d)
 {
   assert(d != NULL);
   d->day--;
   if (d->day == 0)
   {
-    btm_sub_month(d);
+    btm_dec_month(d);
     d->day = max_monthday(d->year,d->month);
   }
 }
 
 /***********************************************************************/
 
-void btm_add_month(struct btm *const d)
+void btm_inc_month(struct btm *const d)
 {
   assert(d != NULL);
   
@@ -113,7 +113,7 @@ void btm_add_month(struct btm *const d)
 
 /***********************************************************************/
 
-void btm_sub_month(struct btm *const d)
+void btm_dec_month(struct btm *const d)
 {
   assert(d != NULL);
   
