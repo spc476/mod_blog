@@ -24,6 +24,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <assert.h>
 
 #include "wbtum.h"
@@ -54,9 +55,13 @@ static bool parse_num(
   
   if (!isdigit(**p))
     return false;
-    
+  
   pv->txt = *p;
+  errno   = 0;
   val     = strtol(*p,(char **)p,10);
+  
+  if (errno != 0)
+    return false;
   
   if (val < (long)low)
     return false;
