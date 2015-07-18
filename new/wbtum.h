@@ -25,7 +25,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include "../src/timeutil.h"
+#include "timeutil.h"
 
 /**********************************************************************/
 
