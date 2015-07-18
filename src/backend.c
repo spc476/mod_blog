@@ -231,7 +231,7 @@ int tumbler_page(FILE *out,Tumbler spec)
 
   if (
        (tu1->entry[YEAR]) 
-       && (tu1->entry[YEAR] < (unsigned)g_blog->first.year)
+       && (tu1->entry[YEAR] < g_blog->first.year)
      ) 
     return(1);
   if (tu1->entry[MONTH]  > 12) return(1);
@@ -243,7 +243,7 @@ int tumbler_page(FILE *out,Tumbler spec)
   {
     if (
          (tu2->entry[YEAR] != 0)
-         && (tu2->entry[YEAR] < (unsigned)g_blog->first.year)
+         && (tu2->entry[YEAR] < g_blog->first.year)
        )
       return(1);
     if (tu2->entry[MONTH]  > 12) return(1);

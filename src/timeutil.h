@@ -27,23 +27,23 @@
 
 struct btm
 {
-  int          year;
-  unsigned int month;
-  unsigned int day;
-  unsigned int part;
+  int year;
+  int month;
+  int day;
+  int part;
 };
 
 /***********************************************************/
 
-extern unsigned int	 max_monthday	(const int,const unsigned int);
-extern void		 btm_add_day	(struct btm *const);
-extern void		 btm_sub_part	(struct btm *const);
-extern void		 btm_sub_day	(struct btm *const);
-extern void		 btm_add_month	(struct btm *const);
-extern void		 btm_sub_month	(struct btm *const);
-extern int		 btm_cmp	(const struct btm *const restrict,const struct btm *const restrict);
-extern int		 btm_cmp_date	(const struct btm *const restrict,const struct btm *const restrict);
-extern void		 tm_init	(struct tm *const);
+extern int	max_monthday	(const int,const int);
+extern void	btm_add_day	(struct btm *const);
+extern void	btm_sub_part	(struct btm *const);
+extern void	btm_sub_day	(struct btm *const);
+extern void	btm_add_month	(struct btm *const);
+extern void	btm_sub_month	(struct btm *const);
+extern int	btm_cmp		(const struct btm *const restrict,const struct btm *const restrict);
+extern int	btm_cmp_date	(const struct btm *const restrict,const struct btm *const restrict);
+extern void	tm_init		(struct tm *const);
 
 #endif
 
