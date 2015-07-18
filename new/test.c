@@ -4,6 +4,19 @@
 
 #include "wbtum.h"
 
+static const char *unit(unit__e u)
+{
+  switch(u)
+  {
+    case UNIT_YEAR:  return "year";
+    case UNIT_MONTH: return "month";
+    case UNIT_DAY:   return "day";
+    case UNIT_PART:  return "part";
+    case UNIT_INDEX: return "index";
+  }
+  return "(unknown)";
+}
+
 int main(int argc,char *argv[])
 {
   if (argc == 1)
@@ -31,8 +44,8 @@ int main(int argc,char *argv[])
             "\n",
             argv[1],
             rc           ? "true" : "false",
-            tum.start.year,tum.start.month,tum.start.day,tum.start.part,
-            tum.stop.year, tum.stop.month, tum.stop.day, tum.stop.part,
+            tum.start.year,tum.start.month,tum.start.day,tum.start.part,unit(tum.ustart),
+            tum.stop.year, tum.stop.month, tum.stop.day, tum.stop.part, unit(tum.ustop), 
             tum.file     ? "true" : "false",
             tum.redirect ? "true" : "false",
             tum.range    ? "true" : "false",
