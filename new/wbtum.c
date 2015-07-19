@@ -62,7 +62,6 @@ static bool parse_num(
   
   if (errno != 0)
     return false;
-  
   if (val < (long)low)
     return false;
   if (val > (long)high)
