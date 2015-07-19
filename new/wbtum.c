@@ -279,7 +279,7 @@ tumbler_new_range:
   
   segments++;
   
-  if (*text == '0')
+  if (*text == '\0')
     goto tumbler_new_calculate;
   
   if (*text == '.')
