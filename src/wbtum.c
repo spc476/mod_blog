@@ -105,7 +105,8 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   tum->start.year  = tum->stop.year  = 0;
   tum->start.month = tum->stop.month = 1;
   tum->start.day   = tum->stop.day   = 1;
-  tum->start.part  = tum->stop.part  = 1;
+  tum->start.part  = 1;
+  tum->stop.part   = INT_MAX;
   tum->ustart      = tum->ustop      = UNIT_YEAR;
   tum->segments    = 0;
   tum->file        = false;
