@@ -318,7 +318,7 @@ tumbler_new_range_part:
   
   assert(part     == false);
   assert(*text    == '.');
-  assert(segments >  1);
+  assert(segments >= 1);
   
   text++;
   
