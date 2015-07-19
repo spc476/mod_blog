@@ -1,6 +1,6 @@
 /*********************************************************************
 *
-* Copyright 2001 by Sean Conner.  All Rights Reserved.
+* Copyright 2015 by Sean Conner.  All Rights Reserved.
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -23,54 +23,35 @@
 #ifndef WBTUM_H
 #define WBTUM_H
 
-#include <stdint.h>
-#include <cgilib6/nodelist.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include "timeutil.h"
 
 /**********************************************************************/
 
-enum ttypes
+typedef enum unit__e
 {
-  TUMBLER_SINGLE,
-  TUMBLER_RANGE
-};
+  UNIT_YEAR,
+  UNIT_MONTH,
+  UNIT_DAY,
+  UNIT_PART,
+  UNIT_INDEX
+} unit__e;
 
-enum
+typedef struct tumbler__s
 {
-  YEAR,
-  MONTH,
-  DAY,
-  PART,
-  INDEX
-};
-
-typedef struct tt
-{
-  unsigned int file     : 1;
-  unsigned int redirect : 1;
-  unsigned int error    : 1;
-} TFlags;
-
-typedef struct tumbler
-{
-  size_t pairs;
-  TFlags flags;
-  List   units;
-} *Tumbler;
-
-typedef struct tumunit
-{
-  Node         node;
-  size_t       size;
-  enum ttypes  type;
-  int          entry[4];
-  char        *file;  
-} *TumblerUnit;
+  struct btm start;
+  struct btm stop;
+  unit__e    ustart;
+  unit__e    ustop;
+  bool       file;
+  bool       redirect;
+  bool       range;
+  char       filename[FILENAME_MAX];
+} tumbler__s;
 
 /***********************************************************************/
 
-extern int	 TumblerNew		(Tumbler *,char **);
-extern char	*TumblerCanonical	(Tumbler);
-extern int	 TumblerFree		(Tumbler *);
+extern bool tumbler_new (tumbler__s *,const char *);
 
 #endif
-
