@@ -281,7 +281,7 @@ tumbler_new_range:
   ; first unit
   ;---------------------*/
   
-  if (!parse_num(&u1,&text,1,ENTRY_MAX))
+  if (!parse_num(&u1,&text,1,INT_MAX))
     return false;
   
   tum->segments++;
@@ -306,7 +306,7 @@ tumbler_new_range:
   ; second unit
   ;------------------------------*/
   
-  if (!parse_num(&u2,&text,1,ENTRY_MAX))
+  if (!parse_num(&u2,&text,1,INT_MAX))
     return false;
   
   tum->segments++;
@@ -331,7 +331,7 @@ tumbler_new_range:
   ; third unit
   ;-----------------------------------*/
   
-  if (!parse_num(&u3,&text,1,ENTRY_MAX))
+  if (!parse_num(&u3,&text,1,INT_MAX))
     return false;
   
   tum->segments++;
@@ -354,7 +354,7 @@ tumbler_new_range_part:
   
   text++;
   
-  if (!parse_num(&u4,&text,1,ENTRY_MAX))
+  if (!parse_num(&u4,&text,1,INT_MAX))
     return false;
     
   tum->segments++;
