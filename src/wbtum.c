@@ -28,6 +28,7 @@
 #include <assert.h>
 
 #include "wbtum.h"
+#include "globals.h"
 
 /************************************************************************/
 
@@ -113,7 +114,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   ; parse year
   ;-------------------------------------------------*/
   
-  if (!parse_num(&u1,&text,1999,2200))
+  if (!parse_num(&u1,&text,g_blog->first.year,2200))
     return false;
   
   tum->start.year = tum->stop.year = u1.val;
@@ -349,7 +350,7 @@ tumbler_new_calculate:
   
   if (segments == 4)
   {
-    if ((u1.val < 1999) || (u1.val > 2200))
+    if ((u1.val < g_blog->first.year) || (u1.val > 2200))
       return false;
     
     if (u2.val > 12)
@@ -405,7 +406,7 @@ tumbler_new_calculate:
     }
     else
     {
-      if ((u1.val < 1999) || (u1.val > 2200))
+      if ((u1.val < g_blog->first.year) || (u1.val > 2200))
         return false;
       if (u2.val > 12)
         return false;
@@ -452,7 +453,7 @@ tumbler_new_calculate:
     }
     else
     {
-      if (u1.val >= 1999)
+      if (u1.val >= g_blog->first.year)
       {
         if (u1.val > 2200)
           return false;
@@ -498,7 +499,7 @@ tumbler_new_calculate:
     switch(tum->ustart)
     {
       case UNIT_YEAR:
-           if ((u1.val < 1999) || (u1.val > 2200))
+           if ((u1.val < g_blog->first.year) || (u1.val > 2200))
              return false;
              
            tum->stop.year  = u1.val;
