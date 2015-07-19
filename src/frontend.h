@@ -39,24 +39,24 @@ typedef struct rflags
 
 typedef struct request
 {
-  int     (*command)(struct request *);
-  int     (*error)  (struct request *,int,char *, ... );
-  RFlags    f;
-  Cgi       cgi;
-  FILE     *in;
-  FILE     *out;
-  char     *update;
-  char     *origauthor;
-  char     *author;
-  char     *name;
-  char     *title;
-  char     *class;
-  char     *status;
-  char     *date;
-  char     *origbody;
-  char     *body;
-  char     *reqtumbler;
-  Tumbler  tumbler;
+  int       (*command)(struct request *);
+  int       (*error)  (struct request *,int,char *, ... );
+  RFlags      f;
+  Cgi         cgi;
+  FILE       *in;
+  FILE       *out;
+  char       *update;
+  char       *origauthor;
+  char       *author;
+  char       *name;
+  char       *title;
+  char       *class;
+  char       *status;
+  char       *date;
+  char       *origbody;
+  char       *body;
+  char       *reqtumbler;
+  tumbler__s  tumbler;
 } *Request;  
 
 typedef struct dflags
