@@ -75,7 +75,7 @@ extern const size_t               c_numaflinks;
 extern const char *const          c_adtag;
 
 extern lua_State             *g_L;
-extern const char *           g_templates;	/* work on */
+extern const char            *g_templates;	/* work on */
 extern volatile bool          gf_debug;
 extern Blog                   g_blog;
 extern struct display         gd;		/* work on */
