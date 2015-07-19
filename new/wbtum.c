@@ -392,8 +392,8 @@ tumbler_new_calculate:
       if (u2.val > max_monthday(tum->stop.year,u1.val))
         return false;
       
-      tum->redirect |= (u1.val == 1)
-                    || (u2.val == 1)
+      tum->redirect |= (u1.len == 1)
+                    || (u2.len == 1)
                     || ((u4.len > 1) && (*u4.txt == '0'))
                     ;
                     
@@ -442,7 +442,7 @@ tumbler_new_calculate:
       if (u1.val > max_monthday(tum->stop.year,tum->stop.month))
         return false;
       
-      tum->redirect |= (u1.val == 1)
+      tum->redirect |= (u1.len == 1)
                     || ((u4.len > 1) && (*u4.txt == '0'))
                     ;
       tum->stop.day  = u1.val;
