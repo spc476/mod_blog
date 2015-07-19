@@ -73,7 +73,7 @@ typedef struct dflags
 typedef struct display
 {
   DFlags      f;
-  int         navunit;
+  unit__e     navunit;
   FILE       *htmldump;
   Cgi         cgi;
   Request     req;
