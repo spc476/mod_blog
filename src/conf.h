@@ -70,15 +70,5 @@
 
 #define EMAIL_NOTIFY
 
-/*-----------------------------------------------------------
-; Some features being worked on:
-;
-;	FEATURE_MULTI_TUMBLER		- support multiple tumbler requests
-;						(doesn't work)
-; At some point, these should all go away.  Hopefully.
-;----------------------------------------------------------------------*/
-
-#undef  FEATURE_MULTI_TUMBLER
-
 #endif
 
