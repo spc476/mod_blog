@@ -446,7 +446,7 @@ static int cli_error(Request req __attribute__((unused)),int level,char *msg, ..
 
   fputc('\n',stderr);
   
-  return -1;
+  return 1;
 }
 
 /**************************************************************************/
