@@ -57,8 +57,8 @@
 
 /*****************************************************************/
 
-static void	   calculate_previous		(struct btm);
-static void	   calculate_next		(struct btm);
+static void	   calculate_previous		(const struct btm);
+static void	   calculate_next		(const struct btm);
 static const char *mime_type			(const char *);
 static int	   display_file			(FILE *,tumbler__s *);
 static char       *tag_collect			(List *);
@@ -313,7 +313,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
 
 /******************************************************************/
 
-static void calculate_previous(struct btm start)
+static void calculate_previous(const struct btm start)
 {
   gd.previous = start;
 
@@ -395,7 +395,7 @@ static void calculate_previous(struct btm start)
 
 /******************************************************************/
 
-static void calculate_next(struct btm end)
+static void calculate_next(const struct btm end)
 {
   gd.next = end;
   
