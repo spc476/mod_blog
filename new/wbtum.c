@@ -185,6 +185,9 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   if (!parse_num(&u1,&text,1,INT_MAX))
     return false;
   
+  tum->start.part = tum->stop.part = u1.val;
+  tum->ustart     = tum->ustop     = UNIT_PART;
+  
   if ((u1.len > 1) && (*u1.txt == '0'))
     tum->redirect |= true;
   
