@@ -187,6 +187,108 @@ int pagegen_days(
 
 /************************************************************************/
 
+static void swap_endpoints(tumbler__s *tum)
+{
+  struct btm start;
+  struct btm stop;
+  
+  assert(tum         != NULL);
+  assert(tum->ustart != UNIT_YEAR);
+  assert(tum->ustart != UNIT_INDEX);
+  assert(tum->ustop  != UNIT_YEAR);
+  assert(tum->ustop  != UNIT_INDEX);
+  
+  /*--------------------------------------------------------------------
+  ; The best way to explain this is to give a bunch of examples.
+  ;	M = month D = day P = part
+  ;
+  ; 2000/12-09			MM
+  ;	2000/12/01.1 2000/09/30.23	2000/09/01.1 2000/12/31.23
+  ;
+  ; 2000/12-09/15		MD
+  ;	2000/12/01.1 2000/09/15.23	2000/09/15.1 2000/12/31.23
+  ;
+  ; 2000/12-09/15.2		MP
+  ;	2000/12/01.1 2000/09/15.2	2000/09/15.2 2000/12/31.23
+  ;
+  ; 2000/12/20-2000/09		DM
+  ;	2000/12/20.1 2000/09/30.23	2000/09/01.1 2000/12/20.23
+  ;
+  ; 2000/12/20-09/15		DD
+  ;	2000/12/20.1 2000/09/15.23	2000/09/15.1 2000/12/20.23
+  ;
+  ; 2000/12/20-09/15.2		DP
+  ;	2000/12/20.1 2000/09/15.2	2000/09/15.2 2000/12/20.23
+  ;
+  ; 2000/12/20.2-2000/09	PM
+  ;	2000/12/20.2 2000/09/30.23	2000/09/01.1 2000/12/20.2
+  ;
+  ; 2000/12/20.2-09/15		PD
+  ;	2000/12/20.2 2000/09/15.23	2000/09/15.1 2000/12/20.2
+  ;
+  ; 2000/12/20.2-09/15.3	PP
+  ;	2000/12/20.2 2000/09/15.3	2000/09/15.3 2000/12/20.2
+  ;
+  ; The year and the month are always swapped.
+  ;--------------------------------------------------------------------*/
+
+  start.year  = tum->stop.year;
+  start.month = tum->stop.month;  
+  stop.year   = tum->start.year;
+  stop.month  = tum->start.month;
+  
+  switch(tum->ustart)
+  {
+    case UNIT_MONTH:
+         stop.day  = max_monthday(stop.year,stop.month);
+         stop.part = ENTRY_MAX;
+         break;
+    
+    case UNIT_DAY:
+         stop.day  = tum->start.day;
+         stop.part = ENTRY_MAX;
+         break;
+    
+    case UNIT_PART:
+         stop.day  = tum->start.day;
+         stop.part = tum->start.part;
+         break;
+
+    case UNIT_YEAR:
+    case UNIT_INDEX:
+         assert(0);
+         break;
+  }
+  
+  switch(tum->ustop)
+  {
+    case UNIT_MONTH:
+         start.day   = 1;
+         start.part  = 1;
+         break;
+                
+    case UNIT_DAY:
+         start.day   = tum->stop.day;
+         start.part  = 1;
+         break;
+                
+    case UNIT_PART:
+         start.day   = tum->stop.day;
+         start.part  = tum->stop.part;
+         break;                
+
+    case UNIT_YEAR:
+    case UNIT_INDEX:
+         assert(0);
+         break;
+  }
+  
+  tum->start = start;
+  tum->stop  = stop;
+}
+
+/************************************************************************/
+
 int tumbler_page(FILE *out,tumbler__s *spec)
 {
   struct callback_data cbd;
@@ -246,23 +348,15 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   {
     if (btm_cmp(&spec->start,&spec->stop) > 0)
     {
-      struct btm tmp;
-      
-      gd.f.reverse = true;
-      tmp          = start;
-      start        = end;
-      end          = start;
-      
-      if ((start.part == ENTRY_MAX) && (end.part == 1))
-      {
-        start.part = 1;
-        end.part   = ENTRY_MAX;
-      }
+      tumbler__s newtum = *spec;
+      swap_endpoints(&newtum);
+      start        = newtum.start;
+      end          = newtum.stop;
+      gd.f.reverse = true;      
     }
   }
-
-  if (end.day > max_monthday(end.year,end.month))
-    return(1);
+  
+  assert(end.day <= max_monthday(end.year,end.month));
 
   /*---------------------------------------------------------------------
   ; Okay, sanity checking here ... These should be true once we hit this
