@@ -354,7 +354,7 @@ tumbler_new_range_part:
   
   text++;
   
-  if (!parse_num(&u4,&text,1,INT_MAX))
+  if (!parse_num(&u4,&text,1,ENTRY_MAX))
     return false;
     
   tum->segments++;
