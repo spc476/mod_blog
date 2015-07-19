@@ -320,6 +320,8 @@ tumbler_new_range_part:
   assert(*text    == '.');
   assert(segments >  1);
   
+  text++;
+  
   if (!parse_num(&u4,&text,1,INT_MAX))
     return false;
     
