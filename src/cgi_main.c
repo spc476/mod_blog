@@ -149,7 +149,7 @@ static int cmd_cgi_get_new(Request req)
 static int cmd_cgi_get_show(Request req)
 {
   char *status;
-  int   rc;
+  int   rc = -1;
   
   assert(req != NULL);
   
@@ -178,8 +178,7 @@ static int cmd_cgi_get_show(Request req)
   else
   {
     req->reqtumbler++;
-    rc = tumbler_new(&req->tumbler,req->reqtumbler);
-    if (rc == 0)
+    if (tumbler_new(&req->tumbler,req->reqtumbler))
     {
 
       if (req->tumbler.redirect)
@@ -231,6 +230,7 @@ static int cmd_cgi_get_show(Request req)
   }
   
   free(status);
+  assert(rc != -1);
   return(rc);
 }
 

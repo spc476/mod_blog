@@ -254,7 +254,7 @@ static int cmd_cli_new(Request req)
 
 static int cmd_cli_show(Request req)
 {
-  int rc;
+  int rc = -1;
   
   assert(req            != NULL);
   assert(req->f.emailin == false);
@@ -278,8 +278,7 @@ static int cmd_cli_show(Request req)
     }
     else
     {
-      rc = tumbler_new(&req->tumbler,req->reqtumbler);
-      if (rc == 0)
+      if (tumbler_new(&req->tumbler,req->reqtumbler))
       {
         if (req->tumbler.redirect)
         {
@@ -295,6 +294,7 @@ static int cmd_cli_show(Request req)
     }
   }
 
+  assert(rc != -1);
   return(rc);
 }
 
