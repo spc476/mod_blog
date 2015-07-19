@@ -168,7 +168,7 @@ int pagegen_days(
     thisday.part--;
     if (thisday.part == 0)
     {
-      thisday.part = 23;
+      thisday.part = ENTRY_MAX;
       btm_dec_day(&thisday);
       if (added)
         days++;
@@ -253,10 +253,10 @@ int tumbler_page(FILE *out,tumbler__s *spec)
       start        = end;
       end          = start;
       
-      if ((start.part == INT_MAX) && (end.part == 1))
+      if ((start.part == ENTRY_MAX) && (end.part == 1))
       {
         start.part = 1;
-        end.part   = INT_MAX;
+        end.part   = ENTRY_MAX;
       }
     }
   }
@@ -289,20 +289,11 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   /*-------------------------------------------------------------------------
   ; okay, resume processing ... bound against the starting time of the blog,
   ; and the current time.
-  ;------------------------------------------------------------------------*/
-  
-  if (btm_cmp(&start,&g_blog->first) < 0)
-    start = g_blog->first;
-  if (btm_cmp(&end,&g_blog->now) > 0)
-    end = g_blog->now;
-  
-  /*-----------------------------------------------------------------------
+  ;    
   ; From here on out, it's pretty straight forward.  read a day, if it has
   ; entries, add it to the list, otherwise, continue on, advancing (or
   ; retreading) the days as we go ...
-  ;----------------------------------------------------------------------*/
-
-  /*-----------------------------------------------------------
+  ;
   ; these four lines replaced 65 very confused lines of code.
   ;-----------------------------------------------------------*/
   

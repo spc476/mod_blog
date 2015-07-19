@@ -27,6 +27,7 @@
 #include <assert.h>
 
 #include "timeutil.h"
+#include "wbtum.h"
 
 /*************************************************************************/
 
@@ -79,7 +80,7 @@ void btm_dec_part(struct btm *const d)
   d->part--;
   if (d->part == 0)
   {
-    d->part = 23;
+    d->part = ENTRY_MAX;
     btm_dec_day(d);
   }
 }

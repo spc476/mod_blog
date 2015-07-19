@@ -127,7 +127,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   tum->ustart      = tum->ustop     = UNIT_YEAR;
   tum->stop.month  = 12;
   tum->stop.day    = 31;
-  tum->stop.part   = INT_MAX;
+  tum->stop.part   = ENTRY_MAX;
   
   if (*text == '\0')
     return true;
@@ -161,7 +161,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
              )
         );
   assert(tum->start.part == 1);
-  assert(tum->stop.part  == INT_MAX);
+  assert(tum->stop.part  == ENTRY_MAX);
   
   tum->start.month = tum->stop.month = u1.val;
   tum->ustart      = tum->ustop      = UNIT_MONTH;
@@ -221,7 +221,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   ; parse part
   ;-----------------------------*/
   
-  if (!parse_num(&u1,&text,1,INT_MAX))
+  if (!parse_num(&u1,&text,1,ENTRY_MAX))
     return false;
   
   if ((tum->start.year == g_blog->now.year) && (u1.val > g_blog->now.part))
@@ -281,7 +281,7 @@ tumbler_new_range:
   ; first unit
   ;---------------------*/
   
-  if (!parse_num(&u1,&text,1,INT_MAX))
+  if (!parse_num(&u1,&text,1,ENTRY_MAX))
     return false;
   
   tum->segments++;
@@ -306,7 +306,7 @@ tumbler_new_range:
   ; second unit
   ;------------------------------*/
   
-  if (!parse_num(&u2,&text,1,INT_MAX))
+  if (!parse_num(&u2,&text,1,ENTRY_MAX))
     return false;
   
   tum->segments++;
@@ -331,7 +331,7 @@ tumbler_new_range:
   ; third unit
   ;-----------------------------------*/
   
-  if (!parse_num(&u3,&text,1,INT_MAX))
+  if (!parse_num(&u3,&text,1,ENTRY_MAX))
     return false;
   
   tum->segments++;
@@ -354,7 +354,7 @@ tumbler_new_range_part:
   
   text++;
   
-  if (!parse_num(&u4,&text,1,INT_MAX))
+  if (!parse_num(&u4,&text,1,ENTRY_MAX))
     return false;
     
   tum->segments++;
@@ -447,7 +447,7 @@ tumbler_new_calculate:
       tum->stop.year  = u1.val;
       tum->stop.month = u2.val;
       tum->stop.day   = u3.val;
-      tum->stop.part  = INT_MAX;
+      tum->stop.part  = ENTRY_MAX;
       return true;
     }
   }
@@ -495,7 +495,7 @@ tumbler_new_calculate:
         tum->stop.year   = u1.val;
         tum->stop.month  = u2.val;
         tum->stop.day    = max_monthday(tum->stop.year,tum->stop.month);
-        tum->stop.part   = INT_MAX;
+        tum->stop.part   = ENTRY_MAX;
         tum->ustop       = UNIT_MONTH;
         return true;
       }
@@ -512,7 +512,7 @@ tumbler_new_calculate:
                       
         tum->stop.month = u1.val;
         tum->stop.day   = u2.val;
-        tum->stop.part  = INT_MAX;
+        tum->stop.part  = ENTRY_MAX;
         tum->ustop      = UNIT_DAY;
         return true;
         
@@ -536,7 +536,7 @@ tumbler_new_calculate:
            tum->stop.year  = u1.val;
            tum->stop.month = 12;
            tum->stop.day   = 31; /* there are always 31 days in Debtember */
-           tum->stop.part  = INT_MAX;
+           tum->stop.part  = ENTRY_MAX;
            tum->ustop      = UNIT_YEAR;
            return true;
            
@@ -547,7 +547,7 @@ tumbler_new_calculate:
            tum->redirect   |= (u1.len == 1);
            tum->stop.month  = u1.val;
            tum->stop.day    = max_monthday(tum->stop.year,tum->stop.month);
-           tum->stop.part   = INT_MAX;
+           tum->stop.part   = ENTRY_MAX;
            tum->ustop       = UNIT_MONTH;
            return true;
            
@@ -557,7 +557,7 @@ tumbler_new_calculate:
            
            tum->redirect  |= (u1.len == 1);
            tum->stop.day   = u1.val;
-           tum->stop.part  = INT_MAX;
+           tum->stop.part  = ENTRY_MAX;
            tum->ustop      = UNIT_DAY;
            return true;
            

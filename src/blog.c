@@ -419,7 +419,7 @@ void BlogEntryReadXD(Blog blog,List *list,struct btm *start,size_t num)
     start->part--;
     if (start->part == 0)
     {
-      start->part = 23;
+      start->part = ENTRY_MAX;
       btm_dec_day(start);
     }
   }

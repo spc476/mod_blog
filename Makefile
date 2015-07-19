@@ -98,5 +98,6 @@ build/src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
 build/src/globals.o: src/timeutil.h src/blog.h src/backend.h src/fix.h
 build/src/main.o: src/conf.h src/blog.h src/timeutil.h src/fix.h
 build/src/main.o: src/frontend.h src/wbtum.h src/backend.h src/globals.h
-build/src/timeutil.o: src/timeutil.h
-build/src/wbtum.o: src/conf.h src/wbtum.h
+build/src/timeutil.o: src/timeutil.h src/wbtum.h
+build/src/wbtum.o: src/wbtum.h src/timeutil.h src/globals.h src/frontend.h
+build/src/wbtum.o: src/blog.h src/backend.h
