@@ -227,7 +227,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   assert(spec->stop.month >   0);
   assert(spec->stop.month <  13);
   assert(spec->stop.day   >   0);
-  assert(spec->stop.day   <= max_monthday(spec->start.year,spec->start.month));
+  assert(spec->stop.day   <= max_monthday(spec->stop.year,spec->stop.month));
 
   start = spec->start;
   end   = spec->stop;
