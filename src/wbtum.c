@@ -562,6 +562,9 @@ tumbler_new_calculate:
            return true;
            
       case UNIT_PART:
+           if (u1.val > ENTRY_MAX)
+             return false;
+           
            tum->redirect  |= ((u1.len > 1) && (*u1.txt == '0'));
            tum->stop.part  = u1.val;
            tum->ustop      = UNIT_PART;
