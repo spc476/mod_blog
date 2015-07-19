@@ -60,7 +60,7 @@
 static void	   calculate_previous		(struct btm);
 static void	   calculate_next		(struct btm);
 static const char *mime_type			(const char *);
-static int	   display_file			(FILE *,Tumbler);
+static int	   display_file			(FILE *,tumbler__s *);
 static char       *tag_collect			(List *);
 static char	  *tag_pick                     (const char *);
 static void	   free_entries			(List *);
@@ -187,175 +187,76 @@ int pagegen_days(
 
 /************************************************************************/
 
-int tumbler_page(FILE *out,Tumbler spec)
+int tumbler_page(FILE *out,tumbler__s *spec)
 {
-  struct btm            start;
-  struct btm            end;
-  TumblerUnit           tu1;
-  TumblerUnit           tu2;
-  int                   nu1;
-  int                   nu2;
-  char                 *tags;
-  struct callback_data  cbd;
+  struct callback_data cbd;
+  struct btm           start;
+  struct btm           end;
+  char                *tags;
   
   assert(out  != NULL);
   assert(spec != NULL);
   
-  gd.f.fullurl = false;
+  gd.f.fullurl = false; /* XXX why? */
   
-  /*---------------------------------------------------------
-  ; easy checks first.  Get these out of the way ... 
-  ;---------------------------------------------------------*/
+  if (spec->redirect)
+    return HTTP_NOTIMP;
   
-  if (spec->flags.error)
-    return(HTTP_NOTFOUND);
-  
-  if (spec->flags.redirect)
-    return(HTTP_NOTIMP);
-  
-  if (spec->flags.file)
+  if (spec->file)
   {
     display_file(out,spec);
-    return 0;	/* XXX hack for now */
+    return 0; /* XXX hack for now */
   }
-
-  memset(&cbd,0,sizeof(struct callback_data));
+  
+  memset(&cbd,0,sizeof(cbd));
   ListInit(&cbd.list);
   
-  tu1 = (TumblerUnit)ListGetHead(&spec->units);
-  tu2 = (TumblerUnit)NodeNext(&tu1->node);
-  
-  /*-----------------------------------------------------
-  ; validate input tumbler from user.  
-  ;----------------------------------------------------*/
-
-  if (
-       (tu1->entry[YEAR]) 
-       && (tu1->entry[YEAR] < g_blog->first.year)
-     ) 
-    return(1);
-  if (tu1->entry[MONTH]  > 12) return(1);
-  if ((tu1->entry[MONTH] == 0) && (tu1->entry[DAY])) return(1);
-  if ((tu1->entry[MONTH]) && (tu1->entry[DAY] > max_monthday(tu1->entry[YEAR],tu1->entry[MONTH])))
-    return(1);
-
-  if (tu1->type == TUMBLER_RANGE)
-  {
-    if (
-         (tu2->entry[YEAR] != 0)
-         && (tu2->entry[YEAR] < g_blog->first.year)
-       )
-      return(1);
-    if (tu2->entry[MONTH]  > 12) return(1);
-    if ((tu2->entry[MONTH] == 0) && (tu2->entry[DAY])) return(1);
-    if ((tu2->entry[MONTH]) && (tu2->entry[DAY]   > max_monthday(tu2->entry[YEAR],tu2->entry[MONTH])))
-      return(1);
-  }
-
-  /*------------------------------------------------------------------------
-  ; I junked the use of struct tm as it was just too error prone.  I defined
-  ; a struct btm with only the fields I need, and with the definitions I
-  ; required.
-  ;
-  ; The tumbler code will set unspecified fields to 0.  In this case, we
-  ; want to start with minimum legal values.
-  ;-----------------------------------------------------------------------*/
-
-  nu1         = PART;
-  start.part  = (tu1->entry[PART]  == 0) ? nu1 = DAY     , 1                  : tu1->entry[PART];
-  start.day   = (tu1->entry[DAY]   == 0) ? nu1 = MONTH   , 1                  : tu1->entry[DAY];
-  start.month = (tu1->entry[MONTH] == 0) ? nu1 = YEAR    , 1                  : tu1->entry[MONTH];
-  start.year  = (tu1->entry[YEAR]  == 0) ? nu1 = YEAR    , g_blog->first.year : (int)tu1->entry[YEAR];
-  
-  if (start.day > max_monthday(start.year,start.month))
-    return(1);				/* invalid day */
-
-  /*------------------------------------------------------------------------
-  ; Make some things easier if for a single request, we set a range and let
-  ; the result fall out of normal processing.
+  /*----------------------------------------------------------------------
+  ; from here to the comment about sanity checking replaced around 100 very
+  ; confused lines of code.  The tumbler code now does more checking of data
+  ; than the old version, so a lot of code was removed.
   ;-----------------------------------------------------------------------*/
   
-  if (tu1->type == TUMBLER_SINGLE)
+  assert(spec->start.year  >= g_blog->first.year);
+  assert(spec->start.month >   0);
+  assert(spec->start.month <  13);
+  assert(spec->start.day   >   0);
+  assert(spec->start.day   <= max_monthday(spec->start.year,spec->start.month));
+
+  assert(spec->stop.year  >= g_blog->first.year);
+  assert(spec->stop.month >   0);
+  assert(spec->stop.month <  13);
+  assert(spec->stop.day   >   0);
+  assert(spec->stop.day   <= max_monthday(spec->start.year,spec->start.month));
+
+  start = spec->start;
+  end   = spec->stop;
+  
+  if (!spec->range)
   {
     gd.f.navigation = true;
-    nu2        = PART;
-    end.year   = (tu1->entry[YEAR]  == 0) ? nu2 = YEAR  , g_blog->now.year                 : (int)tu1->entry[YEAR];
-    end.month  = (tu1->entry[MONTH] == 0) ? nu2 = MONTH , 12                               : tu1->entry[MONTH];
-    end.day    = (tu1->entry[DAY]   == 0) ? nu2 = DAY   , max_monthday(end.year,end.month) : tu1->entry[DAY];
-    end.part   = (tu1->entry[PART]  == 0) ? nu2 = PART  , 23                               : tu1->entry[PART];
-    
-    /*--------------------------------------------------------------------
-    ; XXX---scan-build (static analysis program) found that nu2 was not
-    ; being used.  By that metric, it should be removed, but I think I
-    ; finally figured out what I might have been thinking when I originally
-    ; wrote this code.
-    ; 
-    ; The whole point is to figure out what starting and ending points to
-    ; use.  nu1 is used to determine the starting segment, a YEAR, a MONTH,
-    ; a DAY, a PART, etc.  nu2 is used simularly, but for the ending point. 
-    ; What I do how is just use the part in the starting point for
-    ; pagination when thinking about it, I should use the smallest unit of
-    ; the two.  I'm not doing it now, as I'm not ready to debug this section
-    ; right yet.  Right now I'm just cleaning up some files, and as this is
-    ; the only outstanding problem left in the BUGS file, expanding this
-    ; comment means I can now get rid of the BUGS file.
-    ;
-    ; Besides, the remaining bugs in the codebase are marked with triple-X
-    ; so I can find the other problematic spots, and no longer use the BUGS
-    ; file (which may be a bad idea, but since I'm the only one using this,
-    ; hey, I can do what I want).
-    ;
-    ; Anyway, getting back to the bug---at some point, I'll test
-    ;
-    ;	gd.navunit = max(nu1,nu2);
-    ;
-    ; which may fix some outstanding "issues" with this code.  But not
-    ; today.
-    ;--------------------------------------------------------------------*/
-    
-    gd.navunit = nu1;
-    
+    gd.navunit      = spec->ustart > spec->ustop
+                    ? spec->ustart
+                    : spec->ustop
+                    ;
     calculate_previous(start);
     calculate_next(end);
   }
   else
   {
-    /*----------------------------------------------------------------------
-    ; fix the ending date.  In this case, the unspecified fields will be set
-    ; to the their maximum legal value.
-    ;---------------------------------------------------------------------*/
-    
-    end.year  = (tu2->entry[YEAR]  == 0) ? g_blog->now.year                 : (int)tu2->entry[YEAR];
-    end.month = (tu2->entry[MONTH] == 0) ? 12                               : tu2->entry[MONTH];
-    end.day   = (tu2->entry[DAY]   == 0) ? max_monthday(end.year,end.month) : tu2->entry[DAY];
-    end.part  = (tu2->entry[PART]  == 0) ? 23                               : tu2->entry[PART];
-    
-    /*------------------------------------------------------------------------
-    ; swap tumblers if required.  If the parts are the default values, swap
-    ; them, as they probably weren't specified and need swapping as well.
-    ;
-    ; Example:
-    ;
-    ;     2000/02/04    - 01/26 
-    ;  -> 2000/02/04.1  - 2000/01/26.23
-    ;  -> 2000/01/26.23 - 2000/02/04.1
-    ;  -> 2000/01/26.1  - 2000/02/04.23
-    ;
-    ;-----------------------------------------------------------------------*/
-    
-    if (btm_cmp(&start,&end) > 0)
+    if (btm_cmp(&spec->start,&spec->stop) > 0)
     {
       struct btm tmp;
       
       gd.f.reverse = true;
-      tmp   = start;
-      start = end;
-      end   = tmp;
+      tmp          = start;
+      start        = end;
+      end          = start;
       
-      if ((start.part == 23) && (end.part == 1))
+      if ((start.part == INT_MAX) && (end.part == 1))
       {
         start.part = 1;
-        end.part = 23;
+        end.part   = INT_MAX;
       }
     }
   }
@@ -379,6 +280,11 @@ int tumbler_page(FILE *out,Tumbler spec)
   assert(end.month <= 12);
   assert(end.day   >= 1);
   assert(end.day   <= max_monthday(end.year,end.month));
+  
+  assert(start.year  <= end.year);
+  assert(start.month <= end.month);
+  assert(start.day   <= end.day);
+  assert(start.part  <= end.part);
   
   /*-------------------------------------------------------------------------
   ; okay, resume processing ... bound against the starting time of the blog,
@@ -411,7 +317,7 @@ int tumbler_page(FILE *out,Tumbler spec)
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
   free(cbd.adtag);
-  return(0);
+  return(0);  
 }
 
 /******************************************************************/
@@ -422,13 +328,14 @@ static void calculate_previous(struct btm start)
 
   switch(gd.navunit)
   {
-    case YEAR:
+    case UNIT_YEAR:
          if (start.year == g_blog->first.year)
            gd.f.navprev = false;
          else
            gd.previous.year = start.year - 1;
          break;
-    case MONTH:
+
+    case UNIT_MONTH:
          if (
               (start.year == g_blog->first.year) 
               && (start.month == g_blog->first.month)
@@ -437,7 +344,8 @@ static void calculate_previous(struct btm start)
          else
 	   btm_dec_month(&gd.previous);
          break;
-    case DAY:
+
+    case UNIT_DAY:
          if (btm_cmp_date(&start,&g_blog->first) == 0)
            gd.f.navprev = false;
          else
@@ -462,7 +370,8 @@ static void calculate_previous(struct btm start)
            gd.f.navprev = false;
          }
          break;
-    case PART:
+
+    case UNIT_PART:
          if (btm_cmp(&start,&g_blog->first) == 0)
            gd.f.navprev = false;
          else
@@ -487,6 +396,7 @@ static void calculate_previous(struct btm start)
            gd.f.navprev = false;
          }
          break;
+
     default:
          assert(0);
   }
@@ -500,13 +410,14 @@ static void calculate_next(struct btm end)
   
   switch(gd.navunit)
   {
-    case YEAR:
+    case UNIT_YEAR:
          if (end.year == g_blog->now.year)
            gd.f.navnext = false;
          else
            gd.next.year  = end.year + 1;
          break;
-    case MONTH:
+
+    case UNIT_MONTH:
          if (
               (end.year == g_blog->now.year) 
               && (end.month == g_blog->now.month)
@@ -515,7 +426,8 @@ static void calculate_next(struct btm end)
          else
            btm_inc_month(&gd.next);
          break;
-    case DAY:
+
+    case UNIT_DAY:
          if (btm_cmp_date(&end,&g_blog->now) == 0)
            gd.f.navnext = false;
          else
@@ -541,7 +453,8 @@ static void calculate_next(struct btm end)
            gd.f.navnext = false;
          }
          break;
-    case PART:
+
+    case UNIT_PART:
          if (btm_cmp(&end,&g_blog->now) == 0)
            gd.f.navnext = false;
 	 else
@@ -566,6 +479,7 @@ static void calculate_next(struct btm end)
            gd.f.navnext = false;
 	 }
          break;
+
     default:
          assert(0);
   }
@@ -768,25 +682,23 @@ static const char *mime_type(const char *filename)
 
 /******************************************************************/
 
-static int display_file(FILE * out,Tumbler spec)
+static int display_file(FILE *out,tumbler__s *spec)
 {
-  TumblerUnit tu;
-  char        fname[FILENAME_MAX];
+  char fname[FILENAME_MAX];
   
   assert(out  != NULL);
   assert(spec != NULL);
 
-  tu = (TumblerUnit)ListGetHead(&spec->units);
-  
-  sprintf(
-           fname,
-           "%4d/%02d/%02d/%s",
-           tu->entry[YEAR],
-           tu->entry[MONTH],
-           tu->entry[DAY],
-           tu->file
-         );
-         
+  snprintf(
+      fname,
+      sizeof(fname),
+      "%4d/%02d/%02d/%s",
+      spec->start.year,
+      spec->start.month,
+      spec->start.day,
+      spec->filename
+  );
+    
   if (gd.cgi)
   {
     struct stat  status;
@@ -813,7 +725,7 @@ static int display_file(FILE * out,Tumbler spec)
       return(1);
     }
     
-    type = mime_type(tu->file);
+    type = mime_type(spec->filename);
 
     if (strcmp(type,"text/x-html") == 0)
     {

@@ -20,10 +20,13 @@
 *
 **********************************************************************/
 
+#define _GNU_SOURCE
+
 #include <ctype.h>
 #include <limits.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <assert.h>
 
@@ -94,8 +97,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   struct value u2;
   struct value u3;
   struct value u4;
-  int          segments = 0;
-  bool         part     = false;
+  bool         part = false;
   
   assert(tum  != NULL);
   assert(text != NULL);
@@ -105,6 +107,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   tum->start.day   = tum->stop.day   = 1;
   tum->start.part  = tum->stop.part  = 1;
   tum->ustart      = tum->ustop      = UNIT_YEAR;
+  tum->segments    = 0;
   tum->file        = false;
   tum->redirect    = false;
   tum->range       = false;
@@ -253,7 +256,7 @@ tumbler_new_range:
   if (!parse_num(&u1,&text,1,INT_MAX))
     return false;
   
-  segments++;
+  tum->segments++;
   
   if (*text == '\0')
     goto tumbler_new_calculate;
@@ -278,7 +281,7 @@ tumbler_new_range:
   if (!parse_num(&u2,&text,1,INT_MAX))
     return false;
   
-  segments++;
+  tum->segments++;
   
   if (*text == '\0')
     goto tumbler_new_calculate;
@@ -303,7 +306,7 @@ tumbler_new_range:
   if (!parse_num(&u3,&text,1,INT_MAX))
     return false;
   
-  segments++;
+  tum->segments++;
   
   if (*text == '\0')
     goto tumbler_new_calculate;
@@ -317,16 +320,16 @@ tumbler_new_range:
 
 tumbler_new_range_part:
   
-  assert(part     == false);
-  assert(*text    == '.');
-  assert(segments >= 1);
+  assert(part          == false);
+  assert(*text         == '.');
+  assert(tum->segments >= 1);
   
   text++;
   
   if (!parse_num(&u4,&text,1,INT_MAX))
     return false;
     
-  segments++;
+  tum->segments++;
   part = true;
   
   if ((u4.len > 1) && (*u4.txt == '0'))
@@ -348,7 +351,7 @@ tumbler_new_range_part:
 
 tumbler_new_calculate:
   
-  if (segments == 4)
+  if (tum->segments == 4)
   {
     if ((u1.val < g_blog->first.year) || (u1.val > 2200))
       return false;
@@ -384,7 +387,7 @@ tumbler_new_calculate:
   ; The first is when part is false.  This is a fairly easy case to handle.
   ;-----------------------------------------------------------------------*/
   
-  else if (segments == 3)
+  else if (tum->segments == 3)
   {
     if (part)
     {
@@ -436,7 +439,7 @@ tumbler_new_calculate:
   ; time soon.
   ;------------------------------------------------------------------------*/
   
-  else if (segments == 2)
+  else if (tum->segments == 2)
   {
     if (part)
     {
@@ -543,6 +546,130 @@ tumbler_new_calculate:
   }
   
   return false;
+}
+
+/************************************************************************/
+
+char *tumbler_canonical(tumbler__s *tum)
+{
+  char  start[32];
+  char  stop [32];
+  char *ret;
+  int   rc;
+  
+  assert(tum != NULL);
+  
+  if (tum->file)
+  {
+    rc = asprintf(
+                   &ret,
+                   "%d/%02d/%02d/%s",
+                   tum->start.year,
+                   tum->start.month,
+                   tum->start.day,
+                   tum->filename
+                  );
+    if (rc == -1)
+      return NULL;
+    else
+      return ret;
+  }
+  
+  switch(tum->ustart)
+  {
+    case UNIT_YEAR:
+         snprintf(start,sizeof(start),"%d",tum->start.year);
+         break;
+         
+    case UNIT_MONTH:
+         snprintf(start,sizeof(start),"%d/%02d",tum->start.year,tum->start.month);
+         break;
+         
+    case UNIT_DAY:
+         snprintf(start,sizeof(start),"%d/%02d/%02d",tum->start.year,tum->start.month,tum->start.day);
+         break;
+         
+    case UNIT_PART:
+         snprintf(start,sizeof(start),"%d/%02d/%02d.%d",tum->start.year,tum->start.month,tum->start.day,tum->start.part);
+         break;
+         
+    case UNIT_INDEX:
+         assert(0);
+         return NULL;
+  }
+  
+  if (!tum->range)
+    return strdup(start);
+  
+  if (tum->segments == 4)
+    snprintf(stop,sizeof(stop),"%d/%02d/%02d.%d",tum->stop.year,tum->stop.month,tum->stop.day,tum->stop.part);
+  else if (tum->segments == 3)
+  {
+    if (tum->ustop == UNIT_PART)
+      snprintf(stop,sizeof(stop),"%02d/%02d.%d",tum->stop.month,tum->stop.day,tum->stop.part);
+    else
+      snprintf(stop,sizeof(stop),"%d/%02d/%02d",tum->stop.year,tum->stop.month,tum->stop.day);
+  }
+  else if (tum->segments == 2)
+  {
+    switch(tum->ustop)
+    {
+      /*-------------------------------------------------------------------
+      ; with two segments, we ended up on either a MONTH, DAY or PART. 
+      ; There is no way we could end up with a YEAR unless there was a
+      ; problem with the code.  Also, there is no way we could get an INDEX
+      ; here, again, unless there was a problem with the code.
+      ;--------------------------------------------------------------------*/
+      
+      case UNIT_YEAR:
+      case UNIT_INDEX:
+           assert(0);
+           return NULL;
+      
+      case UNIT_MONTH:
+           snprintf(stop,sizeof(stop),"%d/%02d",tum->stop.year,tum->stop.month);
+           break;
+           
+      case UNIT_DAY:
+           snprintf(stop,sizeof(stop),"%02d/%02d",tum->stop.month,tum->stop.day);
+           break;
+           
+      case UNIT_PART:
+           snprintf(stop,sizeof(stop),"%02d.%d",tum->stop.day,tum->stop.part);
+           break;
+    }
+  }
+  else
+  {
+    switch(tum->ustop)
+    {
+      case UNIT_YEAR:
+           snprintf(stop,sizeof(stop),"%d",tum->stop.year);
+           break;
+           
+      case UNIT_MONTH:
+           snprintf(stop,sizeof(stop),"%02d",tum->stop.month);
+           break;
+           
+      case UNIT_DAY:
+           snprintf(stop,sizeof(stop),"%02d",tum->stop.day);
+           break;
+           
+      case UNIT_PART:
+           snprintf(stop,sizeof(stop),"%d",tum->stop.part);
+           break;
+           
+      case UNIT_INDEX:
+           assert(0);
+           return NULL;
+    }
+  }
+  
+  rc = asprintf(&ret,"%s-%s",start,stop);
+  if (rc == -1)
+    return NULL;
+  else
+    return ret;
 }
 
 /************************************************************************/

@@ -31,6 +31,7 @@
 #include <lauxlib.h>
 
 #include "frontend.h"
+#include "backend.h"
 #include "timeutil.h"
 #include "blog.h"
 

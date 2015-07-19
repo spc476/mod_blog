@@ -98,7 +98,7 @@ Blog           g_blog;
 struct display gd =
 {
   .f       = { false , false , false , true , true , false , false} ,
-  .navunit = INDEX,
+  .navunit = UNIT_INDEX,
 };
 
 /****************************************************/

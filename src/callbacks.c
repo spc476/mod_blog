@@ -316,7 +316,7 @@ static void cb_blog_url(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_url(out,&cbd->entry->when,DAY);
+  print_nav_url(out,&cbd->entry->when,UNIT_DAY);
 }
 
 /*************************************************************************/
@@ -451,7 +451,7 @@ static void cb_entry_url(FILE *out,void *data)
 
   entry = cbd->entry;
   assert(entry->valid);
-  print_nav_url(out,&entry->when,PART);
+  print_nav_url(out,&entry->when,UNIT_PART);
 }
 
 /**********************************************************************/
@@ -466,7 +466,7 @@ static void cb_entry_id(FILE *out,void *data)
 
   entry = cbd->entry;
   assert(entry->valid);
-  print_nav_name(out,&entry->when,DAY,'-');
+  print_nav_name(out,&entry->when,UNIT_DAY,'-');
 }
 
 /**********************************************************************/
@@ -478,7 +478,7 @@ static void cb_entry_date(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
 
-  print_nav_url(out,&cbd->entry->when,DAY);  
+  print_nav_url(out,&cbd->entry->when,UNIT_DAY);  
 }
 
 /*********************************************************************/
@@ -808,7 +808,7 @@ static void cb_cond_hr(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (gd.f.navigation && (gd.navunit == PART))
+  if (gd.f.navigation && (gd.navunit == UNIT_PART))
     return;
 
   entry = cbd->entry;
@@ -829,7 +829,7 @@ static void cb_cond_blog_title(FILE *out,void *data)
   
   assert(out != NULL);
   
-  if (gd.navunit == PART)
+  if (gd.navunit == UNIT_PART)
   {
     entry = (BlogEntry)ListGetHead(&cbd->list);
     if (NodeValid(&entry->node) && entry->valid)
@@ -898,7 +898,7 @@ static void cb_rss_item_url(FILE *out,void *data)
   
   assert(cbd->entry->valid);
   fprintf(out,"%s",c_fullbaseurl);
-  print_nav_url(out,&cbd->entry->when,PART);
+  print_nav_url(out,&cbd->entry->when,UNIT_PART);
 }
 
 /********************************************************************/
@@ -1043,7 +1043,7 @@ static void cb_navigation_current(FILE *out,void *data)
 {
   assert(out != NULL);
   
-  if (gd.navunit != INDEX) return;
+  if (gd.navunit != UNIT_INDEX) return;
   generic_cb("navigation.current",out,data);
 }
 
@@ -1057,7 +1057,7 @@ static void cb_navigation_first_url(FILE *out,void *data __attribute__((unused))
   
   tmp = g_blog->first;
   if (gd.f.navigation == false)
-    print_nav_url(out,&tmp,PART);
+    print_nav_url(out,&tmp,UNIT_PART);
   else
     print_nav_url(out,&tmp,gd.navunit);
 }
@@ -1072,7 +1072,7 @@ static void cb_navigation_first_title(FILE *out,void *data __attribute__((unused
   
   tmp = g_blog->first;
   if (gd.f.navigation == false)
-    print_nav_title(out,&tmp,PART);
+    print_nav_title(out,&tmp,UNIT_PART);
   else
     print_nav_title(out,&tmp,gd.navunit);
 }
@@ -1087,7 +1087,7 @@ static void cb_navigation_last_url(FILE *out,void *data __attribute__((unused)))
   
   tmp = g_blog->now;
   if (gd.f.navigation == false)
-    print_nav_url(out,&tmp,PART);
+    print_nav_url(out,&tmp,UNIT_PART);
   else
     print_nav_url(out,&tmp,gd.navunit);
 }
@@ -1102,7 +1102,7 @@ static void cb_navigation_last_title(FILE *out,void *data __attribute__((unused)
   
   tmp = g_blog->now;
   if (gd.f.navigation == false)
-    print_nav_title(out,&tmp,PART);
+    print_nav_title(out,&tmp,UNIT_PART);
   else
     print_nav_title(out,&tmp,gd.navunit);
 }
@@ -1164,7 +1164,7 @@ static void cb_navigation_current_url(FILE *out,void *data __attribute__((unused
   assert(out != NULL);
   
   tmp = g_blog->now;
-  print_nav_url(out,&tmp,MONTH);
+  print_nav_url(out,&tmp,UNIT_MONTH);
 }
 
 /*********************************************************************/
@@ -1180,10 +1180,10 @@ static void print_nav_title(FILE *out,struct btm *date,int unit)
   
   switch(unit)
   {
-    case YEAR:
+    case UNIT_YEAR:
          fprintf(out,"%04d",date->year);
          break;
-    case MONTH:
+    case UNIT_MONTH:
          tm_init(&stm);
          stm.tm_year = date->year - 1900;
          stm.tm_mon  = date->month;
@@ -1191,7 +1191,7 @@ static void print_nav_title(FILE *out,struct btm *date,int unit)
          strftime(buffer,BUFSIZ,"%B %Y",&stm);
          fputs(buffer,out);
          break;
-    case DAY:
+    case UNIT_DAY:
          tm_init(&stm);
          stm.tm_year = date->year - 1900;
          stm.tm_mon  = date->month - 1;
@@ -1200,7 +1200,7 @@ static void print_nav_title(FILE *out,struct btm *date,int unit)
          strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&stm);
          fputs(buffer,out);
          break;
-    case PART:
+    case UNIT_PART:
          entry = BlogEntryRead(g_blog,date);
          if (entry)
          {
@@ -1235,16 +1235,16 @@ static void print_nav_name(FILE *out,struct btm *date,int unit,char sep)
 
   switch(unit)
   {
-    case YEAR:
+    case UNIT_YEAR:
          fprintf(out,"%04d",date->year);
          break;
-    case MONTH:
+    case UNIT_MONTH:
          fprintf(out,"%04d%c%02d",date->year,sep,date->month);
          break;
-    case DAY:
+    case UNIT_DAY:
          fprintf(out,"%04d%c%02d%c%02d",date->year,sep,date->month,sep,date->day);
          break;
-    case PART:
+    case UNIT_PART:
          fprintf(out,"%04d%c%02d%c%02d.%d",date->year,sep,date->month,sep,date->day,date->part);
          break;
     default:
@@ -1296,7 +1296,7 @@ static void cb_robots_index(FILE *out,void *data __attribute__((unused)))
 {
   assert(out  != NULL);
   
-  if ((gd.navunit == PART) || (gd.navunit == INDEX))
+  if ((gd.navunit == UNIT_PART) || (gd.navunit == UNIT_INDEX))
     fputs("index",out);
   else
     fputs("noindex",out);
@@ -1309,7 +1309,7 @@ static void cb_comments(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (gd.navunit != PART)
+  if (gd.navunit != UNIT_PART)
     return;
   
   generic_cb("comments",out,data);
@@ -1509,7 +1509,7 @@ static void cb_date_day(FILE *out,void *data)
   
   entry = cbd->entry;
   assert(entry->valid);
-  print_nav_name(out,&entry->when,DAY,'-');
+  print_nav_name(out,&entry->when,UNIT_DAY,'-');
 }
 
 /*************************************************************************/
@@ -1524,7 +1524,7 @@ static void cb_date_day_url(FILE *out,void *data)
   
   entry = cbd->entry;
   assert(entry->valid);
-  print_nav_url(out,&entry->when,DAY);
+  print_nav_url(out,&entry->when,UNIT_DAY);
 }
 
 /********************************************************************/
@@ -1581,7 +1581,7 @@ static void cb_entry_name(FILE *out,void *data)
   
   entry = cbd->entry;
   assert(entry->valid);
-  print_nav_name(out,&entry->when,PART,'-');
+  print_nav_name(out,&entry->when,UNIT_PART,'-');
 }
 
 /***********************************************************************/

@@ -178,13 +178,13 @@ static int cmd_cgi_get_show(Request req)
   else
   {
     req->reqtumbler++;
-    rc = TumblerNew(&req->tumbler,&req->reqtumbler);
+    rc = tumbler_new(&req->tumbler,req->reqtumbler);
     if (rc == 0)
     {
 
-      if (req->tumbler->flags.redirect)
+      if (req->tumbler.redirect)
       {
-        char *tum = TumblerCanonical(req->tumbler);
+        char *tum = tumbler_canonical(&req->tumbler);
         fprintf(
         	req->out,
         	"Status: %d\r\n"
@@ -204,14 +204,14 @@ static int cmd_cgi_get_show(Request req)
 	return(0);
       }
 
-      if (req->tumbler->flags.file == false)
+      if (req->tumbler.file == false)
         fprintf(
         	req->out,
         	"Status: %s\r\n"
         	"Content-type: text/html\r\n\r\n",
         	status
         );
-      rc = tumbler_page(req->out,req->tumbler);
+      rc = tumbler_page(req->out,&req->tumbler);
     }
     else
     {

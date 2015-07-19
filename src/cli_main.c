@@ -278,18 +278,17 @@ static int cmd_cli_show(Request req)
     }
     else
     {
-      rc = TumblerNew(&req->tumbler,&req->reqtumbler);
+      rc = tumbler_new(&req->tumbler,req->reqtumbler);
       if (rc == 0)
       {
-        if (req->tumbler->flags.redirect)
+        if (req->tumbler.redirect)
         {
-          char *tum = TumblerCanonical(req->tumbler);
+          char *tum = tumbler_canonical(&req->tumbler);
           rc = (*req->error)(req,HTTP_MOVEPERM,"Redirect: %s",tum);
           free(tum);
           return(rc);
         }
-        rc = tumbler_page(req->out,req->tumbler);
-        TumblerFree(&req->tumbler);
+        rc = tumbler_page(req->out,&req->tumbler);
       }
       else
         rc = (*req->error)(req,HTTP_NOTFOUND,"tumbler error---nothing found");
