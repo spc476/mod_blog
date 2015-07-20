@@ -104,9 +104,7 @@ typedef enum http__e
 
 extern char	*get_remote_user		(void);
 extern bool	 authenticate_author		(Request);
-extern int	 generate_pages			(Request);
 extern void	 notify_emaillist		(void);
-extern int	 tumbler_page			(FILE *,tumbler__s *);
 extern int	 entry_add			(Request);
 extern void	 fix_entry			(Request);
 extern void	 generic_cb			(const char *,FILE *,void *);
