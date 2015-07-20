@@ -1085,7 +1085,7 @@ static void cb_navigation_last_url(FILE *out,void *data __attribute__((unused)))
   
   assert(out  != NULL);
   
-  tmp = g_blog->now;
+  tmp = g_blog->last;
   if (gd.f.navigation == false)
     print_nav_url(out,&tmp,UNIT_PART);
   else
@@ -1100,7 +1100,7 @@ static void cb_navigation_last_title(FILE *out,void *data __attribute__((unused)
   
   assert(out  != NULL);
   
-  tmp = g_blog->now;
+  tmp = g_blog->last;
   if (gd.f.navigation == false)
     print_nav_title(out,&tmp,UNIT_PART);
   else

@@ -437,7 +437,7 @@ static void calculate_previous(const struct btm start)
          {
            btm_dec_day(&gd.previous);
            
-           while(btm_cmp(&gd.previous,&g_blog->first) > 0)
+           while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
            {
              BlogEntry entry;
              
@@ -463,7 +463,7 @@ static void calculate_previous(const struct btm start)
          {
 	   btm_dec_part(&gd.previous);
 
-           while(btm_cmp(&gd.previous,&g_blog->first) > 0)
+           while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
            {
              BlogEntry entry;
              
