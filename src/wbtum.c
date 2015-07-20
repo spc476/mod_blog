@@ -82,6 +82,32 @@ static bool parse_num(
 
 /************************************************************************/
 
+static bool check_dates(tumbler__s *tum)
+{
+  bool start_okay;
+  bool stop_okay;
+  
+  assert(tum != NULL);
+  
+  if (tum->ustart == UNIT_PART)
+    start_okay = (btm_cmp(&tum->start,&g_blog->first) >= 0)
+              && (btm_cmp(&tum->start,&g_blog->now)   <= 0);
+  else
+    start_okay = (btm_cmp_date(&tum->start,&g_blog->first) >= 0)
+              && (btm_cmp_date(&tum->start,&g_blog->now)   <= 0);
+              
+ if (tum->ustop == UNIT_PART)
+   stop_okay = (btm_cmp(&tum->stop,&g_blog->first) >= 0)
+            && (btm_cmp(&tum->stop,&g_blog->now)   <= 0);
+ else
+   stop_okay = (btm_cmp_date(&tum->stop,&g_blog->first) >= 0)
+            && (btm_cmp_date(&tum->stop,&g_blog->now)   <= 0);
+            
+  return start_okay && stop_okay;
+}
+
+/************************************************************************/
+
 bool tumbler_new(tumbler__s *tum,const char *text)
 {
   /*----------------------------------------------------------------------
@@ -130,7 +156,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   tum->stop.part   = ENTRY_MAX;
   
   if (*text == '\0')
-    return true;
+    return check_dates(tum);
   
   if (*text == '-')
     goto tumbler_new_range;
@@ -148,18 +174,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   
   if (!parse_num(&u1,&text,1,12))
     return false;
-  if ((tum->start.year == g_blog->first.year) && (u1.val < g_blog->first.month))
-    return false;
-  if ((tum->start.year == g_blog->now.year) && (u1.val > g_blog->now.month))
-    return false;
   
-  assert(
-          (tum->start.day == 1) 
-          || (
-                  (tum->start.year == g_blog->first.year) 
-               && (tum->start.day == g_blog->first.day)
-             )
-        );
   assert(tum->start.part == 1);
   assert(tum->stop.part  == ENTRY_MAX);
   
@@ -171,7 +186,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
     tum->redirect |= true;
   
   if (*text == '\0')
-    return true;
+    return check_dates(tum);
   
   if (*text == '-')
     goto tumbler_new_range;
@@ -190,10 +205,6 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   
   if (!parse_num(&u1,&text,1,max_monthday(tum->start.year,tum->start.month)))
     return false;
-  if ((tum->start.year == g_blog->first.year) && (u1.val < g_blog->first.day))
-    return false;
-  if ((tum->start.year == g_blog->now.year) && (u1.val > g_blog->now.day))
-    return false;
   
   tum->start.day = tum->stop.day = u1.val;
   tum->ustart    = tum->ustop    = UNIT_DAY;
@@ -202,7 +213,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
     tum->redirect |= true;
     
   if (*text == '\0')
-    return true;
+    return check_dates(tum);
   
   if (*text == '-')
     goto tumbler_new_range;
@@ -224,9 +235,6 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   if (!parse_num(&u1,&text,1,ENTRY_MAX))
     return false;
   
-  if ((tum->start.year == g_blog->now.year) && (u1.val > g_blog->now.part))
-    return false;
-  
   tum->start.part = tum->stop.part = u1.val;
   tum->ustart     = tum->ustop     = UNIT_PART;
   
@@ -234,7 +242,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
     tum->redirect |= true;
   
   if (*text == '\0')
-    return true;
+    return check_dates(tum);
   
   if (*text != '-')
     return false;
@@ -257,7 +265,7 @@ tumbler_new_file:
     tum->filename[i] = *text++;
 
     if (tum->filename[i] == '\0')
-      return true;
+      return check_dates(tum);
     if (tum->filename[i] == '/')
       return false;
   }
@@ -381,15 +389,6 @@ tumbler_new_calculate:
   
   if (tum->segments == 4)
   {
-    if ((u1.val < g_blog->first.year) || (u1.val > g_blog->now.year))
-      return false;
-    
-    if (u2.val > 12)
-      return false;
-    
-    if (u3.val > max_monthday(u1.val,u2.val))
-      return false;
-    
     tum->redirect |= (u2.len == 1) 
                   || (u3.len == 1)
                   || ((u4.len > 1) && (*u4.txt == '0'))
@@ -400,7 +399,7 @@ tumbler_new_calculate:
     tum->stop.day   = u3.val;
     tum->stop.part  = u4.val;
     tum->ustop      = UNIT_PART;
-    return true;
+    return check_dates(tum);
   }
   
   /*---------------------------------------------------------------
@@ -419,11 +418,6 @@ tumbler_new_calculate:
   {
     if (part)
     {
-      if (u1.val > 12)
-        return false;
-      if (u2.val > max_monthday(tum->stop.year,u1.val))
-        return false;
-      
       tum->redirect |= (u1.len == 1)
                     || (u2.len == 1)
                     || ((u4.len > 1) && (*u4.txt == '0'))
@@ -433,22 +427,15 @@ tumbler_new_calculate:
       tum->stop.day   = u2.val;
       tum->stop.part  = u4.val;
       tum->ustop      = UNIT_PART;
-      return true;
+      return check_dates(tum);
     }
     else
     {
-      if ((u1.val < g_blog->first.year) || (u1.val > g_blog->now.year))
-        return false;
-      if (u2.val > 12)
-        return false;
-      if (u3.val > max_monthday(u1.val,u2.val))
-        return false;
-      
       tum->stop.year  = u1.val;
       tum->stop.month = u2.val;
       tum->stop.day   = u3.val;
       tum->stop.part  = ENTRY_MAX;
-      return true;
+      return check_dates(tum);
     }
   }
   
@@ -471,41 +458,32 @@ tumbler_new_calculate:
   {
     if (part)
     {
-      if (u1.val > max_monthday(tum->stop.year,tum->stop.month))
-        return false;
-      
       tum->redirect |= (u1.len == 1)
                     || ((u4.len > 1) && (*u4.txt == '0'))
                     ;
       tum->stop.day  = u1.val;
       tum->stop.part = u4.val;
       tum->ustop     = UNIT_PART;
-      return true;
+      return check_dates(tum);
     }
     else
     {
+      /*---------------------------------------
+      ; check for year/month vs. month/day
+      ;--------------------------------------*/
+      
       if (u1.val >= g_blog->first.year)
       {
-        if (u1.val > g_blog->now.year)
-          return false;
-        if (u2.val > 12)
-          return false;
-        
         tum->redirect   |= (u2.len == 1);
         tum->stop.year   = u1.val;
         tum->stop.month  = u2.val;
         tum->stop.day    = max_monthday(tum->stop.year,tum->stop.month);
         tum->stop.part   = ENTRY_MAX;
         tum->ustop       = UNIT_MONTH;
-        return true;
+        return check_dates(tum);
       }
       else
       {
-        if (u1.val > 12)
-          return false;
-        if (u2.val > max_monthday(tum->stop.year,u1.val))
-          return false;
-          
         tum->redirect |= (u1.len == 1)
                       || (u2.len == 1)
                       ;
@@ -514,7 +492,7 @@ tumbler_new_calculate:
         tum->stop.day   = u2.val;
         tum->stop.part  = ENTRY_MAX;
         tum->ustop      = UNIT_DAY;
-        return true;
+        return check_dates(tum);
         
       }
     }
@@ -530,45 +508,33 @@ tumbler_new_calculate:
     switch(tum->ustart)
     {
       case UNIT_YEAR:
-           if ((u1.val < g_blog->first.year) || (u1.val > g_blog->now.year))
-             return false;
-             
            tum->stop.year  = u1.val;
            tum->stop.month = 12;
            tum->stop.day   = 31; /* there are always 31 days in Debtember */
            tum->stop.part  = ENTRY_MAX;
            tum->ustop      = UNIT_YEAR;
-           return true;
+           return check_dates(tum);
            
       case UNIT_MONTH:
-           if (u1.val > 12)
-             return false;
-           
            tum->redirect   |= (u1.len == 1);
            tum->stop.month  = u1.val;
            tum->stop.day    = max_monthday(tum->stop.year,tum->stop.month);
            tum->stop.part   = ENTRY_MAX;
            tum->ustop       = UNIT_MONTH;
-           return true;
+           return check_dates(tum);
            
       case UNIT_DAY:
-           if (u1.val > max_monthday(tum->stop.year,tum->stop.month))
-             return false;
-           
            tum->redirect  |= (u1.len == 1);
            tum->stop.day   = u1.val;
            tum->stop.part  = ENTRY_MAX;
            tum->ustop      = UNIT_DAY;
-           return true;
+           return check_dates(tum);
            
       case UNIT_PART:
-           if (u1.val > ENTRY_MAX)
-             return false;
-           
            tum->redirect  |= ((u1.len > 1) && (*u1.txt == '0'));
            tum->stop.part  = u1.val;
            tum->ustop      = UNIT_PART;
-           return true;
+           return check_dates(tum);
            
       case UNIT_INDEX:
            assert(0);
