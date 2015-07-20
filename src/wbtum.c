@@ -91,17 +91,17 @@ static bool check_dates(tumbler__s *tum)
   
   if (tum->ustart == UNIT_PART)
     start_okay = (btm_cmp(&tum->start,&g_blog->first) >= 0)
-              && (btm_cmp(&tum->start,&g_blog->now)   <= 0);
+              && (btm_cmp(&tum->start,&g_blog->last)   <= 0);
   else
     start_okay = (btm_cmp_date(&tum->start,&g_blog->first) >= 0)
-              && (btm_cmp_date(&tum->start,&g_blog->now)   <= 0);
+              && (btm_cmp_date(&tum->start,&g_blog->last)   <= 0);
               
   if (tum->ustop == UNIT_PART)
     stop_okay = (btm_cmp(&tum->stop,&g_blog->first) >= 0)
-             && (btm_cmp(&tum->stop,&g_blog->now)   <= 0);
+             && (btm_cmp(&tum->stop,&g_blog->last)   <= 0);
   else
     stop_okay = (btm_cmp_date(&tum->stop,&g_blog->first) >= 0)
-             && (btm_cmp_date(&tum->stop,&g_blog->now)   <= 0);
+             && (btm_cmp_date(&tum->stop,&g_blog->last)   <= 0);
             
   return start_okay && stop_okay;
 }
@@ -134,7 +134,7 @@ bool tumbler_new(tumbler__s *tum,const char *text)
   ; parse year
   ;-------------------------------------------------*/
   
-  if (!parse_num(&u1,&text,g_blog->first.year,g_blog->now.year))
+  if (!parse_num(&u1,&text,g_blog->first.year,g_blog->last.year))
     return false;
   
   if (u1.val == g_blog->first.year)
