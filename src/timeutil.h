@@ -43,6 +43,8 @@ extern void	btm_dec_month	(struct btm *const);
 extern void	btm_inc_month	(struct btm *const);
 extern int	btm_cmp		(const struct btm *const restrict,const struct btm *const restrict);
 extern int	btm_cmp_date	(const struct btm *const restrict,const struct btm *const restrict);
+extern int	btm_cmp_month	(const struct btm *const restrict,const struct btm *const restrict);
+extern int	btm_cmp_year	(const struct btm *const restrict,const struct btm *const restrict);
 extern void	tm_init		(struct tm *const);
 
 #endif

@@ -167,6 +167,37 @@ int btm_cmp_date(
 
 /***************************************************************************/
 
+int btm_cmp_month(
+        const struct btm *const restrict d1,
+        const struct btm *const restrict d2
+)
+{
+  int rc;
+  
+  assert(d1 != NULL);
+  assert(d2 != NULL);
+  
+  if ((rc = d1->year  - d2->year))  return rc;
+  if ((rc = d1->month - d2->month)) return rc;
+  
+  return 0;
+}
+
+/***************************************************************************/
+
+int btm_cmp_year(
+        const struct btm *const restrict d1,
+        const struct btm *const restrict d2
+)
+{
+  assert(d1 != NULL);
+  assert(d2 != NULL);
+  
+  return d1->year - d2->year;
+}
+
+/***************************************************************************/  
+
 void tm_init(struct tm *const ptm)
 {
   memset(ptm,0,sizeof(struct tm));

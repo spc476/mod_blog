@@ -89,20 +89,60 @@ static bool check_dates(tumbler__s *tum)
   
   assert(tum != NULL);
   
-  if (tum->ustart == UNIT_PART)
-    start_okay = (btm_cmp(&tum->start,&g_blog->first) >= 0)
-              && (btm_cmp(&tum->start,&g_blog->last)  <= 0);
-  else
-    start_okay = (btm_cmp_date(&tum->start,&g_blog->first) >= 0)
-              && (btm_cmp_date(&tum->start,&g_blog->last)  <= 0);
-              
-  if (tum->ustop == UNIT_PART)
-    stop_okay = (btm_cmp(&tum->stop,&g_blog->first) >= 0)
-             && (btm_cmp(&tum->stop,&g_blog->last)  <= 0);
-  else
-    stop_okay = (btm_cmp_date(&tum->stop,&g_blog->first) >= 0)
-             && (btm_cmp_date(&tum->stop,&g_blog->last)  <= 0);
-            
+  switch(tum->ustart)
+  {
+    case UNIT_YEAR:
+         start_okay = (btm_cmp_year(&tum->start,&g_blog->first) >= 0)
+                   && (btm_cmp_year(&tum->start,&g_blog->last)  <= 0);
+         break;
+
+    case UNIT_MONTH:
+         start_okay = (btm_cmp_month(&tum->start,&g_blog->first) >= 0)
+                   && (btm_cmp_month(&tum->start,&g_blog->last)  <= 0);
+         break;
+         
+    case UNIT_DAY:
+         start_okay = (btm_cmp_date(&tum->start,&g_blog->first) >= 0)
+                   && (btm_cmp_date(&tum->start,&g_blog->last)  <= 0);
+         break;
+         
+    case UNIT_PART:
+         start_okay = (btm_cmp(&tum->start,&g_blog->first) >= 0)
+                   && (btm_cmp(&tum->start,&g_blog->last)  <= 0);
+         break;
+         
+    case UNIT_INDEX:
+         assert(0);
+         return false;
+  }
+
+  switch(tum->ustop)
+  {
+    case UNIT_YEAR:
+         stop_okay = (btm_cmp_year(&tum->stop,&g_blog->first) >= 0)
+                  && (btm_cmp_year(&tum->stop,&g_blog->last)  <= 0);
+         break;
+
+    case UNIT_MONTH:
+         stop_okay = (btm_cmp_month(&tum->stop,&g_blog->first) >= 0)
+                  && (btm_cmp_month(&tum->stop,&g_blog->last)  <= 0);
+         break;
+         
+    case UNIT_DAY:
+         stop_okay = (btm_cmp_date(&tum->stop,&g_blog->first) >= 0)
+                  && (btm_cmp_date(&tum->stop,&g_blog->last)  <= 0);
+         break;
+         
+    case UNIT_PART:
+         stop_okay = (btm_cmp(&tum->stop,&g_blog->first) >= 0)
+                  && (btm_cmp(&tum->stop,&g_blog->last)  <= 0);
+         break;
+         
+    case UNIT_INDEX:
+         assert(0);
+         return false;
+  }
+  
   return start_okay && stop_okay;
 }
 
