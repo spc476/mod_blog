@@ -43,7 +43,6 @@
 
 int main(int argc,char *argv[],char *envp[])
 {
-  Cgi cgi;
   int rc;
   
   /*-----------------------------------------------------------------------
@@ -102,17 +101,15 @@ int main(int argc,char *argv[],char *envp[])
   while(gf_debug)
     ;
 
-  cgi = CgiNew(NULL);
+  gd.cgi = CgiNew(NULL);
   
-  if (cgi != NULL)
+  if (gd.cgi != NULL)
   {
-    gd.cgi = cgi;
-
-    switch(CgiMethod(cgi))
+    switch(CgiMethod(gd.cgi))
     {
-      case GET:  rc = main_cgi_get (cgi,argc,argv); break;
-      case POST: rc = main_cgi_post(cgi,argc,argv); break;
-      case HEAD: rc = main_cgi_head(cgi,argc,argv); break;
+      case GET:  rc = main_cgi_get (gd.cgi,argc,argv); break;
+      case POST: rc = main_cgi_post(gd.cgi,argc,argv); break;
+      case HEAD: rc = main_cgi_head(gd.cgi,argc,argv); break;
       default:   rc = EXIT_FAILURE;
     }
   }
