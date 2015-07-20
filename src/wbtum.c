@@ -96,12 +96,12 @@ static bool check_dates(tumbler__s *tum)
     start_okay = (btm_cmp_date(&tum->start,&g_blog->first) >= 0)
               && (btm_cmp_date(&tum->start,&g_blog->now)   <= 0);
               
- if (tum->ustop == UNIT_PART)
-   stop_okay = (btm_cmp(&tum->stop,&g_blog->first) >= 0)
-            && (btm_cmp(&tum->stop,&g_blog->now)   <= 0);
- else
-   stop_okay = (btm_cmp_date(&tum->stop,&g_blog->first) >= 0)
-            && (btm_cmp_date(&tum->stop,&g_blog->now)   <= 0);
+  if (tum->ustop == UNIT_PART)
+    stop_okay = (btm_cmp(&tum->stop,&g_blog->first) >= 0)
+             && (btm_cmp(&tum->stop,&g_blog->now)   <= 0);
+  else
+    stop_okay = (btm_cmp_date(&tum->stop,&g_blog->first) >= 0)
+             && (btm_cmp_date(&tum->stop,&g_blog->now)   <= 0);
             
   return start_okay && stop_okay;
 }
