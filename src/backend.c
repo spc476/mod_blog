@@ -375,10 +375,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   assert(end.day   >= 1);
   assert(end.day   <= max_monthday(end.year,end.month));
   
-  assert(start.year  <= end.year);
-  assert(start.month <= end.month);
-  assert(start.day   <= end.day);
-  assert(start.part  <= end.part);
+  assert(btm_cmp(&start,&end) <= 0);
   
   /*-------------------------------------------------------------------------
   ; okay, resume processing ... bound against the starting time of the blog,
