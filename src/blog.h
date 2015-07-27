@@ -61,13 +61,13 @@ extern int		BlogLock		(Blog);
 extern int		BlogUnlock		(Blog);
 extern int		BlogFree		(Blog);
 
-extern BlogEntry	BlogEntryNew		(Blog);
-extern BlogEntry	BlogEntryRead		(Blog,struct btm *);
-extern void		BlogEntryReadBetweenU	(Blog,List *,struct btm *,struct btm *);
-extern void		BlogEntryReadBetweenD	(Blog,List *,struct btm *,struct btm *);
-extern void		BlogEntryReadXD		(Blog,List *,struct btm *,size_t);
-extern void		BlogEntryReadXU		(Blog,List *,struct btm *,size_t);
-extern int		BlogEntryWrite		(BlogEntry);
+extern BlogEntry	BlogEntryNew		(const Blog);
+extern BlogEntry	BlogEntryRead		(const Blog,const struct btm *);
+extern void		BlogEntryReadBetweenU	(const Blog,List *,const struct btm *,const struct btm *);
+extern void		BlogEntryReadBetweenD	(const Blog,List *,const struct btm *,const struct btm *);
+extern void		BlogEntryReadXD		(const Blog,List *,const struct btm *,size_t);
+extern void		BlogEntryReadXU		(const Blog,List *,const struct btm *,size_t);
+extern int		BlogEntryWrite		(const BlogEntry);
 extern int		BlogEntryFree		(BlogEntry);
 
 /**********************************************************************/
