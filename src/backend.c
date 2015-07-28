@@ -67,7 +67,7 @@ static void	   free_entries			(List *);
 
 /************************************************************************/
 
-int generate_pages(Request req __attribute__((unused)))
+int generate_pages(void)
 {
   for (size_t i = 0 ; i < c_numtemplates; i++)
   {

@@ -244,7 +244,7 @@ static int cmd_cli_new(Request req)
   if (rc == 0)
   {
     if (cf_emailupdate) notify_emaillist();
-    generate_pages(req);  
+    generate_pages();
   }
   
   return(rc);
@@ -261,7 +261,7 @@ static int cmd_cli_show(Request req)
   assert(req->f.update  == false);
 
   if (req->f.regenerate)
-    rc = generate_pages(req);  
+    rc = generate_pages();
   else
   {
     if (req->reqtumbler == NULL)
