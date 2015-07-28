@@ -182,7 +182,7 @@ Blog BlogNew(const char *location,const char *lockfile)
 
 /***********************************************************************/
 
-int BlogLock(Blog blog)
+int BlogLock(Blog restrict blog)
 {
   struct flock lockdata;
   int          rc;
@@ -215,7 +215,7 @@ int BlogLock(Blog blog)
 
 /***********************************************************************/
 
-int BlogUnlock(Blog blog)
+int BlogUnlock(Blog restrict blog)
 {
   struct flock lockdata;
   int          rc;
@@ -242,7 +242,7 @@ int BlogUnlock(Blog blog)
 
 /***********************************************************************/
 
-int BlogFree(Blog blog)
+int BlogFree(Blog restrict blog)
 {
   assert(blog != NULL);
   
@@ -256,7 +256,7 @@ int BlogFree(Blog blog)
 
 /************************************************************************/
 
-BlogEntry BlogEntryNew(const Blog blog)
+BlogEntry BlogEntryNew(const Blog restrict blog)
 {
   BlogEntry pbe;
 
@@ -282,7 +282,7 @@ BlogEntry BlogEntryNew(const Blog blog)
 
 /***********************************************************************/
 
-BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
+BlogEntry BlogEntryRead(const Blog restrict blog,const struct btm *restrict which) 
 {
   BlogEntry    entry;
   char         pname[FILENAME_MAX];
@@ -339,7 +339,7 @@ BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
 /**********************************************************************/
 
 void BlogEntryReadBetweenU(
-        const Blog        blog,
+        const Blog        restrict blog,
         List             *restrict list,
         const struct btm *restrict start,
         const struct btm *restrict end
@@ -373,7 +373,7 @@ void BlogEntryReadBetweenU(
 /************************************************************************/
 
 void BlogEntryReadBetweenD(
-        const Blog        blog,
+        const Blog        restrict blog,
         List             *restrict listb,
         const struct btm *restrict end,
         const struct btm *restrict start
@@ -409,7 +409,7 @@ void BlogEntryReadBetweenD(
 /*******************************************************************/
   
 void BlogEntryReadXD(
-        const Blog        blog,
+        const Blog        restrict blog,
         List             *restrict list,
         const struct btm *restrict start,
         size_t            num
@@ -448,7 +448,7 @@ void BlogEntryReadXD(
 /*******************************************************************/
 
 void BlogEntryReadXU(
-        const Blog        blog,
+        const Blog        restrict blog,
         List             *restrict list,
         const struct btm *restrict start,
         size_t            num
@@ -480,7 +480,7 @@ void BlogEntryReadXU(
 
 /**************************************************************************/
 
-int BlogEntryWrite(const BlogEntry entry)
+int BlogEntryWrite(const BlogEntry restrict entry)
 {
   char   **authors;
   char   **class;
@@ -606,7 +606,7 @@ int BlogEntryWrite(const BlogEntry entry)
 
 /***********************************************************************/
 
-int BlogEntryFree(BlogEntry entry)
+int BlogEntryFree(BlogEntry restrict entry)
 {
   assert(entry != NULL);
   
