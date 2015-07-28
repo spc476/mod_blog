@@ -587,7 +587,7 @@ tumbler_new_calculate:
 
 /************************************************************************/
 
-char *tumbler_canonical(tumbler__s *tum)
+char *tumbler_canonical(const tumbler__s *tum)
 {
   char  start[32];
   char  stop [32];
