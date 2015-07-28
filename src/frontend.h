@@ -57,7 +57,7 @@ typedef struct request
   char       *body;
   char       *reqtumbler;
   tumbler__s  tumbler;
-} *restrict Request;  
+} *Request;  
 
 typedef struct dflags
 {
@@ -79,7 +79,7 @@ typedef struct display
   Request     req;
   struct btm  previous;
   struct btm  next;
-} *restrict Display;
+} *Display;
 
 struct callback_data
 {

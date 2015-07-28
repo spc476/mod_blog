@@ -58,9 +58,9 @@ void	set_c_conversion	(const char *);
 void	set_c_url		(const char *);
 
 static bool	   get_next	(char *,const char **);
-static int	   get_field	(lua_State *const restrict,const char *);
-static const char *get_string	(lua_State *const restrict,const char *const restrict,const char *const restrict);
-static bool	   get_bool	(lua_State *const restrict,const char *const restrict,const bool);
+static int	   get_field	(lua_State *const,const char *);
+static const char *get_string	(lua_State *const,const char *const restrict,const char *const restrict);
+static bool	   get_bool	(lua_State *const,const char *const,const bool);
 static void	   globals_free	(void);
 
 /************************************************************/
@@ -422,8 +422,8 @@ static bool get_next(char *dest,const char **pp)
 /************************************************************************/
 
 static int get_field(
-	lua_State  *const restrict L,
-	const char *               name
+	lua_State  *const L,
+	const char *      name
 )
 {
   size_t len = strlen(name);
@@ -442,7 +442,7 @@ static int get_field(
 /***********************************************************************/
 
 static const char *get_string(
-	lua_State  *const restrict L,
+	lua_State  *const          L,
 	const char *const restrict name,
 	const char *const restrict def
 )
@@ -464,9 +464,9 @@ static const char *get_string(
 /*************************************************************************/
 
 static bool get_bool(
-	lua_State  *const restrict L,
-	const char *const restrict name,
-	const bool                 def
+	lua_State  *const L,
+	const char *const name,
+	const bool        def
 )
 {
   bool val;

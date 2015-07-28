@@ -90,9 +90,9 @@ int generate_pages(void)
 /******************************************************************/
 
 int pagegen_items(
-	const template__t *const restrict template,
-	FILE              *const restrict out,
-	Blog               const restrict blog
+	const template__t *const template,
+	FILE              *const out,
+	Blog               const blog
 )
 {
   struct btm            thisday;
@@ -128,9 +128,9 @@ int pagegen_items(
 /************************************************************************/
 
 int pagegen_days(
-	const template__t *const restrict template,
-	FILE              *const restrict out,
-	Blog               const restrict blog
+	const template__t *const template,
+	FILE              *const out,
+	Blog               const blog
 )
 {
   struct btm            thisday;
