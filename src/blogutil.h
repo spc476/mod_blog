@@ -34,7 +34,7 @@ typedef struct mystring
 /*********************************************************************/
 
 extern String 	*tag_split	(size_t *,const char *);
-extern char	*fromstring	(String);
+extern char	*fromstring	(const String);
 
 #endif
 

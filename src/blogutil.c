@@ -70,7 +70,7 @@ String *tag_split(size_t *pnum,const char *tag)
 
 /*********************************************************************/
 
-char *fromstring(String src)
+char *fromstring(const String src)
 {
   char *dest;
   
