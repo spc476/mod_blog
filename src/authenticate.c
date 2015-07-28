@@ -207,7 +207,7 @@ char *get_remote_user(void)
 
 #elif defined (USE_HTPASSWD)
 
-  static size_t breakline(char **dest,size_t dsize,FILE *in)
+  static size_t breakline(char **dest,size_t dsize,FILE *const in)
   {
     char  **tmp;
     char   *line;

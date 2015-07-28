@@ -32,7 +32,7 @@
 
 /*******************************************************************/
 
-String *tag_split(size_t *pnum,const char *tag)
+String *tag_split(size_t *const pnum,const char *tag)
 {
   size_t      num  = 0;
   size_t      max  = 0;

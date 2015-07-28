@@ -415,7 +415,7 @@ char *entity_encode(const char *s)
 
 /********************************************************************/
 
-FILE *fentity_encode_onread(FILE *in)
+FILE *fentity_encode_onread(FILE *const in)
 {
   return fopencookie(in,"r",(cookie_io_functions_t)
   				{
@@ -428,7 +428,7 @@ FILE *fentity_encode_onread(FILE *in)
 
 /*******************************************************************/
 
-FILE *fentity_encode_onwrite(FILE *out)
+FILE *fentity_encode_onwrite(FILE *const out)
 {
   return fopencookie(out,"w",(cookie_io_functions_t)
   				{

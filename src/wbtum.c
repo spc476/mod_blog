@@ -148,7 +148,7 @@ static bool check_dates(tumbler__s *tum)
 
 /************************************************************************/
 
-bool tumbler_new(tumbler__s *tum,const char *text)
+bool tumbler_new(tumbler__s *const tum,const char *text)
 {
   /*----------------------------------------------------------------------
   ; all variables are defined here, even though u2, u3, u4, segments and
@@ -587,7 +587,7 @@ tumbler_new_calculate:
 
 /************************************************************************/
 
-char *tumbler_canonical(const tumbler__s *tum)
+char *tumbler_canonical(const tumbler__s *const tum)
 {
   char  start[32];
   char  stop [32];

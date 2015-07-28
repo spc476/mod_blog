@@ -60,7 +60,7 @@
 static void	   calculate_previous		(const struct btm);
 static void	   calculate_next		(const struct btm);
 static const char *mime_type			(const char *);
-static int	   display_file			(FILE *,tumbler__s *);
+static int	   display_file			(FILE *const,const tumbler__s *);
 static char       *tag_collect			(List *);
 static char	  *tag_pick                     (const char *);
 static void	   free_entries			(List *);
@@ -764,7 +764,7 @@ static const char *mime_type(const char *filename)
 
 /******************************************************************/
 
-static int display_file(FILE *out,tumbler__s *spec)
+static int display_file(FILE *const out,const tumbler__s *spec)
 {
   char fname[FILENAME_MAX];
   

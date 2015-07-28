@@ -82,7 +82,7 @@ static int	cmd_cli_show		(Request);
 static void	get_cli_command		(Request,char *);
 static int	mail_setup_data		(Request);
 static int	mailfile_readdata	(Request);
-static int	cli_error		(Request,int,char *, ... );
+static int	cli_error		(Request,int,const char *, ... );
 
 /*************************************************************************/
 
@@ -435,7 +435,7 @@ static int mailfile_readdata(Request req)
 
 /***************************************************************************/
 
-static int cli_error(Request req __attribute__((unused)),int level,char *msg, ... )
+static int cli_error(Request req __attribute__((unused)),int level,const char *msg, ... )
 {
   va_list args;
   

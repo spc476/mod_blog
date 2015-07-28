@@ -52,20 +52,20 @@ struct nested_params
 
 /**********************************************************************/
 
-static void	text_conversion_backend	(FILE *,FILE *);
-static void	html_handle_tag		(struct nested_params *);
-static void	check_for_uri		(struct nested_params *,const char *);
-static void	entify_char		(char *,size_t,char *,char,const char *);
-static void	html_handle_string	(struct nested_params *);
-static void	html_handle_comment	(struct nested_params *);
-static void	handle_backquote	(FILE *,FILE *);
-static void	handle_quote		(FILE *,FILE *);
-static void	handle_dash		(FILE *,FILE *);
-static void	handle_period		(FILE *,FILE *);
+static void	text_conversion_backend	(FILE *const restrict,FILE *const restrict);
+static void	html_handle_tag		(struct nested_params *const);
+static void	check_for_uri		(struct nested_params *const,const char *const);
+static void	entify_char		(char *,size_t,char *,char,const char *const);
+static void	html_handle_string	(struct nested_params *const);
+static void	html_handle_comment	(struct nested_params *const);
+static void	handle_backquote	(FILE *const restrict,FILE *const restrict);
+static void	handle_quote		(FILE *const restrict,FILE *const restrict);
+static void	handle_dash		(FILE *const restrict,FILE *const restrict);
+static void	handle_period		(FILE *const restrict,FILE *const restrict);
 
 /**********************************************************************/
 
-void text_conversion(FILE *in,FILE *out)
+void text_conversion(FILE *const restrict in,FILE *const restrict out)
 {
   FILE *entin;
   
@@ -79,7 +79,7 @@ void text_conversion(FILE *in,FILE *out)
 
 /**********************************************************************/
 
-static void text_conversion_backend(FILE *in,FILE *out)
+static void text_conversion_backend(FILE *const restrict in,FILE *const restrict out)
 {
   FILE   *tmpout;
   char   *buffer;
@@ -134,7 +134,7 @@ static void text_conversion_backend(FILE *in,FILE *out)
 
 /***********************************************************************/
 
-void mixed_conversion(FILE *in,FILE *out)
+void mixed_conversion(FILE *const restrict in,FILE *const restrict out)
 {
   FILE *tmpfp;
   char *text;
@@ -156,7 +156,7 @@ void mixed_conversion(FILE *in,FILE *out)
 
 /*************************************************************************/
 
-void html_conversion(FILE *in,FILE *out)
+void html_conversion(FILE *const restrict in,FILE *const restrict out)
 {
   struct nested_params local;
   int                  t;
@@ -188,7 +188,7 @@ void html_conversion(FILE *in,FILE *out)
 
 /**********************************************************************/
 
-static void html_handle_tag(struct nested_params *local)
+static void html_handle_tag(struct nested_params *const local)
 {
   assert(local != NULL);
   
@@ -303,7 +303,7 @@ static void html_handle_tag(struct nested_params *local)
 
 /************************************************************************/
 
-static void check_for_uri(struct nested_params *local,const char *attrib)
+static void check_for_uri(struct nested_params *const local,const char *const attrib)
 {
   char         newuri[BUFSIZ];
   struct pair *src;
@@ -325,7 +325,7 @@ static void check_for_uri(struct nested_params *local,const char *attrib)
 
 /*************************************************************************/
 
-static void entify_char(char *d,size_t ds,char *s,char e,const char *entity)
+static void entify_char(char *d,size_t ds,char *s,char e,const char *const entity)
 {
   size_t se;
   
@@ -363,7 +363,7 @@ static void entify_char(char *d,size_t ds,char *s,char e,const char *entity)
 
 /**************************************************************************/
       
-static void html_handle_string(struct nested_params *local)
+static void html_handle_string(struct nested_params *const local)
 {
   FILE *in;
   char *text = HtmlParseValue(local->token);
@@ -385,7 +385,7 @@ static void html_handle_string(struct nested_params *local)
 
 /************************************************************************/
 
-static void html_handle_comment(struct nested_params *local)
+static void html_handle_comment(struct nested_params *const local)
 {
   assert(local != NULL);
   
@@ -394,7 +394,7 @@ static void html_handle_comment(struct nested_params *local)
 
 /**************************************************************************/
 
-void buff_conversion(FILE *in,FILE *out)
+void buff_conversion(FILE *const restrict in,FILE *const restrict out)
 {
   int c;
   
@@ -432,7 +432,7 @@ void buff_conversion(FILE *in,FILE *out)
 
 /*****************************************************************/
 
-static void handle_backquote(FILE *input,FILE *output)
+static void handle_backquote(FILE *const restrict input,FILE *const restrict output)
 {
   int c;
 
@@ -457,7 +457,7 @@ static void handle_backquote(FILE *input,FILE *output)
 
 /********************************************************************/
 
-static void handle_quote(FILE *input,FILE *output)
+static void handle_quote(FILE *const restrict input,FILE *const restrict output)
 {
   int c;
   
@@ -482,7 +482,7 @@ static void handle_quote(FILE *input,FILE *output)
 
 /**********************************************************************/
 
-static void handle_dash(FILE *input,FILE *output)
+static void handle_dash(FILE *const restrict input,FILE *const restrict output)
 {
   int c;
     
@@ -516,7 +516,7 @@ static void handle_dash(FILE *input,FILE *output)
 
 /********************************************************************/
 
-static void handle_period(FILE *input,FILE *output)
+static void handle_period(FILE *const restrict input,FILE *const restrict output)
 {
   int c;
   

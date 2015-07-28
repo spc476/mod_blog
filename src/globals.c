@@ -52,10 +52,10 @@
 
 /***********************************************************/
 
-void	set_c_updatetype	(const char *);
-void	set_gf_emailupdate	(const char *);
-void	set_c_conversion	(const char *);
-void	set_c_url		(const char *);
+void	set_c_updatetype	(const char *const);
+void	set_gf_emailupdate	(const char *const);
+void	set_c_conversion	(const char *const);
+void	set_c_url		(const char *const);
 
 static bool	   get_next	(char *,const char **);
 static int	   get_field	(lua_State *const,const char *);
@@ -314,7 +314,7 @@ int GlobalsInit(const char *conf)
 
 /********************************************************************/
 
-void set_c_updatetype(const char *value)
+void set_c_updatetype(const char *const value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;
@@ -333,7 +333,7 @@ void set_c_updatetype(const char *value)
 
 /************************************************************************/
 
-void set_cf_emailupdate(const char *value)
+void set_cf_emailupdate(const char *const value)
 {
   if (value && !empty_string(value))
   {
@@ -346,7 +346,7 @@ void set_cf_emailupdate(const char *value)
 
 /***************************************************************************/
 
-void set_c_conversion(const char *value)
+void set_c_conversion(const char *const value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;
@@ -361,7 +361,7 @@ void set_c_conversion(const char *value)
 
 /**************************************************************************/
 
-void set_c_url(const char *turl)
+void set_c_url(const char *const turl)
 {
   url__t *url;
   size_t  len;
