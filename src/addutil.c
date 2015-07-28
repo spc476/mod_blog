@@ -43,6 +43,7 @@
 #include "backend.h"
 #include "globals.h"
 #include "fix.h"
+#include "blogutil.h"
 
 #ifdef EMAIL_NOTIFY
 #  include <gdbm.h>

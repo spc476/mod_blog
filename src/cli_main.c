@@ -52,6 +52,7 @@
 #include "timeutil.h"
 #include "wbtum.h"
 #include "fix.h"
+#include "blogutil.h"
 #include "backend.h"
 #include "globals.h"
 

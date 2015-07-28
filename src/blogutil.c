@@ -82,7 +82,7 @@ char *fromstring(const String src)
 
 /*********************************************************************/
 
-size_t fcopy(FILE *out,FILE *in)
+size_t fcopy(FILE *const restrict out,FILE *const restrict in)
 {
   char buffer[BUFSIZ];
   size_t inbytes;

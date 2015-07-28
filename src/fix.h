@@ -111,9 +111,8 @@ extern void	 generic_cb			(const char *,FILE *,void *);
 extern void	 dbcritical			(const char *);
 extern char	*entity_conversion		(const char *);
 extern char	*entity_encode			(const char *);
-extern FILE	*fentity_encode_onread		(FILE *);
-extern FILE	*fentity_encode_onwrite		(FILE *);
-extern size_t	 fcopy				(FILE *,FILE *);
+extern FILE	*fentity_encode_onread		(FILE *const);
+extern FILE	*fentity_encode_onwrite		(FILE *const);
 
 #endif
 

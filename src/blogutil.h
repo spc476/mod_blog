@@ -35,6 +35,7 @@ typedef struct mystring
 
 extern String 	*tag_split	(size_t *,const char *);
 extern char	*fromstring	(const String);
+extern size_t	 fcopy		(FILE *const restrict,FILE *const restrict);
 
 #endif
 
