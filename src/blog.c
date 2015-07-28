@@ -340,9 +340,9 @@ BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
 
 void BlogEntryReadBetweenU(
         const Blog        blog,
-        List             *list,
-        const struct btm *start,
-        const struct btm *end
+        List             *restrict list,
+        const struct btm *restrict start,
+        const struct btm *restrict end
 )
 {
   BlogEntry  entry;
@@ -374,9 +374,9 @@ void BlogEntryReadBetweenU(
 
 void BlogEntryReadBetweenD(
         const Blog        blog,
-        List             *listb,
-        const struct btm *end,
-        const struct btm *start
+        List             *restrict listb,
+        const struct btm *restrict end,
+        const struct btm *restrict start
 )
 {
   List  lista;
@@ -410,8 +410,8 @@ void BlogEntryReadBetweenD(
   
 void BlogEntryReadXD(
         const Blog        blog,
-        List             *list,
-        const struct btm *start,
+        List             *restrict list,
+        const struct btm *restrict start,
         size_t            num
 )
 {
@@ -449,8 +449,8 @@ void BlogEntryReadXD(
 
 void BlogEntryReadXU(
         const Blog        blog,
-        List             *list,
-        const struct btm *start,
+        List             *restrict list,
+        const struct btm *restrict start,
         size_t            num
 )
 {
