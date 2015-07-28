@@ -213,7 +213,7 @@ void notify_emaillist(void)
 
 /*************************************************************************/
 
-void dbcritical(char *msg)
+void dbcritical(const char *msg)
 {
   if (msg)
     fprintf(stderr,"critical error: %s\n",msg);

@@ -108,7 +108,7 @@ extern void	 notify_emaillist		(void);
 extern int	 entry_add			(Request);
 extern void	 fix_entry			(Request);
 extern void	 generic_cb			(const char *,FILE *,void *);
-extern void	 dbcritical			(char *);
+extern void	 dbcritical			(const char *);
 extern char	*entity_conversion		(const char *);
 extern char	*entity_encode			(const char *);
 extern FILE	*fentity_encode_onread		(FILE *);
