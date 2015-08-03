@@ -66,7 +66,7 @@ static int	cgi_error		(Request,int,const char *, ... );
 
 /*************************************************************************/
 
-int main_cgi_head(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attribute__((unused)))
+int main_cgi_head(Cgi cgi)
 {
   struct request req;
   int            rc;
@@ -82,7 +82,7 @@ int main_cgi_head(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attrib
 
 /**********************************************************************/
 
-int main_cgi_get(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attribute__((unused)))
+int main_cgi_get(Cgi cgi)
 {
   struct request  req;
   int             rc;
@@ -258,7 +258,7 @@ static int cmd_cgi_get_overview(Request req)
 
 /**********************************************************************/
 
-int main_cgi_post(Cgi cgi,int argc __attribute__((unused)),char *argv[] __attribute__((unused)))
+int main_cgi_post(Cgi cgi)
 {
   struct request req;
   int            rc;

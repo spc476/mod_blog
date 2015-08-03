@@ -107,9 +107,9 @@ int main(int argc,char *argv[],char *envp[])
   {
     switch(CgiMethod(gd.cgi))
     {
-      case GET:  rc = main_cgi_get (gd.cgi,argc,argv); break;
-      case POST: rc = main_cgi_post(gd.cgi,argc,argv); break;
-      case HEAD: rc = main_cgi_head(gd.cgi,argc,argv); break;
+      case GET:  rc = main_cgi_get (gd.cgi); break;
+      case POST: rc = main_cgi_post(gd.cgi); break;
+      case HEAD: rc = main_cgi_head(gd.cgi); break;
       default:   rc = EXIT_FAILURE;
     }
   }
