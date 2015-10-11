@@ -210,11 +210,11 @@ char *get_remote_user(void)
   static size_t breakline(char **dest,size_t dsize,FILE *const in)
   {
     char  **tmp;
-    char   *line;
+    char   *line = NULL;
     char   *p;
     char   *colon;
     size_t  cnt;
-    size_t  size;
+    size_t  size = 0;
     ssize_t rc;
     
     rc = getline(&line,&size,in);
