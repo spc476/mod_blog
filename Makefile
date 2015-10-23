@@ -67,7 +67,7 @@ clean :
 	$(RM) -r build *~ src/*~ *.bak
 
 tarball:
-	(cd .. ; tar czvf /tmp/boston.tar.gz -X boston/.exclude boston/ )
+	git archive -o /tmp/boston-$(VERSION).tar.gz --prefix boston $(VERSION)
 
 depend:
 	makedepend -pbuild/ -Y -- $(CFLAGS) -- src/*.c 2>/dev/null
