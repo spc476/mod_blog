@@ -453,17 +453,15 @@ void BlogEntryReadXD(
 void BlogEntryReadXU(
         const Blog        blog,
         List             *list,
-        const struct btm *start,
         size_t            num
 )
 {
   BlogEntry  entry;
   struct btm current;
   
-  assert(blog  != NULL);
-  assert(list  != NULL);
-  assert(start != NULL);
-  assert(num   >  0);
+  assert(blog != NULL);
+  assert(list != NULL);
+  assert(num  >  0);
   
   while((num) && (btm_cmp_date(&current,&blog->now) <= 0))
   {

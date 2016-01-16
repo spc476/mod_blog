@@ -85,8 +85,8 @@ static bool parse_num(
 
 static bool check_dates(tumbler__s *tum)
 {
-  bool start_okay;
-  bool stop_okay;
+  bool start_okay = false;
+  bool stop_okay  = false;
   
   assert(tum != NULL);
   
