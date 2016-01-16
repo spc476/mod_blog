@@ -397,7 +397,7 @@ char *entity_encode(const char *s)
   char   *entity;
   size_t  dummy;
  
-  assert(s      != NULL);
+  assert(s != NULL);
 
   out = open_memstream(&text,&size);
 
@@ -449,6 +449,8 @@ static ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
   size_t  repsize;
   int     c;
   
+  assert(buffer != NULL);
+  
   if (feof(realin))
     return 0;
   
@@ -490,6 +492,8 @@ static ssize_t few_write(void *cookie,const char *buffer,size_t bytes)
   char   *replace;
   size_t  repsize;
 
+  assert(buffer != NULL);
+  
   while(bytes)
   {
     if (char_entity(&replace,&repsize,*buffer))

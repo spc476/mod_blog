@@ -88,6 +88,9 @@ size_t fcopy(FILE *const restrict out,FILE *const restrict in)
   size_t inbytes;
   size_t outbytes;
   
+  assert(out != NULL);
+  assert(in  != NULL);
+  
   outbytes = 0;
   
   do

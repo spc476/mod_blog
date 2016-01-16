@@ -348,9 +348,10 @@ void BlogEntryReadBetweenU(
   BlogEntry  entry;
   struct btm current;
   
-  assert(blog               != NULL);
-  assert(start              != NULL);
-  assert(end                != NULL);
+  assert(blog  != NULL);
+  assert(list  != NULL);
+  assert(start != NULL);
+  assert(end   != NULL);
   
   current = *start;
   
@@ -382,9 +383,10 @@ void BlogEntryReadBetweenD(
   List  lista;
   Node *node;
   
-  assert(blog               != NULL);
-  assert(start              != NULL);
-  assert(end                != NULL);
+  assert(blog  != NULL);
+  assert(listb != NULL);
+  assert(start != NULL);
+  assert(end   != NULL);
   
   ListInit(&lista);
   
@@ -419,6 +421,7 @@ void BlogEntryReadXD(
   struct btm current;
   
   assert(blog  != NULL);
+  assert(list  != NULL);
   assert(start != NULL);
   assert(num   >  0);
   
@@ -458,6 +461,7 @@ void BlogEntryReadXU(
   struct btm current;
   
   assert(blog  != NULL);
+  assert(list  != NULL);
   assert(start != NULL);
   assert(num   >  0);
   
@@ -885,6 +889,10 @@ static int blog_meta_write(
 )
 {
   FILE   *fp;
+
+  assert(name != NULL);
+  assert(date != NULL);
+  assert(list != NULL);
   
   fp = open_file_w(name,date);
   if (fp == NULL)

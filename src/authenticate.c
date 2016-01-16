@@ -217,6 +217,10 @@ char *get_remote_user(void)
     size_t  size = 0;
     ssize_t rc;
     
+    assert(dest  != NULL);
+    assert(dsize >  0);
+    assert(in    != NULL);
+    
     rc = getline(&line,&size,in);
     if ((rc == -1) || (emptynull_string(line)))
     {

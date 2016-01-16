@@ -429,6 +429,9 @@ static int get_field(
   size_t len = strlen(name);
   char   field[len];
   
+  assert(L    != NULL);
+  assert(name != NULL);
+  
   lua_getglobal(L,"_G");
   while(get_next(field,&name))
   {

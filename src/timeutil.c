@@ -90,6 +90,7 @@ void btm_dec_part(struct btm *const d)
 void btm_dec_day(struct btm *const d)
 {
   assert(d != NULL);
+
   d->day--;
   if (d->day == 0)
   {
@@ -200,6 +201,8 @@ int btm_cmp_year(
 
 void tm_init(struct tm *const ptm)
 {
+  assert(ptm != NULL);
+  
   memset(ptm,0,sizeof(struct tm));
   ptm->tm_isdst = -1;
 }

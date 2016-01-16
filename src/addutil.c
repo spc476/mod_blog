@@ -56,6 +56,8 @@ int entry_add(Request req)
   BlogEntry  entry;
   char      *p;
   
+  assert(req != NULL);
+  
   fix_entry(req);
   
   entry = BlogEntryNew(g_blog);

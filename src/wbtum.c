@@ -53,9 +53,10 @@ static bool parse_num(
 {
   long val;
   
-  assert(pv != NULL);
-  assert(p  != NULL);
-  assert(*p != NULL);
+  assert(pv  != NULL);
+  assert(p   != NULL);
+  assert(*p  != NULL);
+  assert(low <= high);
   
   if (!isdigit(**p))
     return false;

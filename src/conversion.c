@@ -86,6 +86,9 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
   char   *line;  
   size_t  bufsize;
   
+  assert(in  != NULL);
+  assert(out != NULL);
+  
   line    = NULL;
   buffer  = NULL;
   bufsize = 0;   
@@ -161,8 +164,8 @@ void html_conversion(FILE *const restrict in,FILE *const restrict out)
   struct nested_params local;
   int                  t;
 
-  assert(in    != NULL);
-  assert(out   != NULL);
+  assert(in  != NULL);
+  assert(out != NULL);
     
   local.in         = in;
   local.out        = out;

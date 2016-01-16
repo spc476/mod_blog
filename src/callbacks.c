@@ -789,7 +789,7 @@ static void cb_entry_body_entified(FILE *const out,void *data)
 {
   FILE *eout;
   
-  assert(out != NULL);
+  assert(out  != NULL);
   assert(data != NULL);
   
   eout = fentity_encode_onwrite(out);
@@ -825,9 +825,10 @@ static void cb_cond_hr(FILE *const out,void *data)
 static void cb_cond_blog_title(FILE *const out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry     entry;
+  BlogEntry             entry;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   if (gd.navunit == UNIT_PART)
   {
@@ -1053,7 +1054,7 @@ static void cb_navigation_first_url(FILE *const out,void *data __attribute__((un
 {
   struct btm tmp;
   
-  assert(out  != NULL);
+  assert(out != NULL);
   
   tmp = g_blog->first;
   if (gd.f.navigation == false)
@@ -1068,7 +1069,7 @@ static void cb_navigation_first_title(FILE *const out,void *data __attribute__((
 {
   struct btm tmp;
   
-  assert(out  != NULL);
+  assert(out != NULL);
   
   tmp = g_blog->first;
   if (gd.f.navigation == false)
@@ -1083,7 +1084,7 @@ static void cb_navigation_last_url(FILE *const out,void *data __attribute__((unu
 {
   struct btm tmp;
   
-  assert(out  != NULL);
+  assert(out != NULL);
   
   tmp = g_blog->last;
   if (gd.f.navigation == false)
@@ -1098,7 +1099,7 @@ static void cb_navigation_last_title(FILE *const out,void *data __attribute__((u
 {
   struct btm tmp;
   
-  assert(out  != NULL);
+  assert(out != NULL);
   
   tmp = g_blog->last;
   if (gd.f.navigation == false)
@@ -1113,7 +1114,7 @@ static void cb_navigation_next_title(FILE *const out,void *data __attribute__((u
 {
   struct btm tmp;
   
-  assert(out  != NULL);
+  assert(out != NULL);
   
   tmp = gd.next;
   print_nav_title(out,&tmp,gd.navunit);
@@ -1125,7 +1126,7 @@ static void cb_navigation_prev_title(FILE *const out,void *data __attribute__((u
 {
   struct btm tmp;
   
-  assert(out  != NULL);
+  assert(out != NULL);
   
   tmp = gd.previous;
   print_nav_title(out,&tmp,gd.navunit);
@@ -1137,7 +1138,7 @@ static void cb_navigation_next_url(FILE *const out,void *data __attribute__((unu
 {
   struct btm tmp;
 
-  assert(out  != NULL);
+  assert(out != NULL);
 
   tmp = gd.next;
   print_nav_url(out,&tmp,gd.navunit);
@@ -1149,7 +1150,7 @@ static void cb_navigation_prev_url(FILE *const out,void *data __attribute__((unu
 {
   struct btm tmp;
 
-  assert(out  != NULL);
+  assert(out != NULL);
   
   tmp = gd.previous;
   print_nav_url(out,&tmp,gd.navunit);
@@ -1277,6 +1278,8 @@ static void cb_update_time(FILE *const out,void *data __attribute__((unused)))
 {
   char tmpbuf[20];
   
+  assert(out != NULL);
+  
   strftime(tmpbuf,sizeof(tmpbuf),"%Y-%m-%dT%H:%M:%S",localtime(&g_blog->tnow));
   fprintf(out,"%s%+03d:%02d",tmpbuf,c_tzhour,c_tzmin);
 }
@@ -1285,7 +1288,7 @@ static void cb_update_time(FILE *const out,void *data __attribute__((unused)))
 
 static void cb_update_type(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   fputs(c_updatetype,out);
 }
@@ -1294,7 +1297,7 @@ static void cb_update_type(FILE *const out,void *data __attribute__((unused)))
 
 static void cb_robots_index(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   if ((gd.navunit == UNIT_PART) || (gd.navunit == UNIT_INDEX))
     fputs("index",out);
@@ -1389,7 +1392,7 @@ static void cb_comments_check(FILE *const out,void *data)
 
 static void cb_edit(FILE *const out,void *data)
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   if (gd.f.edit == 0) return;
   generic_cb("edit",out,data);
@@ -1401,8 +1404,8 @@ static void cb_edit_author(FILE *const out,void *data __attribute__((unused)))
 {
   char *name;
   
-  assert(out  != NULL);
-
+  assert(out != NULL);
+  
   if (gd.req->origauthor != NULL)
     fputs(gd.req->origauthor,out);
   else
@@ -1417,7 +1420,7 @@ static void cb_edit_author(FILE *const out,void *data __attribute__((unused)))
 
 static void cb_edit_title(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   if (gd.req->title != NULL)
     fputs(gd.req->title,out);
@@ -1427,7 +1430,7 @@ static void cb_edit_title(FILE *const out,void *data __attribute__((unused)))
 
 static void cb_edit_status(FILE *const out,void *data __attribute__ ((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   if (gd.req->status != NULL)
     fputs(gd.req->status,out);
@@ -1441,7 +1444,7 @@ static void cb_edit_date(FILE *const out,void *data __attribute__((unused)))
   struct tm *ptm;
   char       buffer[BUFSIZ];
 
-  assert(out  != NULL);
+  assert(out != NULL);
 
   if (gd.req->date != NULL)
     fputs(gd.req->date,out);
@@ -1458,7 +1461,7 @@ static void cb_edit_date(FILE *const out,void *data __attribute__((unused)))
 
 static void cb_edit_class(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   if (gd.req->class)
     fputs(gd.req->class,out);
@@ -1482,7 +1485,7 @@ static void cb_edit_filter(FILE *const out __attribute__((unused)),void *data __
 
 static void cb_edit_body(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   if (gd.req->origbody)
     fputs(gd.req->origbody,out);
@@ -1492,7 +1495,7 @@ static void cb_edit_body(FILE *const out,void *data __attribute__((unused)))
 
 static void cb_xyzzy(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   fputs("Nothing happens.",out);
 }
@@ -1596,7 +1599,7 @@ static void cb_overview(FILE *const out __attribute__((unused)),void *data __att
 
 static void cb_overview_date(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   fputs("DATE",out);
 }
@@ -1605,7 +1608,7 @@ static void cb_overview_date(FILE *const out,void *data __attribute__((unused)))
 
 static void cb_overview_list(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   fputs("<li>OVERVIEW</li>",out);
 }

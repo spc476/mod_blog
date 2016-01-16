@@ -386,6 +386,8 @@ static int cmd_cgi_post_show(Request req)
   BlogEntry            entry;
   char                *p;
   
+  assert(req != NULL);
+  
   /*----------------------------------------------------
   ; this routine is a mixture between entry_add() and
   ; tumbler_page().  Perhaps some refactoring is in order
@@ -427,6 +429,8 @@ static int cmd_cgi_post_show(Request req)
 
 static int cmd_cgi_post_edit(Request req)
 {
+  assert(req != NULL);
+  
   return((req->error)(req,HTTP_BADREQ,"bad request"));
 }
 
@@ -438,6 +442,11 @@ static int cgi_error(Request req,int level,const char *msg, ... )
   va_list  args;
   char    *file   = NULL;
   char    *errmsg = NULL;
+  
+  assert(req   != NULL);
+  assert(level >= 0);
+  assert(level <  8);
+  assert(msg   != NULL);
   
   va_start(args,msg);
   vasprintf(&errmsg,msg,args);
