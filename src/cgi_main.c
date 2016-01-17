@@ -445,7 +445,6 @@ static int cgi_error(Request req,int level,const char *msg, ... )
   
   assert(req   != NULL);
   assert(level >= 0);
-  assert(level <  8);
   assert(msg   != NULL);
   
   va_start(args,msg);

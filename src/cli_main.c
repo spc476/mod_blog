@@ -440,7 +440,6 @@ static int cli_error(Request req __attribute__((unused)),int level,const char *m
   va_list args;
   
   assert(level >= 0);
-  assert(level <  8);
   assert(msg   != NULL);
   
   fprintf(stderr,"Error %d: ",level);
