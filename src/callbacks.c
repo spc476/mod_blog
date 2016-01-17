@@ -300,7 +300,7 @@ static void cb_blog_script(FILE *const out,void *data __attribute__((unused)))
 {
   char *script;
   
-  assert(out  != NULL);
+  assert(out != NULL);
   
   script = getenv("SCRIPT_NAME");
   if (script)
@@ -332,7 +332,7 @@ static void cb_blog_url_home(FILE *const out,void *data __attribute__((unused)))
 
 static void cb_blog_name(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   fputs(c_name,out);
 }
@@ -362,7 +362,7 @@ static void cb_blog_adtag(FILE *const out,void *data)
   struct callback_data *cbd;
   char                 *tag;
 
-  assert(out  != NULL);
+  assert(out != NULL);
 
   if (data == NULL)
     tag = UrlEncodeString(c_adtag);
@@ -384,7 +384,7 @@ static void cb_blog_adtag_entity(FILE *const out,void *data)
   FILE                 *entityout;
   const char           *tag;
 
-  assert(out  != NULL);
+  assert(out != NULL);
   
   if (data == NULL)
     tag = c_adtag;
@@ -407,7 +407,7 @@ static void cb_entry(FILE *const out,void *data)
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  assert(out  != NULL);
+  assert(out != NULL);
 
   if (data == NULL)
   {
@@ -556,7 +556,7 @@ static void cb_entry_status(FILE *const out,void *data)
 
 static void cb_entry_adtag(FILE *const out,void *data __attribute__((unused)))
 {
-  assert(out  != NULL);
+  assert(out != NULL);
   
   fputs("Soon young Skywalker.  Soon.",out);
 }
@@ -789,8 +789,7 @@ static void cb_entry_body_entified(FILE *const out,void *data)
 {
   FILE *eout;
   
-  assert(out  != NULL);
-  assert(data != NULL);
+  assert(out != NULL);
   
   eout = fentity_encode_onwrite(out);
   if (eout == NULL) return;
@@ -805,12 +804,13 @@ static void cb_cond_hr(FILE *const out,void *data)
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  assert(out  != NULL);
-  assert(data != NULL);
+  assert(out != NULL);
   
   if (gd.f.navigation && (gd.navunit == UNIT_PART))
     return;
 
+  assert(data != NULL);
+  
   entry = cbd->entry;
   assert(entry->valid);
   if (btm_cmp_date(&entry->when,&cbd->last) == 0)
@@ -827,11 +827,11 @@ static void cb_cond_blog_title(FILE *const out,void *data)
   struct callback_data *cbd = data;
   BlogEntry             entry;
   
-  assert(out  != NULL);
-  assert(data != NULL);
+  assert(out != NULL);
   
   if (gd.navunit == UNIT_PART)
   {
+    assert(data != NULL);
     entry = (BlogEntry)ListGetHead(&cbd->list);
     if (NodeValid(&entry->node) && entry->valid)
       fprintf(out,"%s - ",entry->title);
@@ -845,7 +845,7 @@ static void cb_rss_pubdate(FILE *const out,void *data __attribute__((unused)))
   struct tm *ptm;
   char       buffer[BUFSIZ];
   
-  assert(out  != NULL);
+  assert(out != NULL);
   
   ptm = gmtime(&g_blog->tnow);
   strftime(buffer,BUFSIZ,"%a, %d %b %Y %H:%M:%S GMT",ptm);
@@ -965,8 +965,7 @@ static void cb_atom_category(FILE *const out,void *data)
 {
   FILE *eout;
   
-  assert(out  != NULL);
-  assert(data != NULL);
+  assert(out != NULL);
   
   eout = fentity_encode_onwrite(out);
   if (eout == NULL) return;
@@ -988,8 +987,7 @@ static void cb_navigation_link(FILE *const out,void *data)
 
 static void cb_navigation_link_next(FILE *const out,void *data)
 {
-  assert(out  != NULL);
-  assert(data != NULL);
+  assert(out != NULL);
   
   if (gd.f.navnext == false) return;
   generic_cb("navigation.link.next",out,data);
@@ -999,8 +997,7 @@ static void cb_navigation_link_next(FILE *const out,void *data)
 
 static void cb_navigation_link_prev(FILE *const out,void *data)
 {
-  assert(out  != NULL);
-  assert(data != NULL);
+  assert(out != NULL);
   
   if (gd.f.navprev == false) return;
   generic_cb("navigation.link.prev",out,data);
@@ -1020,8 +1017,7 @@ static void cb_navigation_bar(FILE *const out,void *data)
 
 static void cb_navigation_bar_next(FILE *const out,void *data)
 {
-  assert(out  != NULL);
-  assert(data != NULL);
+  assert(out != NULL);
   
   if (gd.f.navnext == false) return;
   generic_cb("navigation.bar.next",out,data);
@@ -1031,8 +1027,7 @@ static void cb_navigation_bar_next(FILE *const out,void *data)
 
 static void cb_navigation_bar_prev(FILE *const out,void *data)
 {
-  assert(out  != NULL);
-  assert(data != NULL);
+  assert(out != NULL);
   
   if (gd.f.navprev == false) return;
   generic_cb("navigation.bar.prev",out,data);
@@ -1309,8 +1304,7 @@ static void cb_robots_index(FILE *const out,void *data __attribute__((unused)))
 
 static void cb_comments(FILE *const out,void *data)
 {
-  assert(out  != NULL);
-  assert(data != NULL);
+  assert(out != NULL);
   
   if (gd.navunit != UNIT_PART)
     return;
