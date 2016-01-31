@@ -20,8 +20,8 @@
 *
 *************************************************************************/
 
-#ifndef FIX_H
-#define FIX_H
+#ifndef I_923B1CED_AA68_5BFE_A50A_C27EEE5A2EE8
+#define I_923B1CED_AA68_5BFE_A50A_C27EEE5A2EE8
 
 #include <cgilib6/chunk.h>
 

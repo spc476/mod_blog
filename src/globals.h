@@ -20,8 +20,8 @@
 *
 ****************************************************************/
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#ifndef I_82F50023_10E0_5FB8_A706_318F243A6012
+#define I_82F50023_10E0_5FB8_A706_318F243A6012
 
 #include <stdbool.h>
 #include <cgilib6/cgi.h>

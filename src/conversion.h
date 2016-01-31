@@ -20,8 +20,8 @@
 *
 *********************************************************************/
 
-#ifndef CONVERSION_H
-#define CONVERSION_H
+#ifndef I_18C80596_12AD_588C_8AC5_C30F6FDDBF24
+#define I_18C80596_12AD_588C_8AC5_C30F6FDDBF24
 
 #include <stdio.h>
 

@@ -20,8 +20,8 @@
 *
 *************************************************************************/
 
-#ifndef FRONTEND_H
-#define FRONTEND_H
+#ifndef I_CA412E0F_D512_5F3E_AB0B_4739574108FF
+#define I_CA412E0F_D512_5F3E_AB0B_4739574108FF
 
 #include <cgilib6/cgi.h>
 

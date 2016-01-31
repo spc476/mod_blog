@@ -20,8 +20,8 @@
 *
 *********************************************/
 
-#ifndef BLOG_UTIL
-#define BLOG_UTIL
+#ifndef I_F3FFF9B1_0536_542C_B5AB_DB26462A0322
+#define I_F3FFF9B1_0536_542C_B5AB_DB26462A0322
 
 #include <time.h>
 

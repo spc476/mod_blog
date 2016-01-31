@@ -20,8 +20,8 @@
 *
 ********************************************************************/
 
-#ifndef BLOG_MKENTRY
-#define BLOG_MKENTRY
+#ifndef I_A7907483_71BF_5594_9AA6_58C785CB9FFA
+#define I_A7907483_71BF_5594_9AA6_58C785CB9FFA
 
 #include <stdbool.h>
 #include <cgilib6/nodelist.h>

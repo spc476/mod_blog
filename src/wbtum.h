@@ -20,8 +20,8 @@
 *
 **********************************************************************/
 
-#ifndef WBTUM_H
-#define WBTUM_H
+#ifndef I_92A09CC2_0922_5AE9_8A0E_3E71ED370C86
+#define I_92A09CC2_0922_5AE9_8A0E_3E71ED370C86
 
 #include <stdbool.h>
 #include <stdio.h>
