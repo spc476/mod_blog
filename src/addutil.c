@@ -166,17 +166,54 @@ void fix_entry(Request req)
   }
 }
 
+/*************************************************************************/
+
+void dbcritical(const char *msg)
+{
+  if (msg)
+    fprintf(stderr,"critical error: %s\n",msg);
+}
+
+/************************************************************************/
+
+#ifndef EMAIL_NOTIFY
+
+void notify_emaillist(Request req __attribute__((unused)))
+{
+}
+
+/************************************************************************/
+
+#else
+
+static void cb_email_title(FILE *const,void *);
+static void cb_email_url  (FILE *const,void *);
+
+static const struct chunk_callback m_emcallbacks[] =
+{
+  { "email.title"	, cb_email_title	} ,
+  { "email.url" 	, cb_email_url		} ,
+  { "email.author"	, cb_email_author	} ,
+};
+
+static const size_t m_emcbnum = sizeof(m_emcallbacks) / sizeof(struct chunk_callback);
+
 /************************************************************************/
 
 void notify_emaillist(Request req)
 {
-#ifdef EMAIL_NOTIFY
   GDBM_FILE  list;
+  Chunk      templates;
   datum      key;
   datum      content;
   Email      email;
+  FILE      *out;
   FILE      *in;
- 
+  char      *tmp  = NULL;
+  size_t     size = 0;
+  
+  assert(req != NULL);
+  
   list = gdbm_open((char *)c_emaildb,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
     return;
@@ -189,7 +226,13 @@ void notify_emaillist(Request req)
   PairListCreate(&email->headers,"Content-Type","text/plain; charset=UTF-8; format=flowed");
   PairListCreate(&email->headers,"Content-Transfer-Encoding","quoted-printable");
   
-  in = fopen(c_emailmsg,"r");
+  templates = ChunkNew("",m_emcallbacks,m_emcbnum);
+  out       = open_memstream(&tmp,&size);
+  ChunkProcess(templates,c_emailmsg,out,req);
+  ChunkFree(templates);
+  fclose(out);
+  
+  in = fmemopen(tmp,size,"r");
   if (in == NULL)
   {
     EmailFree(email);
@@ -216,16 +259,43 @@ void notify_emaillist(Request req)
   email->to = NULL;
   EmailFree(email);
   gdbm_close(list);
-#endif
 }
 
 /*************************************************************************/
 
-void dbcritical(const char *msg)
+static void cb_email_title(FILE *const out,void *data)
 {
-  if (msg)
-    fprintf(stderr,"critical error: %s\n",msg);
+  Request req = (Request)data;
+  
+  fprintf(out,"%s",req->title);
 }
 
 /*************************************************************************/
 
+static void cb_email_url(FILE *const out,void *data)
+{
+  Request req = (Request)data;
+  
+  fprintf(
+           out,
+           "%s/%04d/%02d/%02d.%d",
+           c_fullbaseurl,
+           req->when.year,
+           req->when.month,
+           req->when.day,
+           req->when.part
+         );
+}
+
+/*************************************************************************/
+
+static void cb_email_author(FILE *const out,void *data)
+{
+  Request req = (Request)data;
+  
+  fprintf(out,"%s",req->author);
+}
+
+/*************************************************************************/
+
+#endif
