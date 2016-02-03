@@ -56,6 +56,7 @@ typedef struct request
   char       *origbody;
   char       *body;
   char       *reqtumbler;
+  struct btm  when;
   tumbler__s  tumbler;
 } *Request;  
 

@@ -93,6 +93,7 @@ int entry_add(Request req)
 
   if (c_authorfile) BlogUnlock(g_blog);
   
+  req->when = entry->when;
   free(entry);
   return(0);    
 }
