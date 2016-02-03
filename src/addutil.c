@@ -340,8 +340,6 @@ void notify_emaillist(Request req)
   Email      email;
   FILE      *out;
   FILE      *in;
-  FILE      *inutf8;
-  FILE      *inqp;
   char      *tmp  = NULL;
   size_t     size = 0;
   
@@ -366,62 +364,46 @@ void notify_emaillist(Request req)
   fclose(out);
   
   in = fmemopen(tmp,size,"r");
-  if (in == NULL)
+  if (in != NULL)
   {
-    EmailFree(email);
-    gdbm_close(list);
-    return;
-  }
-  
-  inutf8 = fopencookie(in,"r",(cookie_io_functions_t)
-                              {
-                                utf8_read,
-                                NULL,
-                                NULL,
-                                NULL
-                              });
-  if (inutf8 == NULL)
-  {
-    fclose(in);
-    EmailFree(email);
-    gdbm_close(list);
-    return;
-  }
-  
-  inqp = fopencookie(inutf8,"r",(cookie_io_functions_t)
-                                {
-                                  qp_read,
-                                  NULL,
-                                  NULL,
-                                  NULL
-                                });
-  if (inqp == NULL)
-  {
-    fclose(inutf8);
-    fclose(in);
-    EmailFree(email);
-    gdbm_close(list);
-    return;
-  }
-  
-  fcopy(email->body,inqp);
-  fclose(inqp);
-  fclose(inutf8);
-  fclose(in);
-  
-  key = gdbm_firstkey(list);
- 
-  while(key.dptr != NULL)
-  {
-    content = gdbm_fetch(list,key);
-    if (content.dptr != NULL)
+    FILE *inutf8 = fopencookie(in,"r",(cookie_io_functions_t)
+                                      {
+                                        utf8_read,
+                                        NULL,
+                                        NULL,
+                                        NULL
+                                      });
+    if (inutf8 != NULL)
     {
-      email->to = content.dptr;
-      EmailSend(email);
+      FILE *inqp = fopencookie(inutf8,"r",(cookie_io_functions_t)
+                                          {
+                                            qp_read,
+                                            NULL,
+                                            NULL,
+                                            NULL
+                                          });
+      if (inqp != NULL)
+      {      
+        fcopy(email->body,inqp);
+        key = gdbm_firstkey(list);
+        
+        while(key.dptr != NULL)
+        {
+          content = gdbm_fetch(list,key);
+          if (content.dptr != NULL)
+          {
+            email->to = content.dptr;
+            EmailSend(email);
+          }
+          key = gdbm_nextkey(list,key);
+        }
+        fclose(inqp);
+      }
+      fclose(inutf8);
     }
-    key = gdbm_nextkey(list,key);
+    fclose(in);
   }
-
+  
   email->to = NULL;
   EmailFree(email);
   gdbm_close(list);
