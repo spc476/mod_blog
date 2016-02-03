@@ -167,7 +167,7 @@ void fix_entry(Request req)
 
 /************************************************************************/
 
-void notify_emaillist(void)
+void notify_emaillist(Request req)
 {
 #ifdef EMAIL_NOTIFY
   GDBM_FILE  list;
@@ -183,6 +183,10 @@ void notify_emaillist(void)
   email          = EmailNew();
   email->from    = c_email;
   email->subject = c_emailsubject;
+  
+  PairListCreate(&email->headers,"MIME-Version","1.0");
+  PairListCreate(&email->headers,"Content-Type","text/plain; charset=UTF-8; format=flowed");
+  PairListCreate(&email->headers,"Content-Transfer-Encoding","quoted-printable");
   
   in = fopen(c_emailmsg,"r");
   if (in == NULL)

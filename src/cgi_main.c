@@ -354,7 +354,7 @@ static int cmd_cgi_post_new(Request req)
   rc = entry_add(req);
   if (rc == 0)
   {
-    if (cf_emailupdate) notify_emaillist();
+    if (cf_emailupdate) notify_emaillist(req);
     generate_pages();
     fprintf(
     	req->out,

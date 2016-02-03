@@ -202,7 +202,7 @@ int main_cli(int argc,char *argv[])
   
   if (forcenotify)
   {
-    notify_emaillist();
+    notify_emaillist(gd.req);
     gd.req = NULL;
     return(0);
   }
@@ -244,7 +244,7 @@ static int cmd_cli_new(Request req)
   rc = entry_add(req);
   if (rc == 0)
   {
-    if (cf_emailupdate) notify_emaillist();
+    if (cf_emailupdate) notify_emaillist(req);
     generate_pages();
   }
   
