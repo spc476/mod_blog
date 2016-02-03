@@ -186,8 +186,9 @@ void notify_emaillist(Request req __attribute__((unused)))
 
 #else
 
-static void cb_email_title(FILE *const,void *);
-static void cb_email_url  (FILE *const,void *);
+static void cb_email_title  (FILE *const,void *);
+static void cb_email_url    (FILE *const,void *);
+static void cb_email_author (FILE *const, void *);
 
 static const struct chunk_callback m_emcallbacks[] =
 {
@@ -200,6 +201,95 @@ static const size_t m_emcbnum = sizeof(m_emcallbacks) / sizeof(struct chunk_call
 
 /************************************************************************/
 
+static ssize_t utf8_read(void *cookie,char *buffer,size_t bytes)
+{
+  FILE *realin = cookie;
+  size_t s     = 0;
+  
+  assert(buffer != NULL);
+  
+  if (feof(realin))
+    return 0;
+  
+  while(bytes)
+  {
+    int c = fgetc(realin);
+    if (c == EOF) return s;
+    
+    if (c == '&')
+    {
+      char numbuf[10];
+      
+      if (bytes < 4)
+      {
+        ungetc(c,realin);
+        return s;
+      }
+      
+      c = fgetc(realin);
+      assert(c == '#');
+      
+      for (size_t i = 0 ; i < sizeof(numbuf) ; i++)
+      {
+        c = fgetc(realin);
+        if (!isdigit(c))
+        {
+          assert(c == ';');
+          numbuf[i] = '\0';
+          break;
+        }
+        numbuf[i] = c;
+      }
+      
+      unsigned long val = strtoul(numbuf,NULL,10);
+      assert(val <= 0x10FFFFuL);
+      
+      if (val < 0x80uL)
+      {
+        *buffer++ = val;
+        bytes--;
+        s++;
+      }
+      else if (val < 0x800uL)
+      {
+        *(unsigned char *)buffer++ = (val >> 6)   | 0xC0uL;
+        *(unsigned char *)buffer++ = (val & 0x3F) | 0x80uL;
+        bytes -= 2;
+        s     += 2;
+      }
+      else if (val < 0x10000uL)
+      {
+        *(unsigned char *)buffer++ = ((val >> 12)         ) | 0xE0uL;
+        *(unsigned char *)buffer++ = ((val >>  6) & 0x3FuL) | 0x80uL;
+        *(unsigned char *)buffer++ = ((val      ) & 0x3FuL) | 0x80uL;
+        bytes -= 3;
+        s     += 3;
+      }
+      else if (val < 0x200000uL)
+      {
+        *(unsigned char *)buffer++ = ((val >> 18)         ) | 0xF0uL;
+        *(unsigned char *)buffer++ = ((val >> 12) & 0x3FuL) | 0x80uL;
+        *(unsigned char *)buffer++ = ((val >>  6) & 0x3FuL) | 0x80uL;
+        *(unsigned char *)buffer++ = ((val      ) & 0x3Ful) | 0x80uL;
+        bytes -= 4;
+        s     += 4;
+      }
+      else
+        assert(0);
+    }
+    else
+    {
+      *buffer++ = c;
+      bytes--;
+      s++;
+    }
+  }
+  
+  return s;
+}
+
+/************************************************************************/
+
 void notify_emaillist(Request req)
 {
   GDBM_FILE  list;
@@ -209,6 +299,7 @@ void notify_emaillist(Request req)
   Email      email;
   FILE      *out;
   FILE      *in;
+  FILE      *inutf8;
   char      *tmp  = NULL;
   size_t     size = 0;
   
@@ -240,7 +331,23 @@ void notify_emaillist(Request req)
     return;
   }
   
-  fcopy(email->body,in);
+  inutf8 = fopencookie(in,"r",(cookie_io_functions_t)
+                              {
+                                utf8_read,
+                                NULL,
+                                NULL,
+                                NULL
+                              });
+  if (inutf8 == NULL)
+  {
+    fclose(in);
+    EmailFree(email);
+    gdbm_close(list);
+    return;
+  }
+  
+  fcopy(email->body,inutf8);
+  fclose(inutf8);
   fclose(in);
   
   key = gdbm_firstkey(list);
@@ -267,7 +374,10 @@ static void cb_email_title(FILE *const out,void *data)
 {
   Request req = (Request)data;
   
-  fprintf(out,"%s",req->title);
+  if (!empty_string(req->status))
+    fprintf(out,"%s",req->status);
+  else
+    fprintf(out,"%s",req->title);
 }
 
 /*************************************************************************/
