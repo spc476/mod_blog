@@ -290,6 +290,47 @@ static ssize_t utf8_read(void *cookie,char *buffer,size_t bytes)
 
 /************************************************************************/
 
+static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
+{
+  FILE   *realin = cookie;
+  size_t  s      = 0;
+  
+  assert(buffer != NULL);
+  
+  if (feof(realin))
+    return 0;
+  
+  while(bytes)
+  {
+    int c = fgetc(realin);
+    if (c == EOF) return s;
+    
+    if ((c == '=') || (c > '~'))
+    {
+      if (bytes < 3)
+      {
+        ungetc(c,realin);
+        return s;
+      }
+      
+      sprintf(buffer,"=%02X",c);
+      buffer += 3;
+      bytes  -= 3;
+      s      += 3;
+    }
+    else
+    {
+      *buffer++ = c;
+      bytes--;
+      s++;
+    }
+  }
+  
+  return s;
+}
+
+/************************************************************************/
+
 void notify_emaillist(Request req)
 {
   GDBM_FILE  list;
@@ -300,6 +341,7 @@ void notify_emaillist(Request req)
   FILE      *out;
   FILE      *in;
   FILE      *inutf8;
+  FILE      *inqp;
   char      *tmp  = NULL;
   size_t     size = 0;
   
@@ -346,7 +388,24 @@ void notify_emaillist(Request req)
     return;
   }
   
-  fcopy(email->body,inutf8);
+  inqp = fopencookie(inutf8,"r",(cookie_io_functions_t)
+                                {
+                                  qp_read,
+                                  NULL,
+                                  NULL,
+                                  NULL
+                                });
+  if (inqp == NULL)
+  {
+    fclose(inutf8);
+    fclose(in);
+    EmailFree(email);
+    gdbm_close(list);
+    return;
+  }
+  
+  fcopy(email->body,inqp);
+  fclose(inqp);
   fclose(inutf8);
   fclose(in);
   
