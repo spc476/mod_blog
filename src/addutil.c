@@ -246,31 +246,31 @@ static ssize_t utf8_read(void *cookie,char *buffer,size_t bytes)
       
       if (val < 0x80uL)
       {
-        *buffer++ = val;
+        *buffer++ = (unsigned char)val;
         bytes--;
         s++;
       }
       else if (val < 0x800uL)
       {
-        *(unsigned char *)buffer++ = (val >> 6)   | 0xC0uL;
-        *(unsigned char *)buffer++ = (val & 0x3F) | 0x80uL;
+        *(unsigned char *)buffer++ = (unsigned char)((val >> 6)   | 0xC0uL);
+        *(unsigned char *)buffer++ = (unsigned char)((val & 0x3F) | 0x80uL);
         bytes -= 2;
         s     += 2;
       }
       else if (val < 0x10000uL)
       {
-        *(unsigned char *)buffer++ = ((val >> 12)         ) | 0xE0uL;
-        *(unsigned char *)buffer++ = ((val >>  6) & 0x3FuL) | 0x80uL;
-        *(unsigned char *)buffer++ = ((val      ) & 0x3FuL) | 0x80uL;
+        *(unsigned char *)buffer++ = (unsigned char)(((val >> 12)         ) | 0xE0uL);
+        *(unsigned char *)buffer++ = (unsigned char)(((val >>  6) & 0x3FuL) | 0x80uL);
+        *(unsigned char *)buffer++ = (unsigned char)(((val      ) & 0x3FuL) | 0x80uL);
         bytes -= 3;
         s     += 3;
       }
       else if (val < 0x200000uL)
       {
-        *(unsigned char *)buffer++ = ((val >> 18)         ) | 0xF0uL;
-        *(unsigned char *)buffer++ = ((val >> 12) & 0x3FuL) | 0x80uL;
-        *(unsigned char *)buffer++ = ((val >>  6) & 0x3FuL) | 0x80uL;
-        *(unsigned char *)buffer++ = ((val      ) & 0x3Ful) | 0x80uL;
+        *(unsigned char *)buffer++ = (unsigned char)(((val >> 18)         ) | 0xF0uL);
+        *(unsigned char *)buffer++ = (unsigned char)(((val >> 12) & 0x3FuL) | 0x80uL);
+        *(unsigned char *)buffer++ = (unsigned char)(((val >>  6) & 0x3FuL) | 0x80uL);
+        *(unsigned char *)buffer++ = (unsigned char)(((val      ) & 0x3Ful) | 0x80uL);
         bytes -= 4;
         s     += 4;
       }
