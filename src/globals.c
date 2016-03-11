@@ -384,7 +384,7 @@ void set_c_url(const char *const turl)
   if (url->scheme == URL_HTTP)
     bu = strdup(url->http.path);
   else if (url->scheme == URL_GOPHER)
-    bu = strdup(url->gopher.path);
+    bu = strdup(url->gopher.selector);
   else
   {
     syslog(LOG_WARNING,"unsupported URL type");
