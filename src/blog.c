@@ -108,6 +108,7 @@ Blog BlogNew(const char *location,const char *lockfile)
     fp = fopen(".first","w");
     if (fp)
     {
+      blog->first = blog->now;
       fprintf(
       	fp,
       	"%4d/%02d/%02d.%d\n",
