@@ -94,7 +94,7 @@ build/src/cli_main.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
 build/src/cli_main.o: src/wbtum.h src/fix.h src/blogutil.h src/backend.h
 build/src/cli_main.o: src/globals.h
 build/src/conversion.o: src/conversion.h src/fix.h src/frontend.h src/wbtum.h
-build/src/conversion.o: src/timeutil.h src/blog.h
+build/src/conversion.o: src/timeutil.h src/blog.h src/blogutil.h
 build/src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
 build/src/globals.o: src/timeutil.h src/blog.h src/backend.h src/fix.h
 build/src/main.o: src/conf.h src/blog.h src/timeutil.h src/fix.h

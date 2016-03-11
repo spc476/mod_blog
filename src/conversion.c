@@ -36,6 +36,7 @@
 
 #include "conversion.h"
 #include "fix.h"
+#include "blogutil.h"
 
 /**********************************************************************/
 
@@ -62,6 +63,16 @@ static void	handle_backquote	(FILE *const restrict,FILE *const restrict);
 static void	handle_quote		(FILE *const restrict,FILE *const restrict);
 static void	handle_dash		(FILE *const restrict,FILE *const restrict);
 static void	handle_period		(FILE *const restrict,FILE *const restrict);
+
+/**********************************************************************/
+
+void no_conversion(FILE *const restrict in,FILE *const restrict out)
+{
+  assert(in  != NULL);
+  assert(out != NULL);
+  
+  fcopy(out,in);
+}
 
 /**********************************************************************/
 

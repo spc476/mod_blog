@@ -357,6 +357,8 @@ void set_c_conversion(const char *const value)
     c_conversion = mixed_conversion;
   else if (strcmp(value,"html") == 0)
     c_conversion = html_conversion;
+  else if (strcmp(value,"none") == 0)
+    c_conversion = no_conversion;
 }
 
 /**************************************************************************/
