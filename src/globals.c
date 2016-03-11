@@ -374,8 +374,23 @@ void set_c_url(const char *const turl)
 
   fbu = strdup(turl);
   url = UrlNew(turl);
-  bu  = strdup(url->http.path);
-
+  
+  if (url == NULL)
+  {
+    syslog(LOG_ERR,"unparsable URL");
+    return;
+  }
+  
+  if (url->scheme == URL_HTTP)
+    bu = strdup(url->http.path);
+  else if (url->scheme == URL_GOPHER)
+    bu = strdup(url->gopher.path);
+  else
+  {
+    syslog(LOG_WARNING,"unsupported URL type");
+    return;
+  }
+  
   /*-----------------------------------------------------------------------
   ; because of the way link generation happens, both of these *CAN'T* end
   ; with a '/'.  So make sure they don't end with a '/'.
