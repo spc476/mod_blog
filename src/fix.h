@@ -37,7 +37,8 @@ typedef enum http__e
 {
   HTTP_CONTINUE		= 100,		/* 1.1	*/
   HTTP_SWITCHPROTO	= 101,		/* 1.1	*/
-  HTTP_100MAX		= 101,
+  HTTP_PROCESSING       = 102,		/* RFC-2518 */
+  HTTP_CHECKPOINT       = 103,		/* U */
 
 	/*--------------------------------------
 	; Successful Codes
@@ -49,8 +50,10 @@ typedef enum http__e
   HTTP_NONAUTH		= 203,		/* 1.1	*/
   HTTP_NOCONTENT	= 204,		/* 1.0	*/
   HTTP_RESETCONTENT	= 205,		/* 1.1	*/
-  HTTP_PARTIALCONTENT	= 206,		/* 1.1	*/
-  HTTP_200MAX		= 206,
+  HTTP_PARTIALCONTENT	= 206,		/* RFC-7233 */
+  HTTP_MULTISTATUS      = 207,		/* RFC-4918 */
+  HTTP_ALREADYREPORTED  = 208,		/* RFC-5842 */
+  HTTP_IMUSED           = 226,		/* RFC-3229 */
 
 	/*----------------------------------------
 	; Redirection Codes
@@ -63,7 +66,9 @@ typedef enum http__e
   HTTP_SEEOTHER		= 303,		/* 1.1	*/
   HTTP_NOTMODIFIED	= 304,		/* 1.0	*/
   HTTP_USEPROXY		= 305,		/* 1.1	*/
-  HTTP_300MAX		= 305,
+  HTTP_SWITCHPROXY      = 306,		/* 1.1  */
+  HTTP_MOVETEMP_M       = 307,		/* 1.1  */
+  HTTP_MOVEPERM_M       = 308,		/* RFC-7538 */
 
 	/*-----------------------------------------
 	; Client Error
@@ -87,7 +92,26 @@ typedef enum http__e
   HTTP_MEDIATYPE	= 415,		/* 1.1	*/
   HTTP_RANGEERROR	= 416,		/* 1.1	*/
   HTTP_EXPECTATION	= 417,		/* 1.1	*/
-  HTTP_400MAX		= 417,
+  HTTP_IM_A_TEA_POT     = 418,		/* RFC-2324 */
+  HTTP_METHODFAILURE    = 420,		/* U */
+  HTTP_MISDIRECT        = 421,		/* RFC-7540 */
+  HTTP_UNPROCESSENTITY  = 422,		/* RFC-4918 */
+  HTTP_LOCKED           = 423,		/* RFC-4918 */
+  HTTP_FAILEDDEP        = 424,		/* RFC-4918 */
+  HTTP_UPGRADE          = 426,
+  HTTP_PRECONDITION2    = 428,		/* RFC-6585 */
+  HTTP_TOOMANYREQUESTS  = 429,		/* RFC-6585 */
+  HTTP_REQHDR2BIG       = 431,		/* RFC-6585 */
+  HTTP_LOGINTIMEOUT     = 440,		/* IIS */
+  HTTP_NORESPONSE       = 444,		/* nginx */
+  HTTP_RETRYWITH        = 449,		/* IIS */
+  HTTP_MSBLOCK          = 450,		/* U */
+  HTTP_LEGALCENSOR      = 451,
+  HTTP_SSLCERTERR       = 495,		/* nginx */
+  HTTP_SSLCERTREQ       = 496,		/* nginx */
+  HTTP_HTTP2HTTPS       = 497,		/* nginx */
+  HTTP_INVALIDTOKEN     = 498,		/* U */
+  HTTP_TOKENREQ         = 499,		/* U */
 
 	/*-----------------------------------------
 	; Server Errors
@@ -99,7 +123,21 @@ typedef enum http__e
   HTTP_NOSERVICE	= 503,		/* 1.0	*/
   HTTP_GATEWAYTIMEOUT	= 504,		/* 1.1	*/
   HTTP_HTTPVERSION 	= 505,		/* 1.1	*/
-  HTTP_500MAX		= 505,
+  HTTP_VARIANTALSO      = 506,		/* RFC-2295 */
+  HTTP_ENOSPC           = 507,		/* RFC-4918 */
+  HTTP_LOOP             = 508,		/* RFC-5842 */
+  HTTP_EXCEEDBW         = 509,		/* U */
+  HTTP_NOTEXTENDED      = 510,		/* RFC-2774 */
+  HTTP_NETAUTHREQ       = 511,		/* RFC-6585 */
+  HTTP_UNKNOWN          = 520,		/* CloudFlare */
+  HTTP_BLACKHAWKDOWN    = 521,		/* CloudFlare */
+  HTTP_CONNECTIONTIMEOUT = 522,		/* CloudFlare */
+  HTTP_ORIGINUNREACHABLE = 523,		/* CloudFlare */
+  HTTP_TIMEOUT500       = 524,		/* CloudFlare */
+  HTTP_SSLHANDSHAKE     = 525,		/* CloudFlare */
+  HTTP_SSLINVALID       = 526,		/* CloudFlare */
+  HTTP_FROZEN           = 530,		/* U */
+
 } http__e;
 
 extern char	*get_remote_user		(void);
