@@ -23,7 +23,7 @@
 
 .PHONY:	all clean tarball depend
 
-VERSION = $(shell git describe --tag)
+VERSION := $(shell git describe --tag)
 
 CC      = gcc -std=c99 -Wall -Wextra -pedantic
 CFLAGS  = -g
