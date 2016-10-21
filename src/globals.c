@@ -97,8 +97,17 @@ volatile bool  gf_debug       = false;
 Blog           g_blog;
 struct display gd =
 {
-  .f       = { false , false , false , true , true , false , false} ,
   .navunit = UNIT_INDEX,
+  .f       = 
+  { 
+    .fullurl    = false ,
+    .reverse    = false ,
+    .navigation = false ,
+    .navprev    = true  ,
+    .navnext    = true  ,
+    .edit       = false ,
+    .overview   = false ,
+  } ,
 };
 
 /****************************************************/
