@@ -33,7 +33,6 @@
 #include <assert.h>
 
 #include <syslog.h>
-#include <unistd.h>
 
 #include <lua.h>
 #include <lualib.h>
