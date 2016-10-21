@@ -112,6 +112,20 @@ struct display gd =
 
 /****************************************************/
 
+#if LUA_VERSION_NUM > 501
+static size_t lua_objlen(lua_State *L,int index)
+{
+  size_t len;
+  
+  lua_len(L,index);
+  len = lua_tointeger(L,-1);
+  lua_pop(L,1);
+  return len;
+}
+#endif
+
+/****************************************************/
+
 int GlobalsInit(const char *conf)
 {
   int rc;
