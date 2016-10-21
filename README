@@ -14,7 +14,7 @@ REQUIREMENTS
 		* Linux (or any POSIX compilant UNIX system)
 		* GCC	(or any C99 compiler that may come with your system)
 		* Apache
-		* Lua 5.1
+		* Lua 5.1 or higher
 
 	The code right now assumes you'll be running this under Apache.
 
@@ -24,10 +24,6 @@ COMPILATION
 	software.  You can install it from
 
 		https://github.com/spc476/CGILib
-
-	or
-
-		http://www.conman.org/software/cgilib/cgilib.tar.gz
 
 	To install it once it's downloaded, all it should take is "make" and
 	then "make install" as root.  The library assumes a POSIX
@@ -54,10 +50,6 @@ INSTALLATION
 	be served up by Apache).  There you will find a sample configuration
 	file and a sample entry to see how the data is stored (each entry is
 	a separate file, stored under a Year/Month/Day directory structure).
-
-	Yes, there is Facebook integration.  No, I'm not telling you how to
-	use that as I use a private "app" for that that was never fully
-	finished.  More power to you if you can get it to work.
 
 	And yes, there is code to do email notifications, but it's not
 	enabled by default.  I only left the code in to support the half
