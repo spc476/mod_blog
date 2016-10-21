@@ -24,18 +24,12 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <stdarg.h>
-#include <time.h>
-#include <stdbool.h>
 #include <assert.h>
 
-#include <cgilib6/cgi.h>
 #include <cgilib6/util.h>
 
 #include "conf.h"
-#include "timeutil.h"
 #include "frontend.h"
-#include "backend.h"
 #include "globals.h"
 
 #ifdef USE_GDBM

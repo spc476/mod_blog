@@ -26,30 +26,15 @@
 
 #define _GNU_SOURCE 1
 
-#include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <string.h>
-#include <ctype.h>
 #include <errno.h>
-#include <stdarg.h>
-#include <assert.h>
 
 #include <sys/stat.h>
-#include <unistd.h>
 #include <syslog.h>
 
-#include <cgilib6/htmltok.h>
 #include <cgilib6/util.h>
-#include <cgilib6/cgi.h>
-#include <cgilib6/chunk.h>
 
-#include "conf.h"
-#include "blog.h"
-#include "timeutil.h"
-#include "wbtum.h"
-#include "frontend.h"
 #include "fix.h"
 #include "blogutil.h"
 #include "backend.h"

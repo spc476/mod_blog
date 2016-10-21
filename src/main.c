@@ -20,23 +20,11 @@
 *
 *************************************************************************/
 
-#include <stddef.h>
-#include <string.h>
-#include <errno.h>
 #include <stdlib.h>
-#include <time.h>
-#include <stdarg.h>
 #include <signal.h>
 
-#include <syslog.h>
-#include <cgilib6/cgi.h>
 #include <cgilib6/crashreport.h>
 
-#include "conf.h"
-#include "blog.h"
-#include "timeutil.h"
-#include "fix.h"
-#include "backend.h"
 #include "globals.h"
 
 /************************************************************************/

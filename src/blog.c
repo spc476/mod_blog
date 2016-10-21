@@ -23,13 +23,9 @@
 #define _GNU_SOURCE 1
 
 #include <stdio.h>
-#include <stdbool.h>
-#include <time.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <stdarg.h>
-#include <assert.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -37,14 +33,9 @@
 #include <unistd.h>
 #include <syslog.h>
 
-#include <cgilib6/util.h>
-#include <cgilib6/nodelist.h>
-
 #include "conf.h"
 #include "blog.h"
-#include "frontend.h"
-#include "backend.h"
-#include "fix.h"
+#include "wbtum.h"
 
 /**********************************************************************/
 

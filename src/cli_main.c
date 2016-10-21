@@ -26,34 +26,22 @@
 
 #define _GNU_SOURCE 1
 
-#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #include <stdio.h>
-#include <time.h>
 #include <errno.h>
-#include <assert.h>
 
 #include <syslog.h>
 #include <getopt.h>
-#include <lua.h>
 
 #include <cgilib6/conf.h>
-#include <cgilib6/pair.h>
-#include <cgilib6/htmltok.h>
 #include <cgilib6/rfc822.h>
-#include <cgilib6/cgi.h>
 #include <cgilib6/util.h>
 
 #include "conf.h"
-#include "blog.h"
 #include "frontend.h"
-#include "timeutil.h"
-#include "wbtum.h"
 #include "fix.h"
 #include "blogutil.h"
-#include "backend.h"
 #include "globals.h"
 
 #ifdef EMAIL_NOTIFY

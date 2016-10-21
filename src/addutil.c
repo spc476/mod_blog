@@ -22,28 +22,17 @@
 
 #define _GNU_SOURCE	1
 
-#include <stdio.h>
+#include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdarg.h>
-#include <time.h>
 
-#include <cgilib6/nodelist.h>
-#include <cgilib6/htmltok.h>
 #include <cgilib6/util.h>
-#include <cgilib6/pair.h>
-#include <cgilib6/cgi.h>
-#include <cgilib6/mail.h>
 
-#include "conf.h"
 #include "blog.h"
 #include "conversion.h"
-#include "timeutil.h"
 #include "frontend.h"
-#include "backend.h"
 #include "globals.h"
 #include "fix.h"
-#include "blogutil.h"
 
 #ifdef EMAIL_NOTIFY
 #  include <gdbm.h>

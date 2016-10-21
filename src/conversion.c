@@ -25,12 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <assert.h>
 
-#include <cgilib6/pair.h>
-#include <cgilib6/nodelist.h>
 #include <cgilib6/util.h>
 #include <cgilib6/htmltok.h>
 

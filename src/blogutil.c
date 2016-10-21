@@ -25,7 +25,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <stdarg.h>
 #include <assert.h>
 
 #include "blogutil.h"
