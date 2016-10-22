@@ -74,31 +74,30 @@ depend:
 
 # DO NOT DELETE
 
-build/src/addutil.o: src/conf.h src/blog.h src/timeutil.h src/conversion.h
-build/src/addutil.o: src/frontend.h src/wbtum.h src/backend.h src/globals.h
-build/src/addutil.o: src/fix.h src/blogutil.h
-build/src/authenticate.o: src/conf.h src/timeutil.h src/frontend.h
-build/src/authenticate.o: src/wbtum.h src/blog.h src/backend.h src/globals.h
-build/src/backend.o: src/conf.h src/blog.h src/timeutil.h src/wbtum.h
-build/src/backend.o: src/frontend.h src/fix.h src/blogutil.h src/backend.h
-build/src/backend.o: src/globals.h
-build/src/blog.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
-build/src/blog.o: src/wbtum.h src/backend.h src/fix.h
+build/src/addutil.o: src/blog.h src/timeutil.h src/conversion.h
+build/src/addutil.o: src/frontend.h src/wbtum.h src/globals.h src/backend.h
+build/src/addutil.o: src/fix.h
+build/src/authenticate.o: src/conf.h src/frontend.h src/wbtum.h
+build/src/authenticate.o: src/timeutil.h src/blog.h src/globals.h
+build/src/authenticate.o: src/backend.h
+build/src/backend.o: src/fix.h src/frontend.h src/wbtum.h src/timeutil.h
+build/src/backend.o: src/blog.h src/blogutil.h src/backend.h src/globals.h
+build/src/blog.o: src/conf.h src/blog.h src/timeutil.h src/wbtum.h
 build/src/blogutil.o: src/blogutil.h
-build/src/callbacks.o: src/conf.h src/blog.h src/timeutil.h src/wbtum.h
-build/src/callbacks.o: src/frontend.h src/backend.h src/fix.h src/blogutil.h
-build/src/callbacks.o: src/globals.h
-build/src/cgi_main.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
-build/src/cgi_main.o: src/wbtum.h src/backend.h src/fix.h src/globals.h
-build/src/cli_main.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
-build/src/cli_main.o: src/wbtum.h src/fix.h src/blogutil.h src/backend.h
-build/src/cli_main.o: src/globals.h
+build/src/callbacks.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
+build/src/callbacks.o: src/wbtum.h src/fix.h src/blogutil.h src/globals.h
+build/src/callbacks.o: src/backend.h
+build/src/cgi_main.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
+build/src/cgi_main.o: src/fix.h src/globals.h src/backend.h
+build/src/cli_main.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
+build/src/cli_main.o: src/blog.h src/fix.h src/blogutil.h src/globals.h
+build/src/cli_main.o: src/backend.h
 build/src/conversion.o: src/conversion.h src/fix.h src/frontend.h src/wbtum.h
 build/src/conversion.o: src/timeutil.h src/blog.h src/blogutil.h
 build/src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
 build/src/globals.o: src/timeutil.h src/blog.h src/backend.h src/fix.h
-build/src/main.o: src/conf.h src/blog.h src/timeutil.h src/fix.h
-build/src/main.o: src/frontend.h src/wbtum.h src/backend.h src/globals.h
+build/src/main.o: src/globals.h src/frontend.h src/wbtum.h src/timeutil.h
+build/src/main.o: src/blog.h src/backend.h
 build/src/timeutil.o: src/timeutil.h src/wbtum.h
 build/src/wbtum.o: src/wbtum.h src/timeutil.h src/globals.h src/frontend.h
 build/src/wbtum.o: src/blog.h src/backend.h
