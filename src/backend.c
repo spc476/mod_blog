@@ -127,7 +127,7 @@ int pagegen_days(
   assert(template != NULL);
   assert(out      != NULL);
   assert(blog     != NULL);
-
+  
   g_templates  = template->template;
   gd.f.fullurl = false;
   gd.f.reverse = true;
@@ -216,7 +216,7 @@ static void swap_endpoints(tumbler__s *tum)
   ;
   ; The year and the month are always swapped.
   ;--------------------------------------------------------------------*/
-
+  
   start.year  = tum->stop.year;
   start.month = tum->stop.month;  
   stop.year   = tum->start.year;
@@ -238,7 +238,7 @@ static void swap_endpoints(tumbler__s *tum)
          stop.day  = tum->start.day;
          stop.part = tum->start.part;
          break;
-
+    
     case UNIT_YEAR:
     case UNIT_INDEX:
          assert(0);
@@ -261,7 +261,7 @@ static void swap_endpoints(tumbler__s *tum)
          start.day   = tum->stop.day;
          start.part  = tum->stop.part;
          break;                
-
+    
     case UNIT_YEAR:
     case UNIT_INDEX:
          assert(0);
@@ -309,13 +309,13 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   assert(spec->start.month <  13);
   assert(spec->start.day   >   0);
   assert(spec->start.day   <= max_monthday(spec->start.year,spec->start.month));
-
+  
   assert(spec->stop.year  >= g_blog->first.year);
   assert(spec->stop.month >   0);
   assert(spec->stop.month <  13);
   assert(spec->stop.day   >   0);
   assert(spec->stop.day   <= max_monthday(spec->stop.year,spec->stop.month));
-
+  
   start = spec->start;
   end   = spec->stop;
   
@@ -342,7 +342,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   }
   
   assert(end.day <= max_monthday(end.year,end.month));
-
+  
   /*---------------------------------------------------------------------
   ; Okay, sanity checking here ... These should be true once we hit this
   ; spot of the code.
@@ -392,7 +392,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
 static void calculate_previous(const struct btm start)
 {
   gd.previous = start;
-
+  
   switch(gd.navunit)
   {
     case UNIT_YEAR:
@@ -401,7 +401,7 @@ static void calculate_previous(const struct btm start)
          else
            gd.previous.year = start.year - 1;
          break;
-
+    
     case UNIT_MONTH:
          if (
               (start.year == g_blog->first.year) 
@@ -411,7 +411,7 @@ static void calculate_previous(const struct btm start)
          else
 	   btm_dec_month(&gd.previous);
          break;
-
+    
     case UNIT_DAY:
          if (btm_cmp_date(&start,&g_blog->first) == 0)
            gd.f.navprev = false;
@@ -437,14 +437,14 @@ static void calculate_previous(const struct btm start)
            gd.f.navprev = false;
          }
          break;
-
+    
     case UNIT_PART:
          if (btm_cmp(&start,&g_blog->first) == 0)
            gd.f.navprev = false;
          else
          {
 	   btm_dec_part(&gd.previous);
-
+           
            while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
            {
              BlogEntry entry;
@@ -463,7 +463,7 @@ static void calculate_previous(const struct btm start)
            gd.f.navprev = false;
          }
          break;
-
+    
     default:
          assert(0);
   }
@@ -483,7 +483,7 @@ static void calculate_next(const struct btm end)
          else
            gd.next.year  = end.year + 1;
          break;
-
+    
     case UNIT_MONTH:
          if (
               (end.year == g_blog->now.year) 
@@ -493,7 +493,7 @@ static void calculate_next(const struct btm end)
          else
            btm_inc_month(&gd.next);
          break;
-
+    
     case UNIT_DAY:
          if (btm_cmp_date(&end,&g_blog->now) == 0)
            gd.f.navnext = false;
@@ -520,7 +520,7 @@ static void calculate_next(const struct btm end)
            gd.f.navnext = false;
          }
          break;
-
+    
     case UNIT_PART:
          if (btm_cmp(&end,&g_blog->now) == 0)
            gd.f.navnext = false;
@@ -546,7 +546,7 @@ static void calculate_next(const struct btm end)
            gd.f.navnext = false;
 	 }
          break;
-
+    
     default:
          assert(0);
   }
@@ -730,7 +730,7 @@ static const char *mime_type(const char *filename)
   assert(filename != NULL);
   
   ext = strrchr(filename,'.');
-
+  
   if (ext != NULL)
   {
     v = bsearch(
@@ -755,7 +755,7 @@ static int display_file(FILE *const out,const tumbler__s *spec)
   
   assert(out  != NULL);
   assert(spec != NULL);
-
+  
   snprintf(
       fname,
       sizeof(fname),
@@ -777,23 +777,23 @@ static int display_file(FILE *const out,const tumbler__s *spec)
     if (rc == -1) 
     {
       if (errno == ENOENT)
-        (*gd.req->error)(gd.req,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
+        (*gd.req.error)(&gd.req,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
       else if (errno == EACCES)
-        (*gd.req->error)(gd.req,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
+        (*gd.req.error)(&gd.req,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
       else
-        (*gd.req->error)(gd.req,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
+        (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
       return(1);
     }
-
+    
     in = fopen(fname,"r");
     if (in == NULL)
     {
-      (*gd.req->error)(gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
+      (*gd.req.error)(&gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
       return(1);
     }
     
     type = mime_type(spec->filename);
-
+    
     if (strcmp(type,"text/x-html") == 0)
     {
       gd.htmldump = in;
@@ -818,7 +818,7 @@ static int display_file(FILE *const out,const tumbler__s *spec)
   }
   else
     fprintf(out,"File to open: %s\n",fname);
-
+  
   return(0);
 }
 
@@ -854,17 +854,17 @@ static char *tag_pick(const char *tag)
   char   *pick;
   
   assert(tag != NULL);
-
+  
   if (empty_string(tag))
     return(strdup(c_adtag));
   
   pool = tag_split(&num,tag);
-
+  
   /*------------------------------------------------------------------------
   ; if num is 0, then the tag string was malformed (basically, started with
   ; a ',') and therefore, we fall back to the default adtag.
   ;-----------------------------------------------------------------------*/
-
+  
   if (num)
   {
     r  = (((double)rand() / (double)RAND_MAX) * (double)num); 
@@ -877,7 +877,7 @@ static char *tag_pick(const char *tag)
   free(pool);
   return(pick);
 }
- 
+
 /******************************************************************/
 
 static void free_entries(List *list)

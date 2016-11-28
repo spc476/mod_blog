@@ -35,7 +35,7 @@ int max_monthday(const int year,const int month)
   assert(year  >  0);
   assert(month >  0);
   assert(month < 13);
-
+  
   if (month == 2)
   {
     /*----------------------------------------------------------------------
@@ -87,7 +87,7 @@ void btm_dec_part(struct btm *const d)
 void btm_dec_day(struct btm *const d)
 {
   assert(d != NULL);
-
+  
   d->day--;
   if (d->day == 0)
   {
@@ -194,7 +194,7 @@ int btm_cmp_year(
   return d1->year - d2->year;
 }
 
-/***************************************************************************/  
+/***************************************************************************/
 
 void tm_init(struct tm *const ptm)
 {

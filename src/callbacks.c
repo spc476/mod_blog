@@ -282,9 +282,9 @@ static void cb_ad_content(FILE *const out,void *data)
   ;-------------------------------------------*/
   
   fcopy(out,cbd->ad);
-}  
-  
-/*********************************************************************/  
+}
+ 
+/*********************************************************************/
 
 static void cb_blog_script(FILE *const out,void *data __attribute__((unused)))
 {
@@ -351,9 +351,9 @@ static void cb_blog_adtag(FILE *const out,void *data)
 {
   struct callback_data *cbd;
   char                 *tag;
-
+  
   assert(out != NULL);
-
+  
   if (data == NULL)
     tag = UrlEncodeString(c_adtag);
   else
@@ -373,7 +373,7 @@ static void cb_blog_adtag_entity(FILE *const out,void *data)
   struct callback_data *cbd;
   FILE                 *entityout;
   const char           *tag;
-
+  
   assert(out != NULL);
   
   if (data == NULL)
@@ -398,14 +398,14 @@ static void cb_entry(FILE *const out,void *data)
   BlogEntry             entry;
   
   assert(out != NULL);
-
+  
   if (data == NULL)
   {
     if (gd.htmldump)
       fcopy(out,gd.htmldump);
     return;
   }
-
+  
   if (gd.f.overview)
   {
     generic_cb("overview",out,data);
@@ -438,7 +438,7 @@ static void cb_entry_url(FILE *const out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   entry = cbd->entry;
   assert(entry->valid);
   print_nav_url(out,&entry->when,UNIT_PART);
@@ -453,7 +453,7 @@ static void cb_entry_id(FILE *const out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   entry = cbd->entry;
   assert(entry->valid);
   print_nav_name(out,&entry->when,UNIT_DAY,'-');
@@ -467,7 +467,7 @@ static void cb_entry_date(FILE *const out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   print_nav_url(out,&cbd->entry->when,UNIT_DAY);  
 }
 
@@ -513,7 +513,7 @@ static void cb_entry_title(FILE *const out,void *data)
     
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   assert(cbd->entry->valid);
   fputs(cbd->entry->title,out);
 }
@@ -526,7 +526,7 @@ static void cb_entry_class(FILE *const out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   fputs(cbd->entry->class,out);  
 }
 
@@ -559,7 +559,7 @@ static void cb_entry_author(FILE *const out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   assert(cbd->entry->valid);
   fputs(cbd->entry->author,out);
 }
@@ -667,7 +667,7 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
 	entry->when.day,
 	src->value
     );
-
+    
     np = PairCreate(attrib,buffer);
     NodeInsert(&src->node,&np->node);
     NodeRemove(&src->node);
@@ -687,7 +687,7 @@ static void cb_entry_body(FILE *const out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   entry = cbd->entry;
   assert(entry->valid);
   in    = fmemopen(entry->body,strlen(entry->body),"r");
@@ -933,19 +933,19 @@ static void cb_atom_categories(FILE *const out,void *data)
   char    *tag;
   size_t   i;
   size_t   num;
-
+  
   assert(out  != NULL);
   assert(data != NULL);
   
   cats = tag_split(&num,cbd->entry->class);
-
+  
   for (i = 0 ; i < num ; i++)
   {
     tag = fromstring(cats[i]);
     generic_cb("categories",out,tag);
     free(tag);
   }
-
+  
   free(cats);
 }
 
@@ -1122,9 +1122,9 @@ static void cb_navigation_prev_title(FILE *const out,void *data __attribute__((u
 static void cb_navigation_next_url(FILE *const out,void *data __attribute__((unused)))
 {
   struct btm tmp;
-
+  
   assert(out != NULL);
-
+  
   tmp = gd.next;
   print_nav_url(out,&tmp,gd.navunit);
 }
@@ -1134,7 +1134,7 @@ static void cb_navigation_next_url(FILE *const out,void *data __attribute__((unu
 static void cb_navigation_prev_url(FILE *const out,void *data __attribute__((unused)))
 {
   struct btm tmp;
-
+  
   assert(out != NULL);
   
   tmp = gd.previous;
@@ -1146,7 +1146,7 @@ static void cb_navigation_prev_url(FILE *const out,void *data __attribute__((unu
 static void cb_navigation_current_url(FILE *const out,void *data __attribute__((unused)))
 {
   struct btm tmp;
-
+  
   assert(out != NULL);
   
   tmp = g_blog->now;
@@ -1218,7 +1218,7 @@ static void print_nav_name(FILE *const out,const struct btm *const date,int unit
 {
   assert(out  != NULL);
   assert(date != NULL);
-
+  
   switch(unit)
   {
     case UNIT_YEAR:
@@ -1336,7 +1336,7 @@ static void cb_comments_filename(FILE *const out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   fprintf(
   	out,
   	"%04d/%02d/%02d/%d.comments",
@@ -1356,7 +1356,7 @@ static void cb_comments_check(FILE *const out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   sprintf(
   	fname,
   	"%04d/%02d/%02d/%d.comments",
@@ -1368,7 +1368,7 @@ static void cb_comments_check(FILE *const out,void *data)
     
   if (access(fname,R_OK) < 0)
     fputs("No ",out);
-
+  
   fputs("Comments",out);
 }
 
@@ -1390,8 +1390,8 @@ static void cb_edit_author(FILE *const out,void *data __attribute__((unused)))
   
   assert(out != NULL);
   
-  if (gd.req->origauthor != NULL)
-    fputs(gd.req->origauthor,out);
+  if (gd.req.origauthor != NULL)
+    fputs(gd.req.origauthor,out);
   else
   {
     name = get_remote_user();
@@ -1406,8 +1406,8 @@ static void cb_edit_title(FILE *const out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req->title != NULL)
-    fputs(gd.req->title,out);
+  if (gd.req.title != NULL)
+    fputs(gd.req.title,out);
 }
 
 /********************************************************************/
@@ -1416,8 +1416,8 @@ static void cb_edit_status(FILE *const out,void *data __attribute__ ((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req->status != NULL)
-    fputs(gd.req->status,out);
+  if (gd.req.status != NULL)
+    fputs(gd.req.status,out);
 }
 
 /**********************************************************************/
@@ -1427,11 +1427,11 @@ static void cb_edit_date(FILE *const out,void *data __attribute__((unused)))
   time_t     now;
   struct tm *ptm;
   char       buffer[BUFSIZ];
-
+  
   assert(out != NULL);
-
-  if (gd.req->date != NULL)
-    fputs(gd.req->date,out);
+  
+  if (gd.req.date != NULL)
+    fputs(gd.req.date,out);
   else
   {
     now = time(NULL);
@@ -1447,8 +1447,8 @@ static void cb_edit_class(FILE *const out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req->class)
-    fputs(gd.req->class,out);
+  if (gd.req.class)
+    fputs(gd.req.class,out);
 }
 
 /********************************************************************/
@@ -1471,8 +1471,8 @@ static void cb_edit_body(FILE *const out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req->origbody)
-    fputs(gd.req->origbody,out);
+  if (gd.req.origbody)
+    fputs(gd.req.origbody,out);
 }
 
 /********************************************************************/
@@ -1548,7 +1548,7 @@ static void cb_entry_cond_date(FILE *const out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   entry = cbd->entry;  
   assert(entry->valid);
   
@@ -1602,7 +1602,7 @@ static void cb_overview_list(FILE *const out,void *data __attribute__((unused)))
 static void cb_generator(FILE *const out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-
+  
 #ifdef EMAIL_NOTIFY  
   fprintf(
     out,

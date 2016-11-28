@@ -77,7 +77,7 @@ void text_conversion(FILE *const restrict in,FILE *const restrict out)
   
   assert(in    != NULL);
   assert(out   != NULL);
-
+  
   entin = fentity_encode_onread(in);
   text_conversion_backend(entin,out);
   fclose(entin);
@@ -123,7 +123,7 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
       tmpout  = open_memstream(&buffer,&bufsize);
     }
     else
-    {   
+    {
       FILE *tmpin;
       
       tmpin = fmemopen(line,bytes,"r");
@@ -131,12 +131,12 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
       fclose(tmpin);
       fputc(' ',tmpout);
     }
-  }  
-     
+  }
+  
   fclose(tmpout);
   if (!empty_string(buffer))
     fprintf(out,"<p>%s</p>\n",buffer);
-    
+  
   free(line);
   free(buffer);
 }
@@ -169,10 +169,10 @@ void html_conversion(FILE *const restrict in,FILE *const restrict out)
 {
   struct nested_params local;
   int                  t;
-
+  
   assert(in  != NULL);
   assert(out != NULL);
-    
+  
   local.in         = in;
   local.out        = out;
   local.p          = false;
@@ -246,7 +246,7 @@ static void html_handle_tag(struct nested_params *const local)
     || (strcmp(HtmlParseValue(local->token),"/OL") == 0)
   )
     local->list = false;
-
+  
   /*--------------------------------------------------------------
   ; tags that have URIs that need to be checked for & and fixed.
   ;--------------------------------------------------------------*/
@@ -323,7 +323,7 @@ static void check_for_uri(struct nested_params *const local,const char *const at
   
   src = HtmlParseGetPair(local->token,attrib);
   if (src == NULL) return;
-
+  
   entify_char(newuri,BUFSIZ,src->value,'&',"&amp;");
     
   np = PairCreate(attrib,newuri);
@@ -378,7 +378,7 @@ static void html_handle_string(struct nested_params *const local)
   char *text = HtmlParseValue(local->token);
   
   assert(local != NULL);
-
+  
   if (!local->pre)
   {
     in = fmemopen(text,strlen(text),"r");
@@ -410,10 +410,10 @@ void buff_conversion(FILE *const restrict in,FILE *const restrict out)
   /*----------------------------------------------------
   ; this is basically the macro substitution module.
   ;-----------------------------------------------------*/
-
+  
   assert(in  != NULL);
   assert(out != NULL);
-
+  
   /*------------------------------------------------------------------------
   ; XXX
   ; how to handle using '"' for smart quotes, or regular quotes.  I'd rather
@@ -422,7 +422,7 @@ void buff_conversion(FILE *const restrict in,FILE *const restrict out)
   ; in strings.  look for something like &[^\s]+; and if so, then pass it
   ; through unchanged; if not, then convert '&' to "&amp;".
   ;------------------------------------------------------------------------*/
-    
+  
   while(!feof(in))
   {
     c = fgetc(in);
@@ -444,16 +444,16 @@ void buff_conversion(FILE *const restrict in,FILE *const restrict out)
 static void handle_backquote(FILE *const restrict input,FILE *const restrict output)
 {
   int c;
-
+  
   assert(input  != NULL);
   assert(output != NULL);  
-
+  
   if (feof(input))
   {
     fputc('`',output);
     return;
   }
-
+  
   c = fgetc(input);
   if (c == '`')
     fputs("&#8220;",output);
@@ -478,7 +478,7 @@ static void handle_quote(FILE *const restrict input,FILE *const restrict output)
     fputc('\'',output);
     return;
   }
-
+  
   c = fgetc(input);
   if (c == '\'')
     fputs("&#8221;",output);
@@ -503,7 +503,7 @@ static void handle_dash(FILE *const restrict input,FILE *const restrict output)
     fputc('-',output);
     return;
   }
-
+  
   c = fgetc(input);
   if (c == '-')
   {
@@ -537,7 +537,7 @@ static void handle_period(FILE *const restrict input,FILE *const restrict output
     fputc('.',output);
     return;
   }
-
+  
   c = fgetc(input);
   if (c == '.')
   {

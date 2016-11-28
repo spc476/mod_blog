@@ -47,7 +47,7 @@
 char *get_remote_user(void)
 {
   char *name;
-
+  
   /*-------------------------------------------------------
   ; A change in Apache 2.0.48:
   ;	Remember an authenticated user during internal redirects if the
@@ -83,7 +83,7 @@ char *get_remote_user(void)
   }
   
   /************************************************************************/
-    
+
 #elif defined(USE_GDBM)
 
   bool authenticate_author(Request req)
@@ -91,17 +91,17 @@ char *get_remote_user(void)
     GDBM_FILE list;
     datum     key;
     int       rc;
-
+    
     assert(req         != NULL);
     assert(req->author != NULL);
     
     if (c_authorfile == NULL)
       return (strcmp(req->author,c_author) == 0);
-
+    
     list = gdbm_open(c_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
     if (list == NULL)
       return(false);
-
+    
     key.dptr  = req->author;
     key.dsize = strlen(req->author) + 1;
     rc        = gdbm_exists(list,key);
@@ -119,7 +119,7 @@ char *get_remote_user(void)
     DBT  key;
     DBT  data;
     int  rc;
-
+    
     assert(req         != NULL);
     assert(req->author != NULL);
     
@@ -128,14 +128,14 @@ char *get_remote_user(void)
     ; assuming it's defined in the database file as the (hardcoded)
     ; third field of the value portion returned.
     ;---------------------------------------------------------------*/
-
+    
     if (c_authorfile == NULL)
       return (strcmp(req->author,c_author) == 0);
-
+    
     list = dbopen(c_authorfile,O_RDONLY,0644,DB_HASH,NULL);
     if (list == NULL)
       return(false);
-
+    
     key.data = req->author;
     key.size = strlen(req->author);
     rc       = (list->get)(list,&key,&data,0);
@@ -147,11 +147,11 @@ char *get_remote_user(void)
       char   *p;
       char   *q;
       size_t  i;
-
+      
       tmp = malloc(data.size + 1);
       memset(tmp,0,data.size + 1);
       memcpy(tmp,data.data,data.size);
- 
+      
       /*----------------------------------------------------------
       ; For now, we assume that if using Berkeley DB, we are doing
       ; so because we want to use the DB file used by Apache, and
@@ -159,7 +159,7 @@ char *get_remote_user(void)
       ; so we look for two colons, and take what is past there as
       ; the real name.  
       ;-----------------------------------------------------------*/
- 
+      
       for (i = 0 , p = tmp ; i < 2 ; i++)
       {
         p = strchr(p,':');
@@ -170,15 +170,15 @@ char *get_remote_user(void)
         }
         p++;
       }
- 
+      
       /*----------------------------------------------------------
       ; there may be more fields, so check for the end of this field,
       ; and if so marked, replace it with an end of string marker.
       ;-----------------------------------------------------------*/
- 
+      
       q = strchr(p,':');
       if (q) *q = '\0';
- 
+      
       /*------------------------------------------------------
       ; There is a potential memory leak here, as m_author may
       ; have been allocated earlier.  But since it's constantly
@@ -189,11 +189,11 @@ char *get_remote_user(void)
       ; This is expected, but since this program doesn't run
       ; infinitely, this is somewhat okay.
       ;------------------------------------------------------*/
- 
+      
       m_author = strdup(p);
       free(tmp);
     }
-
+    
     return(true);
   }
 
@@ -224,7 +224,7 @@ char *get_remote_user(void)
     
     if (line[size - 1] == '\n')
       line[size - 1] = '\0';
-
+    
     tmp = malloc(sizeof(char *) * dsize);
     p   = line;
     cnt = 0;
@@ -245,14 +245,14 @@ char *get_remote_user(void)
     
     for (cnt = 0 ; cnt < dsize ; cnt++)
       dest[cnt] = strdup(tmp[cnt]);
- 
+    
     free(tmp);
     free(line);
     return(dsize);
   }
   
   /*------------------------------------------------------*/
-
+  
   bool authenticate_author(Request req)
   {
     FILE   *in;
@@ -287,7 +287,7 @@ char *get_remote_user(void)
         }
       }
     }
-
+    
     fclose(in);
     return(false);
   }

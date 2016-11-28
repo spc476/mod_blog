@@ -52,7 +52,7 @@ String *tag_split(size_t *const pnum,const char *tag)
     for (p = tag ; (*p) && (*p != ',') ; p++)
       ;
     if (p == tag) break;
-
+    
     pool[num].d   = tag;
     pool[num++].s = p - tag;
     

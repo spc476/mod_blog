@@ -332,7 +332,7 @@ char *entity_conversion(const char *s)
   assert(s != NULL);
   
   tmp = open_memstream(&t,&sz);
-
+  
   while(*s)
   {
     if (*s == '&')
@@ -394,11 +394,11 @@ char *entity_encode(const char *s)
   size_t  size;
   char   *entity;
   size_t  dummy;
- 
+  
   assert(s != NULL);
-
+  
   out = open_memstream(&text,&size);
-
+  
   for ( ; *s ; s++)
   {
     if (char_entity(&entity,&dummy,*s))
@@ -406,7 +406,7 @@ char *entity_encode(const char *s)
     else
       fputc(*s,out);
   }
-
+  
   fclose(out);
   return text;
 }
@@ -489,7 +489,7 @@ static ssize_t few_write(void *cookie,const char *buffer,size_t bytes)
   size_t  size    = bytes;
   char   *replace;
   size_t  repsize;
-
+  
   assert(buffer != NULL);
   
   while(bytes)

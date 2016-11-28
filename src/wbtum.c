@@ -95,49 +95,49 @@ static bool check_dates(tumbler__s *tum)
          start_okay = (btm_cmp_year(&tum->start,&g_blog->first) >= 0)
                    && (btm_cmp_year(&tum->start,&g_blog->last)  <= 0);
          break;
-
+    
     case UNIT_MONTH:
          start_okay = (btm_cmp_month(&tum->start,&g_blog->first) >= 0)
                    && (btm_cmp_month(&tum->start,&g_blog->last)  <= 0);
          break;
-         
+    
     case UNIT_DAY:
          start_okay = (btm_cmp_date(&tum->start,&g_blog->first) >= 0)
                    && (btm_cmp_date(&tum->start,&g_blog->last)  <= 0);
          break;
-         
+    
     case UNIT_PART:
          start_okay = (btm_cmp(&tum->start,&g_blog->first) >= 0)
                    && (btm_cmp(&tum->start,&g_blog->last)  <= 0);
          break;
-         
+    
     case UNIT_INDEX:
          assert(0);
          return false;
   }
-
+  
   switch(tum->ustop)
   {
     case UNIT_YEAR:
          stop_okay = (btm_cmp_year(&tum->stop,&g_blog->first) >= 0)
                   && (btm_cmp_year(&tum->stop,&g_blog->last)  <= 0);
          break;
-
+    
     case UNIT_MONTH:
          stop_okay = (btm_cmp_month(&tum->stop,&g_blog->first) >= 0)
                   && (btm_cmp_month(&tum->stop,&g_blog->last)  <= 0);
          break;
-         
+    
     case UNIT_DAY:
          stop_okay = (btm_cmp_date(&tum->stop,&g_blog->first) >= 0)
                   && (btm_cmp_date(&tum->stop,&g_blog->last)  <= 0);
          break;
-         
+    
     case UNIT_PART:
          stop_okay = (btm_cmp(&tum->stop,&g_blog->first) >= 0)
                   && (btm_cmp(&tum->stop,&g_blog->last)  <= 0);
          break;
-         
+    
     case UNIT_INDEX:
          assert(0);
          return false;
@@ -248,7 +248,7 @@ bool tumbler_new(tumbler__s *const tum,const char *text)
   
   tum->start.day = tum->stop.day = u1.val;
   tum->ustart    = tum->ustop    = UNIT_DAY;
-
+  
   if (u1.len == 1)
     tum->redirect |= true;
     
@@ -295,7 +295,7 @@ bool tumbler_new(tumbler__s *const tum,const char *text)
   ;-----------------------------*/
   
 tumbler_new_file:
-
+  
   assert(*text == '/');
   tum->file = true;
   text++;
@@ -303,7 +303,7 @@ tumbler_new_file:
   for (size_t i = 0 ; i < FILENAME_MAX ; i++)
   {
     tum->filename[i] = *text++;
-
+    
     if (tum->filename[i] == '\0')
       return check_dates(tum);
     if (tum->filename[i] == '/')
@@ -320,7 +320,7 @@ tumbler_new_file:
   ;---------------------------------------*/
   
 tumbler_new_range:
-
+  
   assert(*text == '-');
   tum->range = true;
   text++;
@@ -389,11 +389,11 @@ tumbler_new_range:
   
   if (*text != '.')
     return false;
-
+  
   /*-----------------------------------------------------------------------
   ; the fourth unit, OR the part.  The part will always be stuffed into u4.
-  ;------------------------------------------------------------------------*/  
-
+  ;------------------------------------------------------------------------*/
+  
 tumbler_new_range_part:
   
   assert(part          == false);
@@ -424,7 +424,7 @@ tumbler_new_range_part:
   ; redirect flag appropriately.  The month and day require a leading zero,
   ; while the part does not.
   ;------------------------------------------------------------------------*/
-
+  
 tumbler_new_calculate:
   
   if (tum->segments == 4)
@@ -527,7 +527,7 @@ tumbler_new_calculate:
         tum->redirect |= (u1.len == 1)
                       || (u2.len == 1)
                       ;
-                      
+        
         tum->stop.month = u1.val;
         tum->stop.day   = u2.val;
         tum->stop.part  = ENTRY_MAX;
@@ -554,7 +554,7 @@ tumbler_new_calculate:
            tum->stop.part  = ENTRY_MAX;
            tum->ustop      = UNIT_YEAR;
            return check_dates(tum);
-           
+      
       case UNIT_MONTH:
            tum->redirect   |= (u1.len == 1);
            tum->stop.month  = u1.val;
@@ -562,20 +562,20 @@ tumbler_new_calculate:
            tum->stop.part   = ENTRY_MAX;
            tum->ustop       = UNIT_MONTH;
            return check_dates(tum);
-           
+      
       case UNIT_DAY:
            tum->redirect  |= (u1.len == 1);
            tum->stop.day   = u1.val;
            tum->stop.part  = ENTRY_MAX;
            tum->ustop      = UNIT_DAY;
            return check_dates(tum);
-           
+      
       case UNIT_PART:
            tum->redirect  |= ((u1.len > 1) && (*u1.txt == '0'));
            tum->stop.part  = u1.val;
            tum->ustop      = UNIT_PART;
            return check_dates(tum);
-           
+      
       case UNIT_INDEX:
            assert(0);
            return false;
@@ -666,11 +666,11 @@ char *tumbler_canonical(const tumbler__s *const tum)
       case UNIT_MONTH:
            snprintf(stop,sizeof(stop),"%d/%02d",tum->stop.year,tum->stop.month);
            break;
-           
+      
       case UNIT_DAY:
            snprintf(stop,sizeof(stop),"%02d/%02d",tum->stop.month,tum->stop.day);
            break;
-           
+      
       case UNIT_PART:
            snprintf(stop,sizeof(stop),"%02d.%d",tum->stop.day,tum->stop.part);
            break;
@@ -683,19 +683,19 @@ char *tumbler_canonical(const tumbler__s *const tum)
       case UNIT_YEAR:
            snprintf(stop,sizeof(stop),"%d",tum->stop.year);
            break;
-           
+      
       case UNIT_MONTH:
            snprintf(stop,sizeof(stop),"%02d",tum->stop.month);
            break;
-           
+      
       case UNIT_DAY:
            snprintf(stop,sizeof(stop),"%02d",tum->stop.day);
            break;
-           
+      
       case UNIT_PART:
            snprintf(stop,sizeof(stop),"%d",tum->stop.part);
            break;
-           
+      
       case UNIT_INDEX:
            assert(0);
            return NULL;

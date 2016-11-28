@@ -43,7 +43,7 @@ typedef enum http__e
 	/*--------------------------------------
 	; Successful Codes
 	;--------------------------------------*/
-	
+
   HTTP_OKAY		= 200,		/* 1.0	*/
   HTTP_CREATED		= 201,		/* 1.0	*/
   HTTP_ACCEPTED		= 202,		/* 1.0	*/
@@ -73,7 +73,7 @@ typedef enum http__e
 	/*-----------------------------------------
 	; Client Error
 	;----------------------------------------*/
-	
+
   HTTP_BADREQ		= 400,		/* 1.0	*/
   HTTP_UNAUTHORIZED	= 401,		/* 1.0	*/
   HTTP_PAYMENTREQ	= 402,		/* 1.1	*/
@@ -116,7 +116,7 @@ typedef enum http__e
 	/*-----------------------------------------
 	; Server Errors
 	;-----------------------------------------*/
-	
+
   HTTP_ISERVERERR	= 500,		/* 1.0	*/
   HTTP_NOTIMP		= 501,		/* 1.0	*/
   HTTP_BADGATEWAY	= 502,		/* 1.0	*/

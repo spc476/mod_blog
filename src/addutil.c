@@ -77,9 +77,9 @@ int entry_add(Request req)
   entry->body      = req->body;
   
   if (c_authorfile) BlogLock(g_blog);
-
+    
     BlogEntryWrite(entry);
-
+    
   if (c_authorfile) BlogUnlock(g_blog);
   
   req->when = entry->when;
@@ -337,7 +337,7 @@ void notify_emaillist(Request req)
   list = gdbm_open((char *)c_emaildb,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
     return;
- 
+   
   email          = EmailNew();
   email->from    = c_email;
   email->subject = c_emailsubject;

@@ -59,41 +59,37 @@ static int	cgi_error		(Request,int,const char *, ... );
 
 int main_cgi_head(Cgi cgi)
 {
-  struct request req;
-  int            rc;
+  int rc;
   
   assert(cgi != NULL);
   
-  rc = cgi_init(cgi,&req);
+  rc = cgi_init(cgi,&gd.req);
   if (rc != 0)
-    return((*req.error)(&req,HTTP_ISERVERERR,"cgi_init() failed"));
+    return((*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed"));
   
-  return((*req.error)(&req,HTTP_METHODNOTALLOWED,"HEAD method not supported"));
+  return((*gd.req.error)(&gd.req,HTTP_METHODNOTALLOWED,"HEAD method not supported"));
 }
 
 /**********************************************************************/
 
 int main_cgi_get(Cgi cgi)
 {
-  struct request  req;
-  int             rc;
+  int rc;
   
   assert(cgi != NULL);
 
-  rc = cgi_init(cgi,&req);
+  rc = cgi_init(cgi,&gd.req);
   if (rc != 0)
-    return((*req.error)(&req,HTTP_ISERVERERR,"cgi_init() failed"));
+    return((*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed"));
 
-  req.command    = cmd_cgi_get_show;
-  req.reqtumbler = getenv("PATH_INFO");
-  gd.req         = &req;
+  gd.req.command    = cmd_cgi_get_show;
+  gd.req.reqtumbler = getenv("PATH_INFO");
   
   CgiListMake(cgi);
   
-  set_m_cgi_get_command(CgiListGetValue(cgi,"cmd"),&req);
+  set_m_cgi_get_command(CgiListGetValue(cgi,"cmd"),&gd.req);
   
-  rc = (*req.command)(&req);
-  gd.req = NULL;	/* make sure we don't have a dangling reference */
+  rc = (*gd.req.command)(&gd.req);
   return(rc);
 }
 
@@ -144,7 +140,7 @@ static int cmd_cgi_get_show(Request req)
   
   assert(req != NULL);
   
-  status = CgiListGetValue(req->cgi,"status");
+  status = CgiListGetValue(gd.cgi,"status");
   if (emptynull_string(status))
     status = strdup("200");
   
@@ -251,55 +247,50 @@ static int cmd_cgi_get_overview(Request req)
 
 int main_cgi_post(Cgi cgi)
 {
-  struct request req;
-  int            rc;
+  int rc;
   
   assert(cgi != NULL);
   
-  rc = cgi_init(cgi,&req);
+  rc = cgi_init(cgi,&gd.req);
   if (rc != 0)
-    return((*req.error)(&req,HTTP_ISERVERERR,"cgi_init() failed"));
+    return((*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed"));
   
-  req.command = cmd_cgi_post_new;  
-  gd.req      = &req;
+  gd.req.command = cmd_cgi_post_new;  
   
   CgiListMake(cgi);
   
   set_c_updatetype 	(CgiListGetValue(cgi,"updatetype"));
   set_cf_emailupdate	(CgiListGetValue(cgi,"email"));
   set_c_conversion 	(CgiListGetValue(cgi,"filter"));
-  set_m_author     	(CgiListGetValue(cgi,"author"),&req);
-  set_m_cgi_post_command(CgiListGetValue(cgi,"cmd"),&req);
+  set_m_author     	(CgiListGetValue(cgi,"author"),&gd.req);
+  set_m_cgi_post_command(CgiListGetValue(cgi,"cmd"),&gd.req);
   
-  req.title     = CgiListGetValue(cgi,"title");
-  req.class     = CgiListGetValue(cgi,"class");
-  req.status    = CgiListGetValue(cgi,"status");
-  req.date      = CgiListGetValue(cgi,"date");
-  req.origbody  = CgiListGetValue(cgi,"body");
-  req.body      = strdup(req.origbody);
+  gd.req.title    = CgiListGetValue(cgi,"title");
+  gd.req.class    = CgiListGetValue(cgi,"class");
+  gd.req.status   = CgiListGetValue(cgi,"status");
+  gd.req.date     = CgiListGetValue(cgi,"date");
+  gd.req.origbody = CgiListGetValue(cgi,"body");
+  gd.req.body     = strdup(gd.req.origbody);
 
   if (
-       (emptynull_string(req.author))
-       || (emptynull_string(req.title))
-       || (emptynull_string(req.body))
+       (emptynull_string(gd.req.author))
+       || (emptynull_string(gd.req.title))
+       || (emptynull_string(gd.req.body))
      )
   {
-    gd.req = NULL; /* no dangling references */
-    return((*req.error)(&req,HTTP_BADREQ,"errors-missing"));
+    return((*gd.req.error)(&gd.req,HTTP_BADREQ,"errors-missing"));
   }
 
-  if (req.class == NULL)
-    req.class = strdup("");
+  if (gd.req.class == NULL)
+    gd.req.class = strdup("");
   
-  if (authenticate_author(&req) == false)
+  if (authenticate_author(&gd.req) == false)
   {
-    gd.req = NULL;
-    syslog(LOG_ERR,"'%s' not authorized to post",req.author);
-    return((*req.error)(&req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",req.author,CgiListGetValue(cgi,"author")));
+    syslog(LOG_ERR,"'%s' not authorized to post",gd.req.author);
+    return((*gd.req.error)(&gd.req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",gd.req.author,CgiListGetValue(cgi,"author")));
   }
 
-  rc = (*req.command)(&req);
-  gd.req = NULL;
+  rc = (*gd.req.command)(&gd.req);
   return(rc);  
 }
 
@@ -499,12 +490,11 @@ static int cgi_init(Cgi cgi,Request req)
   assert(cgi != NULL);
   assert(req != NULL);
   
-  memset(req,0,sizeof(struct request));
-  
   req->error = cgi_error;
   req->in    = stdin;
   req->out   = stdout;
-  req->cgi   = cgi;
+  gd.cgi     = cgi;
+  
   
   return GlobalsInit(NULL);
 }

@@ -50,11 +50,11 @@ int main(int argc,char *argv[],char *envp[])
   crashreport(SIGILL);
   crashreport(SIGINT);
   crashreport(SIGSEGV);
-
+  
   /*---------------------------
   ; others we're interested in 
   ;----------------------------*/
-
+  
 #ifdef SIGBUG
   crashreport(SIGBUS);
 #endif
@@ -85,10 +85,10 @@ int main(int argc,char *argv[],char *envp[])
   ; single step, what have you, without having to set up a huge fake "web"
   ; environment.  It's something I rarely do, but when I need it, I need it.
   ;-------------------------------------------------------------------------*/
-
+  
   while(gf_debug)
     ;
-
+  
   gd.cgi = CgiNew(NULL);
   
   if (gd.cgi != NULL)
@@ -103,7 +103,7 @@ int main(int argc,char *argv[],char *envp[])
   }
   else
     rc = main_cli(argc,argv);
-
+  
   return(rc);
 }
 

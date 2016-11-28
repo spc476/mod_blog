@@ -64,31 +64,31 @@ static void	   globals_free	(void);
 
 /************************************************************/
 
-const char   *c_name;
-const char   *c_basedir;
-const char   *c_webdir;
+const char   *c_name;				/* no free */
+const char   *c_basedir;			/* no free */
+const char   *c_webdir;				/* no free */
 char         *c_baseurl;
 char         *c_fullbaseurl;
 char         *c_htmltemplates;
 int           c_days;
-const char   *c_author;
-const char   *c_email;
-const char   *c_authorfile;
-const char   *c_updatetype   = "NewEntry";
-const char   *c_lockfile;
-const char   *c_emaildb;
-const char   *c_emailsubject;
-const char   *c_emailmsg;
+const char   *c_author;				/* no free */
+const char   *c_email;				/* no free */
+const char   *c_authorfile;			/* no free */
+const char   *c_updatetype   = "NewEntry";	/* no free */
+const char   *c_lockfile;			/* no free */
+const char   *c_emaildb;			/* no free */
+const char   *c_emailsubject;			/* no free */
+const char   *c_emailmsg;			/* no free */
 int           c_tzhour;
 int           c_tzmin;
-const char  *c_overview;
+const char  *c_overview;			/* no free */
 void	    (*c_conversion)(FILE *,FILE *) =  html_conversion;
 bool          cf_emailupdate = true;
 template__t  *c_templates;
 size_t        c_numtemplates;
 aflink__t    *c_aflinks;
 size_t        c_numaflinks;
-const char   *c_adtag;
+const char   *c_adtag;				/* no free */
 
 lua_State     *g_L;
 const char    *g_templates;
@@ -171,7 +171,7 @@ int GlobalsInit(const char *conf)
     syslog(LOG_ERR,"Lua error: (%d) %s",rc,err);
     return -1;
   }
-
+  
   c_name         = get_string(g_L,"name",NULL);
   c_basedir      = get_string(g_L,"basedir",NULL);
   c_webdir       = get_string(g_L,"webdir",NULL);
@@ -185,13 +185,13 @@ int GlobalsInit(const char *conf)
   c_emailmsg     = get_string(g_L,"email.message",NULL);
   c_adtag        = get_string(g_L,"adtag","programming");  
   cf_emailupdate = get_bool  (g_L,"email.notify",true);    
-
+  
   gf_debug       = get_bool  (g_L,"debug",false);  
   gd.f.overview  = (c_overview != NULL);  
   
   if (c_emaildb == NULL)
     cf_emailupdate = false;
-
+  
   {
     const char *timezone = get_string(g_L,"timezone","-5:00");
     char       *p;
@@ -247,7 +247,7 @@ int GlobalsInit(const char *conf)
     c_templates[i].reverse  = lua_toboolean(g_L,-4);
     c_templates[i].fullurl  = lua_toboolean(g_L,-3);
     c_templates[i].file     = lua_tostring(g_L,-2);
-
+    
     if (lua_isnumber(g_L,-1))
     {
       c_templates[i].items = lua_tointeger(g_L,-1);
@@ -287,7 +287,7 @@ int GlobalsInit(const char *conf)
   c_htmltemplates = strdup(c_templates[0].template);
   g_templates     = c_htmltemplates;
   c_days          = c_templates[0].items;
-
+  
   /*----------------------------------------------------
   ; process affiliate links
   ;----------------------------------------------------*/
@@ -319,11 +319,11 @@ int GlobalsInit(const char *conf)
     }
   }
   lua_pop(g_L,1);
-
+  
   g_blog = BlogNew(c_basedir,c_lockfile);
   if (g_blog == NULL)
     return(ENOMEM);
-
+  
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting
   ; conventions---this makes sure I have those for sorting
@@ -391,9 +391,9 @@ void set_c_url(const char *const turl)
   size_t  len;
   char   *fbu;
   char   *bu;
-
+  
   assert(turl != NULL);
-
+  
   fbu = strdup(turl);
   url = UrlNew(turl);
   
@@ -498,7 +498,7 @@ static const char *get_string(
     val = def;
   else
     val = lua_tostring(L,-1);
-
+  
   lua_pop(L,1);
   return val;
 }
@@ -529,9 +529,28 @@ static bool get_bool(
 
 static void globals_free(void)
 {
+  if (gd.cgi != NULL)
+  {
+    CgiFree(gd.cgi);
+    gd.cgi = NULL;
+  }
+  
+  if (gd.req.in  != stdin)  fclose(gd.req.in);
+  if (gd.req.out != stdout) fclose(gd.req.out);
+  free(gd.req.update);
+  free(gd.req.origauthor);
+  free(gd.req.author);
+  free(gd.req.name);
+  free(gd.req.title);
+  free(gd.req.class);
+  free(gd.req.status);
+  free(gd.req.date);
+  free(gd.req.origbody);
+  free(gd.req.body);
+  
   if (g_blog != NULL) BlogFree(g_blog);
   if (g_L    != NULL) lua_close(g_L);
-
+  
   free(c_aflinks);  
   free(c_templates);    
   free(c_baseurl);

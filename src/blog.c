@@ -194,14 +194,14 @@ int BlogLock(Blog blog)
   lockdata.l_len    = 0;
   
   rc = fcntl(blog->lock,F_SETLKW,&lockdata);
-
+  
   if (rc < 0)
   {
     syslog(LOG_ERR,"SETLOCK %s: %s",blog->lockfile,strerror(errno));
     close(blog->lock);
     return(false);
   }
-
+  
   return (true);
 }
 
@@ -240,7 +240,7 @@ int BlogFree(Blog blog)
   
   if (blog->lock > 0)
     BlogUnlock(blog);
-
+  
   free(blog->lockfile);
   free(blog);
   return(0);
@@ -306,7 +306,7 @@ BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
   entry->class        = blog_meta_entry("class",which);
   entry->author       = blog_meta_entry("authors",which);
   entry->status       = blog_meta_entry("status",which);
-
+  
   date_to_part(pname,which,which->part);
   
   if (stat(pname,&status) == 0)
@@ -324,7 +324,7 @@ BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
     fclose(sinbody);
     entry->body[status.st_size] = '\0';
   }
-
+  
   return entry;  
 }
 
@@ -879,7 +879,7 @@ static int blog_meta_write(
 )
 {
   FILE   *fp;
-
+  
   assert(name != NULL);
   assert(date != NULL);
   assert(list != NULL);

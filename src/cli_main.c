@@ -27,6 +27,7 @@
 #define _GNU_SOURCE 1
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -94,20 +95,15 @@ static const struct option coptions[] =
 
 int main_cli(int argc,char *argv[])
 {
-  struct request  req;
-  char           *config = NULL;
-  int             rc;
-  int             forcenotify = false;
+  char *config      = NULL;
+  int   forcenotify = false;
   
-  memset(&req,0,sizeof(struct request));
-
-  req.command    = cmd_cli_show;
-  req.error      = cli_error;
-  req.in         = stdin;
-  req.out        = stdout;
-  gd.req         = &req;
+  gd.req.command = cmd_cli_show;
+  gd.req.error   = cli_error;
+  gd.req.in      = stdin;
+  gd.req.out     = stdout;
   
-  while(1)
+  while(true)
   {
     int option = 0;
     int c;
@@ -121,29 +117,29 @@ int main_cli(int argc,char *argv[])
            config = optarg;
            break;
       case OPT_FILE:
-           req.in = fopen(optarg,"r");
+           gd.req.in = fopen(optarg,"r");
            break;
       case OPT_EMAIL:
-           req.f.emailin = true;
+           gd.req.f.emailin = true;
            break;
       case OPT_UPDATE:
-           req.f.update = true;
+           gd.req.f.update = true;
            set_c_updatetype(optarg);
            break;
       case OPT_ENTRY:
-           req.reqtumbler = optarg;
+           gd.req.reqtumbler = optarg;
            break;
       case OPT_DEBUG:
            gf_debug = true;
            break;
       case OPT_REGENERATE:
-           req.f.regenerate = true;
+           gd.req.f.regenerate = true;
            break;
       case OPT_FORCENOTIFY:
            forcenotify = true;
 	   break;
       case OPT_CMD:
-           get_cli_command(&req,optarg);
+           get_cli_command(&gd.req,optarg);
            break;
       case OPT_HELP:
       default:
@@ -176,41 +172,20 @@ int main_cli(int argc,char *argv[])
 		,gdbm_version
 #endif
 	      );
-	   gd.req = NULL;
 	   return(EXIT_FAILURE);
     }
   }
-
-  rc = GlobalsInit(config);
-  if (rc != 0)
-  {
-    gd.req = NULL;
-    return((*req.error)(&req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config));
-  }
+  
+  if (GlobalsInit(config) != 0)
+    return((*gd.req.error)(&gd.req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config));
   
   if (forcenotify)
   {
-    notify_emaillist(gd.req);
-    gd.req = NULL;
+    notify_emaillist(&gd.req);
     return(0);
   }
-
-  rc = (*req.command)(&req);
   
-  if (req.in != stdin) fclose(req.in);
-  
-  free(req.update);
-  free(req.origauthor);
-  free(req.author);
-  free(req.name);
-  free(req.title);
-  free(req.class);
-  free(req.status);
-  free(req.date);
-  free(req.origbody);
-  free(req.body);
-  gd.req = NULL;
-  return(rc);  
+  return (*gd.req.command)(&gd.req);
 }
 
 /************************************************************************/
@@ -220,7 +195,7 @@ static int cmd_cli_new(Request req)
   int rc;
   
   assert(req != NULL);
-
+  
   if (req->f.emailin)
     rc = mail_setup_data(req);
   else
@@ -228,7 +203,7 @@ static int cmd_cli_new(Request req)
   
   if (rc != 0)
     return(EXIT_FAILURE);
-
+  
   rc = entry_add(req);
   if (rc == 0)
   {
@@ -248,7 +223,7 @@ static int cmd_cli_show(Request req)
   assert(req            != NULL);
   assert(req->f.emailin == false);
   assert(req->f.update  == false);
-
+  
   if (req->f.regenerate)
     rc = generate_pages();
   else
@@ -282,7 +257,7 @@ static int cmd_cli_show(Request req)
         rc = (*req->error)(req,HTTP_NOTFOUND,"tumbler error---nothing found");
     }
   }
-
+  
   assert(rc != -1);
   return(rc);
 }
@@ -292,7 +267,7 @@ static int cmd_cli_show(Request req)
 static void get_cli_command(Request req,char *value)
 {
   assert(req != NULL);
-
+  
   if (emptynull_string(value)) return;
   up_string(value);
   
@@ -314,7 +289,7 @@ static int mail_setup_data(Request req)
   
   assert(req            != NULL);
   assert(req->f.emailin == true);
-
+  
   line = NULL;
   size = 0;
   
@@ -336,7 +311,7 @@ static int mail_setup_data(Request req)
   ; At some future point, we might want to decode encoded entries sent via
   ; email.
   ;-----------------------------------------------------------------------*/
-
+  
   RFC822HeadersRead(req->in,&headers);
   
   char *encoding = PairListGetValue(&headers,"CONTENT-TRANSFER-ENCODING");
@@ -354,9 +329,9 @@ static int mail_setup_data(Request req)
       return EINVAL;
     }
   }
-
+  
   PairListFree(&headers);
-
+  
   return(mailfile_readdata(req));
 }
   
@@ -369,13 +344,13 @@ static int mailfile_readdata(Request req)
   char   *email;
   char   *filter;
   size_t  size;
-
+  
   assert(req     != NULL);
   assert(req->in != NULL);
-
+  
   ListInit(&headers);
   RFC822HeadersRead(req->in,&headers);
-
+  
   req->author = PairListGetValue(&headers,"AUTHOR");
   req->title  = PairListGetValue(&headers,"TITLE");
   req->class  = PairListGetValue(&headers,"CLASS");
@@ -385,17 +360,17 @@ static int mailfile_readdata(Request req)
   filter      = PairListGetValue(&headers,"FILTER");
   
   if (req->author != NULL) req->author = strdup(req->author);
-
+  
   if (req->title  != NULL) 
     req->title  = strdup(req->title);
   else
     req->title = strdup("");
-
+  
   if (req->class  != NULL) 
     req->class  = strdup(req->class);
   else
     req->class = strdup("");
-
+  
   if (req->status != NULL)
     req->status = strdup(req->status);
   else
@@ -416,7 +391,7 @@ static int mailfile_readdata(Request req)
   output = open_memstream(&req->origbody,&size);
   fcopy(output,req->in);
   fclose(output);
-
+  
   req->body     = strdup(req->origbody);
   return(0);
 }
@@ -435,7 +410,7 @@ static int cli_error(Request req __attribute__((unused)),int level,const char *m
   va_start(args,msg);
   vfprintf(stderr,msg,args);
   va_end(args);
-
+  
   fputc('\n',stderr);
   
   return 1;

@@ -42,7 +42,6 @@ typedef struct request
   int       (*command)(struct request *);
   int       (*error)  (struct request *,int,const char *, ... );
   RFlags      f;
-  Cgi         cgi;
   FILE       *in;
   FILE       *out;
   char       *update;
@@ -73,23 +72,22 @@ typedef struct dflags
 
 typedef struct display
 {
-  DFlags      f;
-  unit__e     navunit;
-  FILE       *htmldump;
-  Cgi         cgi;
-  Request     req;
-  struct btm  previous;
-  struct btm  next;
+  DFlags          f;
+  unit__e         navunit;
+  FILE           *htmldump;
+  Cgi             cgi;
+  struct request  req;
+  struct btm      previous;
+  struct btm      next;
 } *Display;
 
 struct callback_data
 {
-  List       list;
-  struct btm last;	/* timestamp of previous entry */
-  BlogEntry  entry;	/* current entry being processed */
-  FILE      *ad;	/* file containing ad */
-  char      *adtag;
+  List        list;
+  struct btm  last;	/* timestamp of previous entry */
+  BlogEntry   entry;	/* current entry being processed */
+  FILE       *ad;	/* file containing ad */
+  char       *adtag;
 };
 
 #endif
-
