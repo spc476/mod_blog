@@ -327,6 +327,7 @@ void notify_emaillist(Request req)
 {
   GDBM_FILE  list;
   Chunk      templates;
+  datum      nextkey;
   datum      key;
   datum      content;
   Email      email;
@@ -389,8 +390,9 @@ void notify_emaillist(Request req)
             free(content.dptr);
           }
           
+          nextkey = gdbm_nextkey(list,key);
           free(key.dptr);
-          key = gdbm_nextkey(list,key);
+          key = nextkey;
         }
         fclose(inqp);
       }
