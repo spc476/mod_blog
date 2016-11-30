@@ -173,12 +173,12 @@ int main_cli(int argc,char *argv[])
 		,gdbm_version
 #endif
 	      );
-	   return(EXIT_FAILURE);
+	   return EXIT_FAILURE;
     }
   }
   
   if (GlobalsInit(config) != 0)
-    return((*gd.req.error)(&gd.req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config));
+    return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config);
   
   if (forcenotify)
   {
@@ -215,7 +215,7 @@ static int cmd_cli_new(Request req)
     rc = mailfile_readdata(req);
   
   if (rc != 0)
-    return(EXIT_FAILURE);
+    return EXIT_FAILURE;
   
   rc = entry_add(req);
   if (rc == 0)
@@ -224,7 +224,7 @@ static int cmd_cli_new(Request req)
     generate_pages();
   }
   
-  return(rc);
+  return rc;
 }
 
 /****************************************************************************/
@@ -262,7 +262,7 @@ static int cmd_cli_show(Request req)
           char *tum = tumbler_canonical(&req->tumbler);
           rc = (*req->error)(req,HTTP_MOVEPERM,"Redirect: %s",tum);
           free(tum);
-          return(rc);
+          return rc;
         }
         rc = tumbler_page(req->out,&req->tumbler);
       }
@@ -272,7 +272,7 @@ static int cmd_cli_show(Request req)
   }
   
   assert(rc != -1);
-  return(rc);
+  return rc;
 }
 
 /********************************************************************/
@@ -345,7 +345,7 @@ static int mail_setup_data(Request req)
   
   PairListFree(&headers);
   
-  return(mailfile_readdata(req));
+  return mailfile_readdata(req);
 }
   
 /*******************************************************************/
@@ -389,24 +389,24 @@ static int mailfile_readdata(Request req)
   else
     req->status = strdup("");
   
-  if (req->date   != NULL) req->date = strdup(req->date);
-  if (email       != NULL) set_cf_emailupdate(email);
-  if (filter      != NULL) set_c_conversion(filter);
+  if (req->date != NULL) req->date = strdup(req->date);
+  if (email     != NULL) set_cf_emailupdate(email);
+  if (filter    != NULL) set_c_conversion(filter);
   
   PairListFree(&headers);	/* got everything we need, dump this */
   
   if (authenticate_author(req) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",req->author);
-    return(EPERM);
+    return EPERM;
   }
   
   output = open_memstream(&req->origbody,&size);
   fcopy(output,req->in);
   fclose(output);
   
-  req->body     = strdup(req->origbody);
-  return(0);
+  req->body = strdup(req->origbody);
+  return 0;
 }
 
 /***************************************************************************/
@@ -430,4 +430,3 @@ static int cli_error(Request req __attribute__((unused)),int level,const char *m
 }
 
 /**************************************************************************/
-

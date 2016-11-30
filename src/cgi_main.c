@@ -65,9 +65,9 @@ int main_cgi_head(Cgi cgi)
   
   rc = cgi_init(cgi,&gd.req);
   if (rc != 0)
-    return((*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed"));
+    return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
   
-  return((*gd.req.error)(&gd.req,HTTP_METHODNOTALLOWED,"HEAD method not supported"));
+  return (*gd.req.error)(&gd.req,HTTP_METHODNOTALLOWED,"HEAD method not supported");
 }
 
 /**********************************************************************/
@@ -80,7 +80,7 @@ int main_cgi_get(Cgi cgi)
 
   rc = cgi_init(cgi,&gd.req);
   if (rc != 0)
-    return((*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed"));
+    return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
 
   gd.req.command    = cmd_cgi_get_show;
   gd.req.reqtumbler = getenv("PATH_INFO");
@@ -90,7 +90,7 @@ int main_cgi_get(Cgi cgi)
   set_m_cgi_get_command(CgiListGetValue(cgi,"cmd"),&gd.req);
   
   rc = (*gd.req.command)(&gd.req);
-  return(rc);
+  return rc;
 }
 
 /************************************************************************/
@@ -128,7 +128,7 @@ static int cmd_cgi_get_new(Request req)
   gd.f.edit = 1;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
   generic_cb("main",req->out,&cbd);
-  return(0);
+  return 0;
 }
 
 /**********************************************************************/
@@ -187,7 +187,7 @@ static int cmd_cgi_get_show(Request req)
         );
         free(tum);
 	free(status);
-	return(0);
+	return 0;
       }
 
       if (req->tumbler.file == false)
@@ -218,7 +218,7 @@ static int cmd_cgi_get_show(Request req)
   
   free(status);
   assert(rc != -1);
-  return(rc);
+  return rc;
 }
 
 /********************************************************************/
@@ -226,7 +226,7 @@ static int cmd_cgi_get_show(Request req)
 static int cmd_cgi_get_edit(Request req)
 {
   assert(req != NULL);
-  return((*req->error)(req,HTTP_BADREQ,"bad request"));
+  return (*req->error)(req,HTTP_BADREQ,"bad request");
 }
 
 /***********************************************************************/
@@ -240,7 +240,7 @@ static int cmd_cgi_get_overview(Request req)
   gd.f.overview = true;
   fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
   generic_cb("main",req->out,&days);
-  return(0);  
+  return 0;  
 }
 
 /**********************************************************************/
@@ -253,7 +253,7 @@ int main_cgi_post(Cgi cgi)
   
   rc = cgi_init(cgi,&gd.req);
   if (rc != 0)
-    return((*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed"));
+    return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
   
   gd.req.command = cmd_cgi_post_new;  
   
@@ -278,7 +278,7 @@ int main_cgi_post(Cgi cgi)
        || (emptynull_string(gd.req.body))
      )
   {
-    return((*gd.req.error)(&gd.req,HTTP_BADREQ,"errors-missing"));
+    return (*gd.req.error)(&gd.req,HTTP_BADREQ,"errors-missing");
   }
 
   if (gd.req.class == NULL)
@@ -287,11 +287,11 @@ int main_cgi_post(Cgi cgi)
   if (authenticate_author(&gd.req) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",gd.req.author);
-    return((*gd.req.error)(&gd.req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",gd.req.author,CgiListGetValue(cgi,"author")));
+    return (*gd.req.error)(&gd.req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",gd.req.author,CgiListGetValue(cgi,"author"));
   }
 
   rc = (*gd.req.command)(&gd.req);
-  return(rc);  
+  return rc;  
 }
 
 /************************************************************************/
@@ -357,7 +357,7 @@ static int cmd_cgi_post_new(Request req)
   else
     rc = (*req->error)(req,HTTP_ISERVERERR,"couldn't add entry");
   
-  return(rc);
+  return rc;
 }
 
 /***********************************************************************/
@@ -404,7 +404,7 @@ static int cmd_cgi_post_show(Request req)
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
   generic_cb("main",req->out,&cbd);
 
-  return(0);  
+  return 0;  
 }
 
 /**********************************************************************/
@@ -413,7 +413,7 @@ static int cmd_cgi_post_edit(Request req)
 {
   assert(req != NULL);
   
-  return((req->error)(req,HTTP_BADREQ,"bad request"));
+  return (req->error)(req,HTTP_BADREQ,"bad request");
 }
 
 /***********************************************************************/
@@ -480,7 +480,7 @@ static int cgi_error(Request req,int level,const char *msg, ... )
   free(file);
   free(errmsg);
   
-  return(0);
+  return 0;
 }
 
 /**********************************************************************/
@@ -500,4 +500,3 @@ static int cgi_init(Cgi cgi,Request req)
 }
 
 /***********************************************************************/
-

@@ -104,8 +104,7 @@ int main(int argc,char *argv[],char *envp[])
   else
     rc = main_cli(argc,argv);
   
-  return(rc);
+  return rc;
 }
 
 /***********************************************************************/
-

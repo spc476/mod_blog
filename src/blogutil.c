@@ -64,7 +64,7 @@ String *tag_split(size_t *const pnum,const char *tag)
   }
   
   *pnum = num;
-  return(pool);
+  return pool;
 }
 
 /*********************************************************************/
@@ -76,7 +76,7 @@ char *fromstring(const String src)
   dest = malloc(src.s + 1);
   memcpy(dest,src.d,src.s);
   dest[src.s] = '\0';
-  return (dest);
+  return dest;
 }
 
 /*********************************************************************/
@@ -102,4 +102,3 @@ size_t fcopy(FILE *const restrict out,FILE *const restrict in)
 }
 
 /*********************************************************************/
-

@@ -558,4 +558,3 @@ static void handle_period(FILE *const restrict input,FILE *const restrict output
 }
 
 /*********************************************************************/
-

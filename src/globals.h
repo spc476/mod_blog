@@ -93,4 +93,3 @@ extern int		main_cgi_post		(Cgi);
 extern int		main_cli		(int,char *[]);
 
 #endif
-

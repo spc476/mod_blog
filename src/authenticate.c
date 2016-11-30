@@ -64,10 +64,10 @@ char *get_remote_user(void)
   {
     name = getenv("REDIRECT_REMOTE_USER");
     if (name == NULL)
-      return(strdup(""));
+      return strdup("");
   }
   
-  return(strdup(name));
+  return strdup(name);
 }
 
 /************************************************************************/
@@ -79,7 +79,7 @@ char *get_remote_user(void)
     assert(req         != NULL);
     assert(req->author != NULL);
     
-    return(strcmp(req->author,c_author) == 0);
+    return strcmp(req->author,c_author) == 0;
   }
   
   /************************************************************************/
@@ -96,17 +96,17 @@ char *get_remote_user(void)
     assert(req->author != NULL);
     
     if (c_authorfile == NULL)
-      return (strcmp(req->author,c_author) == 0);
+      return strcmp(req->author,c_author) == 0;
     
     list = gdbm_open(c_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
     if (list == NULL)
-      return(false);
+      return false;
     
     key.dptr  = req->author;
     key.dsize = strlen(req->author) + 1;
     rc        = gdbm_exists(list,key);
     gdbm_close(list);
-    return(rc);
+    return rc;
   }
 
   /***********************************************************************/
@@ -130,17 +130,17 @@ char *get_remote_user(void)
     ;---------------------------------------------------------------*/
     
     if (c_authorfile == NULL)
-      return (strcmp(req->author,c_author) == 0);
+      return  strcmp(req->author,c_author) == 0;
     
     list = dbopen(c_authorfile,O_RDONLY,0644,DB_HASH,NULL);
     if (list == NULL)
-      return(false);
+      return false;
     
     key.data = req->author;
     key.size = strlen(req->author);
     rc       = (list->get)(list,&key,&data,0);
     (list->close)(list);
-    if (rc) return(false);
+    if (rc) return false;
     
     {
       char   *tmp;
@@ -166,7 +166,7 @@ char *get_remote_user(void)
         if (p == NULL)
         {
           free(tmp);
-          return(true);
+          return true;
         }
         p++;
       }
@@ -194,7 +194,7 @@ char *get_remote_user(void)
       free(tmp);
     }
     
-    return(true);
+    return true;
   }
 
   /**********************************************************************/
@@ -219,7 +219,7 @@ char *get_remote_user(void)
     if ((rc == -1) || (emptynull_string(line)))
     {
       free(line);
-      return(0);
+      return 0;
     }
     
     if (line[size - 1] == '\n')
@@ -248,7 +248,7 @@ char *get_remote_user(void)
     
     free(tmp);
     free(line);
-    return(dsize);
+    return dsize;
   }
   
   /*------------------------------------------------------*/
@@ -263,11 +263,11 @@ char *get_remote_user(void)
     assert(req->author != NULL);
     
     if (c_authorfile == NULL)
-      return(strcmp(req->author,c_author) == 0);
+      return strcmp(req->author,c_author) == 0;
     
     in = fopen(c_authorfile,"r");
     if (in == NULL)
-      return(false);
+      return false;
     
     while((cnt = breakline(lines,10,in)))
     {
@@ -283,16 +283,15 @@ char *get_remote_user(void)
           req->name   = req->author;
           req->author = strdup(lines[2]);
           fclose(in);
-          return(true);
+          return true;
         }
       }
     }
     
     fclose(in);
-    return(false);
+    return false;
   }
 
 #endif
 
 /**************************************************************************/
-

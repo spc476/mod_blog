@@ -153,4 +153,3 @@ extern FILE	*fentity_encode_onread		(FILE *const);
 extern FILE	*fentity_encode_onwrite		(FILE *const);
 
 #endif
-

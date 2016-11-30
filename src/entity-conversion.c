@@ -507,4 +507,3 @@ static ssize_t few_write(void *cookie,const char *buffer,size_t bytes)
 }
 
 /*******************************************************************/
-

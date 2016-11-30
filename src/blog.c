@@ -80,7 +80,7 @@ Blog BlogNew(const char *location,const char *lockfile)
   if (rc != 0)
   {
     syslog(LOG_ERR,"%s: %s",location,strerror(errno));
-    return(NULL);
+    return NULL;
   }
   
   blog = calloc(1,sizeof(struct blog));
@@ -169,7 +169,7 @@ Blog BlogNew(const char *location,const char *lockfile)
     blog->now.part = blog->last.part;
   }
   
-  return(blog);
+  return blog;
 }
 
 /***********************************************************************/
@@ -185,7 +185,7 @@ int BlogLock(Blog blog)
   if (blog->lock == -1) 
   {
     syslog(LOG_ERR,"%s: %s",blog->lockfile,strerror(errno));
-    return(false);
+    return false;
   }
   
   lockdata.l_type   = F_WRLCK;
@@ -199,10 +199,10 @@ int BlogLock(Blog blog)
   {
     syslog(LOG_ERR,"SETLOCK %s: %s",blog->lockfile,strerror(errno));
     close(blog->lock);
-    return(false);
+    return false;
   }
   
-  return (true);
+  return true;
 }
 
 /***********************************************************************/
@@ -226,10 +226,10 @@ int BlogUnlock(Blog blog)
     syslog(LOG_ERR,"UNLOCK %s: %s",blog->lockfile,strerror(errno));
     close(blog->lock);
     blog->lock = 0;
-    return(true);
+    return true;
   }
   else
-    return(false);
+    return false;
 }
 
 /***********************************************************************/
@@ -243,7 +243,7 @@ int BlogFree(Blog blog)
   
   free(blog->lockfile);
   free(blog);
-  return(0);
+  return 0;
 }
 
 /************************************************************************/
@@ -616,7 +616,7 @@ int BlogEntryFree(BlogEntry entry)
   free(entry->class);
   free(entry->title);
   free(entry);
-  return(0);
+  return 0;
 }
 
 /***********************************************************************/
@@ -676,7 +676,7 @@ static FILE *open_file_r(const char *name,const struct btm *date)
   ;-------------------------------------------------*/
   
   ungetc(fgetc(in),in);
-  return(in);
+  return in;
 }
 
 /**********************************************************************/
@@ -691,7 +691,7 @@ static FILE *open_file_w(const char *name,const struct btm *date)
   
   date_to_filename(buffer,date,name);
   out = fopen(buffer,"w");
-  return(out);
+  return out;
 }
 
 /*********************************************************************/
@@ -720,10 +720,10 @@ static int date_checkcreate(const struct btm *date)
   if (rc != 0)
   {
     if (errno != ENOENT)
-      return(errno);
+      return errno;
     rc = mkdir(tname,0777);
     if (rc != 0)
-      return(errno);
+      return errno;
   }
   
   sprintf(tname,"%04d/%02d",date->year,date->month);
@@ -731,10 +731,10 @@ static int date_checkcreate(const struct btm *date)
   if (rc != 0)
   {
     if (errno != ENOENT)
-      return(errno);
+      return errno;
     rc = mkdir(tname,0777);
     if (rc != 0)
-      return(errno);
+      return errno;
   }
   
   sprintf(tname,"%04d/%02d/%02d",date->year,date->month,date->day);
@@ -742,13 +742,13 @@ static int date_checkcreate(const struct btm *date)
   if (rc != 0)
   {
     if (errno != ENOENT)
-      return(errno);
+      return errno;
     rc = mkdir(tname,0777);
     if (rc != 0)
-      return(errno);
+      return errno;
   }
   
-  return(0);
+  return 0;
 }
 
 /********************************************************************/

@@ -48,4 +48,3 @@ extern int	btm_cmp_year	(const struct btm *const restrict,const struct btm *cons
 extern void	tm_init		(struct tm *const);
 
 #endif
-

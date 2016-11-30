@@ -38,4 +38,3 @@ extern char	*fromstring	(const String);
 extern size_t	 fcopy		(FILE *const restrict,FILE *const restrict);
 
 #endif
-

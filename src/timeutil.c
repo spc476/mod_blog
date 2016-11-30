@@ -45,13 +45,13 @@ int max_monthday(const int year,const int month)
     ; 2000 is.
     ;----------------------------------------------------------------------*/
     
-    if ((year % 400) == 0) return(29);
-    if ((year % 100) == 0) return(28);
-    if ((year %   4) == 0) return(29);
-    return(28);
+    if ((year % 400) == 0) return 29;
+    if ((year % 100) == 0) return 28;
+    if ((year %   4) == 0) return 29;
+    return 28;
   }
   else
-    return(days[month - 1]);
+    return days[month - 1];
 }
 
 /***************************************************************************/
@@ -136,12 +136,12 @@ int btm_cmp(
   assert(d1 != NULL);
   assert(d2 != NULL);
   
-  if ((rc = d1->year  - d2->year))  return(rc);
-  if ((rc = d1->month - d2->month)) return(rc);
-  if ((rc = d1->day   - d2->day))   return(rc);
-  if ((rc = d1->part  - d2->part))  return(rc);
+  if ((rc = d1->year  - d2->year))  return rc;
+  if ((rc = d1->month - d2->month)) return rc;
+  if ((rc = d1->day   - d2->day))   return rc;
+  if ((rc = d1->part  - d2->part))  return rc;
   
-  return(0);
+  return 0;
 }
 
 /***********************************************************************/
@@ -156,11 +156,11 @@ int btm_cmp_date(
   assert(d1 != NULL);
   assert(d2 != NULL);
   
-  if ((rc = d1->year  - d2->year))  return(rc);
-  if ((rc = d1->month - d2->month)) return(rc);
-  if ((rc = d1->day   - d2->day))   return(rc);
+  if ((rc = d1->year  - d2->year))  return rc;
+  if ((rc = d1->month - d2->month)) return rc;
+  if ((rc = d1->day   - d2->day))   return rc;
   
-  return(0);
+  return 0;
 }
 
 /***************************************************************************/
@@ -205,4 +205,3 @@ void tm_init(struct tm *const ptm)
 }
 
 /**************************************************************************/
-

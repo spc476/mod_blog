@@ -103,6 +103,7 @@ int pagegen_items(
   
   tags      = tag_collect(&cbd.list);
   cbd.adtag = tag_pick(tags);
+  
   free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
@@ -163,6 +164,7 @@ int pagegen_days(
   
   tags      = tag_collect(&cbd.list);
   cbd.adtag = tag_pick(tags);
+  
   free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
@@ -248,18 +250,18 @@ static void swap_endpoints(tumbler__s *tum)
   switch(tum->ustop)
   {
     case UNIT_MONTH:
-         start.day   = 1;
-         start.part  = 1;
+         start.day  = 1;
+         start.part = 1;
          break;
                 
     case UNIT_DAY:
-         start.day   = tum->stop.day;
-         start.part  = 1;
+         start.day  = tum->stop.day;
+         start.part = 1;
          break;
                 
     case UNIT_PART:
-         start.day   = tum->stop.day;
-         start.part  = tum->stop.part;
+         start.day  = tum->stop.day;
+         start.part = tum->stop.part;
          break;                
     
     case UNIT_YEAR:
@@ -380,11 +382,12 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   
   tags      = tag_collect(&cbd.list);  
   cbd.adtag = tag_pick(tags);
+  
   free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
   free(cbd.adtag);
-  return(0);  
+  return 0;  
 }
 
 /******************************************************************/
@@ -429,6 +432,7 @@ static void calculate_previous(const struct btm start)
                btm_dec_day(&gd.previous);
                continue;
              }
+             
              assert(entry->valid);
              BlogEntryFree(entry);
              return;
@@ -455,6 +459,7 @@ static void calculate_previous(const struct btm start)
 	       btm_dec_part(&gd.previous);
                continue;
              }
+             
              assert(entry->valid);
              BlogEntryFree(entry);
              return;
@@ -512,6 +517,7 @@ static void calculate_next(const struct btm end)
                btm_inc_day(&gd.next);
                continue;
              }
+             
              assert(entry->valid);
              BlogEntryFree(entry);
              return;
@@ -539,6 +545,7 @@ static void calculate_next(const struct btm end)
                btm_inc_day(&gd.next);
                continue;
              }
+             
              assert(entry->valid);
              BlogEntryFree(entry);
              return;
@@ -744,7 +751,7 @@ static const char *mime_type(const char *filename)
       return v->s2;
   }
     
-  return("text/plain");
+  return "text/plain";
 }
 
 /******************************************************************/
@@ -782,14 +789,14 @@ static int display_file(FILE *const out,const tumbler__s *spec)
         (*gd.req.error)(&gd.req,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
       else
         (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
-      return(1);
+      return 1;
     }
     
     in = fopen(fname,"r");
     if (in == NULL)
     {
       (*gd.req.error)(&gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
-      return(1);
+      return 1;
     }
     
     type = mime_type(spec->filename);
@@ -819,7 +826,7 @@ static int display_file(FILE *const out,const tumbler__s *spec)
   else
     fprintf(out,"File to open: %s\n",fname);
   
-  return(0);
+  return 0;
 }
 
 /*****************************************************************/
@@ -856,7 +863,7 @@ static char *tag_pick(const char *tag)
   assert(tag != NULL);
   
   if (empty_string(tag))
-    return(strdup(c_adtag));
+    return strdup(c_adtag);
   
   pool = tag_split(&num,tag);
   
@@ -867,7 +874,7 @@ static char *tag_pick(const char *tag)
   
   if (num)
   {
-    r  = (((double)rand() / (double)RAND_MAX) * (double)num); 
+    r    = (((double)rand() / (double)RAND_MAX) * (double)num); 
     assert(r < num);
     pick = fromstring(pool[r]);
   }
@@ -875,7 +882,7 @@ static char *tag_pick(const char *tag)
     pick = strdup(c_adtag);
   
   free(pool);
-  return(pick);
+  return pick;
 }
 
 /******************************************************************/
@@ -897,4 +904,3 @@ static void free_entries(List *list)
 }
 
 /******************************************************************/
-

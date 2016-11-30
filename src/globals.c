@@ -322,7 +322,7 @@ int GlobalsInit(const char *conf)
   
   g_blog = BlogNew(c_basedir,c_lockfile);
   if (g_blog == NULL)
-    return(ENOMEM);
+    return ENOMEM;
   
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting
@@ -537,6 +537,7 @@ static void globals_free(void)
   
   if (gd.req.in  != stdin)  fclose(gd.req.in);
   if (gd.req.out != stdout) fclose(gd.req.out);
+
   free(gd.req.update);
   free(gd.req.origauthor);
   free(gd.req.author);

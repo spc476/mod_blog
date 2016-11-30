@@ -87,7 +87,7 @@ int entry_add(Request req)
   
   req->when = entry->when;
   free(entry);
-  return(0);    
+  return 0;    
 }
 
 /************************************************************************/
