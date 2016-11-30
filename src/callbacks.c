@@ -129,11 +129,11 @@ static void	cb_update_time			(FILE *const,void *);
 static void	cb_update_type			(FILE *const,void *);
 static void	cb_xyzzy			(FILE *const,void *);
 
-static void	print_nav_url		(FILE *const,const struct btm *const,int);
-static void	print_nav_title		(FILE *const,const struct btm *const,int);
-static void	print_nav_name		(FILE *const,const struct btm *const,int,char);
-static void	fixup_uri		(BlogEntry,HtmlToken,const char *);
-static void	handle_aflinks		(HtmlToken,const char *);
+static void	print_nav_url	(FILE *const,const struct btm *const,int);
+static void	print_nav_title	(FILE *const,const struct btm *const,int);
+static void	print_nav_name	(FILE *const,const struct btm *const,int,char);
+static void	fixup_uri	(BlogEntry,HtmlToken,const char *);
+static void	handle_aflinks	(HtmlToken,const char *);
 
 /************************************************************************/
 

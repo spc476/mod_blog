@@ -25,10 +25,10 @@
 
 #include <stdio.h>
 
-extern void		no_conversion		(FILE *const restrict,FILE *const restrict);
-extern void		text_conversion		(FILE *const restrict,FILE *const restrict);
-extern void		mixed_conversion	(FILE *const restrict,FILE *const restrict);
-extern void		html_conversion		(FILE *const restrict,FILE *const restrict);
-extern void		buff_conversion		(FILE *const restrict,FILE *const restrict);
+extern void no_conversion	(FILE *const restrict,FILE *const restrict);
+extern void text_conversion	(FILE *const restrict,FILE *const restrict);
+extern void mixed_conversion	(FILE *const restrict,FILE *const restrict);
+extern void html_conversion	(FILE *const restrict,FILE *const restrict);
+extern void buff_conversion	(FILE *const restrict,FILE *const restrict);
 
 #endif

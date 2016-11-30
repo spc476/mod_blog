@@ -80,16 +80,16 @@ extern volatile bool          gf_debug;
 extern Blog                   g_blog;
 extern struct display         gd;		/* work on */
 
-extern int		GlobalsInit		(const char *);
-extern void		set_c_updatetype	(const char *const);
-extern void		set_cf_emailupdate	(const char *const);
-extern void		set_c_conversion	(const char *const);
-extern void		set_c_url		(const char *const);
-extern void		set_time		(void);
+extern int	GlobalsInit		(const char *);
+extern void	set_c_updatetype	(const char *const);
+extern void	set_cf_emailupdate	(const char *const);
+extern void	set_c_conversion	(const char *const);
+extern void	set_c_url		(const char *const);
+extern void	set_time		(void);
 
-extern int		main_cgi_head		(Cgi);
-extern int		main_cgi_get		(Cgi);
-extern int		main_cgi_post		(Cgi);
-extern int		main_cli		(int,char *[]);
+extern int	main_cgi_head		(Cgi);
+extern int	main_cgi_get		(Cgi);
+extern int	main_cgi_post		(Cgi);
+extern int	main_cli		(int,char *[]);
 
 #endif

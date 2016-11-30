@@ -39,7 +39,6 @@ struct entity_conv
 /********************************************************************/
 
 static bool		char_entity	(char **,size_t *,int);
-
 static ssize_t		fer_read	(void *,char *,size_t);
 static ssize_t		few_write	(void *,const char *,size_t);
 
