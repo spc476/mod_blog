@@ -42,6 +42,7 @@
 #include "conf.h"
 #include "frontend.h"
 #include "fix.h"
+#include "blog.h"
 #include "blogutil.h"
 #include "globals.h"
 
@@ -181,7 +182,18 @@ int main_cli(int argc,char *argv[])
   
   if (forcenotify)
   {
-    notify_emaillist(&gd.req);
+    BlogEntry entry = BlogEntryRead(g_blog,&g_blog->last);
+    
+    if (entry != NULL)
+    {
+      gd.req.title  = strdup(entry->title);
+      gd.req.author = strdup(entry->author);
+      gd.req.status = strdup("");
+      gd.req.when   = entry->when;
+      notify_emaillist(&gd.req);
+      BlogEntryFree(entry);
+    }
+    
     return(0);
   }
   
