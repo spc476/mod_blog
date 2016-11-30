@@ -386,7 +386,10 @@ void notify_emaillist(Request req)
           {
             email->to = content.dptr;
             EmailSend(email);
+            free(content.dptr);
           }
+          
+          free(key.dptr);
           key = gdbm_nextkey(list,key);
         }
         fclose(inqp);
@@ -399,6 +402,7 @@ void notify_emaillist(Request req)
   email->to = NULL;
   EmailFree(email);
   gdbm_close(list);
+  free(tmp);
 }
 
 /*************************************************************************/
