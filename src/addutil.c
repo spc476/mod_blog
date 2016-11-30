@@ -342,8 +342,8 @@ void notify_emaillist(Request req)
     return;
    
   email          = EmailNew();
-  email->from    = c_email;
-  email->subject = c_emailsubject;
+  email->from    = strdup(c_email);
+  email->subject = strdup(c_emailsubject);
   
   PairListCreate(&email->headers,"MIME-Version","1.0");
   PairListCreate(&email->headers,"Content-Type","text/plain; charset=UTF-8; format=flowed");
