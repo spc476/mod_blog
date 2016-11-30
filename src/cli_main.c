@@ -192,9 +192,10 @@ int main_cli(int argc,char *argv[])
       gd.req.when   = entry->when;
       notify_emaillist(&gd.req);
       BlogEntryFree(entry);
+      return EXIT_SUCCESS;
     }
-    
-    return(0);
+    else
+      return EXIT_FAILURE;
   }
   
   return (*gd.req.command)(&gd.req);
