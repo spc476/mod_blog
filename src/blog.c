@@ -174,7 +174,7 @@ Blog BlogNew(const char *location,const char *lockfile)
 
 /***********************************************************************/
 
-int BlogLock(Blog blog)
+bool BlogLock(Blog blog)
 {
   struct flock lockdata;
   int          rc;
@@ -207,7 +207,7 @@ int BlogLock(Blog blog)
 
 /***********************************************************************/
 
-int BlogUnlock(Blog blog)
+bool BlogUnlock(Blog blog)
 {
   struct flock lockdata;
   int          rc;
@@ -234,7 +234,7 @@ int BlogUnlock(Blog blog)
 
 /***********************************************************************/
 
-int BlogFree(Blog blog)
+void BlogFree(Blog blog)
 {
   assert(blog != NULL);
   
@@ -243,7 +243,6 @@ int BlogFree(Blog blog)
   
   free(blog->lockfile);
   free(blog);
-  return 0;
 }
 
 /************************************************************************/
