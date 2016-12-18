@@ -91,18 +91,19 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
   char   *buffer;
   char   *line;  
   size_t  bufsize;
+  size_t  linesize;
   
   assert(in  != NULL);
   assert(out != NULL);
   
-  line    = NULL;
-  buffer  = NULL;
-  bufsize = 0;   
-  tmpout  = open_memstream(&buffer,&bufsize);
+  line     = NULL;
+  buffer   = NULL;
+  bufsize  = 0;
+  linesize = 0;
+  tmpout   = open_memstream(&buffer,&bufsize);
   
   while(!feof(in))
   {
-    size_t   linesize = 0;
     ssize_t  bytes;
     
     bytes = getline(&line,&linesize,in);
