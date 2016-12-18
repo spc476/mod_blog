@@ -183,8 +183,8 @@ int GlobalsInit(const char *conf)
   c_author       = get_string(g_L,"author.name",NULL);
   c_email        = get_string(g_L,"author.email",NULL);
   c_authorfile   = get_string(g_L,"author.file",NULL);
-  c_af_uid       = get_int   (g_L,"author.fields.uid",15)  - 1;
-  c_af_name      = get_int   (g_L,"author.fields.name",13) - 1;
+  c_af_uid       = get_int   (g_L,"author.fields.uid",1)  - 1;
+  c_af_name      = get_int   (g_L,"author.fields.name",3) - 1;
   c_emaildb      = get_string(g_L,"email.list",NULL);
   c_emailsubject = get_string(g_L,"email.subject",NULL);
   c_emailmsg     = get_string(g_L,"email.message",NULL);
