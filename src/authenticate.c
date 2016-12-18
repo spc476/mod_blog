@@ -205,7 +205,6 @@ char *get_remote_user(void)
 
   static size_t breakline(char **dest,size_t dsize,FILE *const in)
   {
-    char  **tmp;
     char   *line = NULL;
     char   *p;
     char   *colon;
@@ -227,14 +226,13 @@ char *get_remote_user(void)
     if (line[rc - 1] == '\n')
       line[rc - 1] = '\0';
     
-    tmp = malloc(sizeof(char *) * dsize);
     p   = line;
     cnt = 0;
     
     do
     {
-      tmp[cnt] = p;
-      colon    = strchr(p,':');
+      dest[cnt] = p;
+      colon = strchr(p,':');
       if (colon != NULL)
       {
         *colon = '\0';
@@ -243,14 +241,7 @@ char *get_remote_user(void)
       cnt++;
     } while ((colon != NULL) && (cnt < dsize));
     
-    dsize = cnt;
-    
-    for (cnt = 0 ; cnt < dsize ; cnt++)
-      dest[cnt] = strdup(tmp[cnt]);
-    
-    free(tmp);
-    free(line);
-    return dsize;
+    return cnt;
   }
   
   /*------------------------------------------------------*/
@@ -276,9 +267,7 @@ char *get_remote_user(void)
     
     while((cnt = breakline(lines,10,in)))
     {
-      if (c_af_uid >= cnt) continue;
-      
-      if (strcmp(req->author,lines[c_af_uid]) == 0)
+      if ((c_af_uid < cnt) && (strcmp(req->author,lines[c_af_uid]) == 0))
       {
         /*----------------------------------------------
         ; A potential memory leak---see the comment above in
@@ -290,9 +279,17 @@ char *get_remote_user(void)
           req->name   = req->author;
           req->author = strdup(lines[c_af_name]);
           fclose(in);
+          free(lines[0]); // see comment below
           return true;
         }
       }
+      
+      /*------------------------------------------------------------------
+      ; Some tight coupling between this routine and breakline().  The first
+      ; element of lines[] needs to be freed, but not the rest.
+      ;--------------------------------------------------------------------*/
+      
+      free(lines[0]);
     }
     
     fclose(in);
