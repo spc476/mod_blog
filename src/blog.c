@@ -223,13 +223,15 @@ bool BlogUnlock(Blog blog)
   rc = fcntl(blog->lock,F_SETLK,&lockdata);
   if (rc == 0)
   {
-    syslog(LOG_ERR,"UNLOCK %s: %s",blog->lockfile,strerror(errno));
     close(blog->lock);
     blog->lock = 0;
     return true;
   }
   else
+  {
+    syslog(LOG_ERR,"UNLOCK %s: %s",blog->lockfile,strerror(errno));
     return false;
+  }
 }
 
 /***********************************************************************/
