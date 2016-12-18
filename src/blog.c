@@ -224,6 +224,7 @@ bool BlogUnlock(Blog blog)
   if (rc == 0)
   {
     close(blog->lock);
+    remove(blog->lockfile);
     blog->lock = 0;
     return true;
   }
