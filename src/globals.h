@@ -56,6 +56,8 @@ extern const int                  c_days;
 extern const char *const          c_author;
 extern const char *const          c_email;
 extern const char *const          c_authorfile;
+extern const size_t               c_af_uid;
+extern const size_t               c_af_name;
 extern const char *const          c_updatetype;
 extern const char *const          c_lockfile;
 extern const char *const          c_emaildb;

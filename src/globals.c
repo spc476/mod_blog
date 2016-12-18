@@ -59,6 +59,7 @@ void	set_c_url		(const char *const);
 static bool	   get_next	(char *,const char **);
 static int	   get_field	(lua_State *const,const char *);
 static const char *get_string	(lua_State *const,const char *const restrict,const char *const restrict);
+static int         get_int	(lua_State *const,const char *const,const int);
 static bool	   get_bool	(lua_State *const,const char *const,const bool);
 static void	   globals_free	(void);
 
@@ -74,6 +75,8 @@ int           c_days;
 const char   *c_author;				/* no free */
 const char   *c_email;				/* no free */
 const char   *c_authorfile;			/* no free */
+size_t        c_af_uid;
+size_t        c_af_name;
 const char   *c_updatetype   = "NewEntry";	/* no free */
 const char   *c_lockfile;			/* no free */
 const char   *c_emaildb;			/* no free */
@@ -180,6 +183,8 @@ int GlobalsInit(const char *conf)
   c_author       = get_string(g_L,"author.name",NULL);
   c_email        = get_string(g_L,"author.email",NULL);
   c_authorfile   = get_string(g_L,"author.file",NULL);
+  c_af_uid       = get_int   (g_L,"author.fields.uid",15)  - 1;
+  c_af_name      = get_int   (g_L,"author.fields.name",13) - 1;
   c_emaildb      = get_string(g_L,"email.list",NULL);
   c_emailsubject = get_string(g_L,"email.subject",NULL);
   c_emailmsg     = get_string(g_L,"email.message",NULL);
@@ -498,6 +503,25 @@ static const char *get_string(
     val = def;
   else
     val = lua_tostring(L,-1);
+  
+  lua_pop(L,1);
+  return val;
+}
+
+/*************************************************************************/
+
+static int get_int(
+        lua_State  *const L,
+        const char *const name,
+        const int         def
+)
+{
+  int val;
+  
+  if (get_field(L,name) != LUA_TNUMBER)
+    val = def;
+  else
+    val = lua_tointeger(L,-1);
   
   lua_pop(L,1);
   return val;

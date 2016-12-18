@@ -276,17 +276,19 @@ char *get_remote_user(void)
     
     while((cnt = breakline(lines,10,in)))
     {
-      if (strcmp(req->author,lines[0]) == 0)
+      if (c_af_uid >= cnt) continue;
+      
+      if (strcmp(req->author,lines[c_af_uid]) == 0)
       {
         /*----------------------------------------------
         ; A potential memory leak---see the comment above in
         ; the USE_DB version of this routine
         ;----------------------------------------------------*/
         
-        if (cnt >= 3)
+        if (c_af_name < cnt)
         {
           req->name   = req->author;
-          req->author = strdup(lines[2]);
+          req->author = strdup(lines[c_af_name]);
           fclose(in);
           return true;
         }

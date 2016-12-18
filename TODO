@@ -21,9 +21,3 @@ http://www.wordyard.com/2007/08/28/can-newspapers-fix-old-errors/#comment-124268
 	Also, it's not an archive section, it's an overview section.  Rename
 	the command appropriately.
 
-2005-09-21T15:45-05:00
-
-        Add a configuration option to specify which field of an htpasswd
-        file has the real name.
-
-
