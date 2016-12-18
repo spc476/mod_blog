@@ -22,10 +22,12 @@
 
 #define _GNU_SOURCE 1
 
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
+#include <syslog.h>
 #include <cgilib6/util.h>
 
 #include "conf.h"
@@ -267,7 +269,10 @@ char *get_remote_user(void)
     
     in = fopen(c_authorfile,"r");
     if (in == NULL)
+    {
+      syslog(LOG_ERR,"%s: %s",c_authorfile,strerror(errno));
       return false;
+    }
     
     while((cnt = breakline(lines,10,in)))
     {
