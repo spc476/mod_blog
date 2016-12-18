@@ -224,8 +224,8 @@ char *get_remote_user(void)
       return 0;
     }
     
-    if (line[size - 1] == '\n')
-      line[size - 1] = '\0';
+    if (line[rc - 1] == '\n')
+      line[rc - 1] = '\0';
     
     tmp = malloc(sizeof(char *) * dsize);
     p   = line;
