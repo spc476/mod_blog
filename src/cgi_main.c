@@ -265,11 +265,11 @@ int main_cgi_post(Cgi cgi)
   set_m_author     	(CgiListGetValue(cgi,"author"),&gd.req);
   set_m_cgi_post_command(CgiListGetValue(cgi,"cmd"),&gd.req);
   
-  gd.req.title    = CgiListGetValue(cgi,"title");
-  gd.req.class    = CgiListGetValue(cgi,"class");
-  gd.req.status   = CgiListGetValue(cgi,"status");
-  gd.req.date     = CgiListGetValue(cgi,"date");
-  gd.req.origbody = CgiListGetValue(cgi,"body");
+  gd.req.title    = strdup(CgiListGetValue(cgi,"title"));
+  gd.req.class    = strdup(CgiListGetValue(cgi,"class"));
+  gd.req.status   = strdup(CgiListGetValue(cgi,"status"));
+  gd.req.date     = strdup(CgiListGetValue(cgi,"date"));
+  gd.req.origbody = strdup(CgiListGetValue(cgi,"body"));
   gd.req.body     = strdup(gd.req.origbody);
 
   if (
