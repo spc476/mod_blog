@@ -47,7 +47,6 @@ typedef struct request
   char       *update;
   char       *origauthor;
   char       *author;
-  char       *name;
   char       *title;
   char       *class;
   char       *status;

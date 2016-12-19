@@ -565,7 +565,6 @@ static void globals_free(void)
   free(gd.req.update);
   free(gd.req.origauthor);
   free(gd.req.author);
-  free(gd.req.name);
   free(gd.req.title);
   free(gd.req.class);
   free(gd.req.status);
