@@ -91,6 +91,7 @@ static void	cb_entry_author			(FILE *const,void *);
 static void	cb_entry_body			(FILE *const,void *);
 static void	cb_entry_body_entified		(FILE *const,void *);
 static void	cb_entry_class			(FILE *const,void *);
+static void	cb_entry_cond_author		(FILE *const,void *);
 static void	cb_entry_cond_date		(FILE *const,void *);
 static void	cb_entry_date			(FILE *const,void *);
 static void	cb_entry_id			(FILE *const,void *);
@@ -182,6 +183,7 @@ static const struct chunk_callback  m_callbacks[] =
   { "entry.body"		, cb_entry_body			} ,
   { "entry.body.entified"	, cb_entry_body_entified	} ,
   { "entry.class"		, cb_entry_class		} ,
+  { "entry.cond.author"		, cb_entry_cond_author		} ,
   { "entry.cond.date"		, cb_entry_cond_date		} ,
   { "entry.date"		, cb_entry_date			} ,
   { "entry.id"			, cb_entry_id			} ,
@@ -1541,6 +1543,20 @@ static void cb_date_day_normal(FILE *const out,void *data)
 
 /**********************************************************************/
 
+static void cb_entry_cond_author(FILE *const out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  assert(cbd->entry->valid);
+  
+  if (strcmp(c_author,cbd->entry->author) != 0)
+    generic_cb("entry.cond.author",out,data);
+}
+
+/*********************************************************************/
 static void cb_entry_cond_date(FILE *const out,void *data)
 {
   struct callback_data *cbd = data;
