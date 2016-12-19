@@ -20,7 +20,7 @@
 *
 *********************************************************************/
 
-#define _GNU_SOURCE	1
+#define _GNU_SOURCE     1
 
 #include <stddef.h>
 #include <string.h>
@@ -57,7 +57,7 @@ int entry_add(Request req)
   if ((req->date == NULL) || (empty_string(req->date)))
   {
     /*----------------------------------------------------------------------
-    ; if this is the case, then we need to ensure we update the main pages. 
+    ; if this is the case, then we need to ensure we update the main pages.
     ; By calling BlogDatesInit() after we update we ensure we generate the
     ; content properly.
     ;---------------------------------------------------------------------*/
@@ -80,14 +80,14 @@ int entry_add(Request req)
   entry->body      = req->body;
   
   if (c_authorfile) BlogLock(g_blog);
-    
+  
     BlogEntryWrite(entry);
     
   if (c_authorfile) BlogUnlock(g_blog);
   
   req->when = entry->when;
   free(entry);
-  return 0;    
+  return 0;
 }
 
 /************************************************************************/
@@ -111,7 +111,7 @@ void fix_entry(Request req)
     size = 0;
     out  = open_memstream(&tmp,&size);
     in   = fmemopen(req->title,strlen(req->title),"r");
-  
+    
     buff_conversion(in,out);
     fclose(in);
     fclose(out);
@@ -137,10 +137,10 @@ void fix_entry(Request req)
     free(req->status);
     req->status = entity_conversion(tmp);
     free(tmp);
-  }  
+  }
   
   /*-------------------------------------
-  ; convert body 
+  ; convert body
   ;--------------------------------------*/
   
   if (!empty_string(req->body))
@@ -149,7 +149,7 @@ void fix_entry(Request req)
     size = 0;
     out  = open_memstream(&tmp,&size);
     in   = fmemopen(req->body,strlen(req->body),"r");
-  
+    
     (*c_conversion)(in,out);
     fclose(in);
     fclose(out);
@@ -184,9 +184,9 @@ static void cb_email_author (FILE *const, void *);
 
 static const struct chunk_callback m_emcallbacks[] =
 {
-  { "email.title"	, cb_email_title	} ,
-  { "email.url" 	, cb_email_url		} ,
-  { "email.author"	, cb_email_author	} ,
+  { "email.title"       , cb_email_title        } ,
+  { "email.url"         , cb_email_url          } ,
+  { "email.author"      , cb_email_author       } ,
 };
 
 static const size_t m_emcbnum = sizeof(m_emcallbacks) / sizeof(struct chunk_callback);
@@ -202,7 +202,7 @@ static ssize_t utf8_read(void *cookie,char *buffer,size_t bytes)
   
   if (feof(realin))
     return 0;
-  
+    
   while(bytes)
   {
     int c = fgetc(realin);
@@ -291,7 +291,7 @@ static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
   
   if (feof(realin))
     return 0;
-  
+    
   while(bytes)
   {
     int c = fgetc(realin);
@@ -341,7 +341,7 @@ void notify_emaillist(Request req)
   list = gdbm_open((char *)c_emaildb,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
     return;
-   
+    
   email          = EmailNew();
   email->from    = strdup(c_email);
   email->subject = strdup(c_emailsubject);
@@ -376,7 +376,7 @@ void notify_emaillist(Request req)
                                             NULL
                                           });
       if (inqp != NULL)
-      {      
+      {
         fcopy(email->body,inqp);
         key = gdbm_firstkey(list);
         

@@ -67,29 +67,29 @@ enum
 
 /*******************************************************************/
 
-static int	cmd_cli_new		(Request);
-static int	cmd_cli_show		(Request);
-static void	get_cli_command		(Request,char *);
-static int	mail_setup_data		(Request);
-static int	mailfile_readdata	(Request);
-static int	cli_error		(Request,int,const char *, ... );
+static int      cmd_cli_new             (Request);
+static int      cmd_cli_show            (Request);
+static void     get_cli_command         (Request,char *);
+static int      mail_setup_data         (Request);
+static int      mailfile_readdata       (Request);
+static int      cli_error               (Request,int,const char *, ... );
 
 /*************************************************************************/
 
 static const struct option coptions[] =
 {
-  { "config"	   , required_argument	, NULL	, OPT_CONFIG 	  } ,
-  { "regenerate"   , no_argument	, NULL	, OPT_REGENERATE  } ,
-  { "regen"	   , no_argument	, NULL	, OPT_REGENERATE  } ,
-  { "cmd"	   , required_argument	, NULL	, OPT_CMD    	  } ,
-  { "file"	   , required_argument	, NULL	, OPT_FILE   	  } ,
-  { "email"	   , no_argument	, NULL	, OPT_EMAIL  	  } ,
-  { "update"	   , required_argument	, NULL	, OPT_UPDATE 	  } ,
-  { "entry"	   , required_argument	, NULL	, OPT_ENTRY  	  } ,
-  { "force-notify" , no_argument 	, NULL  , OPT_FORCENOTIFY } ,
-  { "help"	   , no_argument	, NULL	, OPT_HELP   	  } ,
-  { "debug"	   , no_argument	, NULL  , OPT_DEBUG  	  } ,
-  { NULL           , 0			, NULL	, 0          	  }
+  { "config"       , required_argument  , NULL  , OPT_CONFIG      } ,
+  { "regenerate"   , no_argument        , NULL  , OPT_REGENERATE  } ,
+  { "regen"        , no_argument        , NULL  , OPT_REGENERATE  } ,
+  { "cmd"          , required_argument  , NULL  , OPT_CMD         } ,
+  { "file"         , required_argument  , NULL  , OPT_FILE        } ,
+  { "email"        , no_argument        , NULL  , OPT_EMAIL       } ,
+  { "update"       , required_argument  , NULL  , OPT_UPDATE      } ,
+  { "entry"        , required_argument  , NULL  , OPT_ENTRY       } ,
+  { "force-notify" , no_argument        , NULL  , OPT_FORCENOTIFY } ,
+  { "help"         , no_argument        , NULL  , OPT_HELP        } ,
+  { "debug"        , no_argument        , NULL  , OPT_DEBUG       } ,
+  { NULL           , 0                  , NULL  , 0               }
 };
 
 /*************************************************************************/
@@ -110,7 +110,7 @@ int main_cli(int argc,char *argv[])
     int c;
     
     c = getopt_long_only(argc,argv,"",coptions,&option);
-    if (c == EOF) 
+    if (c == EOF)
       break;
     else switch(c)
     {
@@ -138,48 +138,48 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_FORCENOTIFY:
            forcenotify = true;
-	   break;
+           break;
       case OPT_CMD:
            get_cli_command(&gd.req,optarg);
            break;
       case OPT_HELP:
       default:
            fprintf(
-           	stderr,
-		"usage: %s --options... \n"
-		"\t--config file\n"
-		"\t--regenerate | --regen\n"
-		"\t--cmd ('new' | 'show' *)\n"
-		"\t--file file\n"
-		"\t--email\n"
-		"\t--update ('new' * | 'modify' | 'template' | 'other')\n"
-		"\t--entry <tumbler>\n"
-		"\t--force-notify\n"
-		"\t--help\n"
-		"\t--debug\n"
-		"\n"
-		"\tVersion: " GENERATOR "\n"
-		"\t\t%s\n"
-		"\t\t%s\n"
+                stderr,
+                "usage: %s --options... \n"
+                "\t--config file\n"
+                "\t--regenerate | --regen\n"
+                "\t--cmd ('new' | 'show' *)\n"
+                "\t--file file\n"
+                "\t--email\n"
+                "\t--update ('new' * | 'modify' | 'template' | 'other')\n"
+                "\t--entry <tumbler>\n"
+                "\t--force-notify\n"
+                "\t--help\n"
+                "\t--debug\n"
+                "\n"
+                "\tVersion: " GENERATOR "\n"
+                "\t\t%s\n"
+                "\t\t%s\n"
 #ifdef EMAIL_NOTIFY
-		"\t\t%s\n"
+                "\t\t%s\n"
 #endif
-		"\t* default value\n"
-		"",
-		argv[0],
-		cgilib_version,
-		LUA_RELEASE
+                "\t* default value\n"
+                "",
+                argv[0],
+                cgilib_version,
+                LUA_RELEASE
 #ifdef EMAIL_NOTIFY
-		,gdbm_version
+                ,gdbm_version
 #endif
-	      );
-	   return EXIT_FAILURE;
+              );
+           return EXIT_FAILURE;
     }
   }
   
   if (GlobalsInit(config) != 0)
     return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config);
-  
+    
   if (forcenotify)
   {
     BlogEntry entry = BlogEntryRead(g_blog,&g_blog->last);
@@ -213,10 +213,10 @@ static int cmd_cli_new(Request req)
     rc = mail_setup_data(req);
   else
     rc = mailfile_readdata(req);
-  
+    
   if (rc != 0)
     return EXIT_FAILURE;
-  
+    
   rc = entry_add(req);
   if (rc == 0)
   {
@@ -307,8 +307,8 @@ static int mail_setup_data(Request req)
   size = 0;
   
   ListInit(&headers);
-  getline(&line,&size,req->in);	/* skip Unix 'From ' line */
-  free(line);  
+  getline(&line,&size,req->in); /* skip Unix 'From ' line */
+  free(line);
   
   /*----------------------------------------------------------------------
   ; Recently in the past two months, entries have been sent that have been
@@ -347,7 +347,7 @@ static int mail_setup_data(Request req)
   
   return mailfile_readdata(req);
 }
-  
+
 /*******************************************************************/
 
 static int mailfile_readdata(Request req)
@@ -374,26 +374,26 @@ static int mailfile_readdata(Request req)
   
   if (req->author != NULL) req->author = strdup(req->author);
   
-  if (req->title  != NULL) 
+  if (req->title  != NULL)
     req->title  = strdup(req->title);
   else
     req->title = strdup("");
-  
-  if (req->class  != NULL) 
+    
+  if (req->class  != NULL)
     req->class  = strdup(req->class);
   else
     req->class = strdup("");
-  
+    
   if (req->status != NULL)
     req->status = strdup(req->status);
   else
     req->status = strdup("");
-  
+    
   if (req->date != NULL) req->date = strdup(req->date);
   if (email     != NULL) set_cf_emailupdate(email);
   if (filter    != NULL) set_c_conversion(filter);
   
-  PairListFree(&headers);	/* got everything we need, dump this */
+  PairListFree(&headers);       /* got everything we need, dump this */
   
   if (authenticate_author(req) == false)
   {

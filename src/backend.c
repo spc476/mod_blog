@@ -42,13 +42,13 @@
 
 /*****************************************************************/
 
-static void	   calculate_previous	(const struct btm);
-static void	   calculate_next	(const struct btm);
-static const char *mime_type		(const char *);
-static int	   display_file		(FILE *const,const tumbler__s *);
-static char       *tag_collect		(List *);
-static char	  *tag_pick		(const char *);
-static void	   free_entries		(List *);
+static void        calculate_previous   (const struct btm);
+static void        calculate_next       (const struct btm);
+static const char *mime_type            (const char *);
+static int         display_file         (FILE *const,const tumbler__s *);
+static char       *tag_collect          (List *);
+static char       *tag_pick             (const char *);
+static void        free_entries         (List *);
 
 /************************************************************************/
 
@@ -75,9 +75,9 @@ int generate_pages(void)
 /******************************************************************/
 
 int pagegen_items(
-	const template__t *const template,
-	FILE              *const out,
-	Blog               const blog
+        const template__t *const template,
+        FILE              *const out,
+        Blog               const blog
 )
 {
   struct btm            thisday;
@@ -100,7 +100,7 @@ int pagegen_items(
     BlogEntryReadXD(g_blog,&cbd.list,&thisday,template->items);
   else
     BlogEntryReadXU(g_blog,&cbd.list,template->items);
-  
+    
   tags      = tag_collect(&cbd.list);
   cbd.adtag = tag_pick(tags);
   
@@ -114,9 +114,9 @@ int pagegen_items(
 /************************************************************************/
 
 int pagegen_days(
-	const template__t *const template,
-	FILE              *const out,
-	Blog               const blog
+        const template__t *const template,
+        FILE              *const out,
+        Blog               const blog
 )
 {
   struct btm            thisday;
@@ -187,40 +187,40 @@ static void swap_endpoints(tumbler__s *tum)
   
   /*--------------------------------------------------------------------
   ; The best way to explain this is to give a bunch of examples.
-  ;	M = month D = day P = part
+  ;     M = month D = day P = part
   ;
-  ; 2000/12-09			MM
-  ;	2000/12/01.1 2000/09/30.23	2000/09/01.1 2000/12/31.23
+  ; 2000/12-09                  MM
+  ;     2000/12/01.1 2000/09/30.23      2000/09/01.1 2000/12/31.23
   ;
-  ; 2000/12-09/15		MD
-  ;	2000/12/01.1 2000/09/15.23	2000/09/15.1 2000/12/31.23
+  ; 2000/12-09/15               MD
+  ;     2000/12/01.1 2000/09/15.23      2000/09/15.1 2000/12/31.23
   ;
-  ; 2000/12-09/15.2		MP
-  ;	2000/12/01.1 2000/09/15.2	2000/09/15.2 2000/12/31.23
+  ; 2000/12-09/15.2             MP
+  ;     2000/12/01.1 2000/09/15.2       2000/09/15.2 2000/12/31.23
   ;
-  ; 2000/12/20-2000/09		DM
-  ;	2000/12/20.1 2000/09/30.23	2000/09/01.1 2000/12/20.23
+  ; 2000/12/20-2000/09          DM
+  ;     2000/12/20.1 2000/09/30.23      2000/09/01.1 2000/12/20.23
   ;
-  ; 2000/12/20-09/15		DD
-  ;	2000/12/20.1 2000/09/15.23	2000/09/15.1 2000/12/20.23
+  ; 2000/12/20-09/15            DD
+  ;     2000/12/20.1 2000/09/15.23      2000/09/15.1 2000/12/20.23
   ;
-  ; 2000/12/20-09/15.2		DP
-  ;	2000/12/20.1 2000/09/15.2	2000/09/15.2 2000/12/20.23
+  ; 2000/12/20-09/15.2          DP
+  ;     2000/12/20.1 2000/09/15.2       2000/09/15.2 2000/12/20.23
   ;
-  ; 2000/12/20.2-2000/09	PM
-  ;	2000/12/20.2 2000/09/30.23	2000/09/01.1 2000/12/20.2
+  ; 2000/12/20.2-2000/09        PM
+  ;     2000/12/20.2 2000/09/30.23      2000/09/01.1 2000/12/20.2
   ;
-  ; 2000/12/20.2-09/15		PD
-  ;	2000/12/20.2 2000/09/15.23	2000/09/15.1 2000/12/20.2
+  ; 2000/12/20.2-09/15          PD
+  ;     2000/12/20.2 2000/09/15.23      2000/09/15.1 2000/12/20.2
   ;
-  ; 2000/12/20.2-09/15.3	PP
-  ;	2000/12/20.2 2000/09/15.3	2000/09/15.3 2000/12/20.2
+  ; 2000/12/20.2-09/15.3        PP
+  ;     2000/12/20.2 2000/09/15.3       2000/09/15.3 2000/12/20.2
   ;
   ; The year and the month are always swapped.
   ;--------------------------------------------------------------------*/
   
   start.year  = tum->stop.year;
-  start.month = tum->stop.month;  
+  start.month = tum->stop.month;
   stop.year   = tum->start.year;
   stop.month  = tum->start.month;
   
@@ -230,17 +230,17 @@ static void swap_endpoints(tumbler__s *tum)
          stop.day  = max_monthday(stop.year,stop.month);
          stop.part = ENTRY_MAX;
          break;
-    
+         
     case UNIT_DAY:
          stop.day  = tum->start.day;
          stop.part = ENTRY_MAX;
          break;
-    
+         
     case UNIT_PART:
          stop.day  = tum->start.day;
          stop.part = tum->start.part;
          break;
-    
+         
     case UNIT_YEAR:
     case UNIT_INDEX:
          assert(0);
@@ -253,17 +253,17 @@ static void swap_endpoints(tumbler__s *tum)
          start.day  = 1;
          start.part = 1;
          break;
-                
+         
     case UNIT_DAY:
          start.day  = tum->stop.day;
          start.part = 1;
          break;
-                
+         
     case UNIT_PART:
          start.day  = tum->stop.day;
          start.part = tum->stop.part;
-         break;                
-    
+         break;
+         
     case UNIT_YEAR:
     case UNIT_INDEX:
          assert(0);
@@ -290,7 +290,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   
   if (spec->redirect)
     return HTTP_NOTIMP;
-  
+    
   if (spec->file)
   {
     display_file(out,spec);
@@ -339,7 +339,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
       swap_endpoints(&newtum);
       start        = newtum.start;
       end          = newtum.stop;
-      gd.f.reverse = true;      
+      gd.f.reverse = true;
     }
   }
   
@@ -367,7 +367,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   /*-------------------------------------------------------------------------
   ; okay, resume processing ... bound against the starting time of the blog,
   ; and the current time.
-  ;    
+  ;
   ; From here on out, it's pretty straight forward.  read a day, if it has
   ; entries, add it to the list, otherwise, continue on, advancing (or
   ; retreading) the days as we go ...
@@ -379,15 +379,15 @@ int tumbler_page(FILE *out,tumbler__s *spec)
     BlogEntryReadBetweenD(g_blog,&cbd.list,&end,&start);
   else
     BlogEntryReadBetweenU(g_blog,&cbd.list,&start,&end);
-  
-  tags      = tag_collect(&cbd.list);  
+    
+  tags      = tag_collect(&cbd.list);
   cbd.adtag = tag_pick(tags);
   
   free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
   free(cbd.adtag);
-  return 0;  
+  return 0;
 }
 
 /******************************************************************/
@@ -404,17 +404,17 @@ static void calculate_previous(const struct btm start)
          else
            gd.previous.year = start.year - 1;
          break;
-    
+         
     case UNIT_MONTH:
          if (
-              (start.year == g_blog->first.year) 
+              (start.year == g_blog->first.year)
               && (start.month == g_blog->first.month)
             )
            gd.f.navprev = false;
          else
-	   btm_dec_month(&gd.previous);
+           btm_dec_month(&gd.previous);
          break;
-    
+         
     case UNIT_DAY:
          if (btm_cmp_date(&start,&g_blog->first) == 0)
            gd.f.navprev = false;
@@ -437,17 +437,17 @@ static void calculate_previous(const struct btm start)
              BlogEntryFree(entry);
              return;
            }
-                      
+           
            gd.f.navprev = false;
          }
          break;
-    
+         
     case UNIT_PART:
          if (btm_cmp(&start,&g_blog->first) == 0)
            gd.f.navprev = false;
          else
          {
-	   btm_dec_part(&gd.previous);
+           btm_dec_part(&gd.previous);
            
            while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
            {
@@ -456,7 +456,7 @@ static void calculate_previous(const struct btm start)
              entry = BlogEntryRead(g_blog,&gd.previous);
              if (entry == NULL)
              {
-	       btm_dec_part(&gd.previous);
+               btm_dec_part(&gd.previous);
                continue;
              }
              
@@ -468,7 +468,7 @@ static void calculate_previous(const struct btm start)
            gd.f.navprev = false;
          }
          break;
-    
+         
     default:
          assert(0);
   }
@@ -488,24 +488,24 @@ static void calculate_next(const struct btm end)
          else
            gd.next.year  = end.year + 1;
          break;
-    
+         
     case UNIT_MONTH:
          if (
-              (end.year == g_blog->now.year) 
+              (end.year == g_blog->now.year)
               && (end.month == g_blog->now.month)
             )
            gd.f.navnext = false;
          else
            btm_inc_month(&gd.next);
          break;
-    
+         
     case UNIT_DAY:
          if (btm_cmp_date(&end,&g_blog->now) == 0)
            gd.f.navnext = false;
          else
          {
            btm_inc_day(&gd.next);
-	   gd.next.part = 1;
+           gd.next.part = 1;
            
            while(btm_cmp(&gd.next,&g_blog->now) <= 0)
            {
@@ -526,14 +526,14 @@ static void calculate_next(const struct btm end)
            gd.f.navnext = false;
          }
          break;
-    
+         
     case UNIT_PART:
          if (btm_cmp(&end,&g_blog->now) == 0)
            gd.f.navnext = false;
-	 else
-	 {
-	   gd.next.part++;
-         
+         else
+         {
+           gd.next.part++;
+           
            while(btm_cmp(&gd.next,&g_blog->now) <= 0)
            {
              BlogEntry entry;
@@ -551,9 +551,9 @@ static void calculate_next(const struct btm end)
              return;
            }
            gd.f.navnext = false;
-	 }
+         }
          break;
-    
+         
     default:
          assert(0);
   }
@@ -571,164 +571,164 @@ static int dstring_cmp(const void *needle,const void *haystack)
 
 static const char *mime_type(const char *filename)
 {
-  static const struct dstring  types[] = 
+  static const struct dstring  types[] =
   {
-    { ".ai"		, "application/postscript"		} ,
-    { ".aif"		, "audio/x-aiff"			} ,
-    { ".aifc"		, "audio/x-aiff"			} ,
-    { ".aiff"		, "audio/x-aiff"			} ,
-    { ".asc"		, "text/plain"				} ,
-    { ".au"		, "audio/basic"				} ,
-    { ".avi"		, "video/x-msvideo"			} ,
-    { ".bcpio"		, "application/x-bcpio"			} ,
-    { ".bin"		, "application/octet-stream"		} ,
-    { ".bmp"		, "image/bmp"				} ,
-    { ".cdf"		, "application/x-netcdf"		} ,
-    { ".cgm"		, "image/cgm"				} ,
-    { ".class"		, "application/octet-stream"		} ,
-    { ".cpio"		, "application/x-cpio"			} ,
-    { ".cpt"		, "application/mac-compactpro"		} ,
-    { ".csh"		, "application/x-csh"			} ,
-    { ".css"		, "text/css"				} ,
-    { ".dcr"		, "application/x-director"		} ,
-    { ".dir"		, "application/x-director"		} ,
-    { ".djv"		, "image/vnd.djvu"			} ,
-    { ".djvu"		, "image/vnd.djvu"			} ,
-    { ".dll"		, "application/octet-stream"		} ,
-    { ".dms"		, "application/octet-stream"		} ,
-    { ".doc"		, "application/msword"			} ,
-    { ".dtd"		, "application/xml-dtd"			} ,
-    { ".dvi"		, "application/x-dvi"			} ,
-    { ".dxr"		, "application/x-director"		} ,
-    { ".eps"		, "application/postscript"		} ,
-    { ".etx"		, "text/x-setext"			} ,
-    { ".exe"		, "application/octet-stream"		} ,
-    { ".ez"		, "application/andrew-inset"		} ,
-    { ".gif"		, "image/gif"				} ,
-    { ".gram"		, "application/srgs"			} ,
-    { ".grxml"		, "application/srgs+xml"		} ,
-    { ".gtar"		, "application/x-gtar"			} ,
-    { ".gz"		, "application/x-gzip"			} ,
-    { ".hdf"		, "application/x-hdf"			} ,
-    { ".hqx"		, "application/mac-binhex40"		} ,
-    { ".htm"		, "text/html"				} ,
-    { ".html"		, "text/html"				} ,
-    { ".ice"		, "x-conference/x-cooltalk"		} ,
-    { ".ico"		, "image/x-icon"			} ,
-    { ".ics"		, "text/calendar"			} ,
-    { ".ief"		, "image/ief"				} ,
-    { ".ifb"		, "text/calendar"			} ,
-    { ".iges"		, "model/iges"				} ,
-    { ".igs"		, "model/iges"				} ,
-    { ".jpe"		, "image/jpeg"				} ,
-    { ".jpeg"		, "image/jpeg"				} ,
-    { ".jpg"		, "image/jpeg"				} ,
-    { ".js"		, "application/x-javascript"		} ,
-    { ".kar"		, "audio/midi"				} ,
-    { ".latex"		, "application/x-latex"			} ,
-    { ".lha"		, "application/octet-stream"		} ,
-    { ".lzh"		, "application/octet-stream"		} ,
-    { ".m3u"		, "audio/x-mpegurl"			} ,
-    { ".m4v"		, "video/x-m4v"				} ,
-    { ".man"		, "application/x-troff-man"		} ,
-    { ".mathml"		, "application/mathml+xml"		} ,
-    { ".me"		, "application/x-troff-me"		} ,
-    { ".mesh"		, "model/mesh"				} ,
-    { ".mid"		, "audio/midi"				} ,
-    { ".midi"		, "audio/midi"				} ,
-    { ".mif"		, "application/vnd.mif"			} ,
-    { ".mov"		, "video/quicktime"			} ,
-    { ".movie"		, "video/x-sgi-movie"			} ,
-    { ".mp2"		, "audio/mpeg"				} ,
-    { ".mp3"		, "audio/mpeg"				} ,
-    { ".mp4"		, "video/mp4"				} ,
-    { ".mpe"		, "video/mpeg"				} ,
-    { ".mpeg"		, "video/mpeg"				} ,
-    { ".mpg"		, "video/mpeg"				} ,
-    { ".mpga"		, "audio/mpeg"				} ,
-    { ".ms"		, "application/x-troff-ms"		} ,
-    { ".msh"		, "model/mesh"				} ,
-    { ".mxu"		, "video/vnd.mpegurl"			} ,
-    { ".nc"		, "application/x-netcdf"		} ,
-    { ".oda"		, "application/oda"			} ,
-    { ".ogg"		, "application/ogg"			} ,
-    { ".pbm"		, "image/x-portable-bitmap"		} ,
-    { ".pdb"		, "chemical/x-pdb"			} ,
-    { ".pdf"		, "application/pdf"			} ,
-    { ".pgm"		, "image/x-portable-graymap"		} ,
-    { ".pgn"		, "application/x-chess-pgn"		} ,
-    { ".png"		, "image/png"				} ,
-    { ".pnm"		, "image/x-portable-anymap"		} ,
-    { ".ppm"		, "image/x-portable-pixmap"		} ,
-    { ".ppt"		, "application/vnd.ms-powerpoint"	} ,
-    { ".ps"		, "application/postscript"		} ,
-    { ".qt"		, "video/quicktime"			} ,
-    { ".ra"		, "audio/x-realaudio"			} ,
-    { ".ram"		, "audio/x-pn-realaudio"		} ,
-    { ".ras"		, "image/x-cmu-raster"			} ,
-    { ".rdf"		, "application/rdf+xml"			} ,
-    { ".rgb"		, "image/x-rgb"				} ,
-    { ".rm"		, "audio/x-pn-realaudio"		} ,
-    { ".roff"		, "application/x-troff"			} ,
-    { ".rpm"		, "audio/x-pn-realaudio-plugin"		} ,
-    { ".rtf"		, "text/rtf"				} ,
-    { ".rtx"		, "text/richtext"			} ,
-    { ".sgm"		, "text/sgml"				} ,
-    { ".sgml"		, "text/sgml"				} ,
-    { ".sh"		, "application/x-sh"			} ,
-    { ".shar"		, "application/x-shar"			} ,
-    { ".silo"		, "model/mesh"				} ,
-    { ".sit"		, "application/x-stuffit"		} ,
-    { ".skd"		, "application/x-koan"			} ,
-    { ".skm"		, "application/x-koan"			} ,
-    { ".skp"		, "application/x-koan"			} ,
-    { ".skt"		, "application/x-koan"			} ,
-    { ".smi"		, "application/smil"			} ,
-    { ".smil"		, "application/smil"			} ,
-    { ".snd"		, "audio/basic"				} ,
-    { ".so"		, "application/octet-stream"		} ,
-    { ".spl"		, "application/x-futuresplash"		} ,
-    { ".src"		, "application/x-wais-source"		} ,
-    { ".sv4cpio"	, "application/x-sv4cpio"		} ,
-    { ".sv4crc"		, "application/x-sv4crc"		} ,
-    { ".svg"		, "image/svg+xml"			} ,
-    { ".swf"		, "application/x-shockwave-flash"	} ,
-    { ".t"		, "application/x-troff"			} ,
-    { ".tar"		, "application/x-tar"			} ,
-    { ".tcl"		, "application/x-tcl"			} ,
-    { ".tex"		, "application/x-tex"			} ,
-    { ".texi"		, "application/x-texinfo"		} ,
-    { ".texinfo"	, "application/x-texinfo"		} ,
-    { ".tif"		, "image/tiff"				} ,
-    { ".tiff"		, "image/tiff"				} ,
-    { ".tr"		, "application/x-troff"			} ,
-    { ".tsv"		, "text/tab-separated-values"		} ,
-    { ".txt"		, "text/plain"				} ,
-    { ".ustar"		, "application/x-ustar"			} ,
-    { ".vcd"		, "application/x-cdlink"		} ,
-    { ".vrml"		, "model/vrml"				} ,
-    { ".vxml"		, "application/voicexml+xml"		} ,
-    { ".wav"		, "audio/x-wav"				} ,
-    { ".wbmp"		, "image/vnd.wap.wbmp"			} ,
-    { ".wbxml"		, "application/vnd.wap.wbxml"		} ,
-    { ".wml"		, "text/vnd.wap.wml"			} ,
-    { ".wmlc"		, "application/vnd.wap.wmlc"		} ,
-    { ".wmls"		, "text/vnd.wap.wmlscript"		} ,
-    { ".wmlsc"		, "application/vnd.wap.wmlscriptc"	} ,
-    { ".wrl"		, "model/vrml"				} ,
-    { ".x-html"		, "text/x-html" 			} ,
-    { ".xbm"		, "image/x-xbitmap"			} ,
-    { ".xht"		, "application/xhtml+xml"		} ,
-    { ".xhtml"		, "application/xhtml+xml"		} ,
-    { ".xls"		, "application/vnd.ms-excel"		} ,
-    { ".xml"		, "application/xml"			} ,
-    { ".xpm"		, "image/x-xpixmap"			} ,
-    { ".xsl"		, "application/xml"			} ,
-    { ".xslt"		, "application/xslt+xml"		} ,
-    { ".xul"		, "application/vnd.mozilla.xul+xml"	} ,
-    { ".xwd"		, "image/x-xwindowdump"			} ,
-    { ".xyz"		, "chemical/x-xyz"			} ,
-    { ".zip"		, "application/zip"			} ,
+    { ".ai"             , "application/postscript"              } ,
+    { ".aif"            , "audio/x-aiff"                        } ,
+    { ".aifc"           , "audio/x-aiff"                        } ,
+    { ".aiff"           , "audio/x-aiff"                        } ,
+    { ".asc"            , "text/plain"                          } ,
+    { ".au"             , "audio/basic"                         } ,
+    { ".avi"            , "video/x-msvideo"                     } ,
+    { ".bcpio"          , "application/x-bcpio"                 } ,
+    { ".bin"            , "application/octet-stream"            } ,
+    { ".bmp"            , "image/bmp"                           } ,
+    { ".cdf"            , "application/x-netcdf"                } ,
+    { ".cgm"            , "image/cgm"                           } ,
+    { ".class"          , "application/octet-stream"            } ,
+    { ".cpio"           , "application/x-cpio"                  } ,
+    { ".cpt"            , "application/mac-compactpro"          } ,
+    { ".csh"            , "application/x-csh"                   } ,
+    { ".css"            , "text/css"                            } ,
+    { ".dcr"            , "application/x-director"              } ,
+    { ".dir"            , "application/x-director"              } ,
+    { ".djv"            , "image/vnd.djvu"                      } ,
+    { ".djvu"           , "image/vnd.djvu"                      } ,
+    { ".dll"            , "application/octet-stream"            } ,
+    { ".dms"            , "application/octet-stream"            } ,
+    { ".doc"            , "application/msword"                  } ,
+    { ".dtd"            , "application/xml-dtd"                 } ,
+    { ".dvi"            , "application/x-dvi"                   } ,
+    { ".dxr"            , "application/x-director"              } ,
+    { ".eps"            , "application/postscript"              } ,
+    { ".etx"            , "text/x-setext"                       } ,
+    { ".exe"            , "application/octet-stream"            } ,
+    { ".ez"             , "application/andrew-inset"            } ,
+    { ".gif"            , "image/gif"                           } ,
+    { ".gram"           , "application/srgs"                    } ,
+    { ".grxml"          , "application/srgs+xml"                } ,
+    { ".gtar"           , "application/x-gtar"                  } ,
+    { ".gz"             , "application/x-gzip"                  } ,
+    { ".hdf"            , "application/x-hdf"                   } ,
+    { ".hqx"            , "application/mac-binhex40"            } ,
+    { ".htm"            , "text/html"                           } ,
+    { ".html"           , "text/html"                           } ,
+    { ".ice"            , "x-conference/x-cooltalk"             } ,
+    { ".ico"            , "image/x-icon"                        } ,
+    { ".ics"            , "text/calendar"                       } ,
+    { ".ief"            , "image/ief"                           } ,
+    { ".ifb"            , "text/calendar"                       } ,
+    { ".iges"           , "model/iges"                          } ,
+    { ".igs"            , "model/iges"                          } ,
+    { ".jpe"            , "image/jpeg"                          } ,
+    { ".jpeg"           , "image/jpeg"                          } ,
+    { ".jpg"            , "image/jpeg"                          } ,
+    { ".js"             , "application/x-javascript"            } ,
+    { ".kar"            , "audio/midi"                          } ,
+    { ".latex"          , "application/x-latex"                 } ,
+    { ".lha"            , "application/octet-stream"            } ,
+    { ".lzh"            , "application/octet-stream"            } ,
+    { ".m3u"            , "audio/x-mpegurl"                     } ,
+    { ".m4v"            , "video/x-m4v"                         } ,
+    { ".man"            , "application/x-troff-man"             } ,
+    { ".mathml"         , "application/mathml+xml"              } ,
+    { ".me"             , "application/x-troff-me"              } ,
+    { ".mesh"           , "model/mesh"                          } ,
+    { ".mid"            , "audio/midi"                          } ,
+    { ".midi"           , "audio/midi"                          } ,
+    { ".mif"            , "application/vnd.mif"                 } ,
+    { ".mov"            , "video/quicktime"                     } ,
+    { ".movie"          , "video/x-sgi-movie"                   } ,
+    { ".mp2"            , "audio/mpeg"                          } ,
+    { ".mp3"            , "audio/mpeg"                          } ,
+    { ".mp4"            , "video/mp4"                           } ,
+    { ".mpe"            , "video/mpeg"                          } ,
+    { ".mpeg"           , "video/mpeg"                          } ,
+    { ".mpg"            , "video/mpeg"                          } ,
+    { ".mpga"           , "audio/mpeg"                          } ,
+    { ".ms"             , "application/x-troff-ms"              } ,
+    { ".msh"            , "model/mesh"                          } ,
+    { ".mxu"            , "video/vnd.mpegurl"                   } ,
+    { ".nc"             , "application/x-netcdf"                } ,
+    { ".oda"            , "application/oda"                     } ,
+    { ".ogg"            , "application/ogg"                     } ,
+    { ".pbm"            , "image/x-portable-bitmap"             } ,
+    { ".pdb"            , "chemical/x-pdb"                      } ,
+    { ".pdf"            , "application/pdf"                     } ,
+    { ".pgm"            , "image/x-portable-graymap"            } ,
+    { ".pgn"            , "application/x-chess-pgn"             } ,
+    { ".png"            , "image/png"                           } ,
+    { ".pnm"            , "image/x-portable-anymap"             } ,
+    { ".ppm"            , "image/x-portable-pixmap"             } ,
+    { ".ppt"            , "application/vnd.ms-powerpoint"       } ,
+    { ".ps"             , "application/postscript"              } ,
+    { ".qt"             , "video/quicktime"                     } ,
+    { ".ra"             , "audio/x-realaudio"                   } ,
+    { ".ram"            , "audio/x-pn-realaudio"                } ,
+    { ".ras"            , "image/x-cmu-raster"                  } ,
+    { ".rdf"            , "application/rdf+xml"                 } ,
+    { ".rgb"            , "image/x-rgb"                         } ,
+    { ".rm"             , "audio/x-pn-realaudio"                } ,
+    { ".roff"           , "application/x-troff"                 } ,
+    { ".rpm"            , "audio/x-pn-realaudio-plugin"         } ,
+    { ".rtf"            , "text/rtf"                            } ,
+    { ".rtx"            , "text/richtext"                       } ,
+    { ".sgm"            , "text/sgml"                           } ,
+    { ".sgml"           , "text/sgml"                           } ,
+    { ".sh"             , "application/x-sh"                    } ,
+    { ".shar"           , "application/x-shar"                  } ,
+    { ".silo"           , "model/mesh"                          } ,
+    { ".sit"            , "application/x-stuffit"               } ,
+    { ".skd"            , "application/x-koan"                  } ,
+    { ".skm"            , "application/x-koan"                  } ,
+    { ".skp"            , "application/x-koan"                  } ,
+    { ".skt"            , "application/x-koan"                  } ,
+    { ".smi"            , "application/smil"                    } ,
+    { ".smil"           , "application/smil"                    } ,
+    { ".snd"            , "audio/basic"                         } ,
+    { ".so"             , "application/octet-stream"            } ,
+    { ".spl"            , "application/x-futuresplash"          } ,
+    { ".src"            , "application/x-wais-source"           } ,
+    { ".sv4cpio"        , "application/x-sv4cpio"               } ,
+    { ".sv4crc"         , "application/x-sv4crc"                } ,
+    { ".svg"            , "image/svg+xml"                       } ,
+    { ".swf"            , "application/x-shockwave-flash"       } ,
+    { ".t"              , "application/x-troff"                 } ,
+    { ".tar"            , "application/x-tar"                   } ,
+    { ".tcl"            , "application/x-tcl"                   } ,
+    { ".tex"            , "application/x-tex"                   } ,
+    { ".texi"           , "application/x-texinfo"               } ,
+    { ".texinfo"        , "application/x-texinfo"               } ,
+    { ".tif"            , "image/tiff"                          } ,
+    { ".tiff"           , "image/tiff"                          } ,
+    { ".tr"             , "application/x-troff"                 } ,
+    { ".tsv"            , "text/tab-separated-values"           } ,
+    { ".txt"            , "text/plain"                          } ,
+    { ".ustar"          , "application/x-ustar"                 } ,
+    { ".vcd"            , "application/x-cdlink"                } ,
+    { ".vrml"           , "model/vrml"                          } ,
+    { ".vxml"           , "application/voicexml+xml"            } ,
+    { ".wav"            , "audio/x-wav"                         } ,
+    { ".wbmp"           , "image/vnd.wap.wbmp"                  } ,
+    { ".wbxml"          , "application/vnd.wap.wbxml"           } ,
+    { ".wml"            , "text/vnd.wap.wml"                    } ,
+    { ".wmlc"           , "application/vnd.wap.wmlc"            } ,
+    { ".wmls"           , "text/vnd.wap.wmlscript"              } ,
+    { ".wmlsc"          , "application/vnd.wap.wmlscriptc"      } ,
+    { ".wrl"            , "model/vrml"                          } ,
+    { ".x-html"         , "text/x-html"                         } ,
+    { ".xbm"            , "image/x-xbitmap"                     } ,
+    { ".xht"            , "application/xhtml+xml"               } ,
+    { ".xhtml"          , "application/xhtml+xml"               } ,
+    { ".xls"            , "application/vnd.ms-excel"            } ,
+    { ".xml"            , "application/xml"                     } ,
+    { ".xpm"            , "image/x-xpixmap"                     } ,
+    { ".xsl"            , "application/xml"                     } ,
+    { ".xslt"           , "application/xslt+xml"                } ,
+    { ".xul"            , "application/vnd.mozilla.xul+xml"     } ,
+    { ".xwd"            , "image/x-xwindowdump"                 } ,
+    { ".xyz"            , "chemical/x-xyz"                      } ,
+    { ".zip"            , "application/zip"                     } ,
   };
   
   const struct dstring *v;
@@ -750,7 +750,7 @@ static const char *mime_type(const char *filename)
     if (v != NULL)
       return v->s2;
   }
-    
+  
   return "text/plain";
 }
 
@@ -772,7 +772,7 @@ static int display_file(FILE *const out,const tumbler__s *spec)
       spec->start.day,
       spec->filename
   );
-    
+  
   if (gd.cgi)
   {
     struct stat  status;
@@ -781,7 +781,7 @@ static int display_file(FILE *const out,const tumbler__s *spec)
     int          rc;
     
     rc = stat(fname,&status);
-    if (rc == -1) 
+    if (rc == -1)
     {
       if (errno == ENOENT)
         (*gd.req.error)(&gd.req,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
@@ -810,13 +810,13 @@ static int display_file(FILE *const out,const tumbler__s *spec)
     else
     {
       fprintf(
-      	out,
-      	"Status: 200\r\n"
-      	"Content-Type: %s\r\n"
-      	"Content-Length: %lu\r\n"
-      	"\r\n",
-      	type,
-      	(unsigned long)status.st_size
+        out,
+        "Status: 200\r\n"
+        "Content-Type: %s\r\n"
+        "Content-Length: %lu\r\n"
+        "\r\n",
+        type,
+        (unsigned long)status.st_size
       );
       
       fcopy(out,in);
@@ -825,7 +825,7 @@ static int display_file(FILE *const out,const tumbler__s *spec)
   }
   else
     fprintf(out,"File to open: %s\n",fname);
-  
+    
   return 0;
 }
 
@@ -864,7 +864,7 @@ static char *tag_pick(const char *tag)
   
   if (empty_string(tag))
     return strdup(c_adtag);
-  
+    
   pool = tag_split(&num,tag);
   
   /*------------------------------------------------------------------------
@@ -874,13 +874,13 @@ static char *tag_pick(const char *tag)
   
   if (num)
   {
-    r    = (((double)rand() / (double)RAND_MAX) * (double)num); 
+    r    = (((double)rand() / (double)RAND_MAX) * (double)num);
     assert(r < num);
     pick = fromstring(pool[r]);
   }
   else
     pick = strdup(c_adtag);
-  
+    
   free(pool);
   return pick;
 }

@@ -35,7 +35,7 @@
 ;
 ; Intially, the program was assumed not-SETUID, so therefore
 ; any files it needed to create required them to be world writable
-; (that included directories as well as files) since files could 
+; (that included directories as well as files) since files could
 ; be created via email, a webpage or locally by the end user.
 ;
 ; This might not be desirable so another option is to make the engine
@@ -47,14 +47,14 @@
 ;
 ;--------------------------------------------------------------------*/
 
-#define DEFAULT_PERMS	022
+#define DEFAULT_PERMS   022
 
 /*-----------------------------------------------------------------------
 ; Define one of the following:
-;	USE_NONE	- only the author listed in the config can post
-;	USE_GDBM	- use the GNU Database manipulation routines
-;	USE_DB		- use the Berkeley Database manipulation routines
-;	USE_HTPASSWD	- use the Apache htpassword format file
+;       USE_NONE        - only the author listed in the config can post
+;       USE_GDBM        - use the GNU Database manipulation routines
+;       USE_DB          - use the Berkeley Database manipulation routines
+;       USE_HTPASSWD    - use the Apache htpassword format file
 ;--------------------------------------------------------------------------*/
 
 #undef USE_NONE

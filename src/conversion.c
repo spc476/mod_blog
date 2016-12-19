@@ -48,16 +48,16 @@ struct nested_params
 
 /**********************************************************************/
 
-static void	text_conversion_backend	(FILE *const restrict,FILE *const restrict);
-static void	html_handle_tag		(struct nested_params *const);
-static void	check_for_uri		(struct nested_params *const,const char *const);
-static void	entify_char		(char *,size_t,char *,char,const char *const);
-static void	html_handle_string	(struct nested_params *const);
-static void	html_handle_comment	(struct nested_params *const);
-static void	handle_backquote	(FILE *const restrict,FILE *const restrict);
-static void	handle_quote		(FILE *const restrict,FILE *const restrict);
-static void	handle_dash		(FILE *const restrict,FILE *const restrict);
-static void	handle_period		(FILE *const restrict,FILE *const restrict);
+static void     text_conversion_backend (FILE *const restrict,FILE *const restrict);
+static void     html_handle_tag         (struct nested_params *const);
+static void     check_for_uri           (struct nested_params *const,const char *const);
+static void     entify_char             (char *,size_t,char *,char,const char *const);
+static void     html_handle_string      (struct nested_params *const);
+static void     html_handle_comment     (struct nested_params *const);
+static void     handle_backquote        (FILE *const restrict,FILE *const restrict);
+static void     handle_quote            (FILE *const restrict,FILE *const restrict);
+static void     handle_dash             (FILE *const restrict,FILE *const restrict);
+static void     handle_period           (FILE *const restrict,FILE *const restrict);
 
 /**********************************************************************/
 
@@ -89,7 +89,7 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
 {
   FILE   *tmpout;
   char   *buffer;
-  char   *line;  
+  char   *line;
   size_t  bufsize;
   size_t  linesize;
   
@@ -108,7 +108,7 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
     
     bytes = getline(&line,&linesize,in);
     if (bytes <= 0) break;
-    line[--bytes] = '\0'; 
+    line[--bytes] = '\0';
     
     if (empty_string(line))
     {
@@ -116,11 +116,11 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
       
       if (!empty_string(buffer))
         fprintf(out,"<p>%s</p>\n",buffer);
-      
+        
       free(buffer);
       
       buffer  = NULL;
-      bufsize = 0;   
+      bufsize = 0;
       tmpout  = open_memstream(&buffer,&bufsize);
     }
     else
@@ -128,7 +128,7 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
       FILE *tmpin;
       
       tmpin = fmemopen(line,bytes,"r");
-      buff_conversion(tmpin,tmpout);   
+      buff_conversion(tmpin,tmpout);
       fclose(tmpin);
       fputc(' ',tmpout);
     }
@@ -137,7 +137,7 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
   fclose(tmpout);
   if (!empty_string(buffer))
     fprintf(out,"<p>%s</p>\n",buffer);
-  
+    
   free(line);
   free(buffer);
 }
@@ -241,13 +241,13 @@ static void html_handle_tag(struct nested_params *const local)
     || (strcmp(HtmlParseValue(local->token),"OL") == 0)
   )
     local->list = true;
-  else if 
+  else if
   (
     (strcmp(HtmlParseValue(local->token),"/UL") == 0)
     || (strcmp(HtmlParseValue(local->token),"/OL") == 0)
   )
     local->list = false;
-  
+    
   /*--------------------------------------------------------------
   ; tags that have URIs that need to be checked for & and fixed.
   ;--------------------------------------------------------------*/
@@ -326,7 +326,7 @@ static void check_for_uri(struct nested_params *const local,const char *const at
   if (src == NULL) return;
   
   entify_char(newuri,BUFSIZ,src->value,'&',"&amp;");
-    
+  
   np = PairCreate(attrib,newuri);
   NodeInsert(&src->node,&np->node);
   NodeRemove(&src->node);
@@ -372,7 +372,7 @@ static void entify_char(char *d,size_t ds,char *s,char e,const char *const entit
 }
 
 /**************************************************************************/
-      
+
 static void html_handle_string(struct nested_params *const local)
 {
   FILE *in;
@@ -447,7 +447,7 @@ static void handle_backquote(FILE *const restrict input,FILE *const restrict out
   int c;
   
   assert(input  != NULL);
-  assert(output != NULL);  
+  assert(output != NULL);
   
   if (feof(input))
   {
@@ -495,7 +495,7 @@ static void handle_quote(FILE *const restrict input,FILE *const restrict output)
 static void handle_dash(FILE *const restrict input,FILE *const restrict output)
 {
   int c;
-    
+  
   assert(input  != NULL);
   assert(output != NULL);
   

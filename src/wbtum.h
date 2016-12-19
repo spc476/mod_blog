@@ -29,7 +29,7 @@
 
 /**********************************************************************/
 
-#define ENTRY_MAX	23
+#define ENTRY_MAX       23
 
 typedef enum unit__e
 {
@@ -42,20 +42,20 @@ typedef enum unit__e
 
 typedef struct tumbler__s
 {
-  struct btm start;	/* starting date			*/
-  struct btm stop;	/* ending date				*/
-  unit__e    ustart;	/* ending segment of initial part	*/
-  unit__e    ustop;	/* ending segment of range part		*/
-  int        segments;	/* used for range part			*/
-  bool       file;	/* a file was specified			*/
-  bool       redirect;	/* we need to redirect			*/
-  bool       range;	/* a range was specified		*/
+  struct btm start;     /* starting date                        */
+  struct btm stop;      /* ending date                          */
+  unit__e    ustart;    /* ending segment of initial part       */
+  unit__e    ustop;     /* ending segment of range part         */
+  int        segments;  /* used for range part                  */
+  bool       file;      /* a file was specified                 */
+  bool       redirect;  /* we need to redirect                  */
+  bool       range;     /* a range was specified                */
   char       filename[FILENAME_MAX];
 } tumbler__s;
 
 /***********************************************************************/
 
-extern bool  tumbler_new	(tumbler__s *const,const char *);
-extern char *tumbler_canonical	(const tumbler__s *const);
+extern bool  tumbler_new        (tumbler__s *const,const char *);
+extern char *tumbler_canonical  (const tumbler__s *const);
 
 #endif

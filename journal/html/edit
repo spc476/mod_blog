@@ -2,7 +2,7 @@
 <div id="edit">
 
   <form method="POST" action="/blog/blog.cgi">
-
+  
   <div class="metacontent">
     <table>
       <tr><th><label for="author">Author</label></th>            <td><input id="author"   name="author"   type="text"     value="%{edit.author}%"></td></tr>
@@ -20,11 +20,11 @@
       <tr><th>&nbsp;</th>     <td><input               type="reset"    value="Reset"></td></tr>
     </table>
   </div>
-
+  
   <div class="content">
     <textarea name="body" rows="20" cols="60">%{edit.body}%</textarea>
   </div>
-
+  
   </form>
-
+  
 </div>

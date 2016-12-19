@@ -6,4 +6,4 @@
 %{atom.categories}%
     <content type="html">%{entry.body.entified}%</content>
   </entry>
-
+  

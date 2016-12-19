@@ -9,26 +9,26 @@
 
   <fieldset id="comments">
     <legend>Comment?  Venting?  Go ahead &hellip;</legend>
-
+    
     <label for="realname">Name</label>
     <input id="i-realname" title="Name" type="text" name="realname">
-
+    
     <label for="i-username">Email</label>
     <input id="i-username" title="Email" type="text" name="username">
-
+    
     <label for="i-url">Homepage</label>
     <input id="i-url" title="Homepage" type="text" name="url" value="http://">
-
+    
     <label for="i-comment">Comment</label>
     <textarea id="i-comment" name="comment" cols="35" rows="10"></textarea>
-
+    
   </fieldset>
-
+  
   <input type="hidden" name="entry" value="%{comments.filename}%">
   <input type="hidden" name="entryurl" value="%{entry.url}%">
-
+  
   <input type="submit" value="Add Comment" >
-
+  
 </form>
 
 </div>

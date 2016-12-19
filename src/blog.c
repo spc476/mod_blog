@@ -39,17 +39,17 @@
 
 /**********************************************************************/
 
-static void	 date_to_dir		(char *,const struct btm *);
-static void	 date_to_filename	(char *,const struct btm *,const char *);
-static void	 date_to_part		(char *,const struct btm *,int);
-static FILE	*open_file_r		(const char *,const struct btm *);
-static FILE	*open_file_w		(const char *,const struct btm *);
-static bool	 date_check		(const struct btm *);
-static int	 date_checkcreate	(const struct btm *);
-static char     *blog_meta_entry	(const char *,const struct btm *);
-static size_t	 blog_meta_read		(char ***,const char *,const struct btm *);
-static void	 blog_meta_adjust	(char ***,size_t,size_t);
-static int	 blog_meta_write	(const char *,const struct btm *,char **,size_t);
+static void      date_to_dir            (char *,const struct btm *);
+static void      date_to_filename       (char *,const struct btm *,const char *);
+static void      date_to_part           (char *,const struct btm *,int);
+static FILE     *open_file_r            (const char *,const struct btm *);
+static FILE     *open_file_w            (const char *,const struct btm *);
+static bool      date_check             (const struct btm *);
+static int       date_checkcreate       (const struct btm *);
+static char     *blog_meta_entry        (const char *,const struct btm *);
+static size_t    blog_meta_read         (char ***,const char *,const struct btm *);
+static void      blog_meta_adjust       (char ***,size_t,size_t);
+static int       blog_meta_write        (const char *,const struct btm *,char **,size_t);
 
 /***********************************************************************/
 
@@ -101,12 +101,12 @@ Blog BlogNew(const char *location,const char *lockfile)
     {
       blog->first = blog->now;
       fprintf(
-      	fp,
-      	"%4d/%02d/%02d.%d\n",
-      	blog->now.year,
-      	blog->now.month,
-      	blog->now.day,
-      	blog->now.part
+        fp,
+        "%4d/%02d/%02d.%d\n",
+        blog->now.year,
+        blog->now.month,
+        blog->now.day,
+        blog->now.part
       );
       fclose(fp);
     }
@@ -134,12 +134,12 @@ Blog BlogNew(const char *location,const char *lockfile)
     if (fp)
     {
       fprintf(
-      	fp,
-      	"%4d/%02d/%02d.%d\n",
-      	blog->now.year,
-      	blog->now.month,
-      	blog->now.day,
-      	blog->now.part
+        fp,
+        "%4d/%02d/%02d.%d\n",
+        blog->now.year,
+        blog->now.month,
+        blog->now.day,
+        blog->now.part
       );
       fclose(fp);
     }
@@ -182,7 +182,7 @@ bool BlogLock(Blog blog)
   assert(blog != NULL);
   
   blog->lock = open(blog->lockfile,O_CREAT | O_RDWR, 0666);
-  if (blog->lock == -1) 
+  if (blog->lock == -1)
   {
     syslog(LOG_ERR,"%s: %s",blog->lockfile,strerror(errno));
     return false;
@@ -243,7 +243,7 @@ void BlogFree(Blog blog)
   
   if (blog->lock > 0)
     BlogUnlock(blog);
-  
+    
   free(blog->lockfile);
   free(blog);
 }
@@ -253,7 +253,7 @@ void BlogFree(Blog blog)
 BlogEntry BlogEntryNew(const Blog blog)
 {
   BlogEntry pbe;
-
+  
   assert(blog != NULL);
   
   pbe               = malloc(sizeof(struct blogentry));
@@ -276,7 +276,7 @@ BlogEntry BlogEntryNew(const Blog blog)
 
 /***********************************************************************/
 
-BlogEntry BlogEntryRead(const Blog blog,const struct btm *which) 
+BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
 {
   BlogEntry    entry;
   char         pname[FILENAME_MAX];
@@ -290,11 +290,11 @@ BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
   
   if (!date_check(which))
     return NULL;
-  
+    
   date_to_part(pname,which,which->part);
   if (access(pname,R_OK) != 0)
     return NULL;
-  
+    
   entry               = malloc(sizeof(struct blogentry));
   entry->node.ln_Succ = NULL;
   entry->node.ln_Pred = NULL;
@@ -315,7 +315,7 @@ BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
     entry->timestamp = status.st_mtime;
   else
     entry->timestamp = blog->tnow;
-      
+    
   sinbody = fopen(pname,"r");
   if (sinbody == NULL)
     entry->body = strdup("");
@@ -327,7 +327,7 @@ BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
     entry->body[status.st_size] = '\0';
   }
   
-  return entry;  
+  return entry;
 }
 
 /**********************************************************************/
@@ -403,7 +403,7 @@ void BlogEntryReadBetweenD(
 }
 
 /*******************************************************************/
-  
+
 void BlogEntryReadXD(
         const Blog        blog,
         List             *list,
@@ -497,7 +497,7 @@ int BlogEntryWrite(const BlogEntry entry)
   rc = date_checkcreate(&entry->when);
   if (rc != 0)
     return rc;
-  
+    
   /*---------------------------------------------------------------------
   ; The meta-data for the entries are stored in separate files.  When
   ; updating an entry (or adding an entry), we need to rewrite these
@@ -520,7 +520,7 @@ int BlogEntryWrite(const BlogEntry entry)
   {
     if (maxnum == 99)
       return ENOMEM;
-    
+      
     authors[maxnum]  = strdup(entry->author);
     class  [maxnum]  = strdup(entry->class);
     status [maxnum]  = strdup(entry->status);
@@ -586,18 +586,18 @@ int BlogEntryWrite(const BlogEntry entry)
     if (out)
     {
       fprintf(
-      		out,
-      		"%d/%02d/%02d.%d\n",
-      		entry->when.year,
-      		entry->when.month,
-      		entry->when.day,
-      		entry->when.part
-      	);
+                out,
+                "%d/%02d/%02d.%d\n",
+                entry->when.year,
+                entry->when.month,
+                entry->when.day,
+                entry->when.part
+        );
       fclose(out);
     }
   }
   
-  return 0;  
+  return 0;
 }
 
 /***********************************************************************/
@@ -667,12 +667,12 @@ static FILE *open_file_r(const char *name,const struct btm *date)
   in = fopen(buffer,"r");
   if (in == NULL)
     in = fopen("/dev/null","r");
-  
+    
   /*--------------------------------------------------
   ; because the code was written using a different IO
   ; model (that is, if there's no data in the file to
   ; begin with, we automatically end up in EOF mode,
-  ; let's trigger EOF.  Sigh. (see comment below in 
+  ; let's trigger EOF.  Sigh. (see comment below in
   ; blog_cache_day() for some more commentary on this
   ; sad state of affairs.
   ;-------------------------------------------------*/
@@ -799,9 +799,9 @@ static char *blog_meta_entry(const char *name,const struct btm *date)
 /********************************************************************/
 
 static size_t blog_meta_read(
-	char             ***plines,
-	const char         *name,
-	const struct btm   *date
+        char             ***plines,
+        const char         *name,
+        const struct btm   *date
 )
 {
   char   **lines;
@@ -874,10 +874,10 @@ static void blog_meta_adjust(char ***plines,size_t num,size_t maxnum)
 /************************************************************************/
 
 static int blog_meta_write(
-	const char        *name,
-	const struct btm  *date,
-	char             **list,
-	size_t             num
+        const char        *name,
+        const struct btm  *date,
+        char             **list,
+        size_t             num
 )
 {
   FILE   *fp;
@@ -889,10 +889,10 @@ static int blog_meta_write(
   fp = open_file_w(name,date);
   if (fp == NULL)
     return errno;
-  
+    
   for (size_t i = 0 ; i < num ; i++)
     fprintf(fp,"%s\n",list[i]);
-  
+    
   fclose(fp);
   return 0;
 }

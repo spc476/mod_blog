@@ -49,178 +49,178 @@
 #  include <gdbm.h>
 #endif
 
-#define max(a,b)	((a) > (b)) ? (a) : (b)
+#define max(a,b)        ((a) > (b)) ? (a) : (b)
 
 /*****************************************************************/
 
-static void	cb_ad				(FILE *const,void *);
-static void	cb_ad_content			(FILE *const,void *);
-static void	cb_atom_categories		(FILE *const,void *);
-static void	cb_atom_category		(FILE *const,void *);
-static void	cb_atom_entry			(FILE *const,void *);
-static void	cb_begin_year			(FILE *const,void *);
-static void	cb_blog_adtag			(FILE *const,void *);
-static void	cb_blog_adtag_entity		(FILE *const,void *);
-static void	cb_blog_author			(FILE *const,void *);
-static void	cb_blog_author_email		(FILE *const,void *);
-static void	cb_blog_name			(FILE *const,void *);
-static void	cb_blog_script			(FILE *const,void *);
-static void	cb_blog_url			(FILE *const,void *);
-static void	cb_blog_url_home		(FILE *const,void *);
-static void	cb_comments			(FILE *const,void *);
-static void	cb_comments_body		(FILE *const,void *);
-static void	cb_comments_check		(FILE *const,void *);
-static void	cb_comments_filename		(FILE *const,void *);
-static void	cb_cond_blog_title		(FILE *const,void *);
-static void	cb_cond_hr			(FILE *const,void *);
-static void	cb_date_day			(FILE *const,void *);
-static void	cb_date_day_normal		(FILE *const,void *);
-static void	cb_date_day_url			(FILE *const,void *);
-static void	cb_edit				(FILE *const,void *);
-static void	cb_edit_author			(FILE *const,void *);
-static void	cb_edit_body			(FILE *const,void *);
-static void	cb_edit_class			(FILE *const,void *);
-static void	cb_edit_date			(FILE *const,void *);
-static void	cb_edit_email			(FILE *const,void *);
-static void	cb_edit_filter			(FILE *const,void *);
-static void	cb_edit_status			(FILE *const,void *);
-static void	cb_edit_title			(FILE *const,void *);
-static void	cb_entry			(FILE *const,void *);
-static void	cb_entry_adtag			(FILE *const,void *);
-static void	cb_entry_author			(FILE *const,void *);
-static void	cb_entry_body			(FILE *const,void *);
-static void	cb_entry_body_entified		(FILE *const,void *);
-static void	cb_entry_class			(FILE *const,void *);
-static void	cb_entry_cond_author		(FILE *const,void *);
-static void	cb_entry_cond_date		(FILE *const,void *);
-static void	cb_entry_date			(FILE *const,void *);
-static void	cb_entry_id			(FILE *const,void *);
-static void	cb_entry_name			(FILE *const,void *);
-static void	cb_entry_pubdate		(FILE *const,void *);
-static void	cb_entry_status			(FILE *const,void *);
-static void	cb_entry_title			(FILE *const,void *);
-static void	cb_entry_url			(FILE *const,void *);
-static void	cb_generator			(FILE *const,void *);
-static void	cb_navigation_bar		(FILE *const,void *);
-static void	cb_navigation_bar_next		(FILE *const,void *);
-static void	cb_navigation_bar_prev		(FILE *const,void *);
-static void	cb_navigation_current		(FILE *const,void *);
-static void	cb_navigation_current_url	(FILE *const,void *);
-static void	cb_navigation_first_title	(FILE *const,void *);
-static void	cb_navigation_first_url		(FILE *const,void *);
-static void	cb_navigation_last_title	(FILE *const,void *);
-static void	cb_navigation_last_url		(FILE *const,void *);
-static void	cb_navigation_link		(FILE *const,void *);
-static void	cb_navigation_link_next		(FILE *const,void *);
-static void	cb_navigation_link_prev		(FILE *const,void *);
-static void	cb_navigation_next_title	(FILE *const,void *);
-static void	cb_navigation_next_url		(FILE *const,void *);
-static void	cb_navigation_prev_title	(FILE *const,void *);
-static void	cb_navigation_prev_url		(FILE *const,void *);
-static void	cb_now_year			(FILE *const,void *);
-static void	cb_overview			(FILE *const,void *);
-static void	cb_overview_date		(FILE *const,void *);
-static void	cb_overview_list		(FILE *const,void *);
-static void	cb_robots_index			(FILE *const,void *);
-static void	cb_rss_item			(FILE *const,void *);
-static void	cb_rss_item_url			(FILE *const,void *);
-static void	cb_rss_pubdate			(FILE *const,void *);
-static void	cb_rss_url			(FILE *const,void *);
-static void	cb_update_time			(FILE *const,void *);
-static void	cb_update_type			(FILE *const,void *);
-static void	cb_xyzzy			(FILE *const,void *);
+static void     cb_ad                           (FILE *const,void *);
+static void     cb_ad_content                   (FILE *const,void *);
+static void     cb_atom_categories              (FILE *const,void *);
+static void     cb_atom_category                (FILE *const,void *);
+static void     cb_atom_entry                   (FILE *const,void *);
+static void     cb_begin_year                   (FILE *const,void *);
+static void     cb_blog_adtag                   (FILE *const,void *);
+static void     cb_blog_adtag_entity            (FILE *const,void *);
+static void     cb_blog_author                  (FILE *const,void *);
+static void     cb_blog_author_email            (FILE *const,void *);
+static void     cb_blog_name                    (FILE *const,void *);
+static void     cb_blog_script                  (FILE *const,void *);
+static void     cb_blog_url                     (FILE *const,void *);
+static void     cb_blog_url_home                (FILE *const,void *);
+static void     cb_comments                     (FILE *const,void *);
+static void     cb_comments_body                (FILE *const,void *);
+static void     cb_comments_check               (FILE *const,void *);
+static void     cb_comments_filename            (FILE *const,void *);
+static void     cb_cond_blog_title              (FILE *const,void *);
+static void     cb_cond_hr                      (FILE *const,void *);
+static void     cb_date_day                     (FILE *const,void *);
+static void     cb_date_day_normal              (FILE *const,void *);
+static void     cb_date_day_url                 (FILE *const,void *);
+static void     cb_edit                         (FILE *const,void *);
+static void     cb_edit_author                  (FILE *const,void *);
+static void     cb_edit_body                    (FILE *const,void *);
+static void     cb_edit_class                   (FILE *const,void *);
+static void     cb_edit_date                    (FILE *const,void *);
+static void     cb_edit_email                   (FILE *const,void *);
+static void     cb_edit_filter                  (FILE *const,void *);
+static void     cb_edit_status                  (FILE *const,void *);
+static void     cb_edit_title                   (FILE *const,void *);
+static void     cb_entry                        (FILE *const,void *);
+static void     cb_entry_adtag                  (FILE *const,void *);
+static void     cb_entry_author                 (FILE *const,void *);
+static void     cb_entry_body                   (FILE *const,void *);
+static void     cb_entry_body_entified          (FILE *const,void *);
+static void     cb_entry_class                  (FILE *const,void *);
+static void     cb_entry_cond_author            (FILE *const,void *);
+static void     cb_entry_cond_date              (FILE *const,void *);
+static void     cb_entry_date                   (FILE *const,void *);
+static void     cb_entry_id                     (FILE *const,void *);
+static void     cb_entry_name                   (FILE *const,void *);
+static void     cb_entry_pubdate                (FILE *const,void *);
+static void     cb_entry_status                 (FILE *const,void *);
+static void     cb_entry_title                  (FILE *const,void *);
+static void     cb_entry_url                    (FILE *const,void *);
+static void     cb_generator                    (FILE *const,void *);
+static void     cb_navigation_bar               (FILE *const,void *);
+static void     cb_navigation_bar_next          (FILE *const,void *);
+static void     cb_navigation_bar_prev          (FILE *const,void *);
+static void     cb_navigation_current           (FILE *const,void *);
+static void     cb_navigation_current_url       (FILE *const,void *);
+static void     cb_navigation_first_title       (FILE *const,void *);
+static void     cb_navigation_first_url         (FILE *const,void *);
+static void     cb_navigation_last_title        (FILE *const,void *);
+static void     cb_navigation_last_url          (FILE *const,void *);
+static void     cb_navigation_link              (FILE *const,void *);
+static void     cb_navigation_link_next         (FILE *const,void *);
+static void     cb_navigation_link_prev         (FILE *const,void *);
+static void     cb_navigation_next_title        (FILE *const,void *);
+static void     cb_navigation_next_url          (FILE *const,void *);
+static void     cb_navigation_prev_title        (FILE *const,void *);
+static void     cb_navigation_prev_url          (FILE *const,void *);
+static void     cb_now_year                     (FILE *const,void *);
+static void     cb_overview                     (FILE *const,void *);
+static void     cb_overview_date                (FILE *const,void *);
+static void     cb_overview_list                (FILE *const,void *);
+static void     cb_robots_index                 (FILE *const,void *);
+static void     cb_rss_item                     (FILE *const,void *);
+static void     cb_rss_item_url                 (FILE *const,void *);
+static void     cb_rss_pubdate                  (FILE *const,void *);
+static void     cb_rss_url                      (FILE *const,void *);
+static void     cb_update_time                  (FILE *const,void *);
+static void     cb_update_type                  (FILE *const,void *);
+static void     cb_xyzzy                        (FILE *const,void *);
 
-static void	print_nav_url	(FILE *const,const struct btm *const,int);
-static void	print_nav_title	(FILE *const,const struct btm *const,int);
-static void	print_nav_name	(FILE *const,const struct btm *const,int,char);
-static void	fixup_uri	(BlogEntry,HtmlToken,const char *);
-static void	handle_aflinks	(HtmlToken,const char *);
+static void     print_nav_url   (FILE *const,const struct btm *const,int);
+static void     print_nav_title (FILE *const,const struct btm *const,int);
+static void     print_nav_name  (FILE *const,const struct btm *const,int,char);
+static void     fixup_uri       (BlogEntry,HtmlToken,const char *);
+static void     handle_aflinks  (HtmlToken,const char *);
 
 /************************************************************************/
 
-	/*--------------------------------
-	; the following table needs to
-	; be in alphabetical order
-	;--------------------------------*/
-	
+        /*--------------------------------
+        ; the following table needs to
+        ; be in alphabetical order
+        ;--------------------------------*/
+        
 static const struct chunk_callback  m_callbacks[] =
-{  
-  { "ad"			, cb_ad				} ,
-  { "ad.content"		, cb_ad_content			} ,
-  { "atom.categories"		, cb_atom_categories		} ,
-  { "atom.category"		, cb_atom_category		} ,
-  { "atom.entry"		, cb_atom_entry			} ,
-  { "begin.year"		, cb_begin_year			} ,
-  { "blog.adtag"		, cb_blog_adtag			} ,
-  { "blog.adtag.entity"		, cb_blog_adtag_entity		} ,
-  { "blog.author"		, cb_blog_author		} ,
-  { "blog.author.email"		, cb_blog_author_email		} ,
-  { "blog.name"			, cb_blog_name			} ,
-  { "blog.script"		, cb_blog_script		} ,
-  { "blog.url"			, cb_blog_url			} ,
-  { "blog.url.home"		, cb_blog_url_home		} ,
-  { "comments"			, cb_comments			} ,
-  { "comments.body"		, cb_comments_body		} ,
-  { "comments.check"		, cb_comments_check		} ,
-  { "comments.filename"		, cb_comments_filename		} ,
-  { "cond.blog.title"		, cb_cond_blog_title		} ,
-  { "cond.hr"			, cb_cond_hr			} ,
-  { "date.day"			, cb_date_day			} ,
-  { "date.day.normal"		, cb_date_day_normal		} ,
-  { "date.day.url"		, cb_date_day_url		} ,
-  { "edit"			, cb_edit			} ,
-  { "edit.author"		, cb_edit_author		} ,
-  { "edit.body"			, cb_edit_body			} ,
-  { "edit.class"		, cb_edit_class			} ,
-  { "edit.date"			, cb_edit_date			} ,
-  { "edit.email"		, cb_edit_email			} ,
-  { "edit.filter"		, cb_edit_filter		} ,
-  { "edit.status"		, cb_edit_status		} ,
-  { "edit.title"		, cb_edit_title			} ,
-  { "entry"			, cb_entry			} ,
-  { "entry.adtag"		, cb_entry_adtag		} ,
-  { "entry.author"		, cb_entry_author		} ,
-  { "entry.body"		, cb_entry_body			} ,
-  { "entry.body.entified"	, cb_entry_body_entified	} ,
-  { "entry.class"		, cb_entry_class		} ,
-  { "entry.cond.author"		, cb_entry_cond_author		} ,
-  { "entry.cond.date"		, cb_entry_cond_date		} ,
-  { "entry.date"		, cb_entry_date			} ,
-  { "entry.id"			, cb_entry_id			} ,
-  { "entry.name"		, cb_entry_name			} ,
-  { "entry.pubdate"		, cb_entry_pubdate		} ,
-  { "entry.status"		, cb_entry_status		} ,
-  { "entry.title"		, cb_entry_title		} ,
-  { "entry.url"			, cb_entry_url			} ,
-  { "generator"			, cb_generator			} ,
-  { "navigation.bar"		, cb_navigation_bar		} ,
-  { "navigation.bar.next"	, cb_navigation_bar_next	} ,
-  { "navigation.bar.prev"	, cb_navigation_bar_prev	} ,
-  { "navigation.current"	, cb_navigation_current		} ,
-  { "navigation.current.url"	, cb_navigation_current_url	} ,
-  { "navigation.first.title"	, cb_navigation_first_title	} ,
-  { "navigation.first.url"	, cb_navigation_first_url	} ,
-  { "navigation.last.title"	, cb_navigation_last_title	} ,
-  { "navigation.last.url"	, cb_navigation_last_url	} ,
-  { "navigation.link"		, cb_navigation_link		} ,
-  { "navigation.link.next"	, cb_navigation_link_next	} ,
-  { "navigation.link.prev"	, cb_navigation_link_prev	} ,
-  { "navigation.next.title"	, cb_navigation_next_title	} ,
-  { "navigation.next.url"	, cb_navigation_next_url	} ,
-  { "navigation.prev.title"	, cb_navigation_prev_title	} ,
-  { "navigation.prev.url"	, cb_navigation_prev_url        } ,
-  { "now.year"			, cb_now_year			} ,
-  { "overview"			, cb_overview			} ,
-  { "overview.date"		, cb_overview_date		} ,
-  { "overview.list"		, cb_overview_list		} ,
-  { "robots.index"		, cb_robots_index		} ,
-  { "rss.item"			, cb_rss_item			} ,
-  { "rss.item.url"		, cb_rss_item_url		} ,
-  { "rss.pubdate"		, cb_rss_pubdate		} ,
-  { "rss.url"			, cb_rss_url			} ,
+{
+  { "ad"                        , cb_ad                         } ,
+  { "ad.content"                , cb_ad_content                 } ,
+  { "atom.categories"           , cb_atom_categories            } ,
+  { "atom.category"             , cb_atom_category              } ,
+  { "atom.entry"                , cb_atom_entry                 } ,
+  { "begin.year"                , cb_begin_year                 } ,
+  { "blog.adtag"                , cb_blog_adtag                 } ,
+  { "blog.adtag.entity"         , cb_blog_adtag_entity          } ,
+  { "blog.author"               , cb_blog_author                } ,
+  { "blog.author.email"         , cb_blog_author_email          } ,
+  { "blog.name"                 , cb_blog_name                  } ,
+  { "blog.script"               , cb_blog_script                } ,
+  { "blog.url"                  , cb_blog_url                   } ,
+  { "blog.url.home"             , cb_blog_url_home              } ,
+  { "comments"                  , cb_comments                   } ,
+  { "comments.body"             , cb_comments_body              } ,
+  { "comments.check"            , cb_comments_check             } ,
+  { "comments.filename"         , cb_comments_filename          } ,
+  { "cond.blog.title"           , cb_cond_blog_title            } ,
+  { "cond.hr"                   , cb_cond_hr                    } ,
+  { "date.day"                  , cb_date_day                   } ,
+  { "date.day.normal"           , cb_date_day_normal            } ,
+  { "date.day.url"              , cb_date_day_url               } ,
+  { "edit"                      , cb_edit                       } ,
+  { "edit.author"               , cb_edit_author                } ,
+  { "edit.body"                 , cb_edit_body                  } ,
+  { "edit.class"                , cb_edit_class                 } ,
+  { "edit.date"                 , cb_edit_date                  } ,
+  { "edit.email"                , cb_edit_email                 } ,
+  { "edit.filter"               , cb_edit_filter                } ,
+  { "edit.status"               , cb_edit_status                } ,
+  { "edit.title"                , cb_edit_title                 } ,
+  { "entry"                     , cb_entry                      } ,
+  { "entry.adtag"               , cb_entry_adtag                } ,
+  { "entry.author"              , cb_entry_author               } ,
+  { "entry.body"                , cb_entry_body                 } ,
+  { "entry.body.entified"       , cb_entry_body_entified        } ,
+  { "entry.class"               , cb_entry_class                } ,
+  { "entry.cond.author"         , cb_entry_cond_author          } ,
+  { "entry.cond.date"           , cb_entry_cond_date            } ,
+  { "entry.date"                , cb_entry_date                 } ,
+  { "entry.id"                  , cb_entry_id                   } ,
+  { "entry.name"                , cb_entry_name                 } ,
+  { "entry.pubdate"             , cb_entry_pubdate              } ,
+  { "entry.status"              , cb_entry_status               } ,
+  { "entry.title"               , cb_entry_title                } ,
+  { "entry.url"                 , cb_entry_url                  } ,
+  { "generator"                 , cb_generator                  } ,
+  { "navigation.bar"            , cb_navigation_bar             } ,
+  { "navigation.bar.next"       , cb_navigation_bar_next        } ,
+  { "navigation.bar.prev"       , cb_navigation_bar_prev        } ,
+  { "navigation.current"        , cb_navigation_current         } ,
+  { "navigation.current.url"    , cb_navigation_current_url     } ,
+  { "navigation.first.title"    , cb_navigation_first_title     } ,
+  { "navigation.first.url"      , cb_navigation_first_url       } ,
+  { "navigation.last.title"     , cb_navigation_last_title      } ,
+  { "navigation.last.url"       , cb_navigation_last_url        } ,
+  { "navigation.link"           , cb_navigation_link            } ,
+  { "navigation.link.next"      , cb_navigation_link_next       } ,
+  { "navigation.link.prev"      , cb_navigation_link_prev       } ,
+  { "navigation.next.title"     , cb_navigation_next_title      } ,
+  { "navigation.next.url"       , cb_navigation_next_url        } ,
+  { "navigation.prev.title"     , cb_navigation_prev_title      } ,
+  { "navigation.prev.url"       , cb_navigation_prev_url        } ,
+  { "now.year"                  , cb_now_year                   } ,
+  { "overview"                  , cb_overview                   } ,
+  { "overview.date"             , cb_overview_date              } ,
+  { "overview.list"             , cb_overview_list              } ,
+  { "robots.index"              , cb_robots_index               } ,
+  { "rss.item"                  , cb_rss_item                   } ,
+  { "rss.item.url"              , cb_rss_item_url               } ,
+  { "rss.pubdate"               , cb_rss_pubdate                } ,
+  { "rss.url"                   , cb_rss_url                    } ,
   { "update.time"               , cb_update_time                } ,
   { "update.type"               , cb_update_type                } ,
-  { "xyzzy"			, cb_xyzzy			} 
+  { "xyzzy"                     , cb_xyzzy                      }
 };
 
 static const size_t m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
@@ -253,12 +253,12 @@ static void cb_ad(FILE *const out,void *data)
   assert(cbd->entry->valid);
   
   sprintf(
-  	fname,
-  	"%04d/%02d/%02d/%d.ad",
-  	cbd->entry->when.year,
-  	cbd->entry->when.month,
-  	cbd->entry->when.day,
-  	cbd->entry->when.part
+        fname,
+        "%04d/%02d/%02d/%d.ad",
+        cbd->entry->when.year,
+        cbd->entry->when.month,
+        cbd->entry->when.day,
+        cbd->entry->when.part
   );
   
   cbd->ad = fopen(fname,"r");
@@ -279,13 +279,13 @@ static void cb_ad_content(FILE *const out,void *data)
   
   /*------------------------------------------
   ; we might also do a generic_cb() here, but
-  ; I would need one that takes a FILE * 
-  ; object ... just an idea ... 
+  ; I would need one that takes a FILE *
+  ; object ... just an idea ...
   ;-------------------------------------------*/
   
   fcopy(out,cbd->ad);
 }
- 
+
 /*********************************************************************/
 
 static void cb_blog_script(FILE *const out,void *data __attribute__((unused)))
@@ -365,7 +365,7 @@ static void cb_blog_adtag(FILE *const out,void *data)
   }
   
   fputs(tag,out);
-  free(tag);  
+  free(tag);
 }
 
 /*********************************************************************/
@@ -470,7 +470,7 @@ static void cb_entry_date(FILE *const out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_url(out,&cbd->entry->when,UNIT_DAY);  
+  print_nav_url(out,&cbd->entry->when,UNIT_DAY);
 }
 
 /*********************************************************************/
@@ -492,16 +492,16 @@ static void cb_entry_pubdate(FILE *const out,void *data)
   ptm   = localtime(&ts);
   
   sprintf(
-  	buffer,
-  	"%04d-%02d-%02dT%02d:%02d:%02d%+03d:%02d",
-  	ptm->tm_year + 1900,
-  	ptm->tm_mon + 1,
-  	ptm->tm_mday,
-  	ptm->tm_hour,
-  	ptm->tm_min,
-  	ptm->tm_sec,
-  	c_tzhour,
-  	c_tzmin
+        buffer,
+        "%04d-%02d-%02dT%02d:%02d:%02d%+03d:%02d",
+        ptm->tm_year + 1900,
+        ptm->tm_mon + 1,
+        ptm->tm_mday,
+        ptm->tm_hour,
+        ptm->tm_min,
+        ptm->tm_sec,
+        c_tzhour,
+        c_tzmin
   );
   
   fputs(buffer,out);
@@ -512,7 +512,7 @@ static void cb_entry_pubdate(FILE *const out,void *data)
 static void cb_entry_title(FILE *const out,void *data)
 {
   struct callback_data *cbd = data;
-    
+  
   assert(out  != NULL);
   assert(data != NULL);
   
@@ -529,7 +529,7 @@ static void cb_entry_class(FILE *const out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  fputs(cbd->entry->class,out);  
+  fputs(cbd->entry->class,out);
 }
 
 /***********************************************************************/
@@ -586,10 +586,10 @@ static void handle_aflinks(HtmlToken token,const char *attrib)
         struct pair *np;
         
         snprintf(
-        	buffer,
-        	sizeof(buffer),
-        	c_aflinks[i].format,
-        	&src->value[c_aflinks[i].psize + 1]
+                buffer,
+                sizeof(buffer),
+                c_aflinks[i].format,
+                &src->value[c_aflinks[i].psize + 1]
         );
         np = PairCreate(attrib,buffer);
         NodeInsert(&src->node,&np->node);
@@ -627,7 +627,7 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
        && (strncmp(src->value,"javascript:",11) != 0)
        && (strncmp(src->value,"nntp:",5)        != 0)
        && (strncmp(src->value,"news:",5)        != 0)
-       && (strncmp(src->value,"file:",5)	!= 0)
+       && (strncmp(src->value,"file:",5)        != 0)
      )
   {
     char        buffer[BUFSIZ];
@@ -661,13 +661,13 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
     else
     
     sprintf(
-      	buffer,
-	"%s/%04d/%02d/%02d/%s",
-	baseurl,
-	entry->when.year,
-	entry->when.month,
-	entry->when.day,
-	src->value
+        buffer,
+        "%s/%04d/%02d/%02d/%s",
+        baseurl,
+        entry->when.year,
+        entry->when.month,
+        entry->when.day,
+        src->value
     );
     
     np = PairCreate(attrib,buffer);
@@ -800,7 +800,7 @@ static void cb_cond_hr(FILE *const out,void *data)
   
   if (gd.f.navigation && (gd.navunit == UNIT_PART))
     return;
-
+    
   assert(data != NULL);
   
   entry = cbd->entry;
@@ -1242,7 +1242,7 @@ static void print_nav_name(FILE *const out,const struct btm *const date,int unit
 }
 
 /********************************************************************/
- 
+
 static void cb_begin_year(FILE *const out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
@@ -1255,7 +1255,7 @@ static void cb_begin_year(FILE *const out,void *data __attribute__((unused)))
 static void cb_now_year(FILE *const out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
- 
+  
   fprintf(out,"%04d",g_blog->now.year);
 }
 
@@ -1300,7 +1300,7 @@ static void cb_comments(FILE *const out,void *data)
   
   if (gd.navunit != UNIT_PART)
     return;
-  
+    
   generic_cb("comments",out,data);
 }
 
@@ -1316,12 +1316,12 @@ static void cb_comments_body(FILE *const out,void *data)
   assert(data != NULL);
   
   sprintf(
-  	fname,
-  	"%04d/%02d/%02d/%d.comments",
-  	cbd->entry->when.year,
-  	cbd->entry->when.month,
-  	cbd->entry->when.day,
-  	cbd->entry->when.part
+        fname,
+        "%04d/%02d/%02d/%d.comments",
+        cbd->entry->when.year,
+        cbd->entry->when.month,
+        cbd->entry->when.day,
+        cbd->entry->when.part
   );
   
   in = fopen(fname,"r");
@@ -1340,12 +1340,12 @@ static void cb_comments_filename(FILE *const out,void *data)
   assert(data != NULL);
   
   fprintf(
-  	out,
-  	"%04d/%02d/%02d/%d.comments",
-  	cbd->entry->when.year,
-  	cbd->entry->when.month,
-  	cbd->entry->when.day,
-  	cbd->entry->when.part
+        out,
+        "%04d/%02d/%02d/%d.comments",
+        cbd->entry->when.year,
+        cbd->entry->when.month,
+        cbd->entry->when.day,
+        cbd->entry->when.part
   );
 }
 
@@ -1360,17 +1360,17 @@ static void cb_comments_check(FILE *const out,void *data)
   assert(data != NULL);
   
   sprintf(
-  	fname,
-  	"%04d/%02d/%02d/%d.comments",
-  	cbd->entry->when.year,
-  	cbd->entry->when.month,
-  	cbd->entry->when.day,
-  	cbd->entry->when.part
+        fname,
+        "%04d/%02d/%02d/%d.comments",
+        cbd->entry->when.year,
+        cbd->entry->when.month,
+        cbd->entry->when.day,
+        cbd->entry->when.part
   );
-    
+  
   if (access(fname,R_OK) < 0)
     fputs("No ",out);
-  
+    
   fputs("Comments",out);
 }
 
@@ -1565,7 +1565,7 @@ static void cb_entry_cond_date(FILE *const out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  entry = cbd->entry;  
+  entry = cbd->entry;
   assert(entry->valid);
   
   if (btm_cmp_date(&entry->when,&cbd->last) != 0)
@@ -1619,7 +1619,7 @@ static void cb_generator(FILE *const out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-#ifdef EMAIL_NOTIFY  
+#ifdef EMAIL_NOTIFY
   fprintf(
     out,
     "mod_blog %s, %s, %s, %s"

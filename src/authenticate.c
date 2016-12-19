@@ -52,10 +52,10 @@ char *get_remote_user(void)
   
   /*-------------------------------------------------------
   ; A change in Apache 2.0.48:
-  ;	Remember an authenticated user during internal redirects if the
-  ;	redirection target is not access protected and pass it
-  ;	to scripts using the REDIRECT_REMOTE_USER environment variable.
-  ;	PR 10678, 11602
+  ;     Remember an authenticated user during internal redirects if the
+  ;     redirection target is not access protected and pass it
+  ;     to scripts using the REDIRECT_REMOTE_USER environment variable.
+  ;     PR 10678, 11602
   ;
   ; Because of the way I'm doing this, this is affecting me, so I need
   ; to check both REMOTE_USER and REDIRECT_REMOTE_USER.
@@ -98,7 +98,7 @@ char *get_remote_user(void)
     
     if (line[rc - 1] == '\n')
       line[rc - 1] = '\0';
-    
+      
     p   = line;
     cnt = 0;
     
@@ -116,7 +116,7 @@ char *get_remote_user(void)
     
     return cnt;
   }
-
+  
 #endif
 
 /************************************************************************/
@@ -132,7 +132,7 @@ char *get_remote_user(void)
   }
   
   /************************************************************************/
-
+  
 #elif defined(USE_GDBM)
 
   bool authenticate_author(Request req)
@@ -146,20 +146,20 @@ char *get_remote_user(void)
     
     if (c_authorfile == NULL)
       return strcmp(req->author,c_author) == 0;
-    
+      
     list = gdbm_open(c_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
     if (list == NULL)
       return false;
-    
+      
     key.dptr  = req->author;
     key.dsize = strlen(req->author) + 1;
     rc        = gdbm_exists(list,key);
     gdbm_close(list);
     return rc;
   }
-
+  
   /***********************************************************************/
-
+  
 #elif defined (USE_DB)
 
   bool authenticate_author(Request req)
@@ -182,11 +182,11 @@ char *get_remote_user(void)
     
     if (c_authorfile == NULL)
       return  strcmp(req->author,c_author) == 0;
-    
+      
     list = dbopen(c_authorfile,O_RDONLY,0644,DB_HASH,NULL);
     if (list == NULL)
       return false;
-    
+      
     key.data = req->author;
     key.size = strlen(req->author);
     rc       = (list->get)(list,&key,&data,0);
@@ -199,9 +199,9 @@ char *get_remote_user(void)
     
     return true;
   }
-
+  
   /**********************************************************************/
-
+  
 #elif defined (USE_HTPASSWD)
 
   bool authenticate_author(Request req)
@@ -215,7 +215,7 @@ char *get_remote_user(void)
     
     if (c_authorfile == NULL)
       return strcmp(req->author,c_author) == 0;
-    
+      
     in = fopen(c_authorfile,"r");
     if (in == NULL)
     {
@@ -252,7 +252,7 @@ char *get_remote_user(void)
     fclose(in);
     return false;
   }
-
+  
 #endif
 
 /**************************************************************************/

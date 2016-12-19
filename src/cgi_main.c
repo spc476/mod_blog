@@ -39,21 +39,21 @@
 
 /**************************************************************************/
 
-static int	cgi_init		(Cgi,Request);
+static int      cgi_init                (Cgi,Request);
 
-static void	set_m_cgi_get_command	(char *const,Request);
-static int	cmd_cgi_get_new		(Request);
-static int	cmd_cgi_get_show	(Request);
-static int	cmd_cgi_get_edit	(Request);
-static int	cmd_cgi_get_overview	(Request);
+static void     set_m_cgi_get_command   (char *const,Request);
+static int      cmd_cgi_get_new         (Request);
+static int      cmd_cgi_get_show        (Request);
+static int      cmd_cgi_get_edit        (Request);
+static int      cmd_cgi_get_overview    (Request);
 
-static void	set_m_cgi_post_command	(char *const,Request);
-static void	set_m_author		(char *const,Request);
-static int	cmd_cgi_post_new	(Request);
-static int	cmd_cgi_post_show	(Request);
-static int	cmd_cgi_post_edit	(Request);
+static void     set_m_cgi_post_command  (char *const,Request);
+static void     set_m_author            (char *const,Request);
+static int      cmd_cgi_post_new        (Request);
+static int      cmd_cgi_post_show       (Request);
+static int      cmd_cgi_post_edit       (Request);
 
-static int	cgi_error		(Request,int,const char *, ... );
+static int      cgi_error               (Request,int,const char *, ... );
 
 /*************************************************************************/
 
@@ -66,7 +66,7 @@ int main_cgi_head(Cgi cgi)
   rc = cgi_init(cgi,&gd.req);
   if (rc != 0)
     return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
-  
+    
   return (*gd.req.error)(&gd.req,HTTP_METHODNOTALLOWED,"HEAD method not supported");
 }
 
@@ -77,11 +77,11 @@ int main_cgi_get(Cgi cgi)
   int rc;
   
   assert(cgi != NULL);
-
+  
   rc = cgi_init(cgi,&gd.req);
   if (rc != 0)
     return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
-
+    
   gd.req.command    = cmd_cgi_get_show;
   gd.req.reqtumbler = getenv("PATH_INFO");
   
@@ -119,7 +119,7 @@ static void set_m_cgi_get_command(char *value,Request req)
 static int cmd_cgi_get_new(Request req)
 {
   struct callback_data cbd;
-
+  
   assert(req != NULL);
   
   memset(&cbd,0,sizeof(struct callback_data));
@@ -143,22 +143,22 @@ static int cmd_cgi_get_show(Request req)
   status = CgiListGetValue(gd.cgi,"status");
   if (emptynull_string(status))
     status = strdup("200");
-  
+    
   if ((emptynull_string(req->reqtumbler)) || (strcmp(req->reqtumbler,"/") == 0))
   {
     fprintf(
-    	req->out,
-	"Status: %d\r\n"
-	"Location: %s\r\n"
-	"Content-type: text/html\r\n"
-	"\r\n"
-	"<HTML>\n"
-	"  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
-	"  <BODY><A HREF='%s'>Go here<A></BODY>\n"
-	"</HTML>\n",
-	HTTP_MOVEPERM,
-	c_fullbaseurl,
-	c_fullbaseurl
+        req->out,
+        "Status: %d\r\n"
+        "Location: %s\r\n"
+        "Content-type: text/html\r\n"
+        "\r\n"
+        "<HTML>\n"
+        "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
+        "  <BODY><A HREF='%s'>Go here<A></BODY>\n"
+        "</HTML>\n",
+        HTTP_MOVEPERM,
+        c_fullbaseurl,
+        c_fullbaseurl
       );
     rc = 0;
   }
@@ -167,35 +167,35 @@ static int cmd_cgi_get_show(Request req)
     req->reqtumbler++;
     if (tumbler_new(&req->tumbler,req->reqtumbler))
     {
-
+    
       if (req->tumbler.redirect)
       {
         char *tum = tumbler_canonical(&req->tumbler);
         fprintf(
-        	req->out,
-        	"Status: %d\r\n"
-        	"Location: %s/%s\r\n"
-        	"Content-Type: text/html\r\n\r\n"
-        	"<html>"
-        	"<head><title>Redirect</title></head>"
-        	"<body><p>Redirect to <a href='%s/%s'>%s/%s</a></p></body>"
-        	"</html>\n",
-        	HTTP_MOVEPERM,
-        	c_fullbaseurl, tum,
-        	c_fullbaseurl, tum,
-        	c_fullbaseurl, tum
+                req->out,
+                "Status: %d\r\n"
+                "Location: %s/%s\r\n"
+                "Content-Type: text/html\r\n\r\n"
+                "<html>"
+                "<head><title>Redirect</title></head>"
+                "<body><p>Redirect to <a href='%s/%s'>%s/%s</a></p></body>"
+                "</html>\n",
+                HTTP_MOVEPERM,
+                c_fullbaseurl, tum,
+                c_fullbaseurl, tum,
+                c_fullbaseurl, tum
         );
         free(tum);
-	free(status);
-	return 0;
+        free(status);
+        return 0;
       }
-
+      
       if (req->tumbler.file == false)
         fprintf(
-        	req->out,
-        	"Status: %s\r\n"
-        	"Content-type: text/html\r\n\r\n",
-        	status
+                req->out,
+                "Status: %s\r\n"
+                "Content-type: text/html\r\n\r\n",
+                status
         );
       rc = tumbler_page(req->out,&req->tumbler);
     }
@@ -240,7 +240,7 @@ static int cmd_cgi_get_overview(Request req)
   gd.f.overview = true;
   fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
   generic_cb("main",req->out,&days);
-  return 0;  
+  return 0;
 }
 
 /**********************************************************************/
@@ -254,15 +254,15 @@ int main_cgi_post(Cgi cgi)
   rc = cgi_init(cgi,&gd.req);
   if (rc != 0)
     return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
-  
-  gd.req.command = cmd_cgi_post_new;  
+    
+  gd.req.command = cmd_cgi_post_new;
   
   CgiListMake(cgi);
   
-  set_c_updatetype 	(CgiListGetValue(cgi,"updatetype"));
-  set_cf_emailupdate	(CgiListGetValue(cgi,"email"));
-  set_c_conversion 	(CgiListGetValue(cgi,"filter"));
-  set_m_author     	(CgiListGetValue(cgi,"author"),&gd.req);
+  set_c_updatetype      (CgiListGetValue(cgi,"updatetype"));
+  set_cf_emailupdate    (CgiListGetValue(cgi,"email"));
+  set_c_conversion      (CgiListGetValue(cgi,"filter"));
+  set_m_author          (CgiListGetValue(cgi,"author"),&gd.req);
   set_m_cgi_post_command(CgiListGetValue(cgi,"cmd"),&gd.req);
   
   gd.req.title    = strdup(CgiListGetValue(cgi,"title"));
@@ -271,7 +271,7 @@ int main_cgi_post(Cgi cgi)
   gd.req.date     = strdup(CgiListGetValue(cgi,"date"));
   gd.req.origbody = strdup(CgiListGetValue(cgi,"body"));
   gd.req.body     = strdup(gd.req.origbody);
-
+  
   if (
        (emptynull_string(gd.req.author))
        || (emptynull_string(gd.req.title))
@@ -280,18 +280,18 @@ int main_cgi_post(Cgi cgi)
   {
     return (*gd.req.error)(&gd.req,HTTP_BADREQ,"errors-missing");
   }
-
+  
   if (gd.req.class == NULL)
     gd.req.class = strdup("");
-  
+    
   if (authenticate_author(&gd.req) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",gd.req.author);
     return (*gd.req.error)(&gd.req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",gd.req.author,CgiListGetValue(cgi,"author"));
   }
-
+  
   rc = (*gd.req.command)(&gd.req);
-  return rc;  
+  return rc;
 }
 
 /************************************************************************/
@@ -299,8 +299,8 @@ int main_cgi_post(Cgi cgi)
 static void set_m_cgi_post_command(char *value,Request req)
 {
   assert(req != NULL);
-
-  if (emptynull_string(value)) return;  
+  
+  if (emptynull_string(value)) return;
   up_string(value);
   
   if (strcmp(value,"NEW") == 0)
@@ -339,24 +339,24 @@ static int cmd_cgi_post_new(Request req)
     if (cf_emailupdate) notify_emaillist(req);
     generate_pages();
     fprintf(
-    	req->out,
-	"Status: %d\r\n"
-	"Location: %s\r\n"
-	"Content-type: text/html\r\n"
-	"\r\n"
-	"<HTML>\n"
-	"  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
-	"  <BODY><A HREF='%s'>Go here</A></BODY>\n"
-	"</HTML>\n",
-	HTTP_MOVETEMP,
-	c_fullbaseurl,
-	c_fullbaseurl
-	
+        req->out,
+        "Status: %d\r\n"
+        "Location: %s\r\n"
+        "Content-type: text/html\r\n"
+        "\r\n"
+        "<HTML>\n"
+        "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
+        "  <BODY><A HREF='%s'>Go here</A></BODY>\n"
+        "</HTML>\n",
+        HTTP_MOVETEMP,
+        c_fullbaseurl,
+        c_fullbaseurl
+        
     );
   }
   else
     rc = (*req->error)(req,HTTP_ISERVERERR,"couldn't add entry");
-  
+    
   return rc;
 }
 
@@ -375,7 +375,7 @@ static int cmd_cgi_post_show(Request req)
   ; tumbler_page().  Perhaps some refactoring is in order
   ; at some point.
   ;-------------------------------------------------------*/
-
+  
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
   cbd.adtag = (char *)c_adtag;
@@ -391,7 +391,7 @@ static int cmd_cgi_post_show(Request req)
     entry->when.day   = strtoul(p,        &p,10);
   }
   
-  entry->when.part = 1;	/* doesn't matter what this is */
+  entry->when.part = 1; /* doesn't matter what this is */
   entry->timestamp = g_blog->tnow;
   entry->title     = req->title;
   entry->class     = req->class;
@@ -403,8 +403,8 @@ static int cmd_cgi_post_show(Request req)
   gd.f.edit = 1;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
   generic_cb("main",req->out,&cbd);
-
-  return 0;  
+  
+  return 0;
 }
 
 /**********************************************************************/
@@ -432,16 +432,16 @@ static int cgi_error(Request req,int level,const char *msg, ... )
   va_start(args,msg);
   vasprintf(&errmsg,msg,args);
   va_end(args);
-
+  
   asprintf(&file,"%s/errors/%d.html",getenv("DOCUMENT_ROOT"),level);
-
+  
   in = fopen(file,"r");
   if (in == NULL)
   {
     fprintf(
-    	req->out,
-	"Status: %d\r\n"
-	"X-Error: %s\r\n"
+        req->out,
+        "Status: %d\r\n"
+        "X-Error: %s\r\n"
         "Content-type: text/html\r\n"
         "\r\n"
         "<html>\n"
@@ -450,33 +450,33 @@ static int cgi_error(Request req,int level,const char *msg, ... )
         "</head>\n"
         "<body>\n"
         "<h1>Error %d</h1>\n"
-	"<p>%s</p>\n"
+        "<p>%s</p>\n"
         "</body>\n"
         "</html>\n"
         "\n",
         level,
-	errmsg,
-	level,
-	level,
-	errmsg
+        errmsg,
+        level,
+        level,
+        errmsg
     );
   }
   else
   {
     gd.htmldump = in;
     fprintf(
-    	req->out,    	
-    	"Status: %d\r\n"
-    	"X-Error: %s\r\n"
-    	"Content-type: text/html\r\n"
-    	"\r\n",
-    	level,
-    	errmsg
+        req->out,
+        "Status: %d\r\n"
+        "X-Error: %s\r\n"
+        "Content-type: text/html\r\n"
+        "\r\n",
+        level,
+        errmsg
       );
     generic_cb("main",req->out,NULL);
     fclose(in);
   }
-
+  
   free(file);
   free(errmsg);
   

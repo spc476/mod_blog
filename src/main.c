@@ -38,7 +38,7 @@ int main(int argc,char *argv[],char *envp[])
   ; infomration when it does happen.  Here are the possible signals I want
   ; more information from when it happens.
   ;-----------------------------------------------------------------------*/
-
+  
   crashreport_with(argc,argv,envp);
   
   /*---------------------
@@ -52,7 +52,7 @@ int main(int argc,char *argv[],char *envp[])
   crashreport(SIGSEGV);
   
   /*---------------------------
-  ; others we're interested in 
+  ; others we're interested in
   ;----------------------------*/
   
 #ifdef SIGBUG
@@ -70,7 +70,7 @@ int main(int argc,char *argv[],char *envp[])
 #ifdef SIGTKFLT
   crashreport(SIGTKFLT);
 #endif
-  
+
   /*-----------------------------------------------------------------------
   ; WTF?  This isn't a WTF.  This is a debugging techique.  While gf_debug
   ; is normally set to false by default, changing it to true in the source
@@ -88,7 +88,7 @@ int main(int argc,char *argv[],char *envp[])
   
   while(gf_debug)
     ;
-  
+    
   gd.cgi = CgiNew(NULL);
   
   if (gd.cgi != NULL)
@@ -103,7 +103,7 @@ int main(int argc,char *argv[],char *envp[])
   }
   else
     rc = main_cli(argc,argv);
-  
+    
   return rc;
 }
 

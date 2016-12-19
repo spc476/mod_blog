@@ -127,8 +127,8 @@ void btm_dec_month(struct btm *const d)
 /***********************************************************************/
 
 int btm_cmp(
-	const struct btm *const restrict d1,
-	const struct btm *const restrict d2
+        const struct btm *const restrict d1,
+        const struct btm *const restrict d2
 )
 {
   int rc;
@@ -147,8 +147,8 @@ int btm_cmp(
 /***********************************************************************/
 
 int btm_cmp_date(
-	const struct btm *const restrict d1,
-	const struct btm *const restrict d2
+        const struct btm *const restrict d1,
+        const struct btm *const restrict d2
 )
 {
   int rc;
