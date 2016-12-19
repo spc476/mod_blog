@@ -320,7 +320,7 @@ static void set_m_author(char *value,Request req)
   if (emptynull_string(value))
     req->author = get_remote_user();
   else
-    req->author = strdup(value);
+    req->author = value;
     
   req->origauthor = strdup(req->author);
 }
