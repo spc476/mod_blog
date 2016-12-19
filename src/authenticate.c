@@ -74,6 +74,53 @@ char *get_remote_user(void)
 
 /************************************************************************/
 
+#if defined(USE_DB) || defined(USE_HTPASSWD)
+
+  static size_t breakline(char **dest,size_t dsize,FILE *const in)
+  {
+    char   *line = NULL;
+    char   *p;
+    char   *colon;
+    size_t  cnt;
+    size_t  size = 0;
+    ssize_t rc;
+    
+    assert(dest  != NULL);
+    assert(dsize >  0);
+    assert(in    != NULL);
+    
+    rc = getline(&line,&size,in);
+    if ((rc == -1) || (emptynull_string(line)))
+    {
+      free(line);
+      return 0;
+    }
+    
+    if (line[rc - 1] == '\n')
+      line[rc - 1] = '\0';
+    
+    p   = line;
+    cnt = 0;
+    
+    do
+    {
+      dest[cnt] = p;
+      colon = strchr(p,':');
+      if (colon != NULL)
+      {
+        *colon = '\0';
+        p      = colon + 1;
+      }
+      cnt++;
+    } while ((colon != NULL) && (cnt < dsize));
+    
+    return cnt;
+  }
+
+#endif
+
+/************************************************************************/
+
 #if defined(USE_NONE)
 
   bool authenticate_author(Request req)
@@ -117,10 +164,12 @@ char *get_remote_user(void)
 
   bool authenticate_author(Request req)
   {
-    DB  *list;
-    DBT  key;
-    DBT  data;
-    int  rc;
+    char   *lines[10];
+    size_t  cnt;
+    DB     *list;
+    DBT     key;
+    DBT     data;
+    int     rc;
     
     assert(req         != NULL);
     assert(req->author != NULL);
@@ -144,57 +193,9 @@ char *get_remote_user(void)
     (list->close)(list);
     if (rc) return false;
     
-    {
-      char   *tmp;
-      char   *p;
-      char   *q;
-      size_t  i;
-      
-      tmp            = malloc(data.size + 1);
-      tmp[data.size] = '\0';
-      memcpy(tmp,data.data,data.size);
-      
-      /*----------------------------------------------------------
-      ; For now, we assume that if using Berkeley DB, we are doing
-      ; so because we want to use the DB file used by Apache, and
-      ; that's set up as key => passwd ':' group ':' other
-      ; so we look for two colons, and take what is past there as
-      ; the real name.  
-      ;-----------------------------------------------------------*/
-      
-      for (i = 0 , p = tmp ; i < 2 ; i++)
-      {
-        p = strchr(p,':');
-        if (p == NULL)
-        {
-          free(tmp);
-          return true;
-        }
-        p++;
-      }
-      
-      /*----------------------------------------------------------
-      ; there may be more fields, so check for the end of this field,
-      ; and if so marked, replace it with an end of string marker.
-      ;-----------------------------------------------------------*/
-      
-      q = strchr(p,':');
-      if (q) *q = '\0';
-      
-      /*------------------------------------------------------
-      ; There is a potential memory leak here, as m_author may
-      ; have been allocated earlier.  But since it's constantly
-      ; defined to begin with, and there is no real portable way
-      ; to determine if the pointer has been allocated at run time
-      ; we can't really test it, so we loose some memory here.
-      ;
-      ; This is expected, but since this program doesn't run
-      ; infinitely, this is somewhat okay.
-      ;------------------------------------------------------*/
-      
-      m_author = strdup(p);
-      free(tmp);
-    }
+    cnt        = breakline(lines,10,data.data);
+    req->athor = strdup(lines[c_af_name]);
+    free(lines[0]);
     
     return true;
   }
@@ -203,49 +204,6 @@ char *get_remote_user(void)
 
 #elif defined (USE_HTPASSWD)
 
-  static size_t breakline(char **dest,size_t dsize,FILE *const in)
-  {
-    char   *line = NULL;
-    char   *p;
-    char   *colon;
-    size_t  cnt;
-    size_t  size = 0;
-    ssize_t rc;
-    
-    assert(dest  != NULL);
-    assert(dsize >  0);
-    assert(in    != NULL);
-    
-    rc = getline(&line,&size,in);
-    if ((rc == -1) || (emptynull_string(line)))
-    {
-      free(line);
-      return 0;
-    }
-    
-    if (line[rc - 1] == '\n')
-      line[rc - 1] = '\0';
-    
-    p   = line;
-    cnt = 0;
-    
-    do
-    {
-      dest[cnt] = p;
-      colon = strchr(p,':');
-      if (colon != NULL)
-      {
-        *colon = '\0';
-        p      = colon + 1;
-      }
-      cnt++;
-    } while ((colon != NULL) && (cnt < dsize));
-    
-    return cnt;
-  }
-  
-  /*------------------------------------------------------*/
-  
   bool authenticate_author(Request req)
   {
     FILE   *in;
