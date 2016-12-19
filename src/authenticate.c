@@ -150,8 +150,8 @@ char *get_remote_user(void)
       char   *q;
       size_t  i;
       
-      tmp = malloc(data.size + 1);
-      memset(tmp,0,data.size + 1);
+      tmp            = malloc(data.size + 1);
+      tmp[data.size] = '\0';
       memcpy(tmp,data.data,data.size);
       
       /*----------------------------------------------------------
