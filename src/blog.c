@@ -781,7 +781,7 @@ static char *blog_meta_entry(const char *name,const struct btm *date)
       free(text);
       return strdup("");
     }
-  };
+  }
   
   fclose(fp);
   
