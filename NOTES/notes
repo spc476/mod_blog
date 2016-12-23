@@ -1,3 +1,27 @@
+NOTE:  	A lot of this is outdated information, but kept here for hysterical
+	rasins.
+
+---
+
+2007-08-29T16:44-05:00
+
+        About adding backlinks in old entries to new entries, one thing to
+        keep in mind is to put said links at the top, according to
+
+http://www.wordyard.com/2007/08/28/can-newspapers-fix-old-errors/#comment-978
+
+2016-12-23T03:28-05:00
+
+	After spending a few hours on this, I realized that it would be
+	harder than expected to support.  I would either have to seriously
+	restructure the code to support this feature, or parse the entry
+	twice, which is doable, but doesn't sit well with me.
+
+	So, I'm putting this here in the notes, where it will languish for
+	years, instead of in the TODO, where it did languish for years.
+
+---
+
 http://www.eglug.org/book/export/html/1923
 
 http://10up.github.io/Engineering-Best-Practices/css/#syntax-formatting
