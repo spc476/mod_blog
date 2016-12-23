@@ -21,7 +21,7 @@
 #
 ########################################################################
 
-.PHONY:	all clean tarball depend
+.PHONY:	all clean tarball depend install uninstall reinstall
 
 VERSION := $(shell git describe --tag)
 
@@ -31,8 +31,15 @@ LDFLAGS = -g
 LDLIBS  = -lgdbm -lcgi6 -llua -lm -ldl
 SETUID  = /bin/chmod
 
+INSTALL         = /usr/bin/install
+INSTALL_PROGRAM = $(INSTALL)
+INSTALL_NAME    = boston
+
 override CFLAGS  += -DPROG_VERSION='"$(VERSION)"' 
 override LDFLAGS += -rdynamic
+
+prefix = /usr/local
+bindir = $(prefix)/bin
 
 ###################################
 # some notes
@@ -49,10 +56,21 @@ all: build build/src build/boston
 
 build/boston : $(addprefix build/,$(patsubst %.c,%.o,$(wildcard src/*.c)))
 	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-	$(SETUID) 4755 build/boston
 
 build/%.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+install:
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) build/boston $(DESTDIR)$(bindir)/$(INSTALL_NAME)
+	$(SETUID) 4755 $(DESTDIR)$(bindir)/$(INSTALL_NAME)
+
+uninstall:
+	$(RM) $(DESTDIR)$(bindir)/$(INSTALL_NAME)
+
+reinstall:
+	make uninstall
+	make install
 
 #######################################################################
 #
