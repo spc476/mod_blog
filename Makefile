@@ -105,17 +105,17 @@ build/src/blogutil.o: src/blogutil.h
 build/src/callbacks.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
 build/src/callbacks.o: src/wbtum.h src/fix.h src/blogutil.h src/globals.h
 build/src/callbacks.o: src/backend.h
-build/src/cgi_main.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
-build/src/cgi_main.o: src/fix.h src/globals.h src/backend.h
-build/src/cli_main.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
-build/src/cli_main.o: src/blog.h src/fix.h src/blogutil.h src/globals.h
-build/src/cli_main.o: src/backend.h
 build/src/conversion.o: src/conversion.h src/fix.h src/frontend.h src/wbtum.h
 build/src/conversion.o: src/timeutil.h src/blog.h src/blogutil.h
 build/src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
 build/src/globals.o: src/timeutil.h src/blog.h src/backend.h src/fix.h
 build/src/main.o: src/globals.h src/frontend.h src/wbtum.h src/timeutil.h
 build/src/main.o: src/blog.h src/backend.h
+build/src/main_cgi.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
+build/src/main_cgi.o: src/fix.h src/globals.h src/backend.h
+build/src/main_cli.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
+build/src/main_cli.o: src/blog.h src/fix.h src/blogutil.h src/globals.h
+build/src/main_cli.o: src/backend.h
 build/src/timeutil.o: src/timeutil.h src/wbtum.h
 build/src/wbtum.o: src/wbtum.h src/timeutil.h src/globals.h src/frontend.h
 build/src/wbtum.o: src/blog.h src/backend.h
