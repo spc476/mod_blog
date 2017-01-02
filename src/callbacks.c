@@ -49,8 +49,6 @@
 #  include <gdbm.h>
 #endif
 
-#define max(a,b)        ((a) > (b)) ? (a) : (b)
-
 /*****************************************************************/
 
 static void     cb_ad                           (FILE *const,void *);
