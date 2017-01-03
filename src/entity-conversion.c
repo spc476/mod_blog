@@ -2169,32 +2169,6 @@ static bool char_entity(char **tag,size_t *ps,int c)
 
 /**********************************************************************/
 
-char *entity_encode(const char *s)
-{
-  FILE   *out;
-  char   *text;
-  size_t  size;
-  char   *entity;
-  size_t  dummy;
-  
-  assert(s != NULL);
-  
-  out = open_memstream(&text,&size);
-  
-  for ( ; *s ; s++)
-  {
-    if (char_entity(&entity,&dummy,*s))
-      fputs(entity,out);
-    else
-      fputc(*s,out);
-  }
-  
-  fclose(out);
-  return text;
-}
-
-/********************************************************************/
-
 FILE *fentity_encode_onread(FILE *const in)
 {
   return fopencookie(in,"r",(cookie_io_functions_t)
