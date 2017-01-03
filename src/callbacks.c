@@ -24,7 +24,7 @@
 #  define __attribute__(x)
 #endif
 
-#define _GNU_SOURCE 1
+#define _GNU_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
