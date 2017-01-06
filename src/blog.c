@@ -269,7 +269,7 @@ BlogEntry BlogEntryNew(const Blog blog)
   pbe->class        = NULL;
   pbe->author       = NULL;
   pbe->status       = NULL;
-  pbe->adcat        = NULL;
+  pbe->adtag        = NULL;
   pbe->body         = NULL;
   
   return pbe;
@@ -309,7 +309,7 @@ BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
   entry->class        = blog_meta_entry("class",which);
   entry->author       = blog_meta_entry("authors",which);
   entry->status       = blog_meta_entry("status",which);
-  entry->adcat        = blog_meta_entry("adcat",which);
+  entry->adtag        = blog_meta_entry("adtag",which);
   
   date_to_part(pname,which,which->part);
   
@@ -484,7 +484,7 @@ int BlogEntryWrite(const BlogEntry entry)
   char   **class;
   char   **status;
   char   **titles;
-  char   **adcat;
+  char   **adtag;
   size_t   numa;
   size_t   numc;
   size_t   nums;
@@ -513,14 +513,14 @@ int BlogEntryWrite(const BlogEntry entry)
   numc   = blog_meta_read(&class,  "class",  &entry->when);
   nums   = blog_meta_read(&status, "status", &entry->when);
   numt   = blog_meta_read(&titles, "titles", &entry->when);
-  numad  = blog_meta_read(&adcat,  "adcat",  &entry->when);
+  numad  = blog_meta_read(&adtag,  "adtag",  &entry->when);
   maxnum = max(numa,max(numc,max(nums,numt)));
   
   blog_meta_adjust(&authors,numa, maxnum);
   blog_meta_adjust(&class,  numc, maxnum);
   blog_meta_adjust(&status, nums, maxnum);
   blog_meta_adjust(&titles, numt, maxnum);
-  blog_meta_adjust(&adcat,  numad,maxnum);
+  blog_meta_adjust(&adtag,  numad,maxnum);
   
   if (entry->when.part == 0)
   {
@@ -531,7 +531,7 @@ int BlogEntryWrite(const BlogEntry entry)
     class  [maxnum]  = strdup(entry->class);
     status [maxnum]  = strdup(entry->status);
     titles [maxnum]  = strdup(entry->title);
-    adcat  [maxnum]  = strdup(entry->adcat);
+    adtag  [maxnum]  = strdup(entry->adtag);
     entry->when.part = ++maxnum;
   }
   else
@@ -540,20 +540,20 @@ int BlogEntryWrite(const BlogEntry entry)
     free(class  [entry->when.part]);
     free(status [entry->when.part]);
     free(titles [entry->when.part]);
-    free(adcat  [entry->when.part]);
+    free(adtag  [entry->when.part]);
     
     authors[entry->when.part] = strdup(entry->author);
     class  [entry->when.part] = strdup(entry->class);
     status [entry->when.part] = strdup(entry->status);
     titles [entry->when.part] = strdup(entry->title);
-    adcat  [entry->when.part] = strdup(entry->adcat);
+    adtag  [entry->when.part] = strdup(entry->adtag);
   }
   
   blog_meta_write("authors",&entry->when,authors,maxnum);
   blog_meta_write("class"  ,&entry->when,class,  maxnum);
   blog_meta_write("status" ,&entry->when,status, maxnum);
   blog_meta_write("titles" ,&entry->when,titles, maxnum);
-  blog_meta_write("adcat"  ,&entry->when,adcat,  maxnum);
+  blog_meta_write("adtag"  ,&entry->when,adtag,  maxnum);
   
   /*-------------------------------
   ; update the actual entry body
@@ -574,14 +574,14 @@ int BlogEntryWrite(const BlogEntry entry)
     free(class[i]);
     free(status[i]);
     free(titles[i]);
-    free(adcat[i]);
+    free(adtag[i]);
   }
   
   free(authors);
   free(class);
   free(status);
   free(titles);
-  free(adcat);
+  free(adtag);
   
   /*------------------------------------------------------------------------
   ; Oh, and if this is the latest entry to be added, update the .last file
@@ -625,7 +625,7 @@ int BlogEntryFree(BlogEntry entry)
   }
   
   free(entry->body);
-  free(entry->adcat);
+  free(entry->adtag);
   free(entry->status);
   free(entry->author);
   free(entry->class);
