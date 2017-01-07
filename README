@@ -68,6 +68,7 @@ INSTALLATION
                 |title: [title of entry]
                 |class: [keywords]
                 |status: [status repeated on Facebook]
+		|adtag: [keyword used for advertising network]
                 |
                 |body of entry, usually including HTML
                 | ...

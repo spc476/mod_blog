@@ -9,6 +9,7 @@
       <tr><th><label for="title">Title</label></th>              <td><input id="title"    name="title"    type="text"     value="%{edit.title}%"></td></tr>
       <tr><th><label for="date">Date</label></th>                <td><input id="date"     name="date"     type="text"     value="%{edit.date}%"></td></tr>
       <tr><th><label for="class">Class</label></th>              <td><input id="class"    name="class"    type="text"     value="%{edit.class}%"></td></tr>
+      <tr><th><label for="adtag">Adtag</label></th>              <td><input id="adtag"    name="adtag"    type="text"     value="%{edit.adtag}%"></td></tr>
       <tr><th><label for="status">Status</label></th>            <td><input id="status"   name="status"   type="text"     value="%{edit.status}%"></td></tr>
       <tr><th><label for="email">Send Email</label></th>         <td><input id="email"    name="email"    type="checkbox" value="%{edit.email}%"></td></tr>
       <tr><th><label for="facebook">Update Facebook</label></th> <td><input id="facebook" name="facebook" type="checkbox" value="%{edit.facebook}%"></td></tr>
