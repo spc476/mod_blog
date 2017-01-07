@@ -61,6 +61,7 @@ static int         get_field    (lua_State *const,const char *);
 static const char *get_string   (lua_State *const,const char *const restrict,const char *const restrict);
 static int         get_int      (lua_State *const,const char *const,const int);
 static bool        get_bool     (lua_State *const,const char *const,const bool);
+static void	   seed_rng	(void);
 static void        globals_free (void);
 
 /************************************************************/
@@ -133,6 +134,7 @@ int GlobalsInit(const char *conf)
   int rc;
   
   atexit(globals_free);
+  seed_rng();
   
   if (conf == NULL)
   {
@@ -547,6 +549,23 @@ static bool get_bool(
     
   lua_pop(L,1);
   return val;
+}
+
+/**************************************************************************/
+
+static void seed_rng(void)
+{
+  FILE         *fp;
+  unsigned int  seed;
+  
+  fp = fopen("/dev/urandom","rb");
+  if (fp)
+  {
+    fread(&seed,sizeof(seed),1,fp);
+    fclose(fp);
+  }
+  
+  srand(seed);
 }
 
 /**************************************************************************/
