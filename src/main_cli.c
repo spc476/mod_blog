@@ -373,7 +373,10 @@ static int mailfile_readdata(Request req)
   email       = PairListGetValue(&headers,"EMAIL");
   filter      = PairListGetValue(&headers,"FILTER");
   
-  if (req->author != NULL) req->author = strdup(req->author);
+  if (req->author != NULL)
+    req->author = strdup(req->author);
+  else
+    req->author = strdup("");
   
   if (req->title  != NULL)
     req->title  = strdup(req->title);
