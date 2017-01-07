@@ -588,6 +588,7 @@ static void globals_free(void)
   free(gd.req.class);
   free(gd.req.status);
   free(gd.req.date);
+  free(gd.req.adtag);
   free(gd.req.origbody);
   free(gd.req.body);
   
