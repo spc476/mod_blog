@@ -75,6 +75,7 @@ static void     cb_date_day                     (FILE *const,void *);
 static void     cb_date_day_normal              (FILE *const,void *);
 static void     cb_date_day_url                 (FILE *const,void *);
 static void     cb_edit                         (FILE *const,void *);
+static void     cb_edit_adtag                   (FILE *const,void *);
 static void     cb_edit_author                  (FILE *const,void *);
 static void     cb_edit_body                    (FILE *const,void *);
 static void     cb_edit_class                   (FILE *const,void *);
@@ -167,6 +168,7 @@ static const struct chunk_callback  m_callbacks[] =
   { "date.day.normal"           , cb_date_day_normal            } ,
   { "date.day.url"              , cb_date_day_url               } ,
   { "edit"                      , cb_edit                       } ,
+  { "edit.adtag"                , cb_edit_adtag                 } ,
   { "edit.author"               , cb_edit_author                } ,
   { "edit.body"                 , cb_edit_body                  } ,
   { "edit.class"                , cb_edit_class                 } ,
@@ -1380,6 +1382,16 @@ static void cb_edit(FILE *const out,void *data)
   
   if (gd.f.edit == 0) return;
   generic_cb("edit",out,data);
+}
+
+/*********************************************************************/
+
+static void cb_edit_adtag(FILE *const out,void *data __attribute__((unused)))
+{
+  assert(out != NULL);
+  
+  if (gd.req.adtag != NULL)
+    fputs(gd.req.adtag,out);
 }
 
 /*********************************************************************/
