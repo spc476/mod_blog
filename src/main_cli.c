@@ -369,6 +369,7 @@ static int mailfile_readdata(Request req)
   req->class  = PairListGetValue(&headers,"CLASS");
   req->status = PairListGetValue(&headers,"STATUS");
   req->date   = PairListGetValue(&headers,"DATE");
+  req->adtag  = PairListGetValue(&headers,"ADTAG");
   email       = PairListGetValue(&headers,"EMAIL");
   filter      = PairListGetValue(&headers,"FILTER");
   
@@ -388,6 +389,11 @@ static int mailfile_readdata(Request req)
     req->status = strdup(req->status);
   else
     req->status = strdup("");
+    
+  if (req->adtag != NULL)
+    req->adtag = strdup(req->adtag);
+  else
+    req->adtag = strdup("");
     
   if (req->date != NULL) req->date = strdup(req->date);
   if (email     != NULL) set_cf_emailupdate(email);

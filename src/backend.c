@@ -845,10 +845,16 @@ static char *tag_collect(List *list)
   
   entry = (BlogEntry)ListGetHead(list);
   
-  if (!NodeValid(&entry->node) || empty_string(entry->class))
-    return strdup(c_adtag);
-  else
-    return strdup(entry->class);
+  if (NodeValid(&entry->node))
+  {
+    if (!empty_string(entry->adtag))
+      return strdup(entry->adtag);
+  
+    if (!empty_string(entry->class))
+      return strdup(entry->class);
+  }
+  
+  return strdup(c_adtag);
 }
 
 /********************************************************************/

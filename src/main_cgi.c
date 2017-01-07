@@ -269,6 +269,7 @@ int main_cgi_post(Cgi cgi)
   gd.req.class    = strdup(CgiListGetValue(cgi,"class"));
   gd.req.status   = strdup(CgiListGetValue(cgi,"status"));
   gd.req.date     = strdup(CgiListGetValue(cgi,"date"));
+  gd.req.adtag    = strdup(CgiListGetValue(cgi,"adtag"));
   gd.req.origbody = strdup(CgiListGetValue(cgi,"body"));
   gd.req.body     = strdup(gd.req.origbody);
   

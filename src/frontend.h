@@ -51,6 +51,7 @@ typedef struct request
   char       *class;
   char       *status;
   char       *date;
+  char       *adtag;
   char       *origbody;
   char       *body;
   char       *reqtumbler;

@@ -77,6 +77,7 @@ int entry_add(Request req)
   entry->class     = req->class;
   entry->status    = req->status;
   entry->author    = req->author;
+  entry->adtag     = req->adtag;
   entry->body      = req->body;
   
   if (c_authorfile) BlogLock(g_blog);
