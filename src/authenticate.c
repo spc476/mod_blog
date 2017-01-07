@@ -234,6 +234,7 @@ char *get_remote_user(void)
         
         if (c_af_name < cnt)
         {
+          free(req->author);
           req->author = strdup(lines[c_af_name]);
           fclose(in);
           free(lines[0]); // see comment below
