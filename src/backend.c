@@ -99,7 +99,7 @@ int pagegen_items(
   if (template->reverse)
     BlogEntryReadXD(g_blog,&cbd.list,&thisday,template->items);
   else
-    BlogEntryReadXU(g_blog,&cbd.list,template->items);
+    BlogEntryReadXU(g_blog,&cbd.list,&thisday,template->items);
     
   tags      = tag_collect(&cbd.list);
   cbd.adtag = tag_pick(tags);
