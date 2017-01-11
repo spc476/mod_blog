@@ -169,6 +169,10 @@ bool tumbler_new(tumbler__s *const tum,const char *text)
   assert(text != NULL);
   
   memset(tum,0,sizeof(tumbler__s));
+  memset(&u1,0,sizeof(u1));
+  memset(&u2,0,sizeof(u2));
+  memset(&u3,0,sizeof(u3));
+  memset(&u4,0,sizeof(u4));
   
   /*-------------------------------------------------
   ; parse year
