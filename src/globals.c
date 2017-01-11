@@ -406,6 +406,7 @@ void set_c_url(const char *const turl)
   
   if (url == NULL)
   {
+    free(fbu);
     syslog(LOG_ERR,"unparsable URL");
     return;
   }
@@ -416,6 +417,7 @@ void set_c_url(const char *const turl)
     bu = strdup(url->gopher.selector);
   else
   {
+    free(fbu);
     syslog(LOG_WARNING,"unsupported URL type");
     return;
   }
