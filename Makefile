@@ -1,4 +1,3 @@
-
 #########################################################################
 #
 # Copyright 2000 by Sean Conner.  All Rights Reserved.
@@ -35,8 +34,8 @@ INSTALL         = /usr/bin/install
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_NAME    = boston
 
-override CFLAGS  += -DPROG_VERSION='"$(VERSION)"' 
-override LDFLAGS += -rdynamic
+override CFLAGS  +=-DPROG_VERSION='"$(VERSION)"'
+override LDFLAGS +=-rdynamic
 
 prefix = /usr/local
 bindir = $(prefix)/bin
