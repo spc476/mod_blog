@@ -352,7 +352,7 @@ void set_c_updatetype(const char *const value)
     c_updatetype = "NewEntry";
   else if (strcmp(value,"modify") == 0)
     c_updatetype = "ModifiedEntry";
-  else if (strcmp(value,"exit") == 0)
+  else if (strcmp(value,"edit") == 0)
     c_updatetype = "ModifiedEntry";
   else if (strcmp(value,"template") == 0)
     c_updatetype = "TemplateChange";
