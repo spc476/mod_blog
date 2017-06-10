@@ -72,11 +72,11 @@ static int      cmd_cli_show            (Request);
 static void     get_cli_command         (Request,char *);
 static int      mail_setup_data         (Request);
 static int      mailfile_readdata       (Request);
-static int      cli_error               (Request,int,const char *, ... );
+static int      cli_error               (Request,int,char const *, ... );
 
 /*************************************************************************/
 
-static const struct option coptions[] =
+static struct option const coptions[] =
 {
   { "config"       , required_argument  , NULL  , OPT_CONFIG      } ,
   { "regenerate"   , no_argument        , NULL  , OPT_REGENERATE  } ,
@@ -420,7 +420,7 @@ static int mailfile_readdata(Request req)
 
 /***************************************************************************/
 
-static int cli_error(Request req __attribute__((unused)),int level,const char *msg, ... )
+static int cli_error(Request req __attribute__((unused)),int level,char const *msg, ... )
 {
   va_list args;
   

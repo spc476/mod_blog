@@ -161,7 +161,7 @@ void fix_entry(Request req)
 
 /*************************************************************************/
 
-void dbcritical(const char *msg)
+void dbcritical(char const *msg)
 {
   if (msg)
     fprintf(stderr,"critical error: %s\n",msg);
@@ -181,16 +181,16 @@ void notify_emaillist(Request req __attribute__((unused)))
 
 static void cb_email_title  (FILE *const,void *);
 static void cb_email_url    (FILE *const,void *);
-static void cb_email_author (FILE *const, void *);
+static void cb_email_author (FILE *const,void *);
 
-static const struct chunk_callback m_emcallbacks[] =
+static struct chunk_callback const m_emcallbacks[] =
 {
   { "email.title"       , cb_email_title        } ,
   { "email.url"         , cb_email_url          } ,
   { "email.author"      , cb_email_author       } ,
 };
 
-static const size_t m_emcbnum = sizeof(m_emcallbacks) / sizeof(struct chunk_callback);
+static size_t const m_emcbnum = sizeof(m_emcallbacks) / sizeof(struct chunk_callback);
 
 /************************************************************************/
 

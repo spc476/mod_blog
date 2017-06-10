@@ -28,9 +28,9 @@
 
 /*************************************************************************/
 
-int max_monthday(const int year,const int month)
+int max_monthday(int const year,int const month)
 {
-  static const int days[] = { 31,0,31,30,31,30,31,31,30,31,30,31 } ;
+  static int const days[] = { 31,0,31,30,31,30,31,31,30,31,30,31 } ;
   
   assert(year  >  0);
   assert(month >  0);
@@ -127,8 +127,8 @@ void btm_dec_month(struct btm *const d)
 /***********************************************************************/
 
 int btm_cmp(
-        const struct btm *const restrict d1,
-        const struct btm *const restrict d2
+        struct btm const *const restrict d1,
+        struct btm const *const restrict d2
 )
 {
   int rc;
@@ -147,8 +147,8 @@ int btm_cmp(
 /***********************************************************************/
 
 int btm_cmp_date(
-        const struct btm *const restrict d1,
-        const struct btm *const restrict d2
+        struct btm const *const restrict d1,
+        struct btm const *const restrict d2
 )
 {
   int rc;
@@ -166,8 +166,8 @@ int btm_cmp_date(
 /***************************************************************************/
 
 int btm_cmp_month(
-        const struct btm *const restrict d1,
-        const struct btm *const restrict d2
+        struct btm const *const restrict d1,
+        struct btm const *const restrict d2
 )
 {
   int rc;
@@ -184,8 +184,8 @@ int btm_cmp_month(
 /***************************************************************************/
 
 int btm_cmp_year(
-        const struct btm *const restrict d1,
-        const struct btm *const restrict d2
+        struct btm const *const restrict d1,
+        struct btm const *const restrict d2
 )
 {
   assert(d1 != NULL);

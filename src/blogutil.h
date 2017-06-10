@@ -28,13 +28,13 @@
 typedef struct mystring
 {
   size_t      s;
-  const char *d;
+  char const *d;
 } String;
 
 /*********************************************************************/
 
-extern String   *tag_split      (size_t *const,const char *);
-extern char     *fromstring     (const String);
+extern String   *tag_split      (size_t *const,char const *);
+extern char     *fromstring     (String const);
 extern size_t    fcopy          (FILE *const restrict,FILE *const restrict);
 
 #endif

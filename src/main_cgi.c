@@ -53,7 +53,7 @@ static int      cmd_cgi_post_new        (Request);
 static int      cmd_cgi_post_show       (Request);
 static int      cmd_cgi_post_edit       (Request);
 
-static int      cgi_error               (Request,int,const char *, ... );
+static int      cgi_error               (Request,int,char const *, ... );
 
 /*************************************************************************/
 
@@ -419,7 +419,7 @@ static int cmd_cgi_post_edit(Request req)
 
 /***********************************************************************/
 
-static int cgi_error(Request req,int level,const char *msg, ... )
+static int cgi_error(Request req,int level,char const *msg, ... )
 {
   FILE    *in;
   va_list  args;

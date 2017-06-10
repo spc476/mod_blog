@@ -25,26 +25,26 @@
 
 typedef struct template
 {
-  const char  *template;
-  const char  *file;
+  char const *template;
+  char const *file;
   size_t       items;
-  int        (*pagegen)(const struct template *const,FILE *const,const Blog);
+  int        (*pagegen)(struct template const *const,FILE *const,Blog const);
   bool         reverse;
   bool         fullurl;
 } template__t;
 
 typedef struct aflink
 {
-  const char *proto;
+  char const *proto;
   size_t      psize;
-  const char *format;
+  char const *format;
 } aflink__t;
 
 /************************************************/
 
 extern int generate_pages       (void);
-extern int pagegen_items        (const template__t *const,FILE *const,const Blog);
-extern int pagegen_days         (const template__t *const,FILE *const,const Blog);
+extern int pagegen_items        (template__t const *const,FILE *const,Blog const);
+extern int pagegen_days         (template__t const *const,FILE *const,Blog const);
 extern int tumbler_page         (FILE *,tumbler__s *);
 
 #endif

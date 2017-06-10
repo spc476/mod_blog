@@ -40,7 +40,7 @@ typedef struct rflags
 typedef struct request
 {
   int       (*command)(struct request *);
-  int       (*error)  (struct request *,int,const char *, ... );
+  int       (*error)  (struct request *,int,char const *, ... );
   RFlags      f;
   FILE       *in;
   FILE       *out;

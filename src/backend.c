@@ -42,12 +42,12 @@
 
 /*****************************************************************/
 
-static void        calculate_previous   (const struct btm);
-static void        calculate_next       (const struct btm);
-static const char *mime_type            (const char *);
-static int         display_file         (FILE *const,const tumbler__s *);
+static void        calculate_previous   (struct btm const);
+static void        calculate_next       (struct btm const);
+static char const *mime_type            (char const *);
+static int         display_file         (FILE *const,tumbler__s const *);
 static char       *tag_collect          (List *);
-static char       *tag_pick             (const char *);
+static char       *tag_pick             (char const *);
 static void        free_entries         (List *);
 
 /************************************************************************/
@@ -75,9 +75,9 @@ int generate_pages(void)
 /******************************************************************/
 
 int pagegen_items(
-        const template__t *const template,
+        template__t const *const template,
         FILE              *const out,
-        const Blog               blog
+        Blog        const        blog
 )
 {
   struct btm            thisday;
@@ -114,9 +114,9 @@ int pagegen_items(
 /************************************************************************/
 
 int pagegen_days(
-        const template__t *const template,
+        template__t const *const template,
         FILE              *const out,
-        const Blog               blog
+        Blog        const        blog
 )
 {
   struct btm            thisday;
@@ -392,7 +392,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
 
 /******************************************************************/
 
-static void calculate_previous(const struct btm start)
+static void calculate_previous(struct btm const start)
 {
   gd.previous = start;
   
@@ -476,7 +476,7 @@ static void calculate_previous(const struct btm start)
 
 /******************************************************************/
 
-static void calculate_next(const struct btm end)
+static void calculate_next(struct btm const end)
 {
   gd.next = end;
   
@@ -561,17 +561,17 @@ static void calculate_next(const struct btm end)
 
 /******************************************************************/
 
-static int dstring_cmp(const void *needle,const void *haystack)
+static int dstring_cmp(void const *needle,void const *haystack)
 {
-  const char           *key   = needle;
-  const struct dstring *value = haystack;
+  char const           *key   = needle;
+  struct dstring const *value = haystack;
   
   return strcmp(key,value->s1);
 }
 
-static const char *mime_type(const char *filename)
+static char const *mime_type(char const *filename)
 {
-  static const struct dstring  types[] =
+  static struct dstring const types[] =
   {
     { ".ai"             , "application/postscript"              } ,
     { ".aif"            , "audio/x-aiff"                        } ,
@@ -731,8 +731,8 @@ static const char *mime_type(const char *filename)
     { ".zip"            , "application/zip"                     } ,
   };
   
-  const struct dstring *v;
-  const char           *ext;
+  struct dstring const *v;
+  char const           *ext;
   
   assert(filename != NULL);
   
@@ -756,7 +756,7 @@ static const char *mime_type(const char *filename)
 
 /******************************************************************/
 
-static int display_file(FILE *const out,const tumbler__s *spec)
+static int display_file(FILE *const out,tumbler__s const *spec)
 {
   char fname[FILENAME_MAX];
   
@@ -777,7 +777,7 @@ static int display_file(FILE *const out,const tumbler__s *spec)
   {
     struct stat  status;
     FILE        *in;
-    const char  *type;
+    char const  *type;
     int          rc;
     
     rc = stat(fname,&status);
@@ -859,7 +859,7 @@ static char *tag_collect(List *list)
 
 /********************************************************************/
 
-static char *tag_pick(const char *tag)
+static char *tag_pick(char const *tag)
 {
   String *pool;
   size_t  num;

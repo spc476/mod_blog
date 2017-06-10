@@ -32,15 +32,15 @@
 
 struct entity_conv
 {
-  const char *const name;
-  const       int   value;
+  char const *const name;
+  int  const        value;
 };
 
 /********************************************************************/
 
 static bool             char_entity     (char **,size_t *,int);
 static ssize_t          fer_read        (void *,char *,size_t);
-static ssize_t          few_write       (void *,const char *,size_t);
+static ssize_t          few_write       (void *,char const *,size_t);
 
 /********************************************************************/
 
@@ -52,7 +52,7 @@ static ssize_t          few_write       (void *,const char *,size_t);
         ; and massaged into this format.
         ;------------------------------------------------------------------*/
         
-static const struct entity_conv m_table[] =
+static struct entity_conv const m_table[] =
 {
   { "AElig"                            ,    198 },
   { "AMP"                              ,     38 },
@@ -2092,10 +2092,10 @@ static const struct entity_conv m_table[] =
 
 /********************************************************************/
 
-static int entity_cmp(const void *needle,const void *haystack)
+static int entity_cmp(void const *needle,void const *haystack)
 {
-  const char               *key = needle;
-  const struct entity_conv *hay = haystack;
+  char const               *key = needle;
+  struct entity_conv const *hay = haystack;
   
   assert(needle   != NULL);
   assert(haystack != NULL);
@@ -2105,7 +2105,7 @@ static int entity_cmp(const void *needle,const void *haystack)
 
 /********************************************************************/
 
-char *entity_conversion(const char *s)
+char *entity_conversion(char const *s)
 {
   FILE   *tmp;
   char   *t  = NULL;
@@ -2119,7 +2119,7 @@ char *entity_conversion(const char *s)
   {
     if (*s == '&')
     {
-      const struct entity_conv *pe;
+      struct entity_conv const *pe;
       char                      entity[BUFSIZ];
       char                     *p;
       
@@ -2239,7 +2239,7 @@ static ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
 
 /*******************************************************************/
 
-static ssize_t few_write(void *cookie,const char *buffer,size_t bytes)
+static ssize_t few_write(void *cookie,char const *buffer,size_t bytes)
 {
   FILE   *realout = cookie;
   size_t  size    = bytes;

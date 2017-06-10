@@ -129,11 +129,11 @@ static void     cb_update_time                  (FILE *const,void *);
 static void     cb_update_type                  (FILE *const,void *);
 static void     cb_xyzzy                        (FILE *const,void *);
 
-static void     print_nav_url   (FILE *const,const struct btm *const,int);
-static void     print_nav_title (FILE *const,const struct btm *const,int);
-static void     print_nav_name  (FILE *const,const struct btm *const,int,char);
-static void     fixup_uri       (BlogEntry,HtmlToken,const char *);
-static void     handle_aflinks  (HtmlToken,const char *);
+static void     print_nav_url   (FILE *const,struct btm const *const,int);
+static void     print_nav_title (FILE *const,struct btm const *const,int);
+static void     print_nav_name  (FILE *const,struct btm const *const,int,char);
+static void     fixup_uri       (BlogEntry,HtmlToken,char const *);
+static void     handle_aflinks  (HtmlToken,char const *);
 
 /************************************************************************/
 
@@ -142,7 +142,7 @@ static void     handle_aflinks  (HtmlToken,const char *);
         ; be in alphabetical order
         ;--------------------------------*/
         
-static const struct chunk_callback  m_callbacks[] =
+static struct chunk_callback const m_callbacks[] =
 {
   { "ad"                        , cb_ad                         } ,
   { "ad.content"                , cb_ad_content                 } ,
@@ -223,11 +223,11 @@ static const struct chunk_callback  m_callbacks[] =
   { "xyzzy"                     , cb_xyzzy                      }
 };
 
-static const size_t m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
+static size_t const m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
 
 /*************************************************************************/
 
-void generic_cb(const char *const which,FILE *const out,void *data)
+void generic_cb(char const *const which,FILE *const out,void *data)
 {
   Chunk templates;
   
@@ -374,7 +374,7 @@ static void cb_blog_adtag_entity(FILE *const out,void *data)
 {
   struct callback_data *cbd;
   FILE                 *entityout;
-  const char           *tag;
+  char const          *tag;
   
   assert(out != NULL);
   
@@ -568,7 +568,7 @@ static void cb_entry_author(FILE *const out,void *data)
 
 /*************************************************************************/
 
-static void handle_aflinks(HtmlToken token,const char *attrib)
+static void handle_aflinks(HtmlToken token,char const *attrib)
 {
   struct pair *src;
   
@@ -603,7 +603,7 @@ static void handle_aflinks(HtmlToken token,const char *attrib)
 
 /*************************************************************************/
 
-static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
+static void fixup_uri(BlogEntry entry,HtmlToken token,char const *attrib)
 {
   struct pair *src;
   struct pair *np;
@@ -631,7 +631,7 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,const char *attrib)
      )
   {
     char        buffer[BUFSIZ];
-    const char *baseurl;
+    char const *baseurl;
     
     /*-----------------------------------------------------
     ; Which URL to use?  Full or partial?
@@ -1157,7 +1157,7 @@ static void cb_navigation_current_url(FILE *const out,void *data __attribute__((
 
 /*********************************************************************/
 
-static void print_nav_title(FILE *const out,const struct btm *const date,int unit)
+static void print_nav_title(FILE *const out,struct btm const *const date,int unit)
 {
   BlogEntry entry;
   struct tm stm;
@@ -1205,7 +1205,7 @@ static void print_nav_title(FILE *const out,const struct btm *const date,int uni
 
 /**********************************************************************/
 
-static void print_nav_url(FILE *const out,const struct btm *const date,int unit)
+static void print_nav_url(FILE *const out,struct btm const *const date,int unit)
 {
   assert(out  != NULL);
   assert(date != NULL);
@@ -1216,7 +1216,7 @@ static void print_nav_url(FILE *const out,const struct btm *const date,int unit)
 
 /*******************************************************************/
 
-static void print_nav_name(FILE *const out,const struct btm *const date,int unit,char sep)
+static void print_nav_name(FILE *const out,struct btm const *const date,int unit,char sep)
 {
   assert(out  != NULL);
   assert(date != NULL);

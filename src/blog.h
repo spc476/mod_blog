@@ -57,18 +57,18 @@ typedef struct blogentry
 
 /*********************************************************************/
 
-extern Blog             BlogNew                 (const char *,const char *);
+extern Blog             BlogNew                 (char const *,char const *);
 extern bool             BlogLock                (Blog);
 extern bool             BlogUnlock              (Blog);
 extern void             BlogFree                (Blog);
 
-extern BlogEntry        BlogEntryNew            (const Blog);
-extern BlogEntry        BlogEntryRead           (const Blog,const struct btm *);
-extern void             BlogEntryReadBetweenU   (const Blog,List *,const struct btm *restrict,const struct btm *restrict);
-extern void             BlogEntryReadBetweenD   (const Blog,List *,const struct btm *restrict,const struct btm *restrict);
-extern void             BlogEntryReadXD         (const Blog,List *,const struct btm *restrict,size_t);
-extern void             BlogEntryReadXU         (const Blog,List *,const struct btm *restrict,size_t);
-extern int              BlogEntryWrite          (const BlogEntry);
+extern BlogEntry        BlogEntryNew            (Blog const);
+extern BlogEntry        BlogEntryRead           (Blog const,struct btm const *);
+extern void             BlogEntryReadBetweenU   (Blog const,List *,struct btm const *restrict,struct btm const *restrict);
+extern void             BlogEntryReadBetweenD   (Blog const,List *,struct btm const *restrict,struct btm const *restrict);
+extern void             BlogEntryReadXD         (Blog const,List *,struct btm const *restrict,size_t);
+extern void             BlogEntryReadXU         (Blog const,List *,struct btm const *restrict,size_t);
+extern int              BlogEntryWrite          (BlogEntry const);
 extern int              BlogEntryFree           (BlogEntry);
 
 /**********************************************************************/

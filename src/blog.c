@@ -39,17 +39,17 @@
 
 /**********************************************************************/
 
-static void      date_to_dir            (char *,const struct btm *);
-static void      date_to_filename       (char *,const struct btm *,const char *);
-static void      date_to_part           (char *,const struct btm *,int);
-static FILE     *open_file_r            (const char *,const struct btm *);
-static FILE     *open_file_w            (const char *,const struct btm *);
-static bool      date_check             (const struct btm *);
-static int       date_checkcreate       (const struct btm *);
-static char     *blog_meta_entry        (const char *,const struct btm *);
-static size_t    blog_meta_read         (char ***,const char *,const struct btm *);
+static void      date_to_dir            (char *,struct btm const *);
+static void      date_to_filename       (char *,struct btm const *,char const *);
+static void      date_to_part           (char *,struct btm const *,int);
+static FILE     *open_file_r            (char const *,struct btm const *);
+static FILE     *open_file_w            (char const *,struct btm const *);
+static bool      date_check             (struct btm const *);
+static int       date_checkcreate       (struct btm const *);
+static char     *blog_meta_entry        (char const *,struct btm const *);
+static size_t    blog_meta_read         (char ***,char const *,struct btm const *);
 static void      blog_meta_adjust       (char ***,size_t,size_t);
-static int       blog_meta_write        (const char *,const struct btm *,char **,size_t);
+static int       blog_meta_write        (char const *,struct btm const *,char **,size_t);
 
 /***********************************************************************/
 
@@ -63,7 +63,7 @@ static inline size_t max(size_t a,size_t b)
 
 /***********************************************************************/
 
-Blog BlogNew(const char *location,const char *lockfile)
+Blog BlogNew(char const *location,char const *lockfile)
 {
   Blog       blog;
   FILE      *fp;
@@ -250,7 +250,7 @@ void BlogFree(Blog blog)
 
 /************************************************************************/
 
-BlogEntry BlogEntryNew(const Blog blog)
+BlogEntry BlogEntryNew(Blog const blog)
 {
   BlogEntry pbe;
   
@@ -277,7 +277,7 @@ BlogEntry BlogEntryNew(const Blog blog)
 
 /***********************************************************************/
 
-BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
+BlogEntry BlogEntryRead(Blog const blog,struct btm const *which)
 {
   BlogEntry    entry;
   char         pname[FILENAME_MAX];
@@ -335,10 +335,10 @@ BlogEntry BlogEntryRead(const Blog blog,const struct btm *which)
 /**********************************************************************/
 
 void BlogEntryReadBetweenU(
-        const Blog        blog,
+        Blog      const   blog,
         List             *list,
-        const struct btm *restrict start,
-        const struct btm *restrict end
+        struct btm const *restrict start,
+        struct btm const *restrict end
 )
 {
   BlogEntry  entry;
@@ -370,10 +370,10 @@ void BlogEntryReadBetweenU(
 /************************************************************************/
 
 void BlogEntryReadBetweenD(
-        const Blog        blog,
+        Blog       const  blog,
         List             *listb,
-        const struct btm *restrict end,
-        const struct btm *restrict start
+        struct btm const *restrict end,
+        struct btm const *restrict start
 )
 {
   List  lista;
@@ -407,9 +407,9 @@ void BlogEntryReadBetweenD(
 /*******************************************************************/
 
 void BlogEntryReadXD(
-        const Blog        blog,
+        Blog       const  blog,
         List             *list,
-        const struct btm *start,
+        struct btm const *start,
         size_t            num
 )
 {
@@ -447,9 +447,9 @@ void BlogEntryReadXD(
 /*******************************************************************/
 
 void BlogEntryReadXU(
-        const Blog        blog,
+        Blog       const  blog,
         List             *list,
-        const struct btm *start,
+        struct btm const *start,
         size_t            num
 )
 {
@@ -481,7 +481,7 @@ void BlogEntryReadXU(
 
 /**************************************************************************/
 
-int BlogEntryWrite(const BlogEntry entry)
+int BlogEntryWrite(BlogEntry const entry)
 {
   char   **authors;
   char   **class;
@@ -639,7 +639,7 @@ int BlogEntryFree(BlogEntry entry)
 
 /***********************************************************************/
 
-static void date_to_dir(char *tname,const struct btm *date)
+static void date_to_dir(char *tname,struct btm const *date)
 {
   assert(tname != NULL);
   assert(date  != NULL);
@@ -649,7 +649,7 @@ static void date_to_dir(char *tname,const struct btm *date)
 
 /***********************************************************************/
 
-static void date_to_filename(char *tname,const struct btm *date,const char *file)
+static void date_to_filename(char *tname,struct btm const *date,char const *file)
 {
   assert(tname != NULL);
   assert(date  != NULL);
@@ -660,7 +660,7 @@ static void date_to_filename(char *tname,const struct btm *date,const char *file
 
 /**********************************************************************/
 
-static void date_to_part(char *tname,const struct btm *date,int p)
+static void date_to_part(char *tname,struct btm const *date,int p)
 {
   assert(tname != NULL);
   assert(date  != NULL);
@@ -671,7 +671,7 @@ static void date_to_part(char *tname,const struct btm *date,int p)
 
 /*********************************************************************/
 
-static FILE *open_file_r(const char *name,const struct btm *date)
+static FILE *open_file_r(char const *name,struct btm const *date)
 {
   FILE *in;
   char  buffer[FILENAME_MAX];
@@ -699,7 +699,7 @@ static FILE *open_file_r(const char *name,const struct btm *date)
 
 /**********************************************************************/
 
-static FILE *open_file_w(const char *name,const struct btm *date)
+static FILE *open_file_w(char const *name,struct btm const *date)
 {
   FILE *out;
   char  buffer[FILENAME_MAX];
@@ -714,7 +714,7 @@ static FILE *open_file_w(const char *name,const struct btm *date)
 
 /*********************************************************************/
 
-static bool date_check(const struct btm *date)
+static bool date_check(struct btm const *date)
 {
   char tname[FILENAME_MAX];
   struct stat status;
@@ -725,7 +725,7 @@ static bool date_check(const struct btm *date)
 
 /************************************************************************/
 
-static int date_checkcreate(const struct btm *date)
+static int date_checkcreate(struct btm const *date)
 {
   int         rc;
   char        tname[FILENAME_MAX];
@@ -771,7 +771,7 @@ static int date_checkcreate(const struct btm *date)
 
 /********************************************************************/
 
-static char *blog_meta_entry(const char *name,const struct btm *date)
+static char *blog_meta_entry(char const *name,struct btm const *date)
 {
   FILE         *fp;
   char         *text;
@@ -816,8 +816,8 @@ static char *blog_meta_entry(const char *name,const struct btm *date)
 
 static size_t blog_meta_read(
         char             ***plines,
-        const char         *name,
-        const struct btm   *date
+        char       const   *name,
+        struct btm const   *date
 )
 {
   char   **lines;
@@ -890,8 +890,8 @@ static void blog_meta_adjust(char ***plines,size_t num,size_t maxnum)
 /************************************************************************/
 
 static int blog_meta_write(
-        const char        *name,
-        const struct btm  *date,
+        char       const *name,
+        struct btm const *date,
         char             **list,
         size_t             num
 )

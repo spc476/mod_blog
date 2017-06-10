@@ -36,7 +36,7 @@
 
 struct value
 {
-  const char *txt;
+  char const *txt;
   ptrdiff_t   len;
   int         val;
 };
@@ -45,7 +45,7 @@ struct value
 
 static bool parse_num(
         struct value  *pv,
-        const char   **p,
+        char const   **p,
         int            low,
         int            high
 )
@@ -148,7 +148,7 @@ static bool check_dates(tumbler__s *tum)
 
 /************************************************************************/
 
-bool tumbler_new(tumbler__s *const tum,const char *text)
+bool tumbler_new(tumbler__s *const tum,char const *text)
 {
   /*----------------------------------------------------------------------
   ; all variables are defined here, even though u2, u3, u4, segments and
@@ -591,7 +591,7 @@ tumbler_new_calculate:
 
 /************************************************************************/
 
-char *tumbler_canonical(const tumbler__s *const tum)
+char *tumbler_canonical(tumbler__s const *const tum)
 {
   char  start[32];
   char  stop [32];
