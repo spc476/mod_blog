@@ -412,7 +412,7 @@ void notify_emaillist(Request req)
 
 static void cb_email_title(FILE *const out,void *data)
 {
-  Request req = (Request)data;
+  Request req = data;
   
   if (!empty_string(req->status))
     fprintf(out,"%s",req->status);
@@ -424,7 +424,7 @@ static void cb_email_title(FILE *const out,void *data)
 
 static void cb_email_url(FILE *const out,void *data)
 {
-  Request req = (Request)data;
+  Request req = data;
   
   fprintf(
            out,
@@ -441,7 +441,7 @@ static void cb_email_url(FILE *const out,void *data)
 
 static void cb_email_author(FILE *const out,void *data)
 {
-  Request req = (Request)data;
+  Request req = data;
   
   fprintf(out,"%s",req->author);
 }

@@ -64,7 +64,7 @@ extern char        const  *const c_fullbaseurl;
 extern char        const  *const c_htmltemplates;
 extern template__t const  *const c_templates;
 extern aflink__t   const  *const c_aflinks;
-extern void              (*const c_conversion)(FILE *,FILE *);
+extern void              (*const c_conversion)(FILE *const restrict,FILE *const restrict);
 extern int         const         c_days;
 extern size_t      const         c_af_uid;
 extern size_t      const         c_af_name;

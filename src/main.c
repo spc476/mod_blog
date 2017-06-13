@@ -28,8 +28,6 @@
 
 int main(int argc,char *argv[],char *envp[])
 {
-  int rc;
-  
   /*-----------------------------------------------------------------------
   ; due to a crash for no apparent reason, I decided to log a bit more
   ; information when it does happen.  Here are the possible signals I want
@@ -92,16 +90,14 @@ int main(int argc,char *argv[],char *envp[])
   {
     switch(CgiMethod(gd.cgi))
     {
-      case GET:  rc = main_cgi_get (gd.cgi); break;
-      case POST: rc = main_cgi_post(gd.cgi); break;
-      case HEAD: rc = main_cgi_head(gd.cgi); break;
-      default:   rc = EXIT_FAILURE;          break;
+      case GET:  return main_cgi_get (gd.cgi);
+      case POST: return main_cgi_post(gd.cgi);
+      case HEAD: return main_cgi_head(gd.cgi);
+      default:   return EXIT_FAILURE;
     }
   }
-  else
-    rc = main_cli(argc,argv);
-    
-  return rc;
+  
+  return main_cli(argc,argv);
 }
 
 /***********************************************************************/
