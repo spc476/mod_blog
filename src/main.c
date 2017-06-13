@@ -32,7 +32,7 @@ int main(int argc,char *argv[],char *envp[])
   
   /*-----------------------------------------------------------------------
   ; due to a crash for no apparent reason, I decided to log a bit more
-  ; infomration when it does happen.  Here are the possible signals I want
+  ; information when it does happen.  Here are the possible signals I want
   ; more information from when it happens.
   ;-----------------------------------------------------------------------*/
   
