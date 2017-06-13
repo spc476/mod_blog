@@ -55,7 +55,7 @@ typedef struct tumbler__s
 
 /***********************************************************************/
 
-extern bool  tumbler_new        (tumbler__s *const,char const *);
-extern char *tumbler_canonical  (tumbler__s const *const);
+extern bool  tumbler_new       (tumbler__s *const,char const *);
+extern char *tumbler_canonical (tumbler__s const *const);
 
 #endif

@@ -46,52 +46,49 @@
 *
 ****************************************************************************/
 
-extern char        const          *const c_name;
-extern char        const          *const c_basedir;
-extern char        const          *const c_webdir;
-extern char        const          *const c_baseurl;
-extern char        const          *const c_fullbaseurl;
-extern char        const          *const c_htmltemplates;
-extern int         const                 c_days;
-extern char        const          *const c_author;
-extern char        const          *const c_email;
-extern char        const          *const c_authorfile;
-extern size_t      const                 c_af_uid;
-extern size_t      const                 c_af_name;
-extern char        const          *const c_updatetype;
-extern char        const          *const c_lockfile;
-extern char        const          *const c_emaildb;
-extern char        const          *const c_emailsubject;
-extern char        const          *const c_emailmsg;
-extern int         const                 c_tzhour;
-extern int         const                 c_tzmin;
-extern void                      (*const c_conversion)(FILE *,FILE *);
-extern struct btm  const                 c_start;
-extern struct btm  const                 c_now;
-extern char        const          *const c_overview;
-extern bool        const                 cf_emailupdate;
-extern template__t const          *const c_templates;
-extern size_t      const                 c_numtemplates;
-extern aflink__t   const          *const c_aflinks;
-extern size_t      const                 c_numaflinks;
-extern char        const          *const c_adtag;
+extern char        const  *const c_name;
+extern char        const  *const c_basedir;
+extern char        const  *const c_webdir;
+extern char        const  *const c_author;
+extern char        const  *const c_email;
+extern char        const  *const c_authorfile;
+extern char        const  *const c_updatetype;
+extern char        const  *const c_lockfile;
+extern char        const  *const c_emaildb;
+extern char        const  *const c_emailsubject;
+extern char        const  *const c_emailmsg;
+extern char        const  *const c_overview;
+extern char        const  *const c_adtag;
+extern char        const  *const c_baseurl;
+extern char        const  *const c_fullbaseurl;
+extern char        const  *const c_htmltemplates;
+extern template__t const  *const c_templates;
+extern aflink__t   const  *const c_aflinks;
+extern void              (*const c_conversion)(FILE *,FILE *);
+extern int         const         c_days;
+extern size_t      const         c_af_uid;
+extern size_t      const         c_af_name;
+extern int         const         c_tzhour;
+extern int         const         c_tzmin;
+extern bool        const         cf_emailupdate;
+extern size_t      const         c_numtemplates;
+extern size_t      const         c_numaflinks;
 
-extern lua_State             *g_L;
-extern char const            *g_templates;      /* work on */
-extern bool volatile          gf_debug;
-extern Blog                   g_blog;
-extern struct display         gd;               /* work on */
+extern lua_State      *g_L;
+extern char const     *g_templates;      /* work on */
+extern bool volatile   gf_debug;
+extern Blog            g_blog;
+extern struct display  gd;               /* work on */
 
-extern int      GlobalsInit             (char const *);
-extern void     set_c_updatetype        (char const *const);
-extern void     set_cf_emailupdate      (char const *const);
-extern void     set_c_conversion        (char const *const);
-extern void     set_c_url               (char const *const);
-extern void     set_time                (void);
-
-extern int      main_cgi_head           (Cgi);
-extern int      main_cgi_get            (Cgi);
-extern int      main_cgi_post           (Cgi);
-extern int      main_cli                (int,char *[]);
+extern int  GlobalsInit        (char const *);
+extern void set_c_updatetype   (char const *const);
+extern void set_cf_emailupdate (char const *const);
+extern void set_c_conversion   (char const *const);
+extern void set_c_url          (char const *const);
+extern void set_time           (void);
+extern int  main_cgi_head      (Cgi);
+extern int  main_cgi_get       (Cgi);
+extern int  main_cgi_post      (Cgi);
+extern int  main_cli           (int,char *[]);
 
 #endif

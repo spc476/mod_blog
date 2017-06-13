@@ -51,10 +51,10 @@
 
 /***********************************************************/
 
-void    set_c_updatetype        (char const *const);
-void    set_gf_emailupdate      (char const *const);
-void    set_c_conversion        (char const *const);
-void    set_c_url               (char const *const);
+extern void set_c_updatetype   (char const *const);
+extern void set_gf_emailupdate (char const *const);
+extern void set_c_conversion   (char const *const);
+extern void set_c_url          (char const *const);
 
 static bool        get_next     (char *,char const **);
 static int         get_field    (lua_State *const,char const *);
@@ -66,39 +66,39 @@ static void        globals_free (void);
 
 /************************************************************/
 
-char const  *c_name;                           /* no free */
-char const  *c_basedir;                        /* no free */
-char const  *c_webdir;                         /* no free */
+char const   *c_name;                    /* no free */
+char const   *c_basedir;                 /* no free */
+char const   *c_webdir;                  /* no free */
+char const   *c_author;                  /* no free */
+char const   *c_email;                   /* no free */
+char const   *c_authorfile;              /* no free */
+char const   *c_updatetype = "NewEntry"; /* no free */
+char const   *c_lockfile;                /* no free */
+char const   *c_emaildb;                 /* no free */
+char const   *c_emailsubject;            /* no free */
+char const   *c_emailmsg;                /* no free */
+char const   *c_overview;                /* no free */
+char const   *c_adtag;                   /* no free */
 char         *c_baseurl;
 char         *c_fullbaseurl;
 char         *c_htmltemplates;
+template__t  *c_templates;
+aflink__t    *c_aflinks;
+void        (*c_conversion)(FILE *,FILE *) =  html_conversion;
 int           c_days;
-char const   *c_author;                         /* no free */
-char const   *c_email;                          /* no free */
-char const   *c_authorfile;                     /* no free */
 size_t        c_af_uid;
 size_t        c_af_name;
-char const   *c_updatetype   = "NewEntry";      /* no free */
-char const   *c_lockfile;                       /* no free */
-char const   *c_emaildb;                        /* no free */
-char const   *c_emailsubject;                   /* no free */
-char const   *c_emailmsg;                       /* no free */
 int           c_tzhour;
 int           c_tzmin;
-char const   *c_overview;                        /* no free */
-void        (*c_conversion)(FILE *,FILE *) =  html_conversion;
 bool          cf_emailupdate = true;
-template__t  *c_templates;
 size_t        c_numtemplates;
-aflink__t    *c_aflinks;
 size_t        c_numaflinks;
-char const   *c_adtag;                          /* no free */
 
-lua_State     *g_L;
-char const    *g_templates;
-bool volatile  gf_debug       = false;
-Blog           g_blog;
-struct display gd =
+lua_State      *g_L;
+char const     *g_templates;
+bool volatile   gf_debug = false;
+Blog            g_blog;
+struct display  gd =
 {
   .navunit = UNIT_INDEX,
   .f       =

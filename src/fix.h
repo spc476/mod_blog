@@ -140,16 +140,16 @@ typedef enum http__e
   
 } http__e;
 
-extern char     *get_remote_user        (void);
-extern bool      authenticate_author    (Request);
-extern void      notify_emaillist       (Request);
-extern int       entry_add              (Request);
-extern void      fix_entry              (Request);
-extern void      generic_cb             (char const *const,FILE *const,void *);
-extern void      dbcritical             (char const *const);
-extern char     *entity_conversion      (char const *);
-extern char     *entity_encode          (char const *);
-extern FILE     *fentity_encode_onread  (FILE *const);
-extern FILE     *fentity_encode_onwrite (FILE *const);
+extern char *get_remote_user        (void);
+extern bool  authenticate_author    (Request);
+extern void  notify_emaillist       (Request);
+extern int   entry_add              (Request);
+extern void  fix_entry              (Request);
+extern void  generic_cb             (char const *const,FILE *const,void *);
+extern void  dbcritical             (char const *const);
+extern char *entity_conversion      (char const *);
+extern char *entity_encode          (char const *);
+extern FILE *fentity_encode_onread  (FILE *const);
+extern FILE *fentity_encode_onwrite (FILE *const);
 
 #endif

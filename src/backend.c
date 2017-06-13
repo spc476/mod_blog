@@ -42,13 +42,13 @@
 
 /*****************************************************************/
 
-static void        calculate_previous   (struct btm const);
-static void        calculate_next       (struct btm const);
-static char const *mime_type            (char const *);
-static int         display_file         (FILE *const,tumbler__s const *);
-static char       *tag_collect          (List *);
-static char       *tag_pick             (char const *);
-static void        free_entries         (List *);
+static void        calculate_previous (struct btm const);
+static void        calculate_next     (struct btm const);
+static char const *mime_type          (char const *);
+static int         display_file       (FILE *const,tumbler__s const *);
+static char       *tag_collect        (List *);
+static char       *tag_pick           (char const *);
+static void        free_entries       (List *);
 
 /************************************************************************/
 

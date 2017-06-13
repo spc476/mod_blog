@@ -42,9 +42,9 @@ typedef struct aflink
 
 /************************************************/
 
-extern int generate_pages       (void);
-extern int pagegen_items        (template__t const *const,FILE *const,Blog const);
-extern int pagegen_days         (template__t const *const,FILE *const,Blog const);
-extern int tumbler_page         (FILE *,tumbler__s *);
+extern int generate_pages (void);
+extern int pagegen_items  (template__t const *const,FILE *const,Blog const);
+extern int pagegen_days   (template__t const *const,FILE *const,Blog const);
+extern int tumbler_page   (FILE *,tumbler__s *);
 
 #endif

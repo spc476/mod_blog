@@ -48,16 +48,16 @@ struct nested_params
 
 /**********************************************************************/
 
-static void     text_conversion_backend (FILE *const restrict,FILE *const restrict);
-static void     html_handle_tag         (struct nested_params *const);
-static void     check_for_uri           (struct nested_params *const,char const *const);
-static void     entify_char             (char *,size_t,char *,char,char const *const);
-static void     html_handle_string      (struct nested_params *const);
-static void     html_handle_comment     (struct nested_params *const);
-static void     handle_backquote        (FILE *const restrict,FILE *const restrict);
-static void     handle_quote            (FILE *const restrict,FILE *const restrict);
-static void     handle_dash             (FILE *const restrict,FILE *const restrict);
-static void     handle_period           (FILE *const restrict,FILE *const restrict);
+static void text_conversion_backend (FILE *const restrict,FILE *const restrict);
+static void html_handle_tag         (struct nested_params *const);
+static void check_for_uri           (struct nested_params *const,char const *const);
+static void entify_char             (char *,size_t,char *,char,char const *const);
+static void html_handle_string      (struct nested_params *const);
+static void html_handle_comment     (struct nested_params *const);
+static void handle_backquote        (FILE *const restrict,FILE *const restrict);
+static void handle_quote            (FILE *const restrict,FILE *const restrict);
+static void handle_dash             (FILE *const restrict,FILE *const restrict);
+static void handle_period           (FILE *const restrict,FILE *const restrict);
 
 /**********************************************************************/
 

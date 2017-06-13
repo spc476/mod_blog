@@ -57,19 +57,19 @@ typedef struct blogentry
 
 /*********************************************************************/
 
-extern Blog             BlogNew                 (char const *,char const *);
-extern bool             BlogLock                (Blog);
-extern bool             BlogUnlock              (Blog);
-extern void             BlogFree                (Blog);
+extern Blog      BlogNew               (char const *,char const *);
+extern bool      BlogLock              (Blog);
+extern bool      BlogUnlock            (Blog);
+extern void      BlogFree              (Blog);
 
-extern BlogEntry        BlogEntryNew            (Blog const);
-extern BlogEntry        BlogEntryRead           (Blog const,struct btm const *);
-extern void             BlogEntryReadBetweenU   (Blog const,List *,struct btm const *restrict,struct btm const *restrict);
-extern void             BlogEntryReadBetweenD   (Blog const,List *,struct btm const *restrict,struct btm const *restrict);
-extern void             BlogEntryReadXD         (Blog const,List *,struct btm const *restrict,size_t);
-extern void             BlogEntryReadXU         (Blog const,List *,struct btm const *restrict,size_t);
-extern int              BlogEntryWrite          (BlogEntry const);
-extern int              BlogEntryFree           (BlogEntry);
+extern BlogEntry BlogEntryNew          (Blog const);
+extern BlogEntry BlogEntryRead         (Blog const,struct btm const *);
+extern void      BlogEntryReadBetweenU (Blog const,List *,struct btm const *restrict,struct btm const *restrict);
+extern void      BlogEntryReadBetweenD (Blog const,List *,struct btm const *restrict,struct btm const *restrict);
+extern void      BlogEntryReadXD       (Blog const,List *,struct btm const *restrict,size_t);
+extern void      BlogEntryReadXU       (Blog const,List *,struct btm const *restrict,size_t);
+extern int       BlogEntryWrite        (BlogEntry const);
+extern int       BlogEntryFree         (BlogEntry);
 
 /**********************************************************************/
 

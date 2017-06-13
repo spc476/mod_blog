@@ -39,17 +39,17 @@
 
 /**********************************************************************/
 
-static void      date_to_dir            (char *,struct btm const *);
-static void      date_to_filename       (char *,struct btm const *,char const *);
-static void      date_to_part           (char *,struct btm const *,int);
-static FILE     *open_file_r            (char const *,struct btm const *);
-static FILE     *open_file_w            (char const *,struct btm const *);
-static bool      date_check             (struct btm const *);
-static int       date_checkcreate       (struct btm const *);
-static char     *blog_meta_entry        (char const *,struct btm const *);
-static size_t    blog_meta_read         (char ***,char const *,struct btm const *);
-static void      blog_meta_adjust       (char ***,size_t,size_t);
-static int       blog_meta_write        (char const *,struct btm const *,char **,size_t);
+static void    date_to_dir      (char *,struct btm const *);
+static void    date_to_filename (char *,struct btm const *,char const *);
+static void    date_to_part     (char *,struct btm const *,int);
+static FILE   *open_file_r      (char const *,struct btm const *);
+static FILE   *open_file_w      (char const *,struct btm const *);
+static bool    date_check       (struct btm const *);
+static int     date_checkcreate (struct btm const *);
+static char   *blog_meta_entry  (char const *,struct btm const *);
+static size_t  blog_meta_read   (char ***,char const *,struct btm const *);
+static void    blog_meta_adjust (char ***,size_t,size_t);
+static int     blog_meta_write  (char const *,struct btm const *,char **,size_t);
 
 /***********************************************************************/
 
