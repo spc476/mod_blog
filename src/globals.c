@@ -22,6 +22,7 @@
 
 #define _GNU_SOURCE
 
+#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -48,6 +49,8 @@
 #include "fix.h"
 #include "timeutil.h"
 #include "blog.h"
+
+#define MAX_ITEMS(type) (((SIZE_MAX - sizeof(type)) + 1) / sizeof(type))
 
 /***********************************************************/
 
@@ -230,6 +233,12 @@ int GlobalsInit(char const *conf)
     return ENOENT;
   }
   
+  if (c_numtemplates > MAX_ITEMS(template__t))
+  {
+    syslog(LOG_ERR,"too man templates");
+    return ENOMEM;
+  }
+  
   c_templates   = malloc(sizeof(template__t) * c_numtemplates);
   if (c_templates == NULL)
   {
@@ -303,26 +312,36 @@ int GlobalsInit(char const *conf)
   if (!lua_isnil(g_L,-1))
   {
     c_numaflinks = lua_objlen(g_L,-1);
-    c_aflinks    = malloc(sizeof(aflink__t) * c_numaflinks);
     
-    if (c_aflinks == NULL)
+    if (c_numaflinks > 0)
     {
-      syslog(LOG_ERR,"%s",strerror(ENOMEM));
-      return ENOMEM;
-    }
-    
-    for (size_t i = 0 ; i < c_numaflinks ; i++)
-    {
-      lua_pushinteger(g_L,i + 1);
-      lua_gettable(g_L,-2);
+      if (c_numaflinks > MAX_ITEMS(aflink__t))
+      {
+        syslog(LOG_ERR,"too many affiliate links");
+        return ENOMEM;
+      }
       
-      lua_getfield(g_L,-1,"proto");
-      lua_getfield(g_L,-2,"link");
+      c_aflinks = malloc(sizeof(aflink__t) * c_numaflinks);
       
-      c_aflinks[i].proto  = lua_tolstring(g_L,-2,&c_aflinks[i].psize);
-      c_aflinks[i].format = lua_tostring(g_L,-1);
+      if (c_aflinks == NULL)
+      {
+        syslog(LOG_ERR,"%s",strerror(ENOMEM));
+        return ENOMEM;
+      }
       
-      lua_pop(g_L,3);
+      for (size_t i = 0 ; i < c_numaflinks ; i++)
+      {
+        lua_pushinteger(g_L,i + 1);
+        lua_gettable(g_L,-2);
+        
+        lua_getfield(g_L,-1,"proto");
+        lua_getfield(g_L,-2,"link");
+        
+        c_aflinks[i].proto  = lua_tolstring(g_L,-2,&c_aflinks[i].psize);
+        c_aflinks[i].format = lua_tostring(g_L,-1);
+        
+        lua_pop(g_L,3);
+      }
     }
   }
   lua_pop(g_L,1);
