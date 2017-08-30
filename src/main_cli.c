@@ -119,6 +119,8 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_FILE:
            gd.req.in = fopen(optarg,"r");
+           if (gd.req.in == NULL)
+             return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
            break;
       case OPT_EMAIL:
            gd.req.f.emailin = true;
