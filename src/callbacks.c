@@ -62,6 +62,7 @@ static void cb_blog_adtag             (FILE *const,void *);
 static void cb_blog_adtag_entity      (FILE *const,void *);
 static void cb_blog_author            (FILE *const,void *);
 static void cb_blog_author_email      (FILE *const,void *);
+static void cb_blog_description       (FILE *const,void *);
 static void cb_blog_name              (FILE *const,void *);
 static void cb_blog_script            (FILE *const,void *);
 static void cb_blog_url               (FILE *const,void *);
@@ -76,7 +77,6 @@ static void cb_cond_hr                (FILE *const,void *);
 static void cb_date_day               (FILE *const,void *);
 static void cb_date_day_normal        (FILE *const,void *);
 static void cb_date_day_url           (FILE *const,void *);
-static void cb_description            (FILE *const,void *);
 static void cb_edit                   (FILE *const,void *);
 static void cb_edit_adtag             (FILE *const,void *);
 static void cb_edit_author            (FILE *const,void *);
@@ -131,6 +131,7 @@ static void cb_rss_url                (FILE *const,void *);
 static void cb_update_time            (FILE *const,void *);
 static void cb_update_type            (FILE *const,void *);
 static void cb_xyzzy                  (FILE *const,void *);
+
 static void print_nav_url             (FILE *const,struct btm const *const,int);
 static void print_nav_title           (FILE *const,struct btm const *const,int);
 static void print_nav_name            (FILE *const,struct btm const *const,int,char);
@@ -156,6 +157,7 @@ static struct chunk_callback const m_callbacks[] =
   { "blog.adtag.entity"         , cb_blog_adtag_entity          } ,
   { "blog.author"               , cb_blog_author                } ,
   { "blog.author.email"         , cb_blog_author_email          } ,
+  { "blog.description"          , cb_blog_description           } ,
   { "blog.name"                 , cb_blog_name                  } ,
   { "blog.script"               , cb_blog_script                } ,
   { "blog.url"                  , cb_blog_url                   } ,
@@ -170,7 +172,6 @@ static struct chunk_callback const m_callbacks[] =
   { "date.day"                  , cb_date_day                   } ,
   { "date.day.normal"           , cb_date_day_normal            } ,
   { "date.day.url"              , cb_date_day_url               } ,
-  { "description"               , cb_description                } ,
   { "edit"                      , cb_edit                       } ,
   { "edit.adtag"                , cb_edit_adtag                 } ,
   { "edit.author"               , cb_edit_author                } ,
@@ -350,6 +351,16 @@ static void cb_blog_author_email(FILE *const out,void *data __attribute__((unuse
   
   fputs(c_email,out);
 }
+
+/**********************************************************************/
+
+static void cb_blog_description(FILE *const out,void *data __attribute__((unused)))
+{
+  assert(out != NULL);
+  fputs(c_description,out);
+}
+
+
 
 /*********************************************************************/
 
@@ -1580,14 +1591,6 @@ static void cb_date_day_normal(FILE *const out,void *data)
   
   strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&day);
   fputs(buffer,out);
-}
-
-/**********************************************************************/
-
-static void cb_description(FILE *const out,void *data __attribute__((unused)))
-{
-  assert(out != NULL);
-  fputs(c_description,out);
 }
 
 /**********************************************************************/

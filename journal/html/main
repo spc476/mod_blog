@@ -28,7 +28,7 @@
 
 <div id="masthead">
   <h1>%{blog.name}%</h1>
-  <p>%{description}%</p>
+  <p>%{blog.description}%</p>
 </div>
 
 <!-- *********************************************************** -->
