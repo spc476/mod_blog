@@ -5,7 +5,7 @@
 <head>
   <meta name="robots"                content="%{robots.index}%,follow">
   <meta name="generator"             content="%{generator}% (http://boston.conman.org/about/)">
-  <meta name="description"           content="%{cond.blog.description}%">
+  <meta name="description"           content="%{entry.description}%">
   
   <meta http-equiv="Content-Type"    content="text/html; charset=UTF-8">
   
