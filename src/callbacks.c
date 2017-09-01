@@ -1150,7 +1150,7 @@ static void cb_navigation_current_url(FILE *const out,void *data __attribute__((
   
   assert(out != NULL);
   
-  tmp = g_blog->now;
+  tmp = g_blog->last;
   print_nav_url(out,&tmp,UNIT_MONTH);
 }
 
