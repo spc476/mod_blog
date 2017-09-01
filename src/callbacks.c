@@ -36,6 +36,7 @@
 #include <cgilib6/conf.h>
 #include <cgilib6/htmltok.h>
 #include <cgilib6/chunk.h>
+#include <cgilib6/util.h>
 
 #include "conf.h"
 #include "blog.h"
@@ -69,11 +70,13 @@ static void cb_comments               (FILE *const,void *);
 static void cb_comments_body          (FILE *const,void *);
 static void cb_comments_check         (FILE *const,void *);
 static void cb_comments_filename      (FILE *const,void *);
+static void cb_cond_blog_description  (FILE *const,void *);
 static void cb_cond_blog_title        (FILE *const,void *);
 static void cb_cond_hr                (FILE *const,void *);
 static void cb_date_day               (FILE *const,void *);
 static void cb_date_day_normal        (FILE *const,void *);
 static void cb_date_day_url           (FILE *const,void *);
+static void cb_description            (FILE *const,void *);
 static void cb_edit                   (FILE *const,void *);
 static void cb_edit_adtag             (FILE *const,void *);
 static void cb_edit_author            (FILE *const,void *);
@@ -161,11 +164,13 @@ static struct chunk_callback const m_callbacks[] =
   { "comments.body"             , cb_comments_body              } ,
   { "comments.check"            , cb_comments_check             } ,
   { "comments.filename"         , cb_comments_filename          } ,
+  { "cond.blog.description"     , cb_cond_blog_description      } ,
   { "cond.blog.title"           , cb_cond_blog_title            } ,
   { "cond.hr"                   , cb_cond_hr                    } ,
   { "date.day"                  , cb_date_day                   } ,
   { "date.day.normal"           , cb_date_day_normal            } ,
   { "date.day.url"              , cb_date_day_url               } ,
+  { "description"               , cb_description                } ,
   { "edit"                      , cb_edit                       } ,
   { "edit.adtag"                , cb_edit_adtag                 } ,
   { "edit.author"               , cb_edit_author                } ,
@@ -219,7 +224,7 @@ static struct chunk_callback const m_callbacks[] =
   { "rss.url"                   , cb_rss_url                    } ,
   { "update.time"               , cb_update_time                } ,
   { "update.type"               , cb_update_type                } ,
-  { "xyzzy"                     , cb_xyzzy                      }
+  { "xyzzy"                     , cb_xyzzy                      } ,
 };
 
 static size_t const m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback);
@@ -809,6 +814,33 @@ static void cb_cond_hr(FILE *const out,void *data)
     if (entry->when.part != cbd->last.part)
       fputs("<hr class=\"next\">",out);
   }
+}
+
+/*********************************************************************/
+
+static void cb_cond_blog_description(FILE *const out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry             entry;
+  const char           *msg = c_description;
+  
+  assert(out != NULL);
+  
+  if (gd.navunit == UNIT_PART)
+  {
+    assert(data != NULL);
+    
+    entry = (BlogEntry)ListGetHead(&cbd->list);
+    if (NodeValid(&entry->node) && entry->valid)
+    {
+      if (!empty_string(entry->status))
+        msg = entry->status;
+      else if (!empty_string(entry->title))
+        msg = entry->title;
+    }
+  }
+  
+  fputs(msg,out);
 }
 
 /*********************************************************************/
@@ -1548,6 +1580,14 @@ static void cb_date_day_normal(FILE *const out,void *data)
   
   strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&day);
   fputs(buffer,out);
+}
+
+/**********************************************************************/
+
+static void cb_description(FILE *const out,void *data __attribute__((unused)))
+{
+  assert(out != NULL);
+  fputs(c_description,out);
 }
 
 /**********************************************************************/

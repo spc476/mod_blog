@@ -47,6 +47,7 @@
 ****************************************************************************/
 
 extern char        const  *const c_name;
+extern char        const  *const c_description;
 extern char        const  *const c_basedir;
 extern char        const  *const c_webdir;
 extern char        const  *const c_author;

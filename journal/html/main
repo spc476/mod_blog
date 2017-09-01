@@ -5,6 +5,7 @@
 <head>
   <meta name="robots"                content="%{robots.index}%,follow">
   <meta name="generator"             content="%{generator}% (http://boston.conman.org/about/)">
+  <meta name="description"           content="%{cond.blog.description}%">
   
   <meta http-equiv="Content-Type"    content="text/html; charset=UTF-8">
   
@@ -27,6 +28,7 @@
 
 <div id="masthead">
   <h1>%{blog.name}%</h1>
+  <p>%{description}%</p>
 </div>
 
 <!-- *********************************************************** -->
