@@ -123,6 +123,7 @@ static void cb_now_year               (FILE *const,void *);
 static void cb_overview               (FILE *const,void *);
 static void cb_overview_date          (FILE *const,void *);
 static void cb_overview_list          (FILE *const,void *);
+static void cb_request_url            (FILE *const,void *);
 static void cb_robots_index           (FILE *const,void *);
 static void cb_rss_item               (FILE *const,void *);
 static void cb_rss_item_url           (FILE *const,void *);
@@ -218,6 +219,7 @@ static struct chunk_callback const m_callbacks[] =
   { "overview"                  , cb_overview                   } ,
   { "overview.date"             , cb_overview_date              } ,
   { "overview.list"             , cb_overview_list              } ,
+  { "request.url"               , cb_request_url                } ,
   { "robots.index"              , cb_robots_index               } ,
   { "rss.item"                  , cb_rss_item                   } ,
   { "rss.item.url"              , cb_rss_item_url               } ,
@@ -1666,6 +1668,19 @@ static void cb_overview_list(FILE *const out,void *data __attribute__((unused)))
 }
 
 /**********************************************************************/
+
+static void cb_request_url(FILE *const out,void *data __attribute__((unused)))
+{
+  char *tum;
+  
+  assert(out != NULL);
+  
+  tum = tumbler_canonical(&gd.req.tumbler);
+  fprintf(out,"%s/%s",c_fullbaseurl,tum);
+  free(tum);
+}
+
+/***********************************************************************/
 
 static void cb_generator(FILE *const out,void *data __attribute__((unused)))
 {
