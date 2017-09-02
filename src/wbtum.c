@@ -600,6 +600,9 @@ char *tumbler_canonical(tumbler__s const *const tum)
   
   assert(tum != NULL);
   
+  if (tum->start.year == 0)
+    return strdup("");
+    
   if (tum->file)
   {
     rc = asprintf(
