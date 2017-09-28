@@ -84,7 +84,7 @@ clean :
 	$(RM) -r build *~ src/*~ *.bak
 
 tarball:
-	git archive -o /tmp/mod_blog-$(VERSION).tar.gz --prefix mod_blog $(VERSION)
+	git archive -o /tmp/mod_blog-$(VERSION).tar.gz --prefix mod_blog/ $(VERSION)
 
 depend:
 	makedepend -pbuild/ -Y -- $(CFLAGS) -- src/*.c 2>/dev/null
