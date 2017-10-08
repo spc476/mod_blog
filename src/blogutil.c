@@ -96,7 +96,7 @@ size_t fcopy(FILE *const restrict out,FILE *const restrict in)
   
   do
   {
-    inbytes   = fread(buffer,1,BUFSIZ,in);
+    inbytes   = fread(buffer,1,sizeof(buffer),in);
     outbytes += fwrite(buffer,1,inbytes,out);
   } while (inbytes > 0);
   

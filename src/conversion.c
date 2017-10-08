@@ -325,7 +325,7 @@ static void check_for_uri(struct nested_params *const local,char const *const at
   src = HtmlParseGetPair(local->token,attrib);
   if (src == NULL) return;
   
-  entify_char(newuri,BUFSIZ,src->value,'&',"&amp;");
+  entify_char(newuri,sizeof(newuri),src->value,'&',"&amp;");
   
   np = PairCreate(attrib,newuri);
   NodeInsert(&src->node,&np->node);

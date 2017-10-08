@@ -884,7 +884,7 @@ static void cb_rss_pubdate(FILE *const out,void *data __attribute__((unused)))
   assert(out != NULL);
   
   ptm = gmtime(&g_blog->tnow);
-  strftime(buffer,BUFSIZ,"%a, %d %b %Y %H:%M:%S GMT",ptm);
+  strftime(buffer,sizeof(buffer),"%a, %d %b %Y %H:%M:%S GMT",ptm);
   fputs(buffer,out);
 }
 
@@ -1220,7 +1220,7 @@ static void print_nav_title(FILE *const out,struct btm const *const date,int uni
          stm.tm_year = date->year - 1900;
          stm.tm_mon  = date->month;
          mktime(&stm);
-         strftime(buffer,BUFSIZ,"%B %Y",&stm);
+         strftime(buffer,sizeof(buffer),"%B %Y",&stm);
          fputs(buffer,out);
          break;
     case UNIT_DAY:
@@ -1229,7 +1229,7 @@ static void print_nav_title(FILE *const out,struct btm const *const date,int uni
          stm.tm_mon  = date->month - 1;
          stm.tm_mday = date->day;
          mktime(&stm);
-         strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&stm);
+         strftime(buffer,sizeof(buffer),"%A, %B %d, %Y",&stm);
          fputs(buffer,out);
          break;
     case UNIT_PART:
@@ -1492,7 +1492,7 @@ static void cb_edit_date(FILE *const out,void *data __attribute__((unused)))
   {
     now = time(NULL);
     ptm = localtime(&now);
-    strftime(buffer,BUFSIZ,"%Y/%m/%d",ptm);
+    strftime(buffer,sizeof(buffer),"%Y/%m/%d",ptm);
     fputs(buffer,out);
   }
 }
@@ -1591,7 +1591,7 @@ static void cb_date_day_normal(FILE *const out,void *data)
   
   mktime(&day);
   
-  strftime(buffer,BUFSIZ,"%A, %B %d, %Y",&day);
+  strftime(buffer,sizeof(buffer),"%A, %B %d, %Y",&day);
   fputs(buffer,out);
 }
 
