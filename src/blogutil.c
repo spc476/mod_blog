@@ -83,7 +83,7 @@ char *fromstring(String const src)
 
 size_t fcopy(FILE *const restrict out,FILE *const restrict in)
 {
-  char buffer[BUFSIZ];
+  char   buffer[BUFSIZ];
   size_t inbytes;
   size_t outbytes;
   
@@ -94,7 +94,7 @@ size_t fcopy(FILE *const restrict out,FILE *const restrict in)
   
   do
   {
-    inbytes = fread(buffer,1,BUFSIZ,in);
+    inbytes   = fread(buffer,1,BUFSIZ,in);
     outbytes += fwrite(buffer,1,inbytes,out);
   } while (inbytes > 0);
   
