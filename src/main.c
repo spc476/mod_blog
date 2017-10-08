@@ -37,7 +37,7 @@ int main(int argc,char *argv[],char *envp[])
   crashreport_with(argc,argv,envp);
   
   /*---------------------
-  ; Defined in ANSI C
+  ; Defined by ANSI C
   ;-----------------------*/
   
   crashreport(SIGABRT);
