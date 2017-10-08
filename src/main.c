@@ -43,7 +43,6 @@ int main(int argc,char *argv[],char *envp[])
   crashreport(SIGABRT);
   crashreport(SIGFPE);
   crashreport(SIGILL);
-  crashreport(SIGINT);
   crashreport(SIGSEGV);
   
   /*---------------------------
