@@ -44,22 +44,28 @@ int main(int argc,char *argv[],char *envp[])
   crashreport(SIGFPE);
   crashreport(SIGILL);
   crashreport(SIGSEGV);
-  
+
+  /*---------------------
+  ; defined by POSIX
+  ;---------------------*/
+
+#ifdef SIGBUS
+  crashreport(SIGBUS);
+  crashreport(SIGQUIT);
+  crashreport(SIGSYS);
+  crashreport(SIGXCPU);
+  crashreport(SIGXFSZ);
+#endif
+
   /*---------------------------
   ; others we're interested in
   ;----------------------------*/
-  
-#ifdef SIGBUG
-  crashreport(SIGBUS);
-#endif
-#ifdef SIGQUIT
-  crashreport(SIGQUIT);
-#endif
-#ifdef SIGSYS
-  crashreport(SIGSYS);
-#endif
+
 #ifdef SIGEMT
   crashreport(SIGEMT);
+#endif
+#ifdef SIGIOT
+  crashreport(SIGIOT);
 #endif
 #ifdef SIGTKFLT
   crashreport(SIGTKFLT);
