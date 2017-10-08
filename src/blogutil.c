@@ -73,6 +73,8 @@ char *fromstring(String const src)
 {
   char *dest;
   
+  assert(src.d != NULL);
+  
   dest = malloc(src.s + 1);
   memcpy(dest,src.d,src.s);
   dest[src.s] = '\0';
