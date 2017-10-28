@@ -40,28 +40,15 @@ override LDFLAGS +=-rdynamic
 prefix = /usr/local
 bindir = $(prefix)/bin
 
-###################################
-# some notes
-#
-# for GCC, profiling information can be had with:
-#CFLAGS=-pg
-#LFLAGS=-lcing2d
-#
-# and running gprof after running the program
-#
-################################################
+#######################################################################
 
-all: build build/src build/boston
+.PHONY: clean dist depend install uninstall reinstall
 
-build/boston : $(addprefix build/,$(patsubst %.c,%.o,$(wildcard src/*.c)))
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-
-build/%.o : %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+src/main : $(patsubst %.c,%.o,$(wildcard src/*.c))
 
 install:
 	$(INSTALL) -d $(DESTDIR)$(bindir)
-	$(INSTALL_PROGRAM) build/boston $(DESTDIR)$(bindir)/$(INSTALL_NAME)
+	$(INSTALL_PROGRAM) src/main $(DESTDIR)$(bindir)/$(INSTALL_NAME)
 	$(SETUID) 4755 $(DESTDIR)$(bindir)/$(INSTALL_NAME)
 
 uninstall:
@@ -71,50 +58,42 @@ reinstall:
 	make uninstall
 	make install
 
-#######################################################################
-#
-# Misc targets
-#
-#######################################################################
-
-build build/src :
-	mkdir -p $@
-
 clean :
-	$(RM) -r build *~ src/*~ *.bak
+	$(RM) $(shell find . -name '*~')
+	$(RM) $(shell find . -name '*.o')
+	$(RM) src/main Makefile.bak
 
-tarball:
+dist:
 	git archive -o /tmp/mod_blog-$(VERSION).tar.gz --prefix mod_blog/ $(VERSION)
 
 depend:
-	makedepend -pbuild/ -Y -- $(CFLAGS) -- src/*.c 2>/dev/null
+	makedepend -Y -- $(CFLAGS) -- src/*.c 2>/dev/null
 
 # DO NOT DELETE
 
-build/src/addutil.o: src/conf.h src/blog.h src/timeutil.h src/conversion.h
-build/src/addutil.o: src/frontend.h src/wbtum.h src/globals.h src/backend.h
-build/src/addutil.o: src/fix.h src/blogutil.h
-build/src/authenticate.o: src/conf.h src/frontend.h src/wbtum.h
-build/src/authenticate.o: src/timeutil.h src/blog.h src/globals.h
-build/src/authenticate.o: src/backend.h
-build/src/backend.o: src/fix.h src/frontend.h src/wbtum.h src/timeutil.h
-build/src/backend.o: src/blog.h src/blogutil.h src/backend.h src/globals.h
-build/src/blog.o: src/conf.h src/blog.h src/timeutil.h src/wbtum.h
-build/src/blogutil.o: src/blogutil.h
-build/src/callbacks.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
-build/src/callbacks.o: src/wbtum.h src/fix.h src/blogutil.h src/globals.h
-build/src/callbacks.o: src/backend.h
-build/src/conversion.o: src/conversion.h src/fix.h src/frontend.h src/wbtum.h
-build/src/conversion.o: src/timeutil.h src/blog.h src/blogutil.h
-build/src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
-build/src/globals.o: src/timeutil.h src/blog.h src/backend.h src/fix.h
-build/src/main.o: src/globals.h src/frontend.h src/wbtum.h src/timeutil.h
-build/src/main.o: src/blog.h src/backend.h
-build/src/main_cgi.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
-build/src/main_cgi.o: src/fix.h src/globals.h src/backend.h
-build/src/main_cli.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
-build/src/main_cli.o: src/blog.h src/fix.h src/blogutil.h src/globals.h
-build/src/main_cli.o: src/backend.h
-build/src/timeutil.o: src/timeutil.h src/wbtum.h
-build/src/wbtum.o: src/wbtum.h src/timeutil.h src/globals.h src/frontend.h
-build/src/wbtum.o: src/blog.h src/backend.h
+src/addutil.o: src/conf.h src/blog.h src/timeutil.h src/conversion.h
+src/addutil.o: src/frontend.h src/wbtum.h src/globals.h src/backend.h
+src/addutil.o: src/fix.h src/blogutil.h
+src/authenticate.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
+src/authenticate.o: src/blog.h src/globals.h src/backend.h
+src/backend.o: src/fix.h src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
+src/backend.o: src/blogutil.h src/backend.h src/globals.h
+src/blog.o: src/conf.h src/blog.h src/timeutil.h src/wbtum.h
+src/blogutil.o: src/blogutil.h
+src/callbacks.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
+src/callbacks.o: src/wbtum.h src/fix.h src/blogutil.h src/globals.h
+src/callbacks.o: src/backend.h
+src/conversion.o: src/conversion.h src/fix.h src/frontend.h src/wbtum.h
+src/conversion.o: src/timeutil.h src/blog.h src/blogutil.h
+src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
+src/globals.o: src/timeutil.h src/blog.h src/backend.h src/fix.h
+src/main.o: src/globals.h src/frontend.h src/wbtum.h src/timeutil.h
+src/main.o: src/blog.h src/backend.h
+src/main_cgi.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
+src/main_cgi.o: src/fix.h src/globals.h src/backend.h
+src/main_cli.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
+src/main_cli.o: src/blog.h src/fix.h src/blogutil.h src/globals.h
+src/main_cli.o: src/backend.h
+src/timeutil.o: src/timeutil.h src/wbtum.h
+src/wbtum.o: src/wbtum.h src/timeutil.h src/globals.h src/frontend.h
+src/wbtum.o: src/blog.h src/backend.h
