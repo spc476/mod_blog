@@ -39,6 +39,7 @@ typedef enum http__e
   HTTP_SWITCHPROTO       = 101, /* 1.1  */
   HTTP_PROCESSING        = 102, /* RFC-2518 */
   HTTP_CHECKPOINT        = 103, /* U */
+  HTTP_EARLYHINTS        = 103, /* draft RFC */
   
         /*--------------------------------------
         ; Successful Codes
@@ -136,6 +137,7 @@ typedef enum http__e
   HTTP_TIMEOUT500        = 524, /* CloudFlare */
   HTTP_SSLHANDSHAKE      = 525, /* CloudFlare */
   HTTP_SSLINVALID        = 526, /* CloudFlare */
+  HTTP_RAILGUN           = 527, /* CloudFlare */
   HTTP_FROZEN            = 530, /* U */
   
 } http__e;
