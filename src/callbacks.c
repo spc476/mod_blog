@@ -362,8 +362,6 @@ static void cb_blog_description(FILE *const out,void *data __attribute__((unused
   fputs(c_description,out);
 }
 
-
-
 /*********************************************************************/
 
 static void cb_blog_adtag(FILE *const out,void *data)
