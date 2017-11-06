@@ -494,7 +494,7 @@ static void cb_entry_description(FILE *const out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
-  const char           *msg = c_description;
+  char const           *msg = c_description;
   
   assert(out != NULL);
   
