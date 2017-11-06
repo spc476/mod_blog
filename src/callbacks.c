@@ -567,11 +567,26 @@ static void cb_entry_title(FILE *const out,void *data)
 static void cb_entry_class(FILE *const out,void *data)
 {
   struct callback_data *cbd = data;
+  char const           *msg;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  fputs(cbd->entry->class,out);
+  if (cbd->entry != NULL)
+    msg = cbd->entry->class;
+  else
+  {
+    msg = c_class;
+    if (gd.navunit == UNIT_PART)
+    {
+      BlogEntry entry = (BlogEntry)ListGetHead(&cbd->list);
+      if (NodeValid(&entry->node) && entry->valid)
+        if (!empty_string(entry->class))
+          msg = entry->class;
+    }
+  }
+  
+  fputs(msg,out);
 }
 
 /***********************************************************************/

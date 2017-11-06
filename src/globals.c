@@ -71,6 +71,7 @@ static void        globals_free (void);
 
 char const   *c_name;                    /* no free */
 char const   *c_description;             /* no free */
+char const   *c_class;                   /* no free */
 char const   *c_basedir;                 /* no free */
 char const   *c_webdir;                  /* no free */
 char const   *c_author;                  /* no free */
@@ -183,6 +184,7 @@ int GlobalsInit(char const *conf)
   
   c_name         = get_string(g_L,"name",NULL);
   c_description  = get_string(g_L,"description",NULL);
+  c_class        = get_string(g_L,"class",NULL);
   c_basedir      = get_string(g_L,"basedir",NULL);
   c_webdir       = get_string(g_L,"webdir",NULL);
   c_lockfile     = get_string(g_L,"lockfile","/tmp/.mod_blog.lock");
