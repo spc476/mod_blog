@@ -4,8 +4,9 @@
 <html lang="en-US">
 <head>
   <meta name="robots"                content="%{robots.index}%,follow">
-  <meta name="generator"             content="%{generator}% (http://boston.conman.org/about/)">
+  <meta name="generator"             content="%{generator}% (%{blog.url.home}%/about/)">
   <meta name="description"           content="%{entry.description}%">
+  <meta name="keywords"              content="%{entry.class}%">
   
   <meta http-equiv="Content-Type"    content="text/html; charset=UTF-8">
   
@@ -53,21 +54,6 @@
 
 <!-- *********************************************************** -->
 
-<div id="Amazon">
-    <iframe
-        title="Selling out to Amazon"
-        marginwidth="0"
-        marginheight="0"
-        src="http://rcm.amazon.com/e/cm?t=conmanlaborat-20&amp;o=1&amp;p=14&amp;l=st1&amp;mode=books&amp;search=%{blog.adtag}%&amp;=1&amp;fc1=&amp;lt1=&amp;lc1=&amp;bg1=&amp;f=ifr"
-        width="160"
-        height="600"
-        frameborder="0"
-        style="border: none;"
-        scrolling="no"><p><a class="external" href="http://www.amazon.com/gp/registry/2A3Y9BWJDHC92">Amazon Wish List</a></p></iframe>
-</div>
-
-<!-- *********************************************************** -->
-
 <div id="authorcopyright">
 
         <p>Copyright &copy; %{begin.year}%-%{now.year}% by <a class="page"
@@ -80,4 +66,3 @@
 
 </body>
 </html>
-
