@@ -79,7 +79,7 @@ extern size_t      const         c_numaflinks;
 extern lua_State      *g_L;
 extern char const     *g_templates;      /* work on */
 extern bool volatile   gf_debug;
-extern Blog            g_blog;
+extern Blog           *g_blog;
 extern struct display  gd;               /* work on */
 
 extern int  GlobalsInit        (char const *);

@@ -118,7 +118,7 @@ char *get_remote_user(void)
 
 #if defined(USE_NONE)
 
-  bool authenticate_author(Request req)
+  bool authenticate_author(Request *req)
   {
     assert(req         != NULL);
     assert(req->author != NULL);
@@ -130,7 +130,7 @@ char *get_remote_user(void)
   
 #elif defined(USE_GDBM)
 
-  bool authenticate_author(Request req)
+  bool authenticate_author(Request *req)
   {
     GDBM_FILE list;
     datum     key;
@@ -157,7 +157,7 @@ char *get_remote_user(void)
   
 #elif defined (USE_HTPASSWD)
 
-  bool authenticate_author(Request req)
+  bool authenticate_author(Request *req)
   {
     FILE   *in;
     char   *lines[10];

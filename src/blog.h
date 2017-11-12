@@ -38,13 +38,13 @@ typedef struct blog
   struct btm  last;
   struct btm  now;
   time_t      tnow;
-} *Blog;
+} Blog;
 
 typedef struct blogentry
 {
   Node        node;
   bool        valid;
-  Blog        blog;
+  Blog       *blog;
   time_t      timestamp;
   struct btm  when;
   char       *title;
@@ -53,23 +53,23 @@ typedef struct blogentry
   char       *status;
   char       *adtag;
   char       *body;
-} *BlogEntry;
+} BlogEntry;
 
 /*********************************************************************/
 
-extern Blog      BlogNew               (char const *,char const *);
-extern bool      BlogLock              (Blog);
-extern bool      BlogUnlock            (Blog);
-extern void      BlogFree              (Blog);
+extern Blog      *BlogNew               (char const *,char const *);
+extern bool       BlogLock              (Blog *);
+extern bool       BlogUnlock            (Blog *);
+extern void       BlogFree              (Blog *);
 
-extern BlogEntry BlogEntryNew          (Blog const);
-extern BlogEntry BlogEntryRead         (Blog const,struct btm const *);
-extern void      BlogEntryReadBetweenU (Blog const,List *,struct btm const *restrict,struct btm const *restrict);
-extern void      BlogEntryReadBetweenD (Blog const,List *,struct btm const *restrict,struct btm const *restrict);
-extern void      BlogEntryReadXD       (Blog const,List *,struct btm const *restrict,size_t);
-extern void      BlogEntryReadXU       (Blog const,List *,struct btm const *restrict,size_t);
-extern int       BlogEntryWrite        (BlogEntry const);
-extern int       BlogEntryFree         (BlogEntry);
+extern BlogEntry *BlogEntryNew          (Blog *);
+extern BlogEntry *BlogEntryRead         (Blog *,struct btm const *);
+extern void       BlogEntryReadBetweenU (Blog *,List *,struct btm const *restrict,struct btm const *restrict);
+extern void       BlogEntryReadBetweenD (Blog *,List *,struct btm const *restrict,struct btm const *restrict);
+extern void       BlogEntryReadXD       (Blog *,List *,struct btm const *restrict,size_t);
+extern void       BlogEntryReadXU       (Blog *,List *,struct btm const *restrict,size_t);
+extern int        BlogEntryWrite        (BlogEntry *);
+extern int        BlogEntryFree         (BlogEntry *);
 
 /**********************************************************************/
 

@@ -77,7 +77,7 @@ int generate_pages(void)
 int pagegen_items(
         template__t const *template,
         FILE              *out,
-        Blog        const  blog
+        Blog              *blog
 )
 {
   struct btm            thisday;
@@ -116,7 +116,7 @@ int pagegen_items(
 int pagegen_days(
         template__t const *template,
         FILE              *out,
-        Blog        const  blog
+        Blog              *blog
 )
 {
   struct btm            thisday;
@@ -139,7 +139,7 @@ int pagegen_days(
   
   for (days = 0 , added = false ; days < template->items ; )
   {
-    BlogEntry entry;
+    BlogEntry *entry;
     
     if (btm_cmp(&thisday,&g_blog->first) < 0) break;
     
@@ -424,9 +424,7 @@ static void calculate_previous(struct btm const start)
            
            while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
            {
-             BlogEntry entry;
-             
-             entry = BlogEntryRead(g_blog,&gd.previous);
+             BlogEntry *entry = BlogEntryRead(g_blog,&gd.previous);
              if (entry == NULL)
              {
                btm_dec_day(&gd.previous);
@@ -451,9 +449,7 @@ static void calculate_previous(struct btm const start)
            
            while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
            {
-             BlogEntry entry;
-             
-             entry = BlogEntryRead(g_blog,&gd.previous);
+             BlogEntry *entry = BlogEntryRead(g_blog,&gd.previous);
              if (entry == NULL)
              {
                btm_dec_part(&gd.previous);
@@ -509,9 +505,7 @@ static void calculate_next(struct btm const end)
            
            while(btm_cmp(&gd.next,&g_blog->now) <= 0)
            {
-             BlogEntry entry;
-             
-             entry = BlogEntryRead(g_blog,&gd.next);
+             BlogEntry *entry = BlogEntryRead(g_blog,&gd.next);
              if (entry == NULL)
              {
                btm_inc_day(&gd.next);
@@ -536,9 +530,7 @@ static void calculate_next(struct btm const end)
            
            while(btm_cmp(&gd.next,&g_blog->now) <= 0)
            {
-             BlogEntry entry;
-             
-             entry = BlogEntryRead(g_blog,&gd.next);
+             BlogEntry *entry = BlogEntryRead(g_blog,&gd.next);
              if (entry == NULL)
              {
                gd.next.part = 1;
@@ -833,7 +825,7 @@ static int display_file(FILE *out,tumbler__s const *spec)
 
 static char *tag_collect(List *list)
 {
-  BlogEntry entry;
+  BlogEntry *entry;
   
   /*-----------------------------------------------------------------------
   ; this function used to collect all the class tags from all the entries,
@@ -843,7 +835,7 @@ static char *tag_collect(List *list)
   
   assert(list != NULL);
   
-  entry = (BlogEntry)ListGetHead(list);
+  entry = (BlogEntry *)ListGetHead(list);
   
   if (NodeValid(&entry->node))
   {
@@ -895,13 +887,13 @@ static char *tag_pick(char const *tag)
 
 static void free_entries(List *list)
 {
-  BlogEntry entry;
+  BlogEntry *entry;
   
   for
   (
-    entry = (BlogEntry)ListRemHead(list);
+    entry = (BlogEntry *)ListRemHead(list);
     NodeValid(&entry->node);
-    entry = (BlogEntry)ListRemHead(list)
+    entry = (BlogEntry *)ListRemHead(list)
   )
   {
     assert(entry->valid);

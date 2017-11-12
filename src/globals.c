@@ -102,7 +102,7 @@ size_t        c_numaflinks;
 lua_State      *g_L;
 char const     *g_templates;
 bool volatile   gf_debug = false;
-Blog            g_blog;
+Blog           *g_blog;
 struct display  gd =
 {
   .navunit = UNIT_INDEX,

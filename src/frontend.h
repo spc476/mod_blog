@@ -57,7 +57,7 @@ typedef struct request
   char       *reqtumbler;
   struct btm  when;
   tumbler__s  tumbler;
-} *Request;
+} Request;
 
 typedef struct dflags
 {
@@ -79,13 +79,13 @@ typedef struct display
   struct request  req;
   struct btm      previous;
   struct btm      next;
-} *Display;
+} Display;
 
 struct callback_data
 {
   List        list;
   struct btm  last;     /* timestamp of previous entry */
-  BlogEntry   entry;    /* current entry being processed */
+  BlogEntry  *entry;    /* current entry being processed */
   FILE       *ad;       /* file containing ad */
   char       *adtag;
 };

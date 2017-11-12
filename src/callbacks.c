@@ -136,7 +136,7 @@ static void cb_xyzzy                  (FILE *,void *);
 static void print_nav_url             (FILE *,struct btm const *,int);
 static void print_nav_title           (FILE *,struct btm const *,int);
 static void print_nav_name            (FILE *,struct btm const *,int,char);
-static void fixup_uri                 (BlogEntry,HtmlToken,char const *);
+static void fixup_uri                 (BlogEntry *,HtmlToken,char const *);
 static void handle_aflinks            (HtmlToken,char const *);
 
 /************************************************************************/
@@ -412,7 +412,7 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
 static void cb_entry(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out != NULL);
   
@@ -431,9 +431,9 @@ static void cb_entry(FILE *out,void *data)
   
   for
   (
-    entry = (BlogEntry)ListRemHead(&cbd->list);
+    entry = (BlogEntry *)ListRemHead(&cbd->list);
     NodeValid(&entry->node);
-    entry = (BlogEntry)ListRemHead(&cbd->list)
+    entry = (BlogEntry *)ListRemHead(&cbd->list)
   )
   {
     assert(entry->valid);
@@ -451,7 +451,7 @@ static void cb_entry(FILE *out,void *data)
 static void cb_entry_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -466,7 +466,7 @@ static void cb_entry_url(FILE *out,void *data)
 static void cb_entry_id(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -493,7 +493,7 @@ static void cb_entry_date(FILE *out,void *data)
 static void cb_entry_description(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   char const           *msg = c_description;
   
   assert(out != NULL);
@@ -502,7 +502,7 @@ static void cb_entry_description(FILE *out,void *data)
   {
     assert(data != NULL);
     
-    entry = (BlogEntry)ListGetHead(&cbd->list);
+    entry = (BlogEntry *)ListGetHead(&cbd->list);
     if (NodeValid(&entry->node) && entry->valid)
     {
       if (!empty_string(entry->status))
@@ -520,7 +520,7 @@ static void cb_entry_description(FILE *out,void *data)
 static void cb_entry_pubdate(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   time_t                ts;
   struct tm            *ptm;
   char                  buffer[BUFSIZ];
@@ -579,7 +579,7 @@ static void cb_entry_class(FILE *out,void *data)
     msg = c_class;
     if (gd.navunit == UNIT_PART)
     {
-      BlogEntry entry = (BlogEntry)ListGetHead(&cbd->list);
+      BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
       if (NodeValid(&entry->node) && entry->valid)
         if (!empty_string(entry->class))
           msg = entry->class;
@@ -660,7 +660,7 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
 
 /*************************************************************************/
 
-static void fixup_uri(BlogEntry entry,HtmlToken token,char const *attrib)
+static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
 {
   struct pair *src;
   struct pair *np;
@@ -739,7 +739,7 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,char const *attrib)
 static void cb_entry_body(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   FILE                 *in;
   HtmlToken             token;
   int                   t;
@@ -851,7 +851,7 @@ static void cb_entry_body_entified(FILE *out,void *data)
 static void cb_cond_hr(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out != NULL);
   
@@ -874,14 +874,14 @@ static void cb_cond_hr(FILE *out,void *data)
 static void cb_cond_blog_title(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out != NULL);
   
   if (gd.navunit == UNIT_PART)
   {
     assert(data != NULL);
-    entry = (BlogEntry)ListGetHead(&cbd->list);
+    entry = (BlogEntry *)ListGetHead(&cbd->list);
     if (NodeValid(&entry->node) && entry->valid)
       fprintf(out,"%s - ",entry->title);
   }
@@ -915,16 +915,16 @@ static void cb_rss_url(FILE *out,void *data __attribute__((unused)))
 static void cb_rss_item(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out  != NULL);
   assert(data != NULL);
   
   for
   (
-    entry = (BlogEntry)ListRemHead(&cbd->list);
+    entry = (BlogEntry *)ListRemHead(&cbd->list);
     NodeValid(&entry->node);
-    entry = (BlogEntry)ListRemHead(&cbd->list)
+    entry = (BlogEntry *)ListRemHead(&cbd->list)
   )
   {
     assert(entry->valid);
@@ -956,7 +956,7 @@ static void cb_rss_item_url(FILE *out,void *data)
 static void cb_atom_entry(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -968,9 +968,9 @@ static void cb_atom_entry(FILE *out,void *data)
   
   for
   (
-    entry = (BlogEntry)ListRemHead(&cbd->list);
+    entry = (BlogEntry *)ListRemHead(&cbd->list);
     NodeValid(&entry->node);
-    entry = (BlogEntry)ListRemHead(&cbd->list)
+    entry = (BlogEntry *)ListRemHead(&cbd->list)
   )
   {
     assert(entry->valid);
@@ -1216,9 +1216,9 @@ static void cb_navigation_current_url(FILE *out,void *data __attribute__((unused
 
 static void print_nav_title(FILE *out,struct btm const *date,int unit)
 {
-  BlogEntry entry;
-  struct tm stm;
-  char      buffer[BUFSIZ];
+  BlogEntry *entry;
+  struct tm  stm;
+  char       buffer[BUFSIZ];
   
   assert(out  != NULL);
   assert(date != NULL);
@@ -1411,7 +1411,7 @@ static void cb_comments_filename(FILE *out,void *data)
 static void cb_comments_check(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  char        fname[BUFSIZ];
+  char                  fname[BUFSIZ];
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -1558,7 +1558,7 @@ static void cb_xyzzy(FILE *out,void *data __attribute__((unused)))
 static void cb_date_day(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -1573,7 +1573,7 @@ static void cb_date_day(FILE *out,void *data)
 static void cb_date_day_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -1588,7 +1588,7 @@ static void cb_date_day_url(FILE *out,void *data)
 static void cb_date_day_normal(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   struct tm             day;
   char                  buffer[BUFSIZ];
   
@@ -1627,7 +1627,7 @@ static void cb_entry_cond_author(FILE *out,void *data)
 static void cb_entry_cond_date(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -1644,7 +1644,7 @@ static void cb_entry_cond_date(FILE *out,void *data)
 static void cb_entry_name(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry             entry;
+  BlogEntry            *entry;
   
   assert(out  != NULL);
   assert(data != NULL);

@@ -63,9 +63,9 @@ static inline size_t max(size_t a,size_t b)
 
 /***********************************************************************/
 
-Blog BlogNew(char const *location,char const *lockfile)
+Blog *BlogNew(char const *location,char const *lockfile)
 {
-  Blog       blog;
+  Blog      *blog;
   FILE      *fp;
   struct tm *ptm;
   char       buffer[128];
@@ -174,7 +174,7 @@ Blog BlogNew(char const *location,char const *lockfile)
 
 /***********************************************************************/
 
-bool BlogLock(Blog blog)
+bool BlogLock(Blog *blog)
 {
   struct flock lockdata;
   int          rc;
@@ -207,7 +207,7 @@ bool BlogLock(Blog blog)
 
 /***********************************************************************/
 
-bool BlogUnlock(Blog blog)
+bool BlogUnlock(Blog *blog)
 {
   struct flock lockdata;
   int          rc;
@@ -237,7 +237,7 @@ bool BlogUnlock(Blog blog)
 
 /***********************************************************************/
 
-void BlogFree(Blog blog)
+void BlogFree(Blog *blog)
 {
   assert(blog != NULL);
   
@@ -250,9 +250,9 @@ void BlogFree(Blog blog)
 
 /************************************************************************/
 
-BlogEntry BlogEntryNew(Blog const blog)
+BlogEntry *BlogEntryNew(Blog *blog)
 {
-  BlogEntry pbe;
+  BlogEntry *pbe;
   
   assert(blog != NULL);
   
@@ -277,9 +277,9 @@ BlogEntry BlogEntryNew(Blog const blog)
 
 /***********************************************************************/
 
-BlogEntry BlogEntryRead(Blog const blog,struct btm const *which)
+BlogEntry *BlogEntryRead(Blog *blog,struct btm const *which)
 {
-  BlogEntry    entry;
+  BlogEntry   *entry;
   char         pname[FILENAME_MAX];
   FILE        *sinbody;
   struct stat  status;
@@ -335,14 +335,14 @@ BlogEntry BlogEntryRead(Blog const blog,struct btm const *which)
 /**********************************************************************/
 
 void BlogEntryReadBetweenU(
-        Blog      const   blog,
+        Blog             *blog,
         List             *list,
         struct btm const *restrict start,
         struct btm const *restrict end
 )
 {
-  BlogEntry  entry;
-  struct btm current;
+  BlogEntry  *entry;
+  struct btm  current;
   
   assert(blog  != NULL);
   assert(list  != NULL);
@@ -370,7 +370,7 @@ void BlogEntryReadBetweenU(
 /************************************************************************/
 
 void BlogEntryReadBetweenD(
-        Blog       const  blog,
+        Blog             *blog,
         List             *listb,
         struct btm const *restrict end,
         struct btm const *restrict start
@@ -407,21 +407,20 @@ void BlogEntryReadBetweenD(
 /*******************************************************************/
 
 void BlogEntryReadXD(
-        Blog       const  blog,
+        Blog             *blog,
         List             *list,
         struct btm const *start,
         size_t            num
 )
 {
-  BlogEntry  entry;
-  struct btm current;
+  BlogEntry  *entry;
+  struct btm  current;
   
   assert(blog  != NULL);
   assert(list  != NULL);
   assert(start != NULL);
   assert(num   >  0);
   
-  memset(&entry,0,sizeof(entry));
   current = *start;
   
   while(num)
@@ -447,14 +446,14 @@ void BlogEntryReadXD(
 /*******************************************************************/
 
 void BlogEntryReadXU(
-        Blog       const  blog,
+        Blog             *blog,
         List             *list,
         struct btm const *start,
         size_t            num
 )
 {
-  BlogEntry  entry;
-  struct btm current;
+  BlogEntry  *entry;
+  struct btm  current;
   
   assert(blog != NULL);
   assert(list != NULL);
@@ -481,7 +480,7 @@ void BlogEntryReadXU(
 
 /**************************************************************************/
 
-int BlogEntryWrite(BlogEntry const entry)
+int BlogEntryWrite(BlogEntry *entry)
 {
   char   **authors;
   char   **class;
@@ -617,7 +616,7 @@ int BlogEntryWrite(BlogEntry const entry)
 
 /***********************************************************************/
 
-int BlogEntryFree(BlogEntry entry)
+int BlogEntryFree(BlogEntry *entry)
 {
   assert(entry != NULL);
   

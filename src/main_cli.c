@@ -67,12 +67,12 @@ enum
 
 /*******************************************************************/
 
-static int  cmd_cli_new       (Request);
-static int  cmd_cli_show      (Request);
-static void get_cli_command   (Request,char *);
-static int  mail_setup_data   (Request);
-static int  mailfile_readdata (Request);
-static int  cli_error         (Request,int,char const *, ... );
+static int  cmd_cli_new       (Request *);
+static int  cmd_cli_show      (Request *);
+static void get_cli_command   (Request *,char *);
+static int  mail_setup_data   (Request *);
+static int  mailfile_readdata (Request *);
+static int  cli_error         (Request *,int,char const *, ... );
 
 /*************************************************************************/
 
@@ -184,7 +184,7 @@ int main_cli(int argc,char *argv[])
     
   if (forcenotify)
   {
-    BlogEntry entry = BlogEntryRead(g_blog,&g_blog->last);
+    BlogEntry *entry = BlogEntryRead(g_blog,&g_blog->last);
     
     if (entry != NULL)
     {
@@ -205,7 +205,7 @@ int main_cli(int argc,char *argv[])
 
 /************************************************************************/
 
-static int cmd_cli_new(Request req)
+static int cmd_cli_new(Request *req)
 {
   int rc;
   
@@ -231,7 +231,7 @@ static int cmd_cli_new(Request req)
 
 /****************************************************************************/
 
-static int cmd_cli_show(Request req)
+static int cmd_cli_show(Request *req)
 {
   int rc = -1;
   
@@ -279,7 +279,7 @@ static int cmd_cli_show(Request req)
 
 /********************************************************************/
 
-static void get_cli_command(Request req,char *value)
+static void get_cli_command(Request *req,char *value)
 {
   assert(req != NULL);
   
@@ -296,7 +296,7 @@ static void get_cli_command(Request req,char *value)
 
 /*************************************************************************/
 
-static int mail_setup_data(Request req)
+static int mail_setup_data(Request *req)
 {
   List    headers;
   char   *line;
@@ -352,7 +352,7 @@ static int mail_setup_data(Request req)
 
 /*******************************************************************/
 
-static int mailfile_readdata(Request req)
+static int mailfile_readdata(Request *req)
 {
   FILE   *output;
   List    headers;
@@ -422,7 +422,7 @@ static int mailfile_readdata(Request req)
 
 /***************************************************************************/
 
-static int cli_error(Request req __attribute__((unused)),int level,char const *msg, ... )
+static int cli_error(Request *req __attribute__((unused)),int level,char const *msg, ... )
 {
   va_list args;
   

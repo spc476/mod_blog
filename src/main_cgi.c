@@ -39,18 +39,18 @@
 
 /**************************************************************************/
 
-static int  cgi_init               (Cgi,Request);
-static void set_m_cgi_get_command  (char *,Request);
-static int  cmd_cgi_get_new        (Request);
-static int  cmd_cgi_get_show       (Request);
-static int  cmd_cgi_get_edit       (Request);
-static int  cmd_cgi_get_overview   (Request);
-static void set_m_cgi_post_command (char *,Request);
-static void set_m_author           (char *,Request);
-static int  cmd_cgi_post_new       (Request);
-static int  cmd_cgi_post_show      (Request);
-static int  cmd_cgi_post_edit      (Request);
-static int  cgi_error              (Request,int,char const *, ... );
+static int  cgi_init               (Cgi,Request *);
+static void set_m_cgi_get_command  (char *,Request *);
+static int  cmd_cgi_get_new        (Request *);
+static int  cmd_cgi_get_show       (Request *);
+static int  cmd_cgi_get_edit       (Request *);
+static int  cmd_cgi_get_overview   (Request *);
+static void set_m_cgi_post_command (char *,Request *);
+static void set_m_author           (char *,Request *);
+static int  cmd_cgi_post_new       (Request *);
+static int  cmd_cgi_post_show      (Request *);
+static int  cmd_cgi_post_edit      (Request *);
+static int  cgi_error              (Request *,int,char const *, ... );
 
 /*************************************************************************/
 
@@ -92,7 +92,7 @@ int main_cgi_get(Cgi cgi)
 
 /************************************************************************/
 
-static void set_m_cgi_get_command(char *value,Request req)
+static void set_m_cgi_get_command(char *value,Request *req)
 {
   assert(req != NULL);
   
@@ -113,7 +113,7 @@ static void set_m_cgi_get_command(char *value,Request req)
 
 /***********************************************************************/
 
-static int cmd_cgi_get_new(Request req)
+static int cmd_cgi_get_new(Request *req)
 {
   struct callback_data cbd;
   
@@ -130,7 +130,7 @@ static int cmd_cgi_get_new(Request req)
 
 /**********************************************************************/
 
-static int cmd_cgi_get_show(Request req)
+static int cmd_cgi_get_show(Request *req)
 {
   char *status;
   int   rc = -1;
@@ -220,7 +220,7 @@ static int cmd_cgi_get_show(Request req)
 
 /********************************************************************/
 
-static int cmd_cgi_get_edit(Request req)
+static int cmd_cgi_get_edit(Request *req)
 {
   assert(req != NULL);
   return (*req->error)(req,HTTP_BADREQ,"bad request");
@@ -228,7 +228,7 @@ static int cmd_cgi_get_edit(Request req)
 
 /***********************************************************************/
 
-static int cmd_cgi_get_overview(Request req)
+static int cmd_cgi_get_overview(Request *req)
 {
   List days;
   assert(req != NULL);
@@ -294,7 +294,7 @@ int main_cgi_post(Cgi cgi)
 
 /************************************************************************/
 
-static void set_m_cgi_post_command(char *value,Request req)
+static void set_m_cgi_post_command(char *value,Request *req)
 {
   assert(req != NULL);
   
@@ -311,7 +311,7 @@ static void set_m_cgi_post_command(char *value,Request req)
 
 /************************************************************************/
 
-static void set_m_author(char *value,Request req)
+static void set_m_author(char *value,Request *req)
 {
   assert(req != NULL);
   
@@ -325,7 +325,7 @@ static void set_m_author(char *value,Request req)
 
 /************************************************************************/
 
-static int cmd_cgi_post_new(Request req)
+static int cmd_cgi_post_new(Request *req)
 {
   int rc;
   
@@ -360,10 +360,10 @@ static int cmd_cgi_post_new(Request req)
 
 /***********************************************************************/
 
-static int cmd_cgi_post_show(Request req)
+static int cmd_cgi_post_show(Request *req)
 {
   struct callback_data cbd;
-  BlogEntry            entry;
+  BlogEntry           *entry;
   char                *p;
   
   assert(req != NULL);
@@ -407,7 +407,7 @@ static int cmd_cgi_post_show(Request req)
 
 /**********************************************************************/
 
-static int cmd_cgi_post_edit(Request req)
+static int cmd_cgi_post_edit(Request *req)
 {
   assert(req != NULL);
   
@@ -416,7 +416,7 @@ static int cmd_cgi_post_edit(Request req)
 
 /***********************************************************************/
 
-static int cgi_error(Request req,int level,char const *msg, ... )
+static int cgi_error(Request *req,int level,char const *msg, ... )
 {
   FILE    *in;
   va_list  args;
@@ -483,7 +483,7 @@ static int cgi_error(Request req,int level,char const *msg, ... )
 
 /**********************************************************************/
 
-static int cgi_init(Cgi cgi,Request req)
+static int cgi_init(Cgi cgi,Request *req)
 {
   assert(cgi != NULL);
   assert(req != NULL);

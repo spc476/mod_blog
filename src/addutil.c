@@ -43,9 +43,9 @@
 
 /*********************************************************************/
 
-int entry_add(Request req)
+int entry_add(Request *req)
 {
-  BlogEntry  entry;
+  BlogEntry *entry;
   char      *p;
   
   assert(req != NULL);
@@ -93,7 +93,7 @@ int entry_add(Request req)
 
 /************************************************************************/
 
-void fix_entry(Request req)
+void fix_entry(Request *req)
 {
   FILE   *out;
   FILE   *in;
@@ -171,7 +171,7 @@ void dbcritical(char const *msg)
 
 #ifndef EMAIL_NOTIFY
 
-void notify_emaillist(Request req __attribute__((unused)))
+void notify_emaillist(Request *req __attribute__((unused)))
 {
 }
 
@@ -324,7 +324,7 @@ static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
 
 /************************************************************************/
 
-void notify_emaillist(Request req)
+void notify_emaillist(Request *req)
 {
   GDBM_FILE  list;
   Chunk      templates;
@@ -412,7 +412,7 @@ void notify_emaillist(Request req)
 
 static void cb_email_title(FILE *out,void *data)
 {
-  Request req = data;
+  Request *req = data;
   
   if (!empty_string(req->status))
     fprintf(out,"%s",req->status);
@@ -424,7 +424,7 @@ static void cb_email_title(FILE *out,void *data)
 
 static void cb_email_url(FILE *out,void *data)
 {
-  Request req = data;
+  Request *req = data;
   
   fprintf(
            out,
@@ -441,7 +441,7 @@ static void cb_email_url(FILE *out,void *data)
 
 static void cb_email_author(FILE *out,void *data)
 {
-  Request req = data;
+  Request *req = data;
   
   fprintf(out,"%s",req->author);
 }
