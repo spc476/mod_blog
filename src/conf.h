@@ -53,13 +53,11 @@
 ; Define one of the following:
 ;       USE_NONE        - only the author listed in the config can post
 ;       USE_GDBM        - use the GNU Database manipulation routines
-;       USE_DB          - use the Berkeley Database manipulation routines
 ;       USE_HTPASSWD    - use the Apache htpassword format file
 ;--------------------------------------------------------------------------*/
 
 #undef USE_NONE
 #undef USE_GDBM
-#undef USE_DB
 #define USE_HTPASSWD
 
 /*-------------------------------------------------------------------

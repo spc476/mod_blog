@@ -31,17 +31,12 @@
 #include <cgilib6/util.h>
 
 #include "conf.h"
+#include "fix.h"
 #include "frontend.h"
 #include "globals.h"
 
 #ifdef USE_GDBM
 #  include <gdbm.h>
-#endif
-
-#ifdef USE_DB
-#  include <limits.h>
-#  include <sys/types.h>
-#  include <db.h>
 #endif
 
 /*************************************************************************/
@@ -74,7 +69,7 @@ char *get_remote_user(void)
 
 /************************************************************************/
 
-#if defined(USE_DB) || defined(USE_HTPASSWD)
+#if defined(USE_HTPASSWD)
 
   static size_t breakline(char **dest,size_t dsize,FILE *in)
   {
@@ -147,7 +142,7 @@ char *get_remote_user(void)
     if (c_authorfile == NULL)
       return strcmp(req->author,c_author) == 0;
       
-    list = gdbm_open(c_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
+    list = gdbm_open((char *)c_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
     if (list == NULL)
       return false;
       
@@ -159,48 +154,6 @@ char *get_remote_user(void)
   }
   
   /***********************************************************************/
-  
-#elif defined (USE_DB)
-
-  bool authenticate_author(Request req)
-  {
-    char   *lines[10];
-    size_t  cnt;
-    DB     *list;
-    DBT     key;
-    DBT     data;
-    int     rc;
-    
-    assert(req         != NULL);
-    assert(req->author != NULL);
-    
-    /*--------------------------------------------------------------
-    ; this version will replace the login name with the full name,
-    ; assuming it's defined in the database file as the (hardcoded)
-    ; third field of the value portion returned.
-    ;---------------------------------------------------------------*/
-    
-    if (c_authorfile == NULL)
-      return  strcmp(req->author,c_author) == 0;
-      
-    list = dbopen(c_authorfile,O_RDONLY,0644,DB_HASH,NULL);
-    if (list == NULL)
-      return false;
-      
-    key.data = req->author;
-    key.size = strlen(req->author);
-    rc       = (list->get)(list,&key,&data,0);
-    (list->close)(list);
-    if (rc) return false;
-    
-    cnt        = breakline(lines,10,data.data);
-    req->athor = strdup(lines[c_af_name]);
-    free(lines[0]);
-    
-    return true;
-  }
-  
-  /**********************************************************************/
   
 #elif defined (USE_HTPASSWD)
 
@@ -227,11 +180,6 @@ char *get_remote_user(void)
     {
       if ((c_af_uid < cnt) && (strcmp(req->author,lines[c_af_uid]) == 0))
       {
-        /*----------------------------------------------
-        ; A potential memory leak---see the comment above in
-        ; the USE_DB version of this routine
-        ;----------------------------------------------------*/
-        
         if (c_af_name < cnt)
         {
           free(req->author);
