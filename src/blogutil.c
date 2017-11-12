@@ -31,7 +31,7 @@
 
 /*******************************************************************/
 
-String *tag_split(size_t *const pnum,char const *tag)
+String *tag_split(size_t *pnum,char const *tag)
 {
   size_t      num  = 0;
   size_t      max  = 0;
@@ -83,7 +83,7 @@ char *fromstring(String const src)
 
 /*********************************************************************/
 
-size_t fcopy(FILE *const restrict out,FILE *const restrict in)
+size_t fcopy(FILE *restrict out,FILE *restrict in)
 {
   char   buffer[BUFSIZ];
   size_t inbytes;

@@ -48,20 +48,20 @@ struct nested_params
 
 /**********************************************************************/
 
-static void text_conversion_backend (FILE *const restrict,FILE *const restrict);
+static void text_conversion_backend (FILE *restrict,FILE *restrict);
 static void html_handle_tag         (struct nested_params *const);
 static void check_for_uri           (struct nested_params *const,char const *const);
 static void entify_char             (char *,size_t,char *,char,char const *const);
 static void html_handle_string      (struct nested_params *const);
 static void html_handle_comment     (struct nested_params *const);
-static void handle_backquote        (FILE *const restrict,FILE *const restrict);
-static void handle_quote            (FILE *const restrict,FILE *const restrict);
-static void handle_dash             (FILE *const restrict,FILE *const restrict);
-static void handle_period           (FILE *const restrict,FILE *const restrict);
+static void handle_backquote        (FILE *restrict,FILE *restrict);
+static void handle_quote            (FILE *restrict,FILE *restrict);
+static void handle_dash             (FILE *restrict,FILE *restrict);
+static void handle_period           (FILE *restrict,FILE *restrict);
 
 /**********************************************************************/
 
-void no_conversion(FILE *const restrict in,FILE *const restrict out)
+void no_conversion(FILE *restrict in,FILE *restrict out)
 {
   assert(in  != NULL);
   assert(out != NULL);
@@ -71,7 +71,7 @@ void no_conversion(FILE *const restrict in,FILE *const restrict out)
 
 /**********************************************************************/
 
-void text_conversion(FILE *const restrict in,FILE *const restrict out)
+void text_conversion(FILE *restrict in,FILE *restrict out)
 {
   FILE *entin;
   
@@ -85,7 +85,7 @@ void text_conversion(FILE *const restrict in,FILE *const restrict out)
 
 /**********************************************************************/
 
-static void text_conversion_backend(FILE *const restrict in,FILE *const restrict out)
+static void text_conversion_backend(FILE *restrict in,FILE *restrict out)
 {
   FILE   *tmpout;
   char   *buffer;
@@ -144,7 +144,7 @@ static void text_conversion_backend(FILE *const restrict in,FILE *const restrict
 
 /***********************************************************************/
 
-void mixed_conversion(FILE *const restrict in,FILE *const restrict out)
+void mixed_conversion(FILE *restrict in,FILE *restrict out)
 {
   FILE *tmpfp;
   char *text;
@@ -166,7 +166,7 @@ void mixed_conversion(FILE *const restrict in,FILE *const restrict out)
 
 /*************************************************************************/
 
-void html_conversion(FILE *const restrict in,FILE *const restrict out)
+void html_conversion(FILE *restrict in,FILE *restrict out)
 {
   struct nested_params local;
   int                  t;
@@ -198,7 +198,7 @@ void html_conversion(FILE *const restrict in,FILE *const restrict out)
 
 /**********************************************************************/
 
-static void html_handle_tag(struct nested_params *const local)
+static void html_handle_tag(struct nested_params *local)
 {
   assert(local != NULL);
   
@@ -313,7 +313,7 @@ static void html_handle_tag(struct nested_params *const local)
 
 /************************************************************************/
 
-static void check_for_uri(struct nested_params *const local,char const *const attrib)
+static void check_for_uri(struct nested_params *local,char const *attrib)
 {
   char         newuri[BUFSIZ];
   struct pair *src;
@@ -335,7 +335,7 @@ static void check_for_uri(struct nested_params *const local,char const *const at
 
 /*************************************************************************/
 
-static void entify_char(char *d,size_t ds,char *s,char e,char const *const entity)
+static void entify_char(char *d,size_t ds,char *s,char e,char const *entity)
 {
   size_t se;
   
@@ -373,7 +373,7 @@ static void entify_char(char *d,size_t ds,char *s,char e,char const *const entit
 
 /**************************************************************************/
 
-static void html_handle_string(struct nested_params *const local)
+static void html_handle_string(struct nested_params *local)
 {
   FILE *in;
   char *text = HtmlParseValue(local->token);
@@ -395,7 +395,7 @@ static void html_handle_string(struct nested_params *const local)
 
 /************************************************************************/
 
-static void html_handle_comment(struct nested_params *const local)
+static void html_handle_comment(struct nested_params *local)
 {
   assert(local != NULL);
   
@@ -404,7 +404,7 @@ static void html_handle_comment(struct nested_params *const local)
 
 /**************************************************************************/
 
-void buff_conversion(FILE *const restrict in,FILE *const restrict out)
+void buff_conversion(FILE *restrict in,FILE *restrict out)
 {
   int c;
   
@@ -442,7 +442,7 @@ void buff_conversion(FILE *const restrict in,FILE *const restrict out)
 
 /*****************************************************************/
 
-static void handle_backquote(FILE *const restrict input,FILE *const restrict output)
+static void handle_backquote(FILE *restrict input,FILE *restrict output)
 {
   int c;
   
@@ -467,7 +467,7 @@ static void handle_backquote(FILE *const restrict input,FILE *const restrict out
 
 /********************************************************************/
 
-static void handle_quote(FILE *const restrict input,FILE *const restrict output)
+static void handle_quote(FILE *restrict input,FILE *restrict output)
 {
   int c;
   
@@ -492,7 +492,7 @@ static void handle_quote(FILE *const restrict input,FILE *const restrict output)
 
 /**********************************************************************/
 
-static void handle_dash(FILE *const restrict input,FILE *const restrict output)
+static void handle_dash(FILE *restrict input,FILE *restrict output)
 {
   int c;
   
@@ -526,7 +526,7 @@ static void handle_dash(FILE *const restrict input,FILE *const restrict output)
 
 /********************************************************************/
 
-static void handle_period(FILE *const restrict input,FILE *const restrict output)
+static void handle_period(FILE *restrict input,FILE *restrict output)
 {
   int c;
   

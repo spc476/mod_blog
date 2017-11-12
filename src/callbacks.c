@@ -52,90 +52,90 @@
 
 /*****************************************************************/
 
-static void cb_ad                     (FILE *const,void *);
-static void cb_ad_content             (FILE *const,void *);
-static void cb_atom_categories        (FILE *const,void *);
-static void cb_atom_category          (FILE *const,void *);
-static void cb_atom_entry             (FILE *const,void *);
-static void cb_begin_year             (FILE *const,void *);
-static void cb_blog_adtag             (FILE *const,void *);
-static void cb_blog_adtag_entity      (FILE *const,void *);
-static void cb_blog_author            (FILE *const,void *);
-static void cb_blog_author_email      (FILE *const,void *);
-static void cb_blog_description       (FILE *const,void *);
-static void cb_blog_name              (FILE *const,void *);
-static void cb_blog_script            (FILE *const,void *);
-static void cb_blog_url               (FILE *const,void *);
-static void cb_blog_url_home          (FILE *const,void *);
-static void cb_comments               (FILE *const,void *);
-static void cb_comments_body          (FILE *const,void *);
-static void cb_comments_check         (FILE *const,void *);
-static void cb_comments_filename      (FILE *const,void *);
-static void cb_cond_blog_title        (FILE *const,void *);
-static void cb_cond_hr                (FILE *const,void *);
-static void cb_date_day               (FILE *const,void *);
-static void cb_date_day_normal        (FILE *const,void *);
-static void cb_date_day_url           (FILE *const,void *);
-static void cb_edit                   (FILE *const,void *);
-static void cb_edit_adtag             (FILE *const,void *);
-static void cb_edit_author            (FILE *const,void *);
-static void cb_edit_body              (FILE *const,void *);
-static void cb_edit_class             (FILE *const,void *);
-static void cb_edit_date              (FILE *const,void *);
-static void cb_edit_email             (FILE *const,void *);
-static void cb_edit_filter            (FILE *const,void *);
-static void cb_edit_status            (FILE *const,void *);
-static void cb_edit_title             (FILE *const,void *);
-static void cb_entry                  (FILE *const,void *);
-static void cb_entry_adtag            (FILE *const,void *);
-static void cb_entry_author           (FILE *const,void *);
-static void cb_entry_body             (FILE *const,void *);
-static void cb_entry_body_entified    (FILE *const,void *);
-static void cb_entry_class            (FILE *const,void *);
-static void cb_entry_cond_author      (FILE *const,void *);
-static void cb_entry_cond_date        (FILE *const,void *);
-static void cb_entry_date             (FILE *const,void *);
-static void cb_entry_description      (FILE *const,void *);
-static void cb_entry_id               (FILE *const,void *);
-static void cb_entry_name             (FILE *const,void *);
-static void cb_entry_pubdate          (FILE *const,void *);
-static void cb_entry_status           (FILE *const,void *);
-static void cb_entry_title            (FILE *const,void *);
-static void cb_entry_url              (FILE *const,void *);
-static void cb_generator              (FILE *const,void *);
-static void cb_navigation_bar         (FILE *const,void *);
-static void cb_navigation_bar_next    (FILE *const,void *);
-static void cb_navigation_bar_prev    (FILE *const,void *);
-static void cb_navigation_current     (FILE *const,void *);
-static void cb_navigation_current_url (FILE *const,void *);
-static void cb_navigation_first_title (FILE *const,void *);
-static void cb_navigation_first_url   (FILE *const,void *);
-static void cb_navigation_last_title  (FILE *const,void *);
-static void cb_navigation_last_url    (FILE *const,void *);
-static void cb_navigation_link        (FILE *const,void *);
-static void cb_navigation_link_next   (FILE *const,void *);
-static void cb_navigation_link_prev   (FILE *const,void *);
-static void cb_navigation_next_title  (FILE *const,void *);
-static void cb_navigation_next_url    (FILE *const,void *);
-static void cb_navigation_prev_title  (FILE *const,void *);
-static void cb_navigation_prev_url    (FILE *const,void *);
-static void cb_now_year               (FILE *const,void *);
-static void cb_overview               (FILE *const,void *);
-static void cb_overview_date          (FILE *const,void *);
-static void cb_overview_list          (FILE *const,void *);
-static void cb_request_url            (FILE *const,void *);
-static void cb_robots_index           (FILE *const,void *);
-static void cb_rss_item               (FILE *const,void *);
-static void cb_rss_item_url           (FILE *const,void *);
-static void cb_rss_pubdate            (FILE *const,void *);
-static void cb_rss_url                (FILE *const,void *);
-static void cb_update_time            (FILE *const,void *);
-static void cb_update_type            (FILE *const,void *);
-static void cb_xyzzy                  (FILE *const,void *);
+static void cb_ad                     (FILE *,void *);
+static void cb_ad_content             (FILE *,void *);
+static void cb_atom_categories        (FILE *,void *);
+static void cb_atom_category          (FILE *,void *);
+static void cb_atom_entry             (FILE *,void *);
+static void cb_begin_year             (FILE *,void *);
+static void cb_blog_adtag             (FILE *,void *);
+static void cb_blog_adtag_entity      (FILE *,void *);
+static void cb_blog_author            (FILE *,void *);
+static void cb_blog_author_email      (FILE *,void *);
+static void cb_blog_description       (FILE *,void *);
+static void cb_blog_name              (FILE *,void *);
+static void cb_blog_script            (FILE *,void *);
+static void cb_blog_url               (FILE *,void *);
+static void cb_blog_url_home          (FILE *,void *);
+static void cb_comments               (FILE *,void *);
+static void cb_comments_body          (FILE *,void *);
+static void cb_comments_check         (FILE *,void *);
+static void cb_comments_filename      (FILE *,void *);
+static void cb_cond_blog_title        (FILE *,void *);
+static void cb_cond_hr                (FILE *,void *);
+static void cb_date_day               (FILE *,void *);
+static void cb_date_day_normal        (FILE *,void *);
+static void cb_date_day_url           (FILE *,void *);
+static void cb_edit                   (FILE *,void *);
+static void cb_edit_adtag             (FILE *,void *);
+static void cb_edit_author            (FILE *,void *);
+static void cb_edit_body              (FILE *,void *);
+static void cb_edit_class             (FILE *,void *);
+static void cb_edit_date              (FILE *,void *);
+static void cb_edit_email             (FILE *,void *);
+static void cb_edit_filter            (FILE *,void *);
+static void cb_edit_status            (FILE *,void *);
+static void cb_edit_title             (FILE *,void *);
+static void cb_entry                  (FILE *,void *);
+static void cb_entry_adtag            (FILE *,void *);
+static void cb_entry_author           (FILE *,void *);
+static void cb_entry_body             (FILE *,void *);
+static void cb_entry_body_entified    (FILE *,void *);
+static void cb_entry_class            (FILE *,void *);
+static void cb_entry_cond_author      (FILE *,void *);
+static void cb_entry_cond_date        (FILE *,void *);
+static void cb_entry_date             (FILE *,void *);
+static void cb_entry_description      (FILE *,void *);
+static void cb_entry_id               (FILE *,void *);
+static void cb_entry_name             (FILE *,void *);
+static void cb_entry_pubdate          (FILE *,void *);
+static void cb_entry_status           (FILE *,void *);
+static void cb_entry_title            (FILE *,void *);
+static void cb_entry_url              (FILE *,void *);
+static void cb_generator              (FILE *,void *);
+static void cb_navigation_bar         (FILE *,void *);
+static void cb_navigation_bar_next    (FILE *,void *);
+static void cb_navigation_bar_prev    (FILE *,void *);
+static void cb_navigation_current     (FILE *,void *);
+static void cb_navigation_current_url (FILE *,void *);
+static void cb_navigation_first_title (FILE *,void *);
+static void cb_navigation_first_url   (FILE *,void *);
+static void cb_navigation_last_title  (FILE *,void *);
+static void cb_navigation_last_url    (FILE *,void *);
+static void cb_navigation_link        (FILE *,void *);
+static void cb_navigation_link_next   (FILE *,void *);
+static void cb_navigation_link_prev   (FILE *,void *);
+static void cb_navigation_next_title  (FILE *,void *);
+static void cb_navigation_next_url    (FILE *,void *);
+static void cb_navigation_prev_title  (FILE *,void *);
+static void cb_navigation_prev_url    (FILE *,void *);
+static void cb_now_year               (FILE *,void *);
+static void cb_overview               (FILE *,void *);
+static void cb_overview_date          (FILE *,void *);
+static void cb_overview_list          (FILE *,void *);
+static void cb_request_url            (FILE *,void *);
+static void cb_robots_index           (FILE *,void *);
+static void cb_rss_item               (FILE *,void *);
+static void cb_rss_item_url           (FILE *,void *);
+static void cb_rss_pubdate            (FILE *,void *);
+static void cb_rss_url                (FILE *,void *);
+static void cb_update_time            (FILE *,void *);
+static void cb_update_type            (FILE *,void *);
+static void cb_xyzzy                  (FILE *,void *);
 
-static void print_nav_url             (FILE *const,struct btm const *const,int);
-static void print_nav_title           (FILE *const,struct btm const *const,int);
-static void print_nav_name            (FILE *const,struct btm const *const,int,char);
+static void print_nav_url             (FILE *,struct btm const *,int);
+static void print_nav_title           (FILE *,struct btm const *,int);
+static void print_nav_name            (FILE *,struct btm const *,int,char);
 static void fixup_uri                 (BlogEntry,HtmlToken,char const *);
 static void handle_aflinks            (HtmlToken,char const *);
 
@@ -234,7 +234,7 @@ static size_t const m_cbnum = sizeof(m_callbacks) / sizeof(struct chunk_callback
 
 /*************************************************************************/
 
-void generic_cb(char const *const which,FILE *const out,void *data)
+void generic_cb(char const *which,FILE *out,void *data)
 {
   Chunk templates;
   
@@ -249,7 +249,7 @@ void generic_cb(char const *const which,FILE *const out,void *data)
 
 /*********************************************************************/
 
-static void cb_ad(FILE *const out,void *data)
+static void cb_ad(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   char                  fname[FILENAME_MAX];
@@ -277,7 +277,7 @@ static void cb_ad(FILE *const out,void *data)
 
 /**********************************************************************/
 
-static void cb_ad_content(FILE *const out,void *data)
+static void cb_ad_content(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
@@ -295,7 +295,7 @@ static void cb_ad_content(FILE *const out,void *data)
 
 /*********************************************************************/
 
-static void cb_blog_script(FILE *const out,void *data __attribute__((unused)))
+static void cb_blog_script(FILE *out,void *data __attribute__((unused)))
 {
   char *script;
   
@@ -308,7 +308,7 @@ static void cb_blog_script(FILE *const out,void *data __attribute__((unused)))
 
 /**********************************************************************/
 
-static void cb_blog_url(FILE *const out,void *data)
+static void cb_blog_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
@@ -320,7 +320,7 @@ static void cb_blog_url(FILE *const out,void *data)
 
 /*************************************************************************/
 
-static void cb_blog_url_home(FILE *const out,void *data __attribute__((unused)))
+static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -329,7 +329,7 @@ static void cb_blog_url_home(FILE *const out,void *data __attribute__((unused)))
 
 /**********************************************************************/
 
-static void cb_blog_name(FILE *const out,void *data __attribute__((unused)))
+static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -338,7 +338,7 @@ static void cb_blog_name(FILE *const out,void *data __attribute__((unused)))
 
 /*********************************************************************/
 
-static void cb_blog_author(FILE *const out,void *data __attribute__((unused)))
+static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -347,7 +347,7 @@ static void cb_blog_author(FILE *const out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_blog_author_email(FILE *const out,void *data __attribute__((unused)))
+static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -356,7 +356,7 @@ static void cb_blog_author_email(FILE *const out,void *data __attribute__((unuse
 
 /**********************************************************************/
 
-static void cb_blog_description(FILE *const out,void *data __attribute__((unused)))
+static void cb_blog_description(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   fputs(c_description,out);
@@ -364,7 +364,7 @@ static void cb_blog_description(FILE *const out,void *data __attribute__((unused
 
 /*********************************************************************/
 
-static void cb_blog_adtag(FILE *const out,void *data)
+static void cb_blog_adtag(FILE *out,void *data)
 {
   struct callback_data *cbd;
   char                 *tag;
@@ -385,7 +385,7 @@ static void cb_blog_adtag(FILE *const out,void *data)
 
 /*********************************************************************/
 
-static void cb_blog_adtag_entity(FILE *const out,void *data)
+static void cb_blog_adtag_entity(FILE *out,void *data)
 {
   struct callback_data *cbd;
   FILE                 *entityout;
@@ -409,7 +409,7 @@ static void cb_blog_adtag_entity(FILE *const out,void *data)
 
 /********************************************************************/
 
-static void cb_entry(FILE *const out,void *data)
+static void cb_entry(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -448,7 +448,7 @@ static void cb_entry(FILE *const out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_url(FILE *const out,void *data)
+static void cb_entry_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -463,7 +463,7 @@ static void cb_entry_url(FILE *const out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_id(FILE *const out,void *data)
+static void cb_entry_id(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -478,7 +478,7 @@ static void cb_entry_id(FILE *const out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_date(FILE *const out,void *data)
+static void cb_entry_date(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
@@ -490,7 +490,7 @@ static void cb_entry_date(FILE *const out,void *data)
 
 /*********************************************************************/
 
-static void cb_entry_description(FILE *const out,void *data)
+static void cb_entry_description(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -517,7 +517,7 @@ static void cb_entry_description(FILE *const out,void *data)
 
 /*********************************************************************/
 
-static void cb_entry_pubdate(FILE *const out,void *data)
+static void cb_entry_pubdate(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -551,7 +551,7 @@ static void cb_entry_pubdate(FILE *const out,void *data)
 
 /********************************************************************/
 
-static void cb_entry_title(FILE *const out,void *data)
+static void cb_entry_title(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
@@ -564,7 +564,7 @@ static void cb_entry_title(FILE *const out,void *data)
 
 /***********************************************************************/
 
-static void cb_entry_class(FILE *const out,void *data)
+static void cb_entry_class(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   char const           *msg;
@@ -591,7 +591,7 @@ static void cb_entry_class(FILE *const out,void *data)
 
 /***********************************************************************/
 
-static void cb_entry_status(FILE *const out,void *data)
+static void cb_entry_status(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
@@ -603,7 +603,7 @@ static void cb_entry_status(FILE *const out,void *data)
 
 /************************************************************************/
 
-static void cb_entry_adtag(FILE *const out,void *data __attribute__((unused)))
+static void cb_entry_adtag(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -612,7 +612,7 @@ static void cb_entry_adtag(FILE *const out,void *data __attribute__((unused)))
 
 /**********************************************************************/
 
-static void cb_entry_author(FILE *const out,void *data)
+static void cb_entry_author(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
@@ -736,7 +736,7 @@ static void fixup_uri(BlogEntry entry,HtmlToken token,char const *attrib)
 
 /***************************************************************/
 
-static void cb_entry_body(FILE *const out,void *data)
+static void cb_entry_body(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -834,7 +834,7 @@ static void cb_entry_body(FILE *const out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_body_entified(FILE *const out,void *data)
+static void cb_entry_body_entified(FILE *out,void *data)
 {
   FILE *eout;
   
@@ -848,7 +848,7 @@ static void cb_entry_body_entified(FILE *const out,void *data)
 
 /*********************************************************************/
 
-static void cb_cond_hr(FILE *const out,void *data)
+static void cb_cond_hr(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -871,7 +871,7 @@ static void cb_cond_hr(FILE *const out,void *data)
 
 /*********************************************************************/
 
-static void cb_cond_blog_title(FILE *const out,void *data)
+static void cb_cond_blog_title(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -889,7 +889,7 @@ static void cb_cond_blog_title(FILE *const out,void *data)
 
 /*********************************************************************/
 
-static void cb_rss_pubdate(FILE *const out,void *data __attribute__((unused)))
+static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
 {
   struct tm *ptm;
   char       buffer[BUFSIZ];
@@ -903,7 +903,7 @@ static void cb_rss_pubdate(FILE *const out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_rss_url(FILE *const out,void *data __attribute__((unused)))
+static void cb_rss_url(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -912,7 +912,7 @@ static void cb_rss_url(FILE *const out,void *data __attribute__((unused)))
 
 /*******************************************************************/
 
-static void cb_rss_item(FILE *const out,void *data)
+static void cb_rss_item(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -939,7 +939,7 @@ static void cb_rss_item(FILE *const out,void *data)
 
 /******************************************************************/
 
-static void cb_rss_item_url(FILE *const out,void *data)
+static void cb_rss_item_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
@@ -953,7 +953,7 @@ static void cb_rss_item_url(FILE *const out,void *data)
 
 /********************************************************************/
 
-static void cb_atom_entry(FILE *const out,void *data)
+static void cb_atom_entry(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -985,7 +985,7 @@ static void cb_atom_entry(FILE *const out,void *data)
 
 /************************************************************************/
 
-static void cb_atom_categories(FILE *const out,void *data)
+static void cb_atom_categories(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   String  *cats;
@@ -1010,7 +1010,7 @@ static void cb_atom_categories(FILE *const out,void *data)
 
 /************************************************************************/
 
-static void cb_atom_category(FILE *const out,void *data)
+static void cb_atom_category(FILE *out,void *data)
 {
   FILE *eout;
   
@@ -1024,7 +1024,7 @@ static void cb_atom_category(FILE *const out,void *data)
 
 /****************************************************************/
 
-static void cb_navigation_link(FILE *const out,void *data)
+static void cb_navigation_link(FILE *out,void *data)
 {
   assert(out != NULL);
   
@@ -1034,7 +1034,7 @@ static void cb_navigation_link(FILE *const out,void *data)
 
 /********************************************************************/
 
-static void cb_navigation_link_next(FILE *const out,void *data)
+static void cb_navigation_link_next(FILE *out,void *data)
 {
   assert(out != NULL);
   
@@ -1044,7 +1044,7 @@ static void cb_navigation_link_next(FILE *const out,void *data)
 
 /*******************************************************************/
 
-static void cb_navigation_link_prev(FILE *const out,void *data)
+static void cb_navigation_link_prev(FILE *out,void *data)
 {
   assert(out != NULL);
   
@@ -1054,7 +1054,7 @@ static void cb_navigation_link_prev(FILE *const out,void *data)
 
 /*******************************************************************/
 
-static void cb_navigation_bar(FILE *const out,void *data)
+static void cb_navigation_bar(FILE *out,void *data)
 {
   assert(out != NULL);
   
@@ -1064,7 +1064,7 @@ static void cb_navigation_bar(FILE *const out,void *data)
 
 /*******************************************************************/
 
-static void cb_navigation_bar_next(FILE *const out,void *data)
+static void cb_navigation_bar_next(FILE *out,void *data)
 {
   assert(out != NULL);
   
@@ -1074,7 +1074,7 @@ static void cb_navigation_bar_next(FILE *const out,void *data)
 
 /*******************************************************************/
 
-static void cb_navigation_bar_prev(FILE *const out,void *data)
+static void cb_navigation_bar_prev(FILE *out,void *data)
 {
   assert(out != NULL);
   
@@ -1084,7 +1084,7 @@ static void cb_navigation_bar_prev(FILE *const out,void *data)
 
 /*******************************************************************/
 
-static void cb_navigation_current(FILE *const out,void *data)
+static void cb_navigation_current(FILE *out,void *data)
 {
   assert(out != NULL);
   
@@ -1094,7 +1094,7 @@ static void cb_navigation_current(FILE *const out,void *data)
 
 /********************************************************************/
 
-static void cb_navigation_first_url(FILE *const out,void *data __attribute__((unused)))
+static void cb_navigation_first_url(FILE *out,void *data __attribute__((unused)))
 {
   struct btm tmp;
   
@@ -1109,7 +1109,7 @@ static void cb_navigation_first_url(FILE *const out,void *data __attribute__((un
 
 /********************************************************************/
 
-static void cb_navigation_first_title(FILE *const out,void *data __attribute__((unused)))
+static void cb_navigation_first_title(FILE *out,void *data __attribute__((unused)))
 {
   struct btm tmp;
   
@@ -1124,7 +1124,7 @@ static void cb_navigation_first_title(FILE *const out,void *data __attribute__((
 
 /*******************************************************************/
 
-static void cb_navigation_last_url(FILE *const out,void *data __attribute__((unused)))
+static void cb_navigation_last_url(FILE *out,void *data __attribute__((unused)))
 {
   struct btm tmp;
   
@@ -1139,7 +1139,7 @@ static void cb_navigation_last_url(FILE *const out,void *data __attribute__((unu
 
 /******************************************************************/
 
-static void cb_navigation_last_title(FILE *const out,void *data __attribute__((unused)))
+static void cb_navigation_last_title(FILE *out,void *data __attribute__((unused)))
 {
   struct btm tmp;
   
@@ -1154,7 +1154,7 @@ static void cb_navigation_last_title(FILE *const out,void *data __attribute__((u
 
 /*****************************************************************/
 
-static void cb_navigation_next_title(FILE *const out,void *data __attribute__((unused)))
+static void cb_navigation_next_title(FILE *out,void *data __attribute__((unused)))
 {
   struct btm tmp;
   
@@ -1166,7 +1166,7 @@ static void cb_navigation_next_title(FILE *const out,void *data __attribute__((u
 
 /********************************************************************/
 
-static void cb_navigation_prev_title(FILE *const out,void *data __attribute__((unused)))
+static void cb_navigation_prev_title(FILE *out,void *data __attribute__((unused)))
 {
   struct btm tmp;
   
@@ -1178,7 +1178,7 @@ static void cb_navigation_prev_title(FILE *const out,void *data __attribute__((u
 
 /*******************************************************************/
 
-static void cb_navigation_next_url(FILE *const out,void *data __attribute__((unused)))
+static void cb_navigation_next_url(FILE *out,void *data __attribute__((unused)))
 {
   struct btm tmp;
   
@@ -1190,7 +1190,7 @@ static void cb_navigation_next_url(FILE *const out,void *data __attribute__((unu
 
 /*******************************************************************/
 
-static void cb_navigation_prev_url(FILE *const out,void *data __attribute__((unused)))
+static void cb_navigation_prev_url(FILE *out,void *data __attribute__((unused)))
 {
   struct btm tmp;
   
@@ -1202,7 +1202,7 @@ static void cb_navigation_prev_url(FILE *const out,void *data __attribute__((unu
 
 /********************************************************************/
 
-static void cb_navigation_current_url(FILE *const out,void *data __attribute__((unused)))
+static void cb_navigation_current_url(FILE *out,void *data __attribute__((unused)))
 {
   struct btm tmp;
   
@@ -1214,7 +1214,7 @@ static void cb_navigation_current_url(FILE *const out,void *data __attribute__((
 
 /*********************************************************************/
 
-static void print_nav_title(FILE *const out,struct btm const *const date,int unit)
+static void print_nav_title(FILE *out,struct btm const *date,int unit)
 {
   BlogEntry entry;
   struct tm stm;
@@ -1262,7 +1262,7 @@ static void print_nav_title(FILE *const out,struct btm const *const date,int uni
 
 /**********************************************************************/
 
-static void print_nav_url(FILE *const out,struct btm const *const date,int unit)
+static void print_nav_url(FILE *out,struct btm const *date,int unit)
 {
   assert(out  != NULL);
   assert(date != NULL);
@@ -1273,7 +1273,7 @@ static void print_nav_url(FILE *const out,struct btm const *const date,int unit)
 
 /*******************************************************************/
 
-static void print_nav_name(FILE *const out,struct btm const *const date,int unit,char sep)
+static void print_nav_name(FILE *out,struct btm const *date,int unit,char sep)
 {
   assert(out  != NULL);
   assert(date != NULL);
@@ -1300,7 +1300,7 @@ static void print_nav_name(FILE *const out,struct btm const *const date,int unit
 
 /********************************************************************/
 
-static void cb_begin_year(FILE *const out,void *data __attribute__((unused)))
+static void cb_begin_year(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1309,7 +1309,7 @@ static void cb_begin_year(FILE *const out,void *data __attribute__((unused)))
 
 /*******************************************************************/
 
-static void cb_now_year(FILE *const out,void *data __attribute__((unused)))
+static void cb_now_year(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1318,7 +1318,7 @@ static void cb_now_year(FILE *const out,void *data __attribute__((unused)))
 
 /*******************************************************************/
 
-static void cb_update_time(FILE *const out,void *data __attribute__((unused)))
+static void cb_update_time(FILE *out,void *data __attribute__((unused)))
 {
   char tmpbuf[20];
   
@@ -1330,7 +1330,7 @@ static void cb_update_time(FILE *const out,void *data __attribute__((unused)))
 
 /*******************************************************************/
 
-static void cb_update_type(FILE *const out,void *data __attribute__((unused)))
+static void cb_update_type(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1339,7 +1339,7 @@ static void cb_update_type(FILE *const out,void *data __attribute__((unused)))
 
 /*******************************************************************/
 
-static void cb_robots_index(FILE *const out,void *data __attribute__((unused)))
+static void cb_robots_index(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1351,7 +1351,7 @@ static void cb_robots_index(FILE *const out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_comments(FILE *const out,void *data)
+static void cb_comments(FILE *out,void *data)
 {
   assert(out != NULL);
   
@@ -1363,7 +1363,7 @@ static void cb_comments(FILE *const out,void *data)
 
 /*******************************************************************/
 
-static void cb_comments_body(FILE *const out,void *data)
+static void cb_comments_body(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   FILE                 *in;
@@ -1389,7 +1389,7 @@ static void cb_comments_body(FILE *const out,void *data)
 
 /*******************************************************************/
 
-static void cb_comments_filename(FILE *const out,void *data)
+static void cb_comments_filename(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
@@ -1408,7 +1408,7 @@ static void cb_comments_filename(FILE *const out,void *data)
 
 /*******************************************************************/
 
-static void cb_comments_check(FILE *const out,void *data)
+static void cb_comments_check(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   char        fname[BUFSIZ];
@@ -1433,7 +1433,7 @@ static void cb_comments_check(FILE *const out,void *data)
 
 /********************************************************************/
 
-static void cb_edit(FILE *const out,void *data)
+static void cb_edit(FILE *out,void *data)
 {
   assert(out != NULL);
   
@@ -1443,7 +1443,7 @@ static void cb_edit(FILE *const out,void *data)
 
 /*********************************************************************/
 
-static void cb_edit_adtag(FILE *const out,void *data __attribute__((unused)))
+static void cb_edit_adtag(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1453,7 +1453,7 @@ static void cb_edit_adtag(FILE *const out,void *data __attribute__((unused)))
 
 /*********************************************************************/
 
-static void cb_edit_author(FILE *const out,void *data __attribute__((unused)))
+static void cb_edit_author(FILE *out,void *data __attribute__((unused)))
 {
   char *name;
   
@@ -1471,7 +1471,7 @@ static void cb_edit_author(FILE *const out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_edit_title(FILE *const out,void *data __attribute__((unused)))
+static void cb_edit_title(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1481,7 +1481,7 @@ static void cb_edit_title(FILE *const out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_edit_status(FILE *const out,void *data __attribute__ ((unused)))
+static void cb_edit_status(FILE *out,void *data __attribute__ ((unused)))
 {
   assert(out != NULL);
   
@@ -1491,7 +1491,7 @@ static void cb_edit_status(FILE *const out,void *data __attribute__ ((unused)))
 
 /**********************************************************************/
 
-static void cb_edit_date(FILE *const out,void *data __attribute__((unused)))
+static void cb_edit_date(FILE *out,void *data __attribute__((unused)))
 {
   time_t     now;
   struct tm *ptm;
@@ -1512,7 +1512,7 @@ static void cb_edit_date(FILE *const out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_edit_class(FILE *const out,void *data __attribute__((unused)))
+static void cb_edit_class(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1522,21 +1522,21 @@ static void cb_edit_class(FILE *const out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_edit_email(FILE *const out __attribute__((unused)),void *data __attribute__((unused)))
+static void cb_edit_email(FILE *out __attribute__((unused)),void *data __attribute__((unused)))
 {
   /* XXX */
 }
 
 /*******************************************************************/
 
-static void cb_edit_filter(FILE *const out __attribute__((unused)),void *data __attribute__((unused)))
+static void cb_edit_filter(FILE *out __attribute__((unused)),void *data __attribute__((unused)))
 {
   /* XXX */
 }
 
 /*******************************************************************/
 
-static void cb_edit_body(FILE *const out,void *data __attribute__((unused)))
+static void cb_edit_body(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1546,7 +1546,7 @@ static void cb_edit_body(FILE *const out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_xyzzy(FILE *const out,void *data __attribute__((unused)))
+static void cb_xyzzy(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1555,7 +1555,7 @@ static void cb_xyzzy(FILE *const out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_date_day(FILE *const out,void *data)
+static void cb_date_day(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -1570,7 +1570,7 @@ static void cb_date_day(FILE *const out,void *data)
 
 /*************************************************************************/
 
-static void cb_date_day_url(FILE *const out,void *data)
+static void cb_date_day_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -1585,7 +1585,7 @@ static void cb_date_day_url(FILE *const out,void *data)
 
 /********************************************************************/
 
-static void cb_date_day_normal(FILE *const out,void *data)
+static void cb_date_day_normal(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -1610,7 +1610,7 @@ static void cb_date_day_normal(FILE *const out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_cond_author(FILE *const out,void *data)
+static void cb_entry_cond_author(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
@@ -1624,7 +1624,7 @@ static void cb_entry_cond_author(FILE *const out,void *data)
 }
 
 /*********************************************************************/
-static void cb_entry_cond_date(FILE *const out,void *data)
+static void cb_entry_cond_date(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -1641,7 +1641,7 @@ static void cb_entry_cond_date(FILE *const out,void *data)
 
 /**********************************************************************/
 
-static void cb_entry_name(FILE *const out,void *data)
+static void cb_entry_name(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry             entry;
@@ -1656,7 +1656,7 @@ static void cb_entry_name(FILE *const out,void *data)
 
 /***********************************************************************/
 
-static void cb_overview(FILE *const out __attribute__((unused)),void *data __attribute__((unused)))
+static void cb_overview(FILE *out __attribute__((unused)),void *data __attribute__((unused)))
 {
   assert(out  != NULL);
   assert(data != NULL);
@@ -1664,7 +1664,7 @@ static void cb_overview(FILE *const out __attribute__((unused)),void *data __att
 
 /***********************************************************************/
 
-static void cb_overview_date(FILE *const out,void *data __attribute__((unused)))
+static void cb_overview_date(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1673,7 +1673,7 @@ static void cb_overview_date(FILE *const out,void *data __attribute__((unused)))
 
 /***********************************************************************/
 
-static void cb_overview_list(FILE *const out,void *data __attribute__((unused)))
+static void cb_overview_list(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
@@ -1682,7 +1682,7 @@ static void cb_overview_list(FILE *const out,void *data __attribute__((unused)))
 
 /**********************************************************************/
 
-static void cb_request_url(FILE *const out,void *data __attribute__((unused)))
+static void cb_request_url(FILE *out,void *data __attribute__((unused)))
 {
   char *tum;
   
@@ -1695,7 +1695,7 @@ static void cb_request_url(FILE *const out,void *data __attribute__((unused)))
 
 /***********************************************************************/
 
-static void cb_generator(FILE *const out,void *data __attribute__((unused)))
+static void cb_generator(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   

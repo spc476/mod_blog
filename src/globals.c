@@ -61,7 +61,7 @@ extern void set_c_url          (char const *const);
 
 static bool        get_next     (char *,char const **);
 static int         get_field    (lua_State *const,char const *);
-static char const *get_string   (lua_State *const,char const *const restrict,char const *const restrict);
+static char const *get_string   (lua_State *const,char const *restrict,char const *restrict);
 static int         get_int      (lua_State *const,char const *const,int const);
 static bool        get_bool     (lua_State *const,char const *const,bool const);
 static void	   seed_rng	(void);
@@ -366,7 +366,7 @@ int GlobalsInit(char const *conf)
 
 /********************************************************************/
 
-void set_c_updatetype(char const *const value)
+void set_c_updatetype(char const *value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;
@@ -385,7 +385,7 @@ void set_c_updatetype(char const *const value)
 
 /************************************************************************/
 
-void set_cf_emailupdate(char const *const value)
+void set_cf_emailupdate(char const *value)
 {
   if (value && !empty_string(value))
   {
@@ -398,7 +398,7 @@ void set_cf_emailupdate(char const *const value)
 
 /***************************************************************************/
 
-void set_c_conversion(char const *const value)
+void set_c_conversion(char const *value)
 {
   if (value == NULL) return;
   if (empty_string(value)) return;
@@ -415,7 +415,7 @@ void set_c_conversion(char const *const value)
 
 /**************************************************************************/
 
-void set_c_url(char const *const turl)
+void set_c_url(char const *turl)
 {
   url__t *url;
   size_t  len;
@@ -493,7 +493,7 @@ static bool get_next(char *dest,char const **pp)
 /************************************************************************/
 
 static int get_field(
-        lua_State  *const L,
+        lua_State  *L,
         char const *      name
 )
 {
@@ -516,9 +516,9 @@ static int get_field(
 /***********************************************************************/
 
 static char const *get_string(
-        lua_State  *const          L,
-        char const *const restrict name,
-        char const *const restrict def
+        lua_State  *         L,
+        char const *restrict name,
+        char const *restrict def
 )
 {
   char const *val;
@@ -538,9 +538,9 @@ static char const *get_string(
 /*************************************************************************/
 
 static int get_int(
-        lua_State  *const L,
-        char const *const name,
-        int  const        def
+        lua_State  *L,
+        char const *name,
+        int  const  def
 )
 {
   int val;
@@ -557,9 +557,9 @@ static int get_int(
 /*************************************************************************/
 
 static bool get_bool(
-        lua_State  *const L,
-        char const *const name,
-        bool const        def
+        lua_State  *L,
+        char const *name,
+        bool const  def
 )
 {
   bool val;

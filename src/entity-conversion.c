@@ -32,8 +32,8 @@
 
 struct entity_conv
 {
-  char const *const name;
-  int  const        value;
+  char const *name;
+  int  const  value;
 };
 
 /********************************************************************/
@@ -2169,7 +2169,7 @@ static bool char_entity(char **tag,size_t *ps,int c)
 
 /**********************************************************************/
 
-FILE *fentity_encode_onread(FILE *const in)
+FILE *fentity_encode_onread(FILE *in)
 {
   return fopencookie(in,"r",(cookie_io_functions_t)
                                 {
@@ -2182,7 +2182,7 @@ FILE *fentity_encode_onread(FILE *const in)
 
 /*******************************************************************/
 
-FILE *fentity_encode_onwrite(FILE *const out)
+FILE *fentity_encode_onwrite(FILE *out)
 {
   return fopencookie(out,"w",(cookie_io_functions_t)
                                 {

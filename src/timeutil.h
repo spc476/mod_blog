@@ -36,15 +36,15 @@ struct btm
 /***********************************************************/
 
 extern int  max_monthday  (int const,int const);
-extern void btm_inc_day   (struct btm *const);
-extern void btm_dec_part  (struct btm *const);
-extern void btm_dec_day   (struct btm *const);
-extern void btm_dec_month (struct btm *const);
-extern void btm_inc_month (struct btm *const);
-extern int  btm_cmp       (struct btm const *const restrict,struct btm const *const restrict);
-extern int  btm_cmp_date  (struct btm const *const restrict,struct btm const *const restrict);
-extern int  btm_cmp_month (struct btm const *const restrict,struct btm const *const restrict);
-extern int  btm_cmp_year  (struct btm const *const restrict,struct btm const *const restrict);
-extern void tm_init       (struct tm *const);
+extern void btm_inc_day   (struct btm *);
+extern void btm_dec_part  (struct btm *);
+extern void btm_dec_day   (struct btm *);
+extern void btm_dec_month (struct btm *);
+extern void btm_inc_month (struct btm *);
+extern int  btm_cmp       (struct btm const *restrict,struct btm const *restrict);
+extern int  btm_cmp_date  (struct btm const *restrict,struct btm const *restrict);
+extern int  btm_cmp_month (struct btm const *restrict,struct btm const *restrict);
+extern int  btm_cmp_year  (struct btm const *restrict,struct btm const *restrict);
+extern void tm_init       (struct tm *);
 
 #endif

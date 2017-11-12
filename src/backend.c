@@ -75,9 +75,9 @@ int generate_pages(void)
 /******************************************************************/
 
 int pagegen_items(
-        template__t const *const template,
-        FILE              *const out,
-        Blog        const        blog
+        template__t const *template,
+        FILE              *out,
+        Blog        const  blog
 )
 {
   struct btm            thisday;
@@ -114,9 +114,9 @@ int pagegen_items(
 /************************************************************************/
 
 int pagegen_days(
-        template__t const *const template,
-        FILE              *const out,
-        Blog        const        blog
+        template__t const *template,
+        FILE              *out,
+        Blog        const  blog
 )
 {
   struct btm            thisday;
@@ -756,7 +756,7 @@ static char const *mime_type(char const *filename)
 
 /******************************************************************/
 
-static int display_file(FILE *const out,tumbler__s const *spec)
+static int display_file(FILE *out,tumbler__s const *spec)
 {
   char fname[FILENAME_MAX];
   

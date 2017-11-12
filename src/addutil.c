@@ -410,7 +410,7 @@ void notify_emaillist(Request req)
 
 /*************************************************************************/
 
-static void cb_email_title(FILE *const out,void *data)
+static void cb_email_title(FILE *out,void *data)
 {
   Request req = data;
   
@@ -422,7 +422,7 @@ static void cb_email_title(FILE *const out,void *data)
 
 /*************************************************************************/
 
-static void cb_email_url(FILE *const out,void *data)
+static void cb_email_url(FILE *out,void *data)
 {
   Request req = data;
   
@@ -439,7 +439,7 @@ static void cb_email_url(FILE *const out,void *data)
 
 /*************************************************************************/
 
-static void cb_email_author(FILE *const out,void *data)
+static void cb_email_author(FILE *out,void *data)
 {
   Request req = data;
   

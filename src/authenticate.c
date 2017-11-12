@@ -76,7 +76,7 @@ char *get_remote_user(void)
 
 #if defined(USE_DB) || defined(USE_HTPASSWD)
 
-  static size_t breakline(char **dest,size_t dsize,FILE *const in)
+  static size_t breakline(char **dest,size_t dsize,FILE *in)
   {
     char   *line = NULL;
     char   *p;
