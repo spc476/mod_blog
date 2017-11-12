@@ -3,9 +3,7 @@
 <channel>
   <title>%{blog.name}%</title>
   <link>%{rss.url}%</link>
-  <description>
-        Yada yada blah blah yada yada.
-  </description>
+  <description>%{blog.description}%</description>
   <language>en-us</language>
   <pubDate>%{rss.pubdate}%</pubDate>
   <managingEditor>%{blog.author.email}% (%{blog.author}%)</managingEditor>
