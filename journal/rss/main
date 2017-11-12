@@ -8,7 +8,7 @@
   </description>
   <language>en-us</language>
   <pubDate>%{rss.pubdate}%</pubDate>
-  <managingEditor>{blog.author.email}% (%{blog.author}%)</managingEditor>
+  <managingEditor>%{blog.author.email}% (%{blog.author}%)</managingEditor>
   <webMaster>%{blog.author.email}% (%{blog.author}%)</webMaster>
   <copyright>
         Copyright %{begin.year}%-%{now.year}% by %{blog.author}%.  All Rights Reserved.
