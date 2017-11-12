@@ -74,8 +74,8 @@ depend:
 src/addutil.o: src/conf.h src/blog.h src/timeutil.h src/conversion.h
 src/addutil.o: src/frontend.h src/wbtum.h src/globals.h src/backend.h
 src/addutil.o: src/fix.h src/blogutil.h
-src/authenticate.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
-src/authenticate.o: src/blog.h src/globals.h src/backend.h
+src/authenticate.o: src/conf.h src/fix.h src/frontend.h src/wbtum.h
+src/authenticate.o: src/timeutil.h src/blog.h src/globals.h src/backend.h
 src/backend.o: src/fix.h src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
 src/backend.o: src/blogutil.h src/backend.h src/globals.h
 src/blog.o: src/conf.h src/blog.h src/timeutil.h src/wbtum.h
