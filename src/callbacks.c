@@ -62,6 +62,7 @@ static void cb_blog_adtag             (FILE *,void *);
 static void cb_blog_adtag_entity      (FILE *,void *);
 static void cb_blog_author            (FILE *,void *);
 static void cb_blog_author_email      (FILE *,void *);
+static void cb_blog_class             (FILE *,void *);
 static void cb_blog_description       (FILE *,void *);
 static void cb_blog_name              (FILE *,void *);
 static void cb_blog_script            (FILE *,void *);
@@ -158,6 +159,7 @@ static struct chunk_callback const m_callbacks[] =
   { "blog.adtag.entity"         , cb_blog_adtag_entity          } ,
   { "blog.author"               , cb_blog_author                } ,
   { "blog.author.email"         , cb_blog_author_email          } ,
+  { "blog.class"                , cb_blog_class                 } ,
   { "blog.description"          , cb_blog_description           } ,
   { "blog.name"                 , cb_blog_name                  } ,
   { "blog.script"               , cb_blog_script                } ,
@@ -352,6 +354,14 @@ static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
   assert(out != NULL);
   
   fputs(c_email,out);
+}
+
+/**********************************************************************/
+
+static void cb_blog_class(FILE *out,void *data __attribute__((unused)))
+{
+  assert(out != NULL);
+  fputs(c_class,out);
 }
 
 /**********************************************************************/
