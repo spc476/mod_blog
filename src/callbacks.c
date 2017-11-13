@@ -325,7 +325,6 @@ static void cb_blog_url(FILE *out,void *data)
 static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fputs(c_fullbaseurl,out);
 }
 
@@ -334,7 +333,6 @@ static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fputs(c_name,out);
 }
 
@@ -361,7 +359,6 @@ static void cb_blog_title(FILE *out,void *data)
 static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fputs(c_author,out);
 }
 
@@ -370,7 +367,6 @@ static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fputs(c_email,out);
 }
 
@@ -634,7 +630,6 @@ static void cb_entry_status(FILE *out,void *data)
 static void cb_entry_adtag(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fputs("Soon young Skywalker.  Soon.",out);
 }
 
@@ -916,7 +911,6 @@ static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
 static void cb_rss_url(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fprintf(out,"%s/",c_fullbaseurl);
 }
 
@@ -1313,7 +1307,6 @@ static void print_nav_name(FILE *out,struct btm const *date,int unit,char sep)
 static void cb_begin_year(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fprintf(out,"%04d",g_blog->first.year);
 }
 
@@ -1322,7 +1315,6 @@ static void cb_begin_year(FILE *out,void *data __attribute__((unused)))
 static void cb_now_year(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fprintf(out,"%04d",g_blog->now.year);
 }
 
@@ -1343,7 +1335,6 @@ static void cb_update_time(FILE *out,void *data __attribute__((unused)))
 static void cb_update_type(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fputs(c_updatetype,out);
 }
 
@@ -1559,7 +1550,6 @@ static void cb_edit_body(FILE *out,void *data __attribute__((unused)))
 static void cb_xyzzy(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fputs("Nothing happens.",out);
 }
 
@@ -1677,7 +1667,6 @@ static void cb_overview(FILE *out __attribute__((unused)),void *data __attribute
 static void cb_overview_date(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fputs("DATE",out);
 }
 
@@ -1686,7 +1675,6 @@ static void cb_overview_date(FILE *out,void *data __attribute__((unused)))
 static void cb_overview_list(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  
   fputs("<li>OVERVIEW</li>",out);
 }
 
