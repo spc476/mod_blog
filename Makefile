@@ -20,8 +20,6 @@
 #
 ########################################################################
 
-.PHONY:	all clean tarball depend install uninstall reinstall
-
 VERSION := $(shell git describe --tag)
 
 CC      = c99 -Wall -Wextra -pedantic
