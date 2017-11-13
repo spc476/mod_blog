@@ -66,13 +66,13 @@ static void cb_blog_class             (FILE *,void *);
 static void cb_blog_description       (FILE *,void *);
 static void cb_blog_name              (FILE *,void *);
 static void cb_blog_script            (FILE *,void *);
+static void cb_blog_title             (FILE *,void *);
 static void cb_blog_url               (FILE *,void *);
 static void cb_blog_url_home          (FILE *,void *);
 static void cb_comments               (FILE *,void *);
 static void cb_comments_body          (FILE *,void *);
 static void cb_comments_check         (FILE *,void *);
 static void cb_comments_filename      (FILE *,void *);
-static void cb_cond_blog_title        (FILE *,void *);
 static void cb_cond_hr                (FILE *,void *);
 static void cb_date_day               (FILE *,void *);
 static void cb_date_day_normal        (FILE *,void *);
@@ -163,13 +163,13 @@ static struct chunk_callback const m_callbacks[] =
   { "blog.description"          , cb_blog_description           } ,
   { "blog.name"                 , cb_blog_name                  } ,
   { "blog.script"               , cb_blog_script                } ,
+  { "blog.title"                , cb_blog_title                 } ,
   { "blog.url"                  , cb_blog_url                   } ,
   { "blog.url.home"             , cb_blog_url_home              } ,
   { "comments"                  , cb_comments                   } ,
   { "comments.body"             , cb_comments_body              } ,
   { "comments.check"            , cb_comments_check             } ,
   { "comments.filename"         , cb_comments_filename          } ,
-  { "cond.blog.title"           , cb_cond_blog_title            } ,
   { "cond.hr"                   , cb_cond_hr                    } ,
   { "date.day"                  , cb_date_day                   } ,
   { "date.day.normal"           , cb_date_day_normal            } ,
@@ -335,6 +335,24 @@ static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
+  fputs(c_name,out);
+}
+
+/*********************************************************************/
+
+static void cb_blog_title(FILE *out,void *data)
+{
+  if (gd.navunit == UNIT_PART)
+  {
+    assert(data != NULL);
+    
+    struct callback_data *cbd   = data;
+    BlogEntry            *entry = (BlogEntry *)ListGetHead(&cbd->list);
+    
+    if (NodeValid(&entry->node) && entry->valid)
+      fprintf(out,"%s - ",entry->title);
+  }
+
   fputs(c_name,out);
 }
 
@@ -876,24 +894,6 @@ static void cb_cond_hr(FILE *out,void *data)
   {
     if (entry->when.part != cbd->last.part)
       fputs("<hr class=\"next\">",out);
-  }
-}
-
-/*********************************************************************/
-
-static void cb_cond_blog_title(FILE *out,void *data)
-{
-  struct callback_data *cbd = data;
-  BlogEntry            *entry;
-  
-  assert(out != NULL);
-  
-  if (gd.navunit == UNIT_PART)
-  {
-    assert(data != NULL);
-    entry = (BlogEntry *)ListGetHead(&cbd->list);
-    if (NodeValid(&entry->node) && entry->valid)
-      fprintf(out,"%s - ",entry->title);
   }
 }
 
