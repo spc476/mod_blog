@@ -22,6 +22,10 @@
 
 VERSION := $(shell git describe --tag)
 
+ifeq ($(VERSION),)
+  VERSION=4.14.0
+endif
+
 CC      = c99 -Wall -Wextra -pedantic
 CFLAGS  = -g
 LDFLAGS = -g
