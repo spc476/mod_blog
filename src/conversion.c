@@ -559,3 +559,43 @@ static void handle_period(FILE *restrict input,FILE *restrict output)
 }
 
 /*********************************************************************/
+
+static ssize_t fj_write(void *cookie,char const *buffer,size_t bytes)
+{
+  FILE *realout = cookie;
+  size_t size   = bytes;
+  
+  assert(cookie != NULL);
+  assert(buffer != NULL);
+  
+  while(size)
+  {
+    switch(*buffer)
+    {
+      case '"' : fputc('\\',realout); fputc(*buffer,realout); break;
+      case '\\': fputc('\\',realout); fputc(*buffer,realout); break;
+      case '\b': fputc('\\',realout); fputc('b',realout);     break;
+      case '\f': fputc('\\',realout); fputc('f',realout);     break;
+      case '\n': fputc('\\',realout); fputc('n',realout);     break;
+      case '\r': fputc('\\',realout); fputc('r',realout);     break;
+      case '\t': fputc('\\',realout); fputc('t',realout);     break;
+      default:   fputc(*buffer,realout);                      break;
+    }
+    buffer++;
+    size--;
+  }
+  
+  return bytes;
+}
+
+/*********************************************************************/
+
+FILE *fjson_encode_onwrite(FILE *out)
+{
+  return fopencookie(out,"w",(cookie_io_functions_t) {
+                               NULL,
+                               fj_write,
+                               NULL,
+                               NULL
+                             });
+}

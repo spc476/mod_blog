@@ -44,6 +44,7 @@
 #include "frontend.h"
 #include "fix.h"
 #include "blogutil.h"
+#include "conversion.h"
 #include "globals.h"
 
 #ifdef EMAIL_NOTIFY
@@ -92,7 +93,9 @@ static void cb_entry_adtag            (FILE *,void *);
 static void cb_entry_author           (FILE *,void *);
 static void cb_entry_body             (FILE *,void *);
 static void cb_entry_body_entified    (FILE *,void *);
+static void cb_entry_body_jsonified   (FILE *,void *);
 static void cb_entry_class            (FILE *,void *);
+static void cb_entry_class_jsonified  (FILE *,void *);
 static void cb_entry_cond_author      (FILE *,void *);
 static void cb_entry_cond_date        (FILE *,void *);
 static void cb_entry_date             (FILE *,void *);
@@ -104,6 +107,7 @@ static void cb_entry_status           (FILE *,void *);
 static void cb_entry_title            (FILE *,void *);
 static void cb_entry_url              (FILE *,void *);
 static void cb_generator              (FILE *,void *);
+static void cb_json_item              (FILE *,void *);
 static void cb_navigation_bar         (FILE *,void *);
 static void cb_navigation_bar_next    (FILE *,void *);
 static void cb_navigation_bar_prev    (FILE *,void *);
@@ -189,7 +193,9 @@ static struct chunk_callback const m_callbacks[] =
   { "entry.author"              , cb_entry_author               } ,
   { "entry.body"                , cb_entry_body                 } ,
   { "entry.body.entified"       , cb_entry_body_entified        } ,
+  { "entry.body.jsonified"      , cb_entry_body_jsonified       } ,
   { "entry.class"               , cb_entry_class                } ,
+  { "entry.class.jsonified"     , cb_entry_class_jsonified      } ,
   { "entry.cond.author"         , cb_entry_cond_author          } ,
   { "entry.cond.date"           , cb_entry_cond_date            } ,
   { "entry.date"                , cb_entry_date                 } ,
@@ -201,6 +207,7 @@ static struct chunk_callback const m_callbacks[] =
   { "entry.title"               , cb_entry_title                } ,
   { "entry.url"                 , cb_entry_url                  } ,
   { "generator"                 , cb_generator                  } ,
+  { "json.item"                 , cb_json_item                  } ,
   { "navigation.bar"            , cb_navigation_bar             } ,
   { "navigation.bar.next"       , cb_navigation_bar_next        } ,
   { "navigation.bar.prev"       , cb_navigation_bar_prev        } ,
@@ -350,7 +357,7 @@ static void cb_blog_title(FILE *out,void *data)
     if (NodeValid(&entry->node) && entry->valid)
       fprintf(out,"%s - ",entry->title);
   }
-
+  
   fputs(c_name,out);
 }
 
@@ -615,6 +622,35 @@ static void cb_entry_class(FILE *out,void *data)
 
 /***********************************************************************/
 
+static void cb_entry_class_jsonified(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  String               *cats;
+  size_t                num;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  cats = tag_split(&num,cbd->entry->class);
+  for (size_t i = 0 ; i < num ; i++)
+  {
+    fputc('"',out);
+    FILE *jout = fjson_encode_onwrite(out);
+    if (jout)
+    {
+      fwrite(cats[i].d,cats[i].s,1,jout);
+      fclose(jout);
+    }
+    fputc('"',out);
+    if (i < num - 1)
+      fputc(',',out);
+  }
+  
+  free(cats);
+}
+
+/***********************************************************************/
+
 static void cb_entry_status(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
@@ -870,6 +906,20 @@ static void cb_entry_body_entified(FILE *out,void *data)
 }
 
 /*********************************************************************/
+
+static void cb_entry_body_jsonified(FILE *out,void *data)
+{
+  FILE *jout;
+  
+  assert(out != NULL);
+  
+  jout = fjson_encode_onwrite(out);
+  if (jout == NULL) return;
+  cb_entry_body(jout,data);
+  fclose(jout);
+}
+
+/**********************************************************************/
 
 static void cb_cond_hr(FILE *out,void *data)
 {
@@ -1717,6 +1767,41 @@ static void cb_generator(FILE *out,void *data __attribute__((unused)))
     LUA_RELEASE
   );
 #endif
+}
+
+/*********************************************************************/
+
+static void cb_json_item(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry            *entry;
+  char const           *sep = "";
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  /*----------------------------------------------------------------------
+  ; XXX---this code is identical to cb_rss_item(), except for which template
+  ; is being used.  Could possibly use some refactoring here ...
+  ;-----------------------------------------------------------------------*/
+  
+  for
+  (
+    entry = (BlogEntry *)ListRemHead(&cbd->list);
+    NodeValid(&entry->node);
+    entry = (BlogEntry *)ListRemHead(&cbd->list)
+  )
+  {
+    assert(entry->valid);
+    cbd->entry = entry;
+    fputs(sep,out);
+    generic_cb("item",out,data);
+    cbd->last = entry->when;
+    BlogEntryFree(entry);
+    sep = ",";
+  }
+  
+  cbd->entry = NULL;
 }
 
 /*********************************************************************/

@@ -25,10 +25,11 @@
 
 #include <stdio.h>
 
-extern void no_conversion    (FILE *restrict,FILE *restrict);
-extern void text_conversion  (FILE *restrict,FILE *restrict);
-extern void mixed_conversion (FILE *restrict,FILE *restrict);
-extern void html_conversion  (FILE *restrict,FILE *restrict);
-extern void buff_conversion  (FILE *restrict,FILE *restrict);
+extern void  no_conversion        (FILE *restrict,FILE *restrict);
+extern void  text_conversion      (FILE *restrict,FILE *restrict);
+extern void  mixed_conversion     (FILE *restrict,FILE *restrict);
+extern void  html_conversion      (FILE *restrict,FILE *restrict);
+extern void  buff_conversion      (FILE *restrict,FILE *restrict);
+extern FILE *fjson_encode_onwrite (FILE *);
 
 #endif
