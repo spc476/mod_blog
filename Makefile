@@ -23,7 +23,7 @@
 VERSION := $(shell git describe --tag)
 
 ifeq ($(VERSION),)
-  VERSION=v5.0.0
+  VERSION=v5.0.1
 endif
 
 CC      = c99 -Wall -Wextra -pedantic
