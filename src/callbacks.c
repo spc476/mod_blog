@@ -523,9 +523,7 @@ static void cb_entry_date(FILE *out,void *data)
 
 static void cb_entry_description(FILE *out,void *data)
 {
-  struct callback_data *cbd = data;
-  BlogEntry            *entry;
-  char const           *msg = c_description;
+  char const *msg = c_description;
   
   assert(out != NULL);
   
@@ -533,7 +531,9 @@ static void cb_entry_description(FILE *out,void *data)
   {
     assert(data != NULL);
     
-    entry = (BlogEntry *)ListGetHead(&cbd->list);
+    struct callback_data *cbd   = data;
+    BlogEntry            *entry = (BlogEntry *)ListGetHead(&cbd->list);
+    
     if (NodeValid(&entry->node) && entry->valid)
     {
       if (!empty_string(entry->status))
@@ -597,23 +597,25 @@ static void cb_entry_title(FILE *out,void *data)
 
 static void cb_entry_class(FILE *out,void *data)
 {
-  struct callback_data *cbd = data;
-  char const           *msg;
+  char const *msg = c_class;
   
   assert(out  != NULL);
-  assert(data != NULL);
   
-  if (cbd->entry != NULL)
-    msg = cbd->entry->class;
-  else
+  if (data != NULL)
   {
-    msg = c_class;
-    if (gd.navunit == UNIT_PART)
+    struct callback_data *cbd = data;
+    
+    if (cbd->entry != NULL)
+      msg = cbd->entry->class;
+    else
     {
-      BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
-      if (NodeValid(&entry->node) && entry->valid)
-        if (!empty_string(entry->class))
-          msg = entry->class;
+      if (gd.navunit == UNIT_PART)
+      {
+        BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
+        if (NodeValid(&entry->node) && entry->valid)
+          if (!empty_string(entry->class))
+            msg = entry->class;
+      }
     }
   }
   
