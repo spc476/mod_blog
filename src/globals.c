@@ -59,7 +59,7 @@ extern void set_gf_emailupdate (char const *const);
 extern void set_c_conversion   (char const *const);
 extern void set_c_url          (char const *const);
 
-static bool        get_next     (char *,char const **);
+static bool        get_next     (char const **,size_t *);
 static int         get_field    (lua_State *const,char const *);
 static char const *get_string   (lua_State *const,char const *restrict,char const *restrict);
 static int         get_int      (lua_State *const,char const *const,int const);
@@ -469,24 +469,27 @@ void set_c_url(char const *turl)
 
 /************************************************************************/
 
-static bool get_next(char *dest,char const **pp)
+static bool get_next(char const **pp,size_t *plen)
 {
-  char const *p;
-  
-  assert(dest != NULL);
   assert(pp   != NULL);
   assert(*pp  != NULL);
+  assert(plen != NULL);
   
-  p = *pp;
+  if (**pp == '\0') return false;
   
-  if (*p == '\0') return false;
+  const char *p   = *pp;
+  size_t      len = 0;
+  
   while((*p != '\0') && (*p != '.'))
-    *dest++ = *p++;
-    
+  {
+    p++;
+    len++;
+  }
+  
   assert((*p == '.') || (*p == '\0'));
   if (*p) p++;
-  *dest = '\0';
-  *pp = p;
+  *pp   = p;
+  *plen = len;
   return true;
 }
 
@@ -497,18 +500,22 @@ static int get_field(
         char const *name
 )
 {
-  size_t len = strlen(name);
-  char   field[len];
+  const char *field;
+  size_t      len;
   
   assert(L    != NULL);
   assert(name != NULL);
   
+  field = name;
   lua_getglobal(L,"_G");
-  while(get_next(field,&name))
+  
+  while(get_next(&name,&len))
   {
-    lua_getfield(L,-1,field);
+    lua_pushlstring(L,field,len);
+    lua_gettable(L,-2);
     lua_remove(L,-2);
     if (lua_isnil(L,-1)) break;
+    field = name;
   }
   return lua_type(L,-1);
 }
