@@ -494,7 +494,7 @@ static bool get_next(char *dest,char const **pp)
 
 static int get_field(
         lua_State  *L,
-        char const *      name
+        char const *name
 )
 {
   size_t len = strlen(name);
