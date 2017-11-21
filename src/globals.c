@@ -495,10 +495,7 @@ static bool get_next(char const **pp,size_t *plen)
 
 /************************************************************************/
 
-static int get_field(
-        lua_State  *L,
-        char const *name
-)
+static int get_field(lua_State  *L,char const *name)
 {
   const char *field;
   size_t      len;
@@ -522,11 +519,7 @@ static int get_field(
 
 /***********************************************************************/
 
-static char const *get_string(
-        lua_State  *         L,
-        char const *restrict name,
-        char const *restrict def
-)
+static char const *get_string(lua_State  *L,char const *restrict name,char const *restrict def)
 {
   char const *val;
   
@@ -544,11 +537,7 @@ static char const *get_string(
 
 /*************************************************************************/
 
-static int get_int(
-        lua_State  *L,
-        char const *name,
-        int  const  def
-)
+static int get_int(lua_State  *L,char const *name,int  const  def)
 {
   int val;
   
@@ -563,11 +552,7 @@ static int get_int(
 
 /*************************************************************************/
 
-static bool get_bool(
-        lua_State  *L,
-        char const *name,
-        bool const  def
-)
+static bool get_bool(lua_State  *L,char const *name,bool const  def)
 {
   bool val;
   
