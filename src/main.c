@@ -53,22 +53,9 @@ int main(int argc,char *argv[],char *envp[])
   crashreport(SIGBUS);
   crashreport(SIGQUIT);
   crashreport(SIGSYS);
+  crashreport(SIGTRAP);
   crashreport(SIGXCPU);
   crashreport(SIGXFSZ);
-#endif
-
-  /*---------------------------
-  ; others we're interested in
-  ;----------------------------*/
-
-#ifdef SIGEMT
-  crashreport(SIGEMT);
-#endif
-#ifdef SIGIOT
-  crashreport(SIGIOT);
-#endif
-#ifdef SIGTKFLT
-  crashreport(SIGTKFLT);
 #endif
 
   /*-----------------------------------------------------------------------
