@@ -30,33 +30,12 @@ int main(int argc,char *argv[],char *envp[])
 {
   /*-----------------------------------------------------------------------
   ; due to a crash for no apparent reason, I decided to log a bit more
-  ; information when it does happen.  Here are the possible signals I want
-  ; more information from when it happens.
+  ; information when it does happen, so log information when a signal that
+  ; causes a coredump happens.
   ;-----------------------------------------------------------------------*/
   
   crashreport_with(argc,argv,envp);
-  
-  /*---------------------
-  ; Defined by ANSI C
-  ;-----------------------*/
-  
-  crashreport(SIGABRT);
-  crashreport(SIGFPE);
-  crashreport(SIGILL);
-  crashreport(SIGSEGV);
-
-  /*---------------------
-  ; defined by POSIX
-  ;---------------------*/
-
-#ifdef SIGBUS
-  crashreport(SIGBUS);
-  crashreport(SIGQUIT);
-  crashreport(SIGSYS);
-  crashreport(SIGTRAP);
-  crashreport(SIGXCPU);
-  crashreport(SIGXFSZ);
-#endif
+  crashreport_core();
 
   /*-----------------------------------------------------------------------
   ; WTF?  This isn't a WTF.  This is a debugging techique.  While gf_debug
