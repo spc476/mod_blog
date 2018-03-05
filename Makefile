@@ -26,7 +26,7 @@ ifeq ($(VERSION),)
   VERSION=v5.0.3
 endif
 
-CC      = c99 -Wall -Wextra -pedantic
+CC      = gcc -std=c99 -Wall -Wextra -pedantic
 CFLAGS  = -g
 LDFLAGS = -g
 LDLIBS  = -lgdbm -lcgi6 -llua -lm -ldl
