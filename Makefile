@@ -23,7 +23,7 @@
 VERSION := $(shell git describe --tag)
 
 ifeq ($(VERSION),)
-  VERSION=v5.0.3
+  VERSION=v5.0.4
 endif
 
 CC      = gcc -std=c99 -Wall -Wextra -pedantic
@@ -36,7 +36,7 @@ INSTALL         = /usr/bin/install
 INSTALL_PROGRAM = $(INSTALL)
 INSTALL_NAME    = boston
 
-override CFLAGS  +=-DPROG_VERSION='"$(VERSION)"'
+override CFLAGS  +=-D_GNU_SOURCE -DPROG_VERSION='"$(VERSION)"'
 override LDFLAGS +=-rdynamic
 
 prefix = /usr/local
