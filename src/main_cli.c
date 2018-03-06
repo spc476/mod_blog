@@ -124,7 +124,6 @@ int main_cli(int argc,char *argv[])
            gd.req.f.emailin = true;
            break;
       case OPT_UPDATE:
-           gd.req.f.update = true;
            set_c_updatetype(optarg);
            break;
       case OPT_ENTRY:
@@ -235,7 +234,6 @@ static int cmd_cli_show(Request *req)
   
   assert(req            != NULL);
   assert(req->f.emailin == false);
-  assert(req->f.update  == false);
   
   if (req->f.regenerate)
     rc = generate_pages();

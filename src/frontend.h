@@ -32,7 +32,6 @@
 typedef struct rflags
 {
   unsigned int emailin    : 1;
-  unsigned int update     : 1;
   unsigned int preview    : 1;
   unsigned int regenerate : 1;
 } RFlags;
