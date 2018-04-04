@@ -47,11 +47,11 @@ struct nested_params
 /**********************************************************************/
 
 static void text_conversion_backend (FILE *restrict,FILE *restrict);
-static void html_handle_tag         (struct nested_params *const);
-static void check_for_uri           (struct nested_params *const,char const *const);
-static void entify_char             (char *,size_t,char *,char,char const *const);
-static void html_handle_string      (struct nested_params *const);
-static void html_handle_comment     (struct nested_params *const);
+static void html_handle_tag         (struct nested_params *);
+static void check_for_uri           (struct nested_params *,char const *);
+static void entify_char             (char *,size_t,char *,char,char const *);
+static void html_handle_string      (struct nested_params *);
+static void html_handle_comment     (struct nested_params *);
 static void handle_backquote        (FILE *restrict,FILE *restrict);
 static void handle_quote            (FILE *restrict,FILE *restrict);
 static void handle_dash             (FILE *restrict,FILE *restrict);

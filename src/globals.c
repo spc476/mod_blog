@@ -52,16 +52,16 @@
 
 /***********************************************************/
 
-extern void set_c_updatetype   (char const *const);
-extern void set_gf_emailupdate (char const *const);
-extern void set_c_conversion   (char const *const);
-extern void set_c_url          (char const *const);
+extern void set_c_updatetype   (char const *);
+extern void set_gf_emailupdate (char const *);
+extern void set_c_conversion   (char const *);
+extern void set_c_url          (char const *);
 
 static bool        get_next     (char const **,size_t *);
-static int         get_field    (lua_State *const,char const *);
-static char const *get_string   (lua_State *const,char const *restrict,char const *restrict);
-static int         get_int      (lua_State *const,char const *const,int const);
-static bool        get_bool     (lua_State *const,char const *const,bool const);
+static int         get_field    (lua_State *,char const *);
+static char const *get_string   (lua_State *,char const *restrict,char const *restrict);
+static int         get_int      (lua_State *,char const *,int);
+static bool        get_bool     (lua_State *,char const *,bool);
 static void	   seed_rng	(void);
 static void        globals_free (void);
 

@@ -35,7 +35,7 @@ struct btm
 
 /***********************************************************/
 
-extern int  max_monthday  (int const,int const);
+extern int  max_monthday  (int,int);
 extern void btm_inc_day   (struct btm *);
 extern void btm_dec_part  (struct btm *);
 extern void btm_dec_day   (struct btm *);

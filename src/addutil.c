@@ -177,9 +177,9 @@ void notify_emaillist(Request *req __attribute__((unused)))
 
 #else
 
-static void cb_email_title  (FILE *const,void *);
-static void cb_email_url    (FILE *const,void *);
-static void cb_email_author (FILE *const,void *);
+static void cb_email_title  (FILE *,void *);
+static void cb_email_url    (FILE *,void *);
+static void cb_email_author (FILE *,void *);
 
 static struct chunk_callback const m_emcallbacks[] =
 {

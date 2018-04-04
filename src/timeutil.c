@@ -28,7 +28,7 @@
 
 /*************************************************************************/
 
-int max_monthday(int const year,int const month)
+int max_monthday(int year,int month)
 {
   static int const days[] = { 31,0,31,30,31,30,31,31,30,31,30,31 } ;
   
