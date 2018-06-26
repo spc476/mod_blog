@@ -439,6 +439,7 @@ void set_c_url(char const *turl)
   else
   {
     free(fbu);
+    UrlFree(url);
     syslog(LOG_WARNING,"unsupported URL type");
     return;
   }
