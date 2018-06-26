@@ -100,6 +100,7 @@ static void cb_entry_date             (FILE *,void *);
 static void cb_entry_description      (FILE *,void *);
 static void cb_entry_id               (FILE *,void *);
 static void cb_entry_name             (FILE *,void *);
+static void cb_entry_path             (FILE *,void *);
 static void cb_entry_pubdate          (FILE *,void *);
 static void cb_entry_status           (FILE *,void *);
 static void cb_entry_title            (FILE *,void *);
@@ -200,6 +201,7 @@ static struct chunk_callback const m_callbacks[] =
   { "entry.description"         , cb_entry_description          } ,
   { "entry.id"                  , cb_entry_id                   } ,
   { "entry.name"                , cb_entry_name                 } ,
+  { "entry.path"                , cb_entry_path                 } ,
   { "entry.pubdate"             , cb_entry_pubdate              } ,
   { "entry.status"              , cb_entry_status               } ,
   { "entry.title"               , cb_entry_title                } ,
@@ -1706,6 +1708,21 @@ static void cb_entry_name(FILE *out,void *data)
 }
 
 /***********************************************************************/
+
+static void cb_entry_path(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry            *entry;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  entry = cbd->entry;
+  assert(entry->valid);
+  print_nav_name(out,&entry->when,UNIT_PART,'/');
+}
+
+/**********************************************************************/
 
 static void cb_overview(FILE *out __attribute__((unused)),void *data __attribute__((unused)))
 {
