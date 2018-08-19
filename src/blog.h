@@ -57,7 +57,7 @@ typedef struct blogentry
 
 /*********************************************************************/
 
-extern Blog      *BlogNew               (char const *,char const *);
+extern Blog      *BlogNew               (char const *restrict,char const *restrict);
 extern bool       BlogLock              (Blog *);
 extern bool       BlogUnlock            (Blog *);
 extern void       BlogFree              (Blog *);

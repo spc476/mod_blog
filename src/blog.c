@@ -61,7 +61,7 @@ static inline size_t max(size_t a,size_t b)
 
 /***********************************************************************/
 
-Blog *BlogNew(char const *location,char const *lockfile)
+Blog *BlogNew(char const *restrict location,char const *restrict lockfile)
 {
   Blog      *blog;
   FILE      *fp;
