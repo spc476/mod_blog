@@ -281,10 +281,17 @@ static ssize_t utf8_read(void *cookie,char *buffer,size_t bytes)
 
 /************************************************************************/
 
+struct qpcookie
+{
+  FILE *fpin;
+  size_t l;
+};
+
 static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
 {
-  FILE   *realin = cookie;
-  size_t  s      = 0;
+  struct qpcookie *qpc = cookie;
+  FILE   *realin       = qpc->fpin;
+  size_t  s            = 0;
   
   assert(buffer != NULL);
   
@@ -293,6 +300,17 @@ static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
     
   while(bytes)
   {
+    if (qpc->l >= 68)
+    {
+      if (bytes < 2) return s;
+      *buffer++ = '=';
+      *buffer++ = '\n';
+      s      += 2;
+      bytes  -= 2;
+      qpc->l  = 0;
+      continue;
+    }
+    
     int c = fgetc(realin);
     if (c == EOF) return s;
     
@@ -308,12 +326,14 @@ static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
       buffer += 3;
       bytes  -= 3;
       s      += 3;
+      qpc->l += 3;
     }
     else
     {
       *buffer++ = c;
       bytes--;
       s++;
+      qpc->l++;
     }
   }
   
@@ -367,7 +387,11 @@ void notify_emaillist(Request *req)
                                       });
     if (inutf8 != NULL)
     {
-      FILE *inqp = fopencookie(inutf8,"r",(cookie_io_functions_t)
+      struct qpcookie qpc;
+      
+      qpc.l      = 0;
+      qpc.fpin   = inutf8;
+      FILE *inqp = fopencookie(&qpc,"r",(cookie_io_functions_t)
                                           {
                                             qp_read,
                                             NULL,
