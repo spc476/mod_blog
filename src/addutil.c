@@ -305,9 +305,9 @@ static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
       if (bytes < 2) return s;
       *buffer++ = '=';
       *buffer++ = '\n';
-      s      += 2;
-      bytes  -= 2;
-      qpc->l  = 0;
+      s        += 2;
+      bytes    -= 2;
+      qpc->l    = 0;
       continue;
     }
     
