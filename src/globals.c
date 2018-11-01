@@ -103,7 +103,7 @@ bool volatile   gf_debug = false;
 Blog           *g_blog;
 struct display  gd =
 {
-  .navunit = UNIT_INDEX,
+  .navunit = UNIT_PART,
   .f       =
   {
     .fullurl    = false ,

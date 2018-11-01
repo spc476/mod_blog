@@ -1144,8 +1144,6 @@ static void cb_navigation_bar_prev(FILE *out,void *data)
 static void cb_navigation_current(FILE *out,void *data)
 {
   assert(out != NULL);
-  
-  if (gd.navunit != UNIT_INDEX) return;
   generic_cb("navigation.current",out,data);
 }
 
@@ -1397,7 +1395,7 @@ static void cb_robots_index(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if ((gd.navunit == UNIT_PART) || (gd.navunit == UNIT_INDEX))
+  if (gd.navunit == UNIT_PART)
     fputs("index",out);
   else
     fputs("noindex",out);

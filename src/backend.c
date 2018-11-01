@@ -179,9 +179,7 @@ static void swap_endpoints(tumbler__s *tum)
   
   assert(tum         != NULL);
   assert(tum->ustart != UNIT_YEAR);
-  assert(tum->ustart != UNIT_INDEX);
   assert(tum->ustop  != UNIT_YEAR);
-  assert(tum->ustop  != UNIT_INDEX);
   
   /*--------------------------------------------------------------------
   ; The best way to explain this is to give a bunch of examples.
@@ -240,7 +238,6 @@ static void swap_endpoints(tumbler__s *tum)
          break;
          
     case UNIT_YEAR:
-    case UNIT_INDEX:
          assert(0);
          break;
   }
@@ -263,7 +260,6 @@ static void swap_endpoints(tumbler__s *tum)
          break;
          
     case UNIT_YEAR:
-    case UNIT_INDEX:
          assert(0);
          break;
   }

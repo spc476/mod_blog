@@ -37,7 +37,6 @@ typedef enum unit__e
   UNIT_MONTH,
   UNIT_DAY,
   UNIT_PART,
-  UNIT_INDEX
 } unit__e;
 
 typedef struct tumbler__s

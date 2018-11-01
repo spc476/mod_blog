@@ -108,10 +108,6 @@ static bool check_dates(tumbler__s *tum)
          start_okay = (btm_cmp(&tum->start,&g_blog->first) >= 0)
                    && (btm_cmp(&tum->start,&g_blog->last)  <= 0);
          break;
-         
-    case UNIT_INDEX:
-         assert(0);
-         return false;
   }
   
   switch(tum->ustop)
@@ -135,10 +131,6 @@ static bool check_dates(tumbler__s *tum)
          stop_okay = (btm_cmp(&tum->stop,&g_blog->first) >= 0)
                   && (btm_cmp(&tum->stop,&g_blog->last)  <= 0);
          break;
-         
-    case UNIT_INDEX:
-         assert(0);
-         return false;
   }
   
   return start_okay && stop_okay;
@@ -580,10 +572,6 @@ tumbler_new_calculate:
            tum->stop.part  = u1.val;
            tum->ustop      = UNIT_PART;
            return check_dates(tum);
-           
-      case UNIT_INDEX:
-           assert(0);
-           return false;
     }
   }
   
@@ -637,10 +625,6 @@ char *tumbler_canonical(tumbler__s const *tum)
     case UNIT_PART:
          snprintf(start,sizeof(start),"%d/%02d/%02d.%d",tum->start.year,tum->start.month,tum->start.day,tum->start.part);
          break;
-         
-    case UNIT_INDEX:
-         assert(0);
-         return NULL;
   }
   
   if (!tum->range)
@@ -667,7 +651,6 @@ char *tumbler_canonical(tumbler__s const *tum)
       ;--------------------------------------------------------------------*/
       
       case UNIT_YEAR:
-      case UNIT_INDEX:
            assert(0);
            return NULL;
            
@@ -703,10 +686,6 @@ char *tumbler_canonical(tumbler__s const *tum)
       case UNIT_PART:
            snprintf(stop,sizeof(stop),"%d",tum->stop.part);
            break;
-           
-      case UNIT_INDEX:
-           assert(0);
-           return NULL;
     }
   }
   
