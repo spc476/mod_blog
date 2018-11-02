@@ -34,7 +34,6 @@ extern bool  authenticate_author    (Request *);
 extern void  notify_emaillist       (Request *);
 extern int   entry_add              (Request *);
 extern void  fix_entry              (Request *);
-extern void  generic_cb             (char const *,FILE *,void *);
 extern void  dbcritical             (char const *);
 extern char *entity_conversion      (char const *);
 extern char *entity_encode          (char const *);
