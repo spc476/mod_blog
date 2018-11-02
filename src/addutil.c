@@ -26,13 +26,13 @@
 
 #include <cgilib6/mail.h>
 #include <cgilib6/util.h>
+#include <cgilib6/chunk.h>
 
 #include "conf.h"
 #include "blog.h"
 #include "conversion.h"
 #include "frontend.h"
 #include "globals.h"
-#include "fix.h"
 #include "blogutil.h"
 
 #ifdef EMAIL_NOTIFY

@@ -33,8 +33,8 @@
 
 #include <cgilib6/util.h>
 
-#include "fix.h"
 #include "blogutil.h"
+#include "frontend.h"
 #include "backend.h"
 #include "globals.h"
 

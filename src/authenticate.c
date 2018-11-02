@@ -29,7 +29,6 @@
 #include <cgilib6/util.h>
 
 #include "conf.h"
-#include "fix.h"
 #include "frontend.h"
 #include "globals.h"
 

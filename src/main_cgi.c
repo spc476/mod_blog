@@ -32,7 +32,6 @@
 #include <cgilib6/util.h>
 
 #include "frontend.h"
-#include "fix.h"
 #include "globals.h"
 
 /**************************************************************************/

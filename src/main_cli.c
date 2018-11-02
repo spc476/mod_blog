@@ -39,7 +39,6 @@
 
 #include "conf.h"
 #include "frontend.h"
-#include "fix.h"
 #include "blog.h"
 #include "blogutil.h"
 #include "globals.h"

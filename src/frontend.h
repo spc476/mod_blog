@@ -29,6 +29,8 @@
 #include "timeutil.h"
 #include "blog.h"
 
+#define DB_BLOCK 1024
+
 typedef struct rflags
 {
   unsigned int emailin    : 1;
@@ -79,5 +81,18 @@ typedef struct display
   struct btm      previous;
   struct btm      next;
 } Display;
+
+/************************************************/
+
+extern char *get_remote_user        (void);
+extern bool  authenticate_author    (Request *);
+extern void  notify_emaillist       (Request *);
+extern int   entry_add              (Request *);
+extern void  fix_entry              (Request *);
+extern void  dbcritical             (char const *);
+extern char *entity_conversion      (char const *);
+extern char *entity_encode          (char const *);
+extern FILE *fentity_encode_onread  (FILE *);
+extern FILE *fentity_encode_onwrite (FILE *);
 
 #endif

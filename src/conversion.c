@@ -28,7 +28,7 @@
 #include <cgilib6/htmltok.h>
 
 #include "conversion.h"
-#include "fix.h"
+#include "frontend.h"
 #include "blogutil.h"
 
 /**********************************************************************/

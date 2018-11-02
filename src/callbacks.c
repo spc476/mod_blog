@@ -41,7 +41,6 @@
 #include "blog.h"
 #include "timeutil.h"
 #include "frontend.h"
-#include "fix.h"
 #include "blogutil.h"
 #include "conversion.h"
 #include "globals.h"
