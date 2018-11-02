@@ -80,13 +80,4 @@ typedef struct display
   struct btm      next;
 } Display;
 
-struct callback_data
-{
-  List        list;
-  struct btm  last;     /* timestamp of previous entry */
-  BlogEntry  *entry;    /* current entry being processed */
-  FILE       *ad;       /* file containing ad */
-  char       *adtag;
-};
-
 #endif
