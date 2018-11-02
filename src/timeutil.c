@@ -20,7 +20,6 @@
 *
 ***************************/
 
-#include <string.h>
 #include <assert.h>
 
 #include "timeutil.h"
@@ -195,13 +194,3 @@ int btm_cmp_year(
 }
 
 /***************************************************************************/
-
-void tm_init(struct tm *ptm)
-{
-  assert(ptm != NULL);
-  
-  memset(ptm,0,sizeof(struct tm));
-  ptm->tm_isdst = -1;
-}
-
-/**************************************************************************/

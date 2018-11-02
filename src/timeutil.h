@@ -23,8 +23,6 @@
 #ifndef I_F3FFF9B1_0536_542C_B5AB_DB26462A0322
 #define I_F3FFF9B1_0536_542C_B5AB_DB26462A0322
 
-#include <time.h>
-
 struct btm
 {
   int year;
@@ -45,6 +43,5 @@ extern int  btm_cmp       (struct btm const *restrict,struct btm const *restrict
 extern int  btm_cmp_date  (struct btm const *restrict,struct btm const *restrict);
 extern int  btm_cmp_month (struct btm const *restrict,struct btm const *restrict);
 extern int  btm_cmp_year  (struct btm const *restrict,struct btm const *restrict);
-extern void tm_init       (struct tm *);
 
 #endif

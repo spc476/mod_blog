@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 
 #include <unistd.h>
 
@@ -254,6 +255,16 @@ void generic_cb(char const *which,FILE *out,void *data)
   ChunkProcess(templates,which,out,data);
   ChunkFree(templates);
   fflush(out);
+}
+
+/*********************************************************************/
+
+static void tm_init(struct tm *ptm)
+{
+  assert(ptm != NULL);
+  
+  memset(ptm,0,sizeof(struct tm));
+  ptm->tm_isdst = -1;
 }
 
 /*********************************************************************/
