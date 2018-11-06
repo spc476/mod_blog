@@ -66,8 +66,8 @@ extern BlogEntry *BlogEntryNew          (Blog *);
 extern BlogEntry *BlogEntryRead         (Blog *,struct btm const *);
 extern void       BlogEntryReadBetweenU (Blog *,List *,struct btm const *restrict,struct btm const *restrict);
 extern void       BlogEntryReadBetweenD (Blog *,List *,struct btm const *restrict,struct btm const *restrict);
-extern void       BlogEntryReadXD       (Blog *,List *,struct btm const *restrict,size_t);
-extern void       BlogEntryReadXU       (Blog *,List *,struct btm const *restrict,size_t);
+extern void       BlogEntryReadXD       (Blog *,List *,struct btm const *,size_t);
+extern void       BlogEntryReadXU       (Blog *,List *,struct btm const *,size_t);
 extern int        BlogEntryWrite        (BlogEntry *);
 extern int        BlogEntryFree         (BlogEntry *);
 
