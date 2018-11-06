@@ -86,7 +86,7 @@ char         *c_fullbaseurl;
 char         *c_htmltemplates;
 template__t  *c_templates;
 aflink__t    *c_aflinks;
-void        (*c_conversion)(FILE *,FILE *) =  html_conversion;
+void        (*c_conversion)(FILE *restrict,FILE *restrict) =  html_conversion;
 int           c_days;
 size_t        c_af_uid;
 size_t        c_af_name;
