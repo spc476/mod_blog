@@ -27,11 +27,9 @@
 -- Format:
 --
 -- #this is a caption
--- *headerline	field2	field3	field4
--- dataitem	data2	data3	data4
--- **
---
--- 	** = repeat header as footer
+-- *headerline  field2  field3  field4
+-- **footerline field2  field3  field4
+-- dataitem     data2   data3   data4
 --
 -- caption, header and footer marker are optional.
 -- Fields are tab-delimeted.
@@ -40,74 +38,38 @@
 
 local lpeg = require "lpeg"
 
-local function TDn(c)
-  return string.format([[<td class="num">%s</td>]],c)
-end
-
-local function TD(c)
-  return string.format([[<td>%s</td>]],c)
-end
-
-local function TH(c)
-  return string.format([[<th>%s</th>]],c)
-end
-
-local HEADER = "NOTHING"
-
 local Cc = lpeg.Cc
-local C  = lpeg.C
+local Cs = lpeg.Cs
 local P  = lpeg.P
 local R  = lpeg.R
 local S  = lpeg.S
 
-local nl        = P"\n"
-local tab       = P"\t"
-local text	= R(" ~")^1
-local int       = P"0" + (R"19" * R"09"^0)
-local frac      = P"." * R"09"^1
-local exp       = S"Ee" * S"+-"^-1 * R"09"^1
-local number    = (P"-"^-1 * int * frac^-1 * exp^-1) / tonumber
-local tr        = C(number) * tab^-1 / function(c) return TDn(c) end
-                + C(text)   * tab^-1 / function(c) return TD(c)  end
-local row       = (Cc("    <tr>") * tr^1 * Cc("</tr>\n") * nl)^1
-                / function(...)
-                    return table.concat { ... }
-	          end
-local th        = C(text) * tab^-1 / function(c) return TH(c) end
-local header    = P"*"
-                * (
-                      Cc("  <thead>\n    <tr>")
-                    * th^1
-                    * Cc("</tr>\n  </thead>\n")
-                    * nl
-                  )
-                / function(...)
-                    local t = { ... }
-                    HEADER = table.concat(t,"",2,#t-1)
-                    return table.concat(t)
-                  end
-local footer    = P"**\n"
-                * Cc("  <tfoot>\n    <tr>")
-                * "" / function(c) return c .. HEADER end
-                * Cc("</tr>\n  </tfoot>\n")
-local caption   = P"#"
-                * (Cc("  <caption>") * C(text) * Cc("</caption>\n") * nl)
-                / function(...)
-                    return table.concat{ ... }
-                  end
-local htable    = (
-                      Cc("<table>\n")
+local nl      = P"\n"
+local tab     = P"\t"
+local text    = R(" ~","\128\255")^1
+local int     = P"0" + (R"19" * R"09"^0)
+local frac    = P"." * R"09"^1
+local exp     = S"Ee" * S"+-"^-1 * R"09"^1
+local number  = (P"-"^-1 * int * frac^-1 * exp^-1)
+
+local td      = Cc'<td class="num">' * number * Cc'</td>' * tab^-1
+              + Cc'<td>'             * text   * Cc'</td>' * tab^-1
+local th      = Cc'<th>'             * text   * Cc'</th>' * tab^-1
+local tr      = Cc'    <tr>' * td^1 * Cc'</tr>' * nl
+
+local caption = P"#" / ""
+              * Cc'  <caption>' * text * Cc'</caption>' * nl
+local header  = P"*" / ""
+              * Cc'  <thead>\n    <tr>' * th^1 * Cc'</tr>\n  </thead>' * nl
+local footer  = P"**" / ""
+              * Cc'  <tfoot>\n    <tr>' * th^1 * Cc'</tr>\n  </tfoot>' * nl
+local htable  = Cs(
+                      Cc'<table>\n'
                     * caption^-1
                     * header^-1
-                    * Cc("  <tbody>\n")
-                    * row
-                    * Cc("  </tbody>\n")
                     * footer^-1
-                    * Cc("  </tbody>\n</table>\n")
+                    * Cc'  <tbody>\n' * tr^1 * Cc'  </tbody>\n'
+                    * Cc'</table>\n'
                   )
-                * P";\n"^-1
-                / function(...)
-                    return table.concat { ... }
-                  end
-
+                  
 print(htable:match(io.stdin:read("*a")))
