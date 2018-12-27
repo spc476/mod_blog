@@ -357,10 +357,8 @@ static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
 
 static void cb_blog_title(FILE *out,void *data)
 {
-  if (gd.navunit == UNIT_PART)
+  if ((gd.navunit == UNIT_PART) && (data != NULL))
   {
-    assert(data != NULL);
-    
     struct callback_data *cbd   = data;
     BlogEntry            *entry = (BlogEntry *)ListGetHead(&cbd->list);
     
@@ -537,10 +535,8 @@ static void cb_entry_description(FILE *out,void *data)
   
   assert(out != NULL);
   
-  if (gd.navunit == UNIT_PART)
+  if ((gd.navunit == UNIT_PART) && (data != NULL))
   {
-    assert(data != NULL);
-    
     struct callback_data *cbd   = data;
     BlogEntry            *entry = (BlogEntry *)ListGetHead(&cbd->list);
     
