@@ -240,7 +240,7 @@ int GlobalsInit(char const *conf)
     return ENOMEM;
   }
   
-  c_templates   = malloc(sizeof(template__t) * c_numtemplates);
+  c_templates = calloc(c_numtemplates,sizeof(template__t));
   if (c_templates == NULL)
   {
     syslog(LOG_ERR,"%s",strerror(ENOMEM));
@@ -322,7 +322,7 @@ int GlobalsInit(char const *conf)
         return ENOMEM;
       }
       
-      c_aflinks = malloc(sizeof(aflink__t) * c_numaflinks);
+      c_aflinks = calloc(c_numaflinks,sizeof(aflink__t));
       
       if (c_aflinks == NULL)
       {
