@@ -3,6 +3,18 @@ NOTE:  	A lot of this is outdated information, but kept here for hysterical
 
 ---
 
+2019-03-30T20:46:00-05:00
+
+Yup.  To add to that, posting a reply to your own blog and setting
+rel=“in-reply-to” and notifying the author with Webmention provides standard
+decentralized comments/notifications.  See aaronparecki.com and the indieweb
+community for examples.
+
+also
+
+https://news.ycombinator.com/item?id=19532614
+
+
 2018-04-03T21:43-05:00
 	Webmention:
 	https://webmention.rocks/
