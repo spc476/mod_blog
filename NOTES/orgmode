@@ -1,0 +1,55 @@
+
+[[https://orgmode.org/][Org Mode]]
+[[https://orgmode.org/org.html][Org Mode Manual]]
+
+* This Is A Heading
+** This Is A Sub-Heading
+*** And A Sub-Sub-Heading
+
+Paragraphs are separated by at least one empty line.
+
+*bold* /italic/ _underlined_ +strikethrough+ =monospaced=
+[[http://Karl-Voit.at][Link description]]
+http://Karl-Voit.at → link without description
+
+: Simple pre-formatted text such as for source code.
+: This also respects the line breaks. *bold* is not bold here.
+
+#+BEGIN_SRC sh
+#!/bin/sh
+echo "foobar"
+#+END_SRC
+
+This paragraph contains a footnote [fn:1]
+[fn:1] this is a footnote.
+
+- list item
+- another item
+  - sub-item
+    1. also enumerated
+    2. if you like
+- [ ] yet to be done
+- [X] item which is done	  
+
+
+| My Column 1 | My Column 2 | Last Column |
+|-------------+-------------+-------------|
+|          42 | foo         | bar         |
+|          23 | baz         | abcdefg     |
+|-------------+-------------+-------------|
+|          65 |             |             |
+
+
+or
+
+ | My Column 1|My Column 2 | Last Column |
+ |-
+ | 42 | foo | bar|
+ | 23 | baz | abcdefg|
+ |-
+ | 65 |||
+
+There is also
+
+Scribble:	https://docs.racket-lang.org/scribble/
+Perl POD:	https://perldoc.perl.org/perlpod.html
