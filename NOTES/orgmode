@@ -15,6 +15,22 @@ http://Karl-Voit.at → link without description
 : Simple pre-formatted text such as for source code.
 : This also respects the line breaks. *bold* is not bold here.
 
+
+#+NAME: name
+
+#+BEGIN:
+#+BEGIN_VERSE
+#+BEGIN_QUOTE
+#+BEGIN_CENTER
+#+BEGIN_EXAMPLE
+#+BEGIN_SRC language switches header-argument
+#+BEGIN_COMMENT
+#+BEGIN_EXPORT charset
+#+BEGIN_JUSTIFYLEFT
+#+BEGIN_JUSTIFYRIGHT
+
+#+RESULTS
+
 #+BEGIN_SRC sh
 #!/bin/sh
 echo "foobar"
