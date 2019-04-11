@@ -1,0 +1,48 @@
+author: Sean Conner
+title: ``Ah!'' I said, ``hold me beer ... ''
+class: testing, debugging, programming
+
+So,
+in writing =syslogintr= I thought,
+//This is going to be /incredible!/\ //
+But in reality,
+things were +pretty good+ bad.
+And by ``bad,'' I meant /bad./
+Okay, *really bad.*
+You can read about it
+[[http://www.conman.org/people/spc/?one=two&three=four][here at this link]].
+
+When writing HTML,
+I thought I might do some code---<span lang="fr" title="um ...">merde</span>:
+
+#+BEGIN_SRC C
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void)
+{
+  /* This contains no HTML at all */
+  puts("Hello, world!");
+  return EXIT_SUCCESS;
+}
+#+END_SRC
+
+---
+
+* This is a sub heading ...
+
+And here we have a table of data:
+
+#+BEGIN_TABLE Some data goes here
+*foo	bar	baz
+**foo	bar	baz
+3	14	15
+92	62	82
+8	-1	4
+#+END_TABLE
+
+So this is the end of the test.
+But I have *strong* reservations about /stuff./
+And I want to make a **strong** statement about AT&amp;T&larr;27&deg;.
+
+
