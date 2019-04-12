@@ -253,7 +253,7 @@ local begin_table   = Cc"\n<table>\n" * table_caption
 -- ********************************************************************
 
 local LWSP        = (abnf.WSP + (abnf.CRLF * abnf.WSP) / " ")
-local email_all   = S" \t"^0 * P"all" * S" \t"^0
+local email_opt   = S" \t"^0 * P"all" * S" \t"^0
                   * Cmt(Carg(1),function(_,pos,s) s.email_all = true return pos end)
 local hdr_name    = (P(1) - P":")^1
 local hdr_char    = P"<" / "&lt;"
@@ -279,7 +279,7 @@ local email_hdrs  = (P"From:"    / "  <dt>From</dt>")    * hdr_value * abnf.CRLF
                   + (P"Subject:" / "  <dt>Subject</dt>") * hdr_value * abnf.CRLF
                   + (P"Date:"    / "  <dt>Date</dt>")    * hdr_value * abnf.CRLF
                   + hdr_generic
-local begin_email = Cc'\n<dl class="header">' * email_all^-1 * P"\n"
+local begin_email = Cc'\n<dl class="header">' * email_opt^-1 * P"\n"
                   * email_hdrs^1
                   * Cc'</dl>\n'
                   * abnf.CRLF
