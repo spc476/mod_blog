@@ -293,7 +293,7 @@ local begin_email = Cc'\n<blockquote>\n  <dl class="header">' * email_opt^-1 * P
                   * Cc'  </dl>\n'
                   * abnf.CRLF * Cc'<p>'
                   * email_text^0
-                  * (P"#+END_EMAIL" * #P"\n" / "  </dl>\n</blockquote>")
+                  * (P"#+END_EMAIL" * #P"\n" / "\n</blockquote>")
                   
 -- ********************************************************************
 -- Top level #+BEGIN blocks definition
