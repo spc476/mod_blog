@@ -107,6 +107,14 @@ local strong = Cmt(P"*"  * Carg(1),stack "strong")
 local strike = Cmt(P"+"  * Carg(1),stack "del")
 local code   = Cmt(P"="  * Carg(1),stack "code")
 
+	-- ----------------------------------
+	-- Handle paraggraphs automagically
+	-- ----------------------------------
+
+local paras = C"\n\n" * C(uchar - S"#-*") / "%1<p>%2"
+local parae = C(uchar) * #(P'\n\n' + P'\n' * P(-1) + P(-1)) / "%1</p>"
+local para  = paras + parae
+
         -- ------------------------------------------------------------
         -- HTML links.  Format: [[href][linktext]]
         --
@@ -171,11 +179,11 @@ local htmltag = P"<"  * tag * attrs^0 * P">"
         -- -----------------------------
         
 local hchar  = tex + entity + uchar
-local header = C"\n***** " * Cs(hchar^1) * C"\n" / "\n<h5>%2</h5>%3"
-             + C"\n**** "  * Cs(hchar^1) * C"\n" / "\n<h4>%2</h4>%3"
-             + C"\n*** "   * Cs(hchar^1) * C"\n" / "\n<h3>%2</h3>%3"
-             + C"\n** "    * Cs(hchar^1) * C"\n" / "\n<h2>%2</h2>%3"
-             + C"\n* "     * Cs(hchar^1) * C"\n" / "\n<h1>%2</h1>%3"
+local header = C"\n***** " * Cs(hchar^1) * #P"\n" / "\n<h5>%2</h5>"
+             + C"\n**** "  * Cs(hchar^1) * #P"\n" / "\n<h4>%2</h4>"
+             + C"\n*** "   * Cs(hchar^1) * #P"\n" / "\n<h3>%2</h3>"
+             + C"\n** "    * Cs(hchar^1) * #P"\n" / "\n<h2>%2</h2>"
+             + C"\n* "     * Cs(hchar^1) * #P"\n" / "\n<h1>%2</h1>"
              
 -- ********************************************************************
 -- #+BEGIN blocks.  We start with #+BEGIN_SRC
@@ -197,7 +205,7 @@ local src_char  = P"<" / "&lt;"
 local begin_src = C(S" \t"^0) * C(R("AZ","az")^1) * C(P"\n")
                 / '\n<pre class="language-%2" title="%2">\n'
                 * Cs(src_char^0)
-                * (P"\n#+END_SRC\n" / "\n</pre>\n")
+                * (P"\n#+END_SRC" * #P"\n" / "\n</pre>\n")
                 
 -- ********************************************************************
 -- #+BEGIN_TABLE
@@ -239,7 +247,7 @@ local begin_table   = Cc"\n<table>\n" * table_caption
                     * table_header^-1
                     * table_footer^-1
                     * table_body
-                    * (P"#+END_TABLE\n" / "</table>\n")
+                    * (P"#+END_TABLE" * #P"\n" / "</table>\n")
                     
 -- ********************************************************************
 -- #+BEGIN_EMAIL
@@ -273,6 +281,7 @@ local hdr_generic = Cmt(
                     )
 local email_text  = header + htmltag + tex + entity + link
                   + cut + italic + bold + em + strong + strike + code
+                  + para
                   + (P(1) - P"#+END_EMAIL")
 local email_hdrs  = (P"From:"    / "  <dt>From</dt>")    * hdr_value * abnf.CRLF
                   + (P"To:"      / "  <dt>To</dt>")      * hdr_value * abnf.CRLF
@@ -282,9 +291,9 @@ local email_hdrs  = (P"From:"    / "  <dt>From</dt>")    * hdr_value * abnf.CRLF
 local begin_email = Cc'\n<dl class="header">' * email_opt^-1 * P"\n"
                   * email_hdrs^1
                   * Cc'</dl>\n'
-                  * abnf.CRLF
+                  --* #abnf.CRLF
                   * email_text^0
-                  * (P"#+END_EMAIL\n" / "</dl>\n")
+                  * (P"#+END_EMAIL" * #P"\n" / "</dl>\n")
                   
 -- ********************************************************************
 -- Top level #+BEGIN blocks definition
@@ -303,6 +312,7 @@ local char = blocks
            + tex +  entity
            + link
            + cut + italic + bold + em + strong + strike + code
+           + para
            + P(1)
            
 local text = Cs(char^0)
