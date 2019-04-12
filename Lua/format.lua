@@ -283,17 +283,17 @@ local email_text  = header + htmltag + tex + entity + link
                   + cut + italic + bold + em + strong + strike + code
                   + para
                   + (P(1) - P"#+END_EMAIL")
-local email_hdrs  = (P"From:"    / "  <dt>From</dt>")    * hdr_value * abnf.CRLF
-                  + (P"To:"      / "  <dt>To</dt>")      * hdr_value * abnf.CRLF
-                  + (P"Subject:" / "  <dt>Subject</dt>") * hdr_value * abnf.CRLF
-                  + (P"Date:"    / "  <dt>Date</dt>")    * hdr_value * abnf.CRLF
+local email_hdrs  = (P"From:"    / "    <dt>From</dt>")    * hdr_value * abnf.CRLF
+                  + (P"To:"      / "    <dt>To</dt>")      * hdr_value * abnf.CRLF
+                  + (P"Subject:" / "    <dt>Subject</dt>") * hdr_value * abnf.CRLF
+                  + (P"Date:"    / "    <dt>Date</dt>")    * hdr_value * abnf.CRLF
                   + hdr_generic
-local begin_email = Cc'\n<dl class="header">' * email_opt^-1 * P"\n"
+local begin_email = Cc'\n<blockquote>\n  <dl class="header">' * email_opt^-1 * P"\n"
                   * email_hdrs^1
-                  * Cc'</dl>\n'
-                  --* #abnf.CRLF
+                  * Cc'  </dl>\n'
+                  * abnf.CRLF * Cc'<p>'
                   * email_text^0
-                  * (P"#+END_EMAIL" * #P"\n" / "</dl>\n")
+                  * (P"#+END_EMAIL" * #P"\n" / "  </dl>\n</blockquote>")
                   
 -- ********************************************************************
 -- Top level #+BEGIN blocks definition
