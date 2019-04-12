@@ -11,6 +11,8 @@ And by ``bad,'' I meant /bad./
 Okay, *really bad.*
 You can read about it
 [[http://www.conman.org/people/spc/?one=two&three=four][here at this link]].
+There's also [[gopher://floodgap.org/][this link]] and then
+[[2019/03/04.1][there's this page]].
 
 When writing HTML,
 I thought I might do some code---<span lang="fr" title="um ...">merde</span>:
@@ -27,7 +29,7 @@ int main(void)
 }
 #+END_SRC
 
----
+-----
 
 * This is a sub heading ...
 
@@ -43,6 +45,34 @@ And here we have a table of data:
 
 So this is the end of the test.
 But I have *strong* reservations about /stuff./
-And I want to make a **strong** statement about AT&amp;T&larr;27&deg;.
+And I want to make a **strong** statement about AT&amp;T<-27&deg;.
 
+``View -> Page Style -> No Style'' is the menu item to select.
+
+#+BEGIN_TABLE
+1	2	3	4
+5	6	7	8
+9	10	11	12
+#+END_TABLE
+
+My location: 27&deg;15&prime;37&Prime;N
+80&deg;32&prime;3&Prime;W.  Shoot me down.
+
+#+BEGIN_EMAIL all
+From: John Doe <{{johndoe@example.net}}>
+To: sean@conman.org
+Subject: Re: This is an example of a
+	Subject line ...
+Date: Mon, 1 Apr 2019 18:12:41 +0200
+Cc: Sean Conner <spc@conman.org>,
+ Comment <comment@noreply.github.com>
+
+Hi Sean,
+
+some other people (from {{example.com}}) have ideas regarding encrypted Gopher
+(I will only throw some links at you, I'm feeling a little bit uncomfortable
+writing longer english texts):
+#+END_EMAIL
+
+That's my story, and I'm sticking to it.  Even with all the {{redactions}}.
 
