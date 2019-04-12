@@ -108,7 +108,7 @@ local strike = Cmt(P"+"  * Carg(1),stack "del")
 local code   = Cmt(P"="  * Carg(1),stack "code")
 
 	-- ----------------------------------
-	-- Handle paraggraphs automagically
+	-- Handle paragraphs automagically
 	-- ----------------------------------
 
 local paras = C"\n\n" * C(uchar - S"#-*") / "%1<p>%2"
