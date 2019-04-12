@@ -89,29 +89,13 @@ local entity = P"&#" * C(R"09"^1)             * P";" / utf8.char
         -- soft-hypen every 5 characters.  This text will be placed in
         -- a <SPAN> with a CLASS attribute of 'cut'.
         -- --------------------------------------------------------------
-        
-local cut_char = (uchar - P"}}") / "X" -- XXX this should collapse combining chars
-local cut      = Cmt(
-                   P"{{" * Carg(1),
-                   function(_,pos,s)
-                     s.cut = 0
-                     return pos,'<span class="cut">'
-                   end
-                 )
-               * Cmt(
-                  cut_char * Carg(1),
-                  function(_,pos,char,s)
-                    s.cut = s.cut + 1
-                    if s.cut == 5 then
-                      s.cut = 0
-                      return pos,char .. "\194\173"
-                    else
-                      return pos,char
-                    end
-                  end
-                )^0
+
+local cut_c    = (uchar - P"}}") / "X"
+local cut_char = cut_c * cut_c^-4 * (#cut_c * Cc"\194\173")^-1
+local cut      = (P"{{" / '<span class="cut">')
+               * Cs(cut_char^0)
                * (P"}}" / '</span>')
-               
+
         -- ---------------------------------------------------------
         -- Various shorthand notations for common HTML styling tags
         -- ---------------------------------------------------------
