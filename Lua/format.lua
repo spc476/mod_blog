@@ -263,7 +263,7 @@ local begin_table   = Cc"\n<table>\n" * table_caption
 -- ********************************************************************
 
 local LWSP        = (abnf.WSP + (abnf.CRLF * abnf.WSP) / " ")
-local email_opt   = S" \t"^0 * P"all" * S" \t"^0
+local email_opt   = S" \t"^0 * P"all" * S" \t"^0 / ""
                   * Cmt(Carg(1),function(_,pos,s) s.email_all = true return pos end)
 local hdr_name    = (P(1) - P":")^1
 local hdr_char    = P"<" / "&lt;"
