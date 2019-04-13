@@ -77,3 +77,27 @@ writing longer english texts):
 
 That's my story, and I'm sticking to it.  Even with all the {{redactions}}.
 
+Here's a post about it:
+
+#+ATTR_QUOTE: :cite http://boston.conman.org/2019/04/08.2
+#+ATTR_QUOTE: :title Why the web went bad
+#+ATTR_QUOTE: :via-url http://www.example.net/links-today/2018/04/12
+#+ATTR_QUOTE: :via-title Link's O' the Day
+#+BEGIN_QUOTE
+
+In my opinion, the point where HTTP and HTML “went off the rails” into the
+current trainwreck of the modern web happened when browsers gained the
+ability to run code within the browser, turning the browser from a content
+delivery platform and into an application delivery platform (althought that
+transformation didn't happen overnight).  And no, it wasn't the fault of
+[[https://en.wikipedia.org/wiki/Netscape][Netscape]] and their introduction
+of [[https://en.wikipedia.org/wiki/JavaScript][Javascript]] that brought
+about the current apocalypse of bloated webpages and constant surveillance.
+Nope, the fault lies directly at the feet of
+[[https://en.wikipedia.org/wiki/Sun_Microsystems][Sun Microsystems]] (whose
+zombie corpse is following the command of
+[[https://www.oracle.com/sun/][Oracle]] but I digress) and the introduction
+of [[https://en.wikipedia.org/wiki/Java_(software_platform)#History][Java in
+early 1996]].  Javascript was Netscape's reaction to Java.
+
+#+END_QUOTE

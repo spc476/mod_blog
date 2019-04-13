@@ -39,6 +39,21 @@ local S    = lpeg.S
 
 -- ********************************************************************
 
+local function url_class(href)
+  local u = url:match(href)
+  
+  if u.scheme then
+    if u.host:match "conman.org" then
+      return "site"
+    else
+      return "external"
+    end
+  else
+    return "local"
+  end
+end
+
+-- ********************************************************************
 local function stack(tag)
   local st = "<"  .. tag .. ">"
   local et = "</" .. tag .. ">"
@@ -89,13 +104,13 @@ local entity = P"&#" * C(R"09"^1)             * P";" / utf8.char
         -- soft-hypen every 5 characters.  This text will be placed in
         -- a <SPAN> with a CLASS attribute of 'cut'.
         -- --------------------------------------------------------------
-
+        
 local cut_c    = (uchar - P"}}") / "X"
 local cut_char = cut_c * cut_c^-4 * (#cut_c * Cc"\194\173")^-1
 local cut      = (P"{{" / '<span class="cut">')
                * Cs(cut_char^0)
                * (P"}}" / '</span>')
-
+               
         -- ---------------------------------------------------------
         -- Various shorthand notations for common HTML styling tags
         -- ---------------------------------------------------------
@@ -107,10 +122,10 @@ local strong = Cmt(P"*"  * Carg(1),stack "strong")
 local strike = Cmt(P"+"  * Carg(1),stack "del")
 local code   = Cmt(P"="  * Carg(1),stack "code")
 
-	-- ----------------------------------
-	-- Handle paragraphs automagically
-	-- ----------------------------------
-
+        -- ----------------------------------
+        -- Handle paragraphs automagically
+        -- ----------------------------------
+        
 local paras = C"\n\n" * C(uchar - S"#-*") / "%1<p>%2"
 local parae = C(uchar) * #(P'\n\n' + P'\n' * P(-1) + P(-1)) / "%1</p>"
 local para  = paras + parae
@@ -129,22 +144,9 @@ local totext   = tex + entity + italic + bold + em + strong + strike + code
 local linktext = Cs(totext^0)
 local link     = P"[[" * urltext * P"][" * linktext * P"]]"
                / function(href,text)
-                   local class
-                   local u = url:match(href)
-                   
-                   if u.scheme then
-                     if u.host:match "conman.org" then
-                       class = "site"
-                     else
-                       class = "external"
-                     end
-                   else
-                     class = "local"
-                   end
-                   
                    return string.format(
                         [[<a class="%s" href="%s">%s</a>]],
-                        class,
+                        url_class(href),
                         href,
                         text
                    )
@@ -296,14 +298,148 @@ local begin_email = Cc'\n<blockquote>\n  <dl class="header">' * email_opt^-1 * P
                   * (P"#+END_EMAIL" * #P"\n" / "\n</blockquote>")
                   
 -- ********************************************************************
+-- #+BEGIN_QUOTE
+--
+--      <sol> #+BEGIN_QUOTE
+--      <text>
+--      <sol> #+END_QUOTE
+--
+-- ********************************************************************
+
+local quote_text  = header + htmltag + tex + entity + link
+                  + cut + italic + bold + em + strong + strike + code
+                  + para
+                  + (P(1) - P"#+END_QUOTE")
+                  
+local begin_quote = Cmt(
+                      Carg(1),
+                      function(_,pos,state)
+                        local htag = '\n<blockquote'
+                        if state.quote.cite then
+                          htag = htag .. string.format(" cite=%q",state.quote.cite)
+                        end
+                        if state.quote.title then
+                          htag = htag .. string.format(" title=%q",state.quote.title)
+                        end
+                        htag = htag .. ">"
+                        return pos,htag
+                      end
+                    )
+                  * quote_text^0
+                  * Cmt(
+                      P"#+END_QUOTE" * #P"\n" * Carg(1),
+                      function(_,pos,state)
+                        local via
+                        local cite
+                        local par
+                        
+                        if state.quote.via_url and state.quote.via_title then
+                          via = string.format(
+                              [[Via <a class="%s" href="%s">%s</a>, ]],
+                              url_class(state.quote.via_url),
+                              state.quote.via_url,
+                              state.quote.via_title
+                          )
+                        elseif state.quote.via_url and not state.quote.via_title then
+                          via = string.format(
+                              [[Via <code><a class="%s" href="%s">%s</a></code>, ]],
+                              url_class(state.quote.via_url),
+                              state.quote.via_url,
+                              state.quote.via_url
+                          )
+                        elseif not state.quote.via_url and state.quote.via_title then
+                          via = string.format([[Via %s, ]],state.quote.via_title)
+                        end
+                        
+                        if state.quote.cite and state.quote.title then
+                          cite = string.format(
+                              [[<cite><a class="%s" href="%s">%s</a></cite>]],
+                              url_class(state.quote.cite),
+                              state.quote.cite,
+                              state.quote.title
+                          )
+                        elseif state.quote.cite and not state.quote.title then
+                          cite = string.format(
+                              [[<cite><code><a class="%s" href="%s">%s</a></code></cite>]],
+                              url_class(state.quote.cite),
+                              state.quote.cite,
+                              state.quote.cite
+                          )
+                        elseif not state.quote.cite and state.quote.title then
+                          cite = string.format([[<cite>%s</cite>]],state.quote.title)
+                        end
+                        
+                        if via or cite then
+                          par = string.format(
+                              '<p class="cite">%s%s</p>',
+                              via or "",
+                              cite or ""
+                          )
+                        end
+                        
+                        state.quote.cite      = nil
+                        state.quote.title     = nil
+                        state.quote.via_url   = nil
+                        state.quote.via_title = nil
+                        
+                        return pos,string.format("%s\n</blockquote>\n",par or "")
+                      end
+                    )
+                    
+-- ********************************************************************
+-- #+BEGIN_COMMENT
+--
+--      <sol> #+BEGIN_COMMENT <eol>
+--      text
+--      <sol> #+END_COMMENT <eol>
+--
+-- NOTE:        These blocks cannot nest.  Bad things will happen.
+-- ********************************************************************
+
+local begin_comment = (P(1) - P"\n#+END_COMMENT")^0 / "<!-- comment -->"
+                    * (P"\n#+END_COMMENT" * #P"\n") / ""
+                    
+-- ********************************************************************
+-- #+ATTR_QUOTE
+--
+--      <sol> '#+ATTR_QUOTE:' <sp> [<cite> / <title> / <via-url> | <via-title> ] <eol>
+--
+--      <cite>      -> ':cite'      <sp> <url>
+--      <title>     -> ':title'     <sp> <text>
+--      <via-url>   -> ':via-url'   <sp> <url>
+--      <via-title> -> ':via-title' <sp> <text>
+--
+-- NOTE:        Only one attribute per #+ATTR_QUOTE is supported.
+--              Multiple #+ATTR_QUOTE lines can be specified
+-- ********************************************************************
+
+local quote_attrs = P":cite"      / "cite"
+                  + P":title"     / "title"
+                  + P":via-url"   / "via_url"
+                  + P":via-title" / "via_title"
+                  
+local attr_quote = S" \t"^1 / ""
+                 * Cmt(Carg(1) * quote_attrs * C(S" \t"^1) * C((P(1) - P"\n")^1),
+                   function(_,pos,state,cite,_,text)
+                     state.quote[cite] = text
+                     return pos,""
+                   end)
+                   
+-- ********************************************************************
 -- Top level #+BEGIN blocks definition
 -- ********************************************************************
 
 local begin  = P"_SRC"      / "" * begin_src
              + P"_TABLE"    / "" * begin_table
              + P"_EMAIL"    / "" * begin_email
-local blocks = P"\n#+BEGIN" / "" * begin
+             + P"_QUOTE"    / "" * begin_quote
+             + P"_COMMENT"  / "" * begin_comment
+             
+local battr  = P"_QUOTE:"   / "" * attr_quote
 
+local blocks = P"\n#+BEGIN" / "" * begin
+             + P"\n#+ATTR"  / "" * battr
+             
 -- ********************************************************************
 
 local char = blocks
@@ -319,5 +455,12 @@ local text = Cs(char^0)
 
 -- ********************************************************************
 
+local state =
+{
+  stack     = {},
+  email_all = false,
+  quote     = {}
+}
+
 local data = io.stdin:read("*a")
-io.stdout:write(text:match(data,1,{ stack = {} , email_all = false }))
+io.stdout:write(text:match(data,1,state))
