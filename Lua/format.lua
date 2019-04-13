@@ -54,6 +54,7 @@ local function url_class(href)
 end
 
 -- ********************************************************************
+
 local function stack(tag)
   local st = "<"  .. tag .. ">"
   local et = "</" .. tag .. ">"
@@ -402,7 +403,7 @@ local begin_comment = (P(1) - P"\n#+END_COMMENT")^0 / "<!-- comment -->"
 -- ********************************************************************
 -- #+ATTR_QUOTE
 --
---      <sol> '#+ATTR_QUOTE:' <sp> [<cite> / <title> / <via-url> | <via-title> ] <eol>
+--      <sol> '#+ATTR_QUOTE:' <sp> [<cite> | <title> | <via-url> | <via-title> ] <eol>
 --
 --      <cite>      -> ':cite'      <sp> <url>
 --      <title>     -> ':title'     <sp> <text>
