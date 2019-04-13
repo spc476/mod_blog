@@ -21,6 +21,7 @@
 -- ************************************************************************
 -- luacheck: ignore 611
 
+local ss     = require "org.conman.table".safestring
 local ENTITY = require "org.conman.const.entity"
 local abnf   = require "org.conman.parsers.abnf"
 local url    = require "org.conman.parsers.url"
@@ -127,7 +128,7 @@ local code   = Cmt(P"="  * Carg(1),stack "code")
         -- Handle paragraphs automagically
         -- ----------------------------------
         
-local paras = C"\n\n" * C(uchar - S"#-*") / "%1<p>%2"
+local paras = C"\n\n"  * #(uchar - S"#-*") / "%1<p>"
 local parae = C(uchar) * #(P'\n\n' + P'\n' * P(-1) + P(-1)) / "%1</p>"
 local para  = paras + parae
 
