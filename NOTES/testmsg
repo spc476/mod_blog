@@ -1,6 +1,9 @@
 author: Sean Conner
 title: ``Ah!'' I said, ``hold me beer ... ''
 class: testing, debugging, programming
+status: Things go pear shaped when I have someone hold my beer
+email: no
+filter: html
 
 So,
 in writing =syslogintr= I thought,

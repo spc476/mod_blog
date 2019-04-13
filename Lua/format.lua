@@ -441,7 +441,27 @@ local blocks = P"\n#+BEGIN" / "" * begin
              + P"\n#+ATTR"  / "" * battr
              
 -- ********************************************************************
+-- Entry header
+-- ********************************************************************
 
+local entry_header do
+  local sol    = P"\n"^-1
+  local echar  = tex + entity + uchar
+  
+  local author = sol * P"author:" * Cs(uchar^0)
+  local title  = sol * P"title:"  * Cs(echar^0)
+  local class  = sol * P"class:"  * Cs(echar^0)
+  local status = sol * P"status:" * Cs(echar^0)
+  local date   = sol * P"date:"   * uchar^0
+  local adtag  = sol * P"adtag:"  * Cs(echar^0)
+  local email  = sol * P"email:"  * uchar^0
+  local filter = sol * P"filter:" * uchar^0
+  
+  entry_header = (author + title + class + status + date + adtag + email + filter)^0
+end
+
+-- ********************************************************************
+  
 local char = blocks
            + header
            + htmltag
@@ -451,7 +471,7 @@ local char = blocks
            + para
            + P(1)
            
-local text = Cs(char^0)
+local text = Cs(entry_header * char^0)
 
 -- ********************************************************************
 
