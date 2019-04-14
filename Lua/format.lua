@@ -151,7 +151,10 @@ local parae = C(uchar) * #(P'\n\n' + P'\n' * P(-1) + P(-1)) / "%1</p>"
 local para  = paras + parae
 
         -- ------------------------------------------------------------
-        -- HTML links.  Format: [[href][linktext]]
+        -- HTML links.  Formats:
+        --              [[href][linktext]]
+        --              [[href]]
+        --              [[href][]]
         --
         -- NOTE:  relative links get a CLASS attribute of 'local',
         --        URIs to 'conman.org' get a CLASS attribute of 'site'
@@ -161,7 +164,7 @@ local para  = paras + parae
 local urltext  = C((ascii - P']')^1)
 local totext   = abbr + tex + entity + italic + bold + strike + code
                + (uchar - P"]")
-local linktext = Cs(totext^0)
+local linktext = Cs(totext^1)
 local link     = P"[[" * urltext * P"][" * linktext * P"]]"
                / function(href,text)
                    return string.format(
@@ -169,6 +172,15 @@ local link     = P"[[" * urltext * P"][" * linktext * P"]]"
                         url_class(href),
                         href,
                         text
+                   )
+                 end
+               + P"[[" * urltext * (P"]]" + P"][]]")
+               / function(href)
+                   return string.format(
+                     [[<code><a class="%s" href="%s">%s</a></code>]],
+                     url_class(href),
+                     href,
+                     href
                    )
                  end
                  
