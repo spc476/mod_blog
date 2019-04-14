@@ -470,6 +470,7 @@ local char = blocks
            + link
            + cut + italic + bold + strike + code
            + para
+           + uchar
            + P(1)
            
 local text = Cs(entry_header * char^0)
