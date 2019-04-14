@@ -75,11 +75,11 @@ end
 
 -- ********************************************************************
 
-	-- ----------------------------------------
-	-- acronym expansion into
-	--    <abbr title="expansion">ABBR</abbr>
-	-- ----------------------------------------
-
+        -- ----------------------------------------
+        -- acronym expansion into
+        --    <abbr title="expansion">ABBR</abbr>
+        -- ----------------------------------------
+        
 local abbr = Cmt(
                   C(R"AZ"^1) * Carg(1),
                   function(_,pos,acronym,state)
