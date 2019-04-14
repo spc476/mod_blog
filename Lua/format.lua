@@ -87,16 +87,16 @@ local tex = P"``"    / ENTITY.ldquo
           + P"<-"    / "\226\134\144"
           + P"->"    / "\226\134\146"
           + P"\\ "   / ""
-          + P"&amp;"
-          + P"&lt;"
-          + P"&quot;"
-          + P"&apos;"
           
         -- -----------------------------------------
         -- convert HTML entities to UTF-8 characters
         -- -----------------------------------------
         
-local entity = P"&#" * C(R"09"^1)             * P";" / utf8.char
+local entity = P"&amp;"
+             + P"&lt;"
+             + P"&quot;"
+             + P"&apos;"
+             + P"&#" * C(R"09"^1)             * P";" / utf8.char
              + P"&"  * C(R("az","AZ","09")^1) * P";" / ENTITY
              
         -- --------------------------------------------------------------
