@@ -109,7 +109,7 @@ local entity = P"&amp;"
         -- a <SPAN> with a CLASS attribute of 'cut'.
         -- --------------------------------------------------------------
         
-local cut_c    = (uchar - P"}}") / "X"
+local cut_c    = (allchar - P"}}") / "X"
 local cut_char = cut_c * cut_c^-4 * (#cut_c * Cc"\194\173")^-1
 local cut      = (P"{{" / '<span class="cut">')
                * Cs(cut_char^0)
