@@ -75,6 +75,22 @@ end
 
 -- ********************************************************************
 
+	-- ----------------------------------------
+	-- acronym expansion into
+	--    <abbr title="expansion">ABBR</abbr>
+	-- ----------------------------------------
+
+local abbr = Cmt(
+                  C(R"AZ"^1) * Carg(1),
+                  function(_,pos,acronym,state)
+                    if state.abbr[acronym] then
+                      return pos,state.abbr[acronym]
+                    else
+                      return pos
+                    end
+                  end
+                )
+                
         -- ------------------
         -- simple substutions
         -- ------------------
@@ -143,7 +159,7 @@ local para  = paras + parae
         -- ------------------------------------------------------------
         
 local urltext  = C((ascii - P']')^1)
-local totext   = tex + entity + italic + bold + strike + code
+local totext   = abbr + tex + entity + italic + bold + strike + code
                + (uchar - P"]")
 local linktext = Cs(totext^0)
 local link     = P"[[" * urltext * P"][" * linktext * P"]]"
@@ -184,7 +200,7 @@ local htmltag = P"<"  * tag * attrs^0 * P">"
         -- Shorthand for <H1> .. <H5>
         -- -----------------------------
         
-local hchar  = tex + entity + uchar
+local hchar  = abbr + tex + entity + uchar
 local header = C"\n***** " * Cs(hchar^1) * #P"\n" / "\n<h5>%2</h5>"
              + C"\n**** "  * Cs(hchar^1) * #P"\n" / "\n<h4>%2</h4>"
              + C"\n*** "   * Cs(hchar^1) * #P"\n" / "\n<h3>%2</h3>"
@@ -273,7 +289,7 @@ local hdr_name    = (ascii - P":")^1
 local hdr_char    = P"<" / "&lt;"
                   + P"&" / "&amp;"
                   + P">" / "&gt;"
-local hdr_text    = LWSP + hdr_char + cut + tex + entity + uchar
+local hdr_text    = LWSP + hdr_char + abbr + cut + tex + entity + uchar
 local hdr_value   = Cc'<dd>' * Cs(hdr_text^1) * Cc'</dd>'
 local hdr_generic = Cmt(
                       Carg(1) * C(hdr_name) * P":" * Cs(hdr_text^1) * abnf.CRLF,
@@ -285,7 +301,7 @@ local hdr_generic = Cmt(
                         end
                       end
                     )
-local email_text  = header + htmltag + tex + entity + link
+local email_text  = header + htmltag + abbr + tex + entity + link
                   + cut + italic + bold + strike + code
                   + para
                   + (allchar - P"#+END_EMAIL")
@@ -310,7 +326,7 @@ local begin_email = Cc'\n<blockquote>\n  <dl class="header">' * email_opt^-1 * P
 --
 -- ********************************************************************
 
-local quote_text  = header + htmltag + tex + entity + link
+local quote_text  = header + htmltag + abbr + tex + entity + link
                   + cut + italic + bold + strike + code
                   + para
                   + (allchar - P"#+END_QUOTE")
@@ -449,8 +465,20 @@ local blocks = P"\n#+BEGIN" / "" * begin
 -- ********************************************************************
 
 local entry_header do
-  local sol    = P"\n"^-1
-  local echar  = tex + entity + uchar
+  local sol   = P"\n"^-1
+  local echar = tex + entity + uchar
+  
+  local acronyms = (P"\n"^-1 * S" \t"^1) / ""
+                 * Cmt(
+                          C(R"AZ"^1)
+                        * C(S" \t"^1)
+                        * C(tex + entity + uchar^1)
+                        * Carg(1),
+                        function(_,pos,abrev,_,expansion,state)
+                          state.abbr[abrev] = string.format('<abbr title="%s">%s</abbr>',expansion,abrev)
+                          return pos,""
+                        end)
+  local abbrh    = (sol * P"abbr:") / ""   * acronyms^1
   
   local author = sol * P"author:" * Cs(uchar^0)
   local title  = sol * P"title:"  * Cs(echar^0)
@@ -461,15 +489,25 @@ local entry_header do
   local email  = sol * P"email:"  * uchar^0
   local filter = sol * P"filter:" * uchar^0
   
-  entry_header = (author + title + class + status + date + adtag + email + filter)^0
+  entry_header = (
+                     author
+                   + title
+                   + class
+                   + status
+                   + date
+                   + adtag
+                   + email
+                   + filter
+                   + abbrh
+                 )^0
 end
 
 -- ********************************************************************
-  
+
 local char = blocks
            + header
            + htmltag
-           + tex +  entity
+           + abbr + tex +  entity
            + link
            + cut + italic + bold + strike + code
            + para
@@ -483,7 +521,8 @@ local state =
 {
   stack     = {},
   email_all = false,
-  quote     = {}
+  quote     = {},
+  abbr      = {},
 }
 
 local data = io.stdin:read("*a")

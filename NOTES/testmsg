@@ -3,6 +3,9 @@ title: ``Ah!'' I said, ``hold me beer ... ''
 class: testing, debugging, programming
 status: Things go pear shaped when I have someone hold my beer
 email: no
+abbr:	HTML	HyperText Markup Language
+	HTTP	HyperText Transport Protocol
+	TLA	Three Letter Acronym
 filter: html
 
 So,
@@ -65,7 +68,7 @@ My location: 27&deg;15&prime;37&Prime;N
 From: John Doe <{{johndoe@example.net}}>
 To: sean@conman.org
 Subject: Re: This is an example of a
-	Subject line ...
+	Subject line wth a TLA ...
 Date: Mon, 1 Apr 2019 18:12:41 +0200
 Cc: Sean Conner <spc@conman.org>,
  Comment <comment@noreply.github.com>
