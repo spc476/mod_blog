@@ -21,12 +21,15 @@
 -- ************************************************************************
 -- luacheck: ignore 611
 
-local ENTITY = require "org.conman.const.entity"
-local abnf   = require "org.conman.parsers.abnf"
-local url    = require "org.conman.parsers.url"
-local uchar  = require "org.conman.parsers.ascii.char"
-             + require "org.conman.parsers.utf8.char"
-local lpeg   = require "lpeg"
+local ENTITY  = require "org.conman.const.entity"
+local abnf    = require "org.conman.parsers.abnf"
+local url     = require "org.conman.parsers.url"
+local uchar   = require "org.conman.parsers.ascii.char"
+              + require "org.conman.parsers.utf8.char"
+local allchar = require "org.conman.parsers.ascii"
+              + require "org.conman.parsers.utf8.char"
+local ascii   = require "org.conman.parsers.ascii"
+local lpeg    = require "lpeg"
 
 local Carg = lpeg.Carg
 local Cmt  = lpeg.Cmt
@@ -139,9 +142,9 @@ local para  = paras + parae
         --        All others get a CLASS attribute of 'external'
         -- ------------------------------------------------------------
         
-local urltext  = C((P(1) - P']')^1)
+local urltext  = C((ascii - P']')^1)
 local totext   = tex + entity + italic + bold + strike + code
-               + (P(1) - P"]")
+               + (uchar - P"]")
 local linktext = Cs(totext^0)
 local link     = P"[[" * urltext * P"][" * linktext * P"]]"
                / function(href,text)
@@ -203,7 +206,7 @@ local header = C"\n***** " * Cs(hchar^1) * #P"\n" / "\n<h5>%2</h5>"
 
 local src_char  = P"<" / "&lt;"
                 + P"&" / "&amp;"
-                + P(1) - P"\n#+END_SRC\n"
+                + allchar - P"\n#+END_SRC\n"
                 
 local begin_src = C(S" \t"^0) * C(R("AZ","az")^1) * C(P"\n")
                 / '\n<pre class="language-%2" title="%2">\n'
@@ -266,7 +269,7 @@ local begin_table   = Cc"\n<table>\n" * table_caption
 local LWSP        = (abnf.WSP + (abnf.CRLF * abnf.WSP) / " ")
 local email_opt   = S" \t"^0 * P"all" * S" \t"^0 / ""
                   * Cmt(Carg(1),function(_,pos,s) s.email_all = true return pos end)
-local hdr_name    = (P(1) - P":")^1
+local hdr_name    = (ascii - P":")^1
 local hdr_char    = P"<" / "&lt;"
                   + P"&" / "&amp;"
                   + P">" / "&gt;"
@@ -285,7 +288,7 @@ local hdr_generic = Cmt(
 local email_text  = header + htmltag + tex + entity + link
                   + cut + italic + bold + strike + code
                   + para
-                  + (P(1) - P"#+END_EMAIL")
+                  + (allchar - P"#+END_EMAIL")
 local email_hdrs  = (P"From:"    / "    <dt>From</dt>")    * hdr_value * abnf.CRLF
                   + (P"To:"      / "    <dt>To</dt>")      * hdr_value * abnf.CRLF
                   + (P"Subject:" / "    <dt>Subject</dt>") * hdr_value * abnf.CRLF
@@ -310,7 +313,7 @@ local begin_email = Cc'\n<blockquote>\n  <dl class="header">' * email_opt^-1 * P
 local quote_text  = header + htmltag + tex + entity + link
                   + cut + italic + bold + strike + code
                   + para
-                  + (P(1) - P"#+END_QUOTE")
+                  + (allchar - P"#+END_QUOTE")
                   
 local begin_quote = Cmt(
                       Carg(1),
@@ -420,7 +423,7 @@ local quote_attrs = P":cite"      / "cite"
                   + P":via-title" / "via_title"
                   
 local attr_quote = S" \t"^1 / ""
-                 * Cmt(Carg(1) * quote_attrs * C(S" \t"^1) * C((P(1) - P"\n")^1),
+                 * Cmt(Carg(1) * quote_attrs * C(S" \t"^1) * C((allchar - P"\n")^1),
                    function(_,pos,state,cite,_,text)
                      state.quote[cite] = text
                      return pos,""
@@ -470,8 +473,7 @@ local char = blocks
            + link
            + cut + italic + bold + strike + code
            + para
-           + uchar
-           + P(1)
+           + allchar
            
 local text = Cs(entry_header * char^0)
 
