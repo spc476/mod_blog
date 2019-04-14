@@ -21,7 +21,6 @@
 -- ************************************************************************
 -- luacheck: ignore 611
 
-local ss     = require "org.conman.table".safestring
 local ENTITY = require "org.conman.const.entity"
 local abnf   = require "org.conman.parsers.abnf"
 local url    = require "org.conman.parsers.url"
