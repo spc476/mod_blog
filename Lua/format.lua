@@ -117,9 +117,9 @@ local cut      = (P"{{" / '<span class="cut">')
         -- ---------------------------------------------------------
         
 local italic = Cmt(P"//" * Carg(1),stack "i")
+             + Cmt(P"/"  * Carg(1),stack "em")
 local bold   = Cmt(P"**" * Carg(1),stack "b")
-local em     = Cmt(P"/"  * Carg(1),stack "em")
-local strong = Cmt(P"*"  * Carg(1),stack "strong")
+             + Cmt(P"*"  * Carg(1),stack "strong")
 local strike = Cmt(P"+"  * Carg(1),stack "del")
 local code   = Cmt(P"="  * Carg(1),stack "code")
 
@@ -140,7 +140,7 @@ local para  = paras + parae
         -- ------------------------------------------------------------
         
 local urltext  = C((P(1) - P']')^1)
-local totext   = tex + entity + italic + bold + em + strong + strike + code
+local totext   = tex + entity + italic + bold + strike + code
                + (P(1) - P"]")
 local linktext = Cs(totext^0)
 local link     = P"[[" * urltext * P"][" * linktext * P"]]"
@@ -283,7 +283,7 @@ local hdr_generic = Cmt(
                       end
                     )
 local email_text  = header + htmltag + tex + entity + link
-                  + cut + italic + bold + em + strong + strike + code
+                  + cut + italic + bold + strike + code
                   + para
                   + (P(1) - P"#+END_EMAIL")
 local email_hdrs  = (P"From:"    / "    <dt>From</dt>")    * hdr_value * abnf.CRLF
@@ -308,7 +308,7 @@ local begin_email = Cc'\n<blockquote>\n  <dl class="header">' * email_opt^-1 * P
 -- ********************************************************************
 
 local quote_text  = header + htmltag + tex + entity + link
-                  + cut + italic + bold + em + strong + strike + code
+                  + cut + italic + bold + strike + code
                   + para
                   + (P(1) - P"#+END_QUOTE")
                   
@@ -468,7 +468,7 @@ local char = blocks
            + htmltag
            + tex +  entity
            + link
-           + cut + italic + bold + em + strong + strike + code
+           + cut + italic + bold + strike + code
            + para
            + P(1)
            
