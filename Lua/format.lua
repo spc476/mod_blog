@@ -148,7 +148,8 @@ local code   = Cmt(P"="  * Carg(1),stack "code")
         
 local paras = C"\n\n"  * #(uchar - S"#-*") / "%1<p>"
 local parae = C(uchar) * #(P'\n\n' + P'\n' * P(-1) + P(-1)) / "%1</p>"
-local para  = paras + parae
+local parab = C[[\\]]  * #P"\n" / "<br>"
+local para  = parab + paras + parae
 
         -- ------------------------------------------------------------
         -- HTML links.  Formats:
