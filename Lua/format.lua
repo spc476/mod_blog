@@ -218,10 +218,10 @@ local attr      = P"title" *  EQ * htmltrans
                 + P"alt"   *  EQ * htmltrans
                 + aname    * (EQ * value)^-1
 local attrs     = SPACE^0 * attr
-local htmltag = P"<"    * tag * attrs^0 * P">"
-              + P"<!--" * (P(1) - P"-->")^0 * P"-->"
-              + P"</"   * tag * P">"
-              
+local htmltag   = P"<"    * tag * attrs^0 * P">"
+                + P"<!--" * (P(1) - P"-->")^0 * P"-->"
+                + P"</"   * tag * P">"
+                
         -- -----------------------------
         -- Shorthand for <H1> .. <H5>
         -- -----------------------------
@@ -249,7 +249,6 @@ local header = C"\n***** " * Cs(hchar^1) * #P"\n" / "\n<h5>%2</h5>"
 local src_char  = P"<" / "&lt;"
                 + P"&" / "&amp;"
                 + allchar - P"\n#+END_SRC\n"
-                
 local begin_src = C(S" \t"^0) * C(R("AZ","az")^1) * C(P"\n")
                 / '\n<pre class="language-%2" title="%2">\n'
                 * Cs(src_char^0)
@@ -266,11 +265,10 @@ local begin_src = C(S" \t"^0) * C(R("AZ","az")^1) * C(P"\n")
 --
 -- ********************************************************************
 
-local int    = P"0" + (R"19" * R"09"^0)
-local frac   = P"." * R"09"^1
-local exp    = S"Ee" * S"+-"^-1 * R"09"^1
-local number = (P"-"^-1 * int * frac^-1 * exp^-1)
-
+local int           = P"0" + (R"19" * R"09"^0)
+local frac          = P"." * R"09"^1
+local exp           = S"Ee" * S"+-"^-1 * R"09"^1
+local number        = (P"-"^-1 * int * frac^-1 * exp^-1)
 local table_caption = C(S" \t"^0) * Cs(hchar^1) * C"\n"
                     / "  <caption>%2</caption>\n"
                     + P"\n" / ""
@@ -356,7 +354,6 @@ local quote_text  = header + htmltag + abbr + tex + entity + link
                   + cut + italic + bold + strike + code
                   + para
                   + (allchar - P"#+END_QUOTE")
-                  
 local begin_quote = Cmt(
                       Carg(1),
                       function(_,pos,state)
@@ -463,14 +460,13 @@ local quote_attrs = P":cite"      / "cite"
                   + P":title"     / "title"
                   + P":via-url"   / "via_url"
                   + P":via-title" / "via_title"
-                  
-local attr_quote = S" \t"^1 / ""
-                 * Cmt(Carg(1) * quote_attrs * C(S" \t"^1) * C((allchar - P"\n")^1),
-                   function(_,pos,state,cite,_,text)
-                     state.quote[cite] = text
-                     return pos,""
-                   end)
-                   
+local attr_quote  = S" \t"^1 / ""
+                  * Cmt(Carg(1) * quote_attrs * C(S" \t"^1) * C((allchar - P"\n")^1),
+                    function(_,pos,state,cite,_,text)
+                      state.quote[cite] = text
+                      return pos,""
+                    end)
+                    
 -- ********************************************************************
 -- Top level #+BEGIN blocks definition
 -- ********************************************************************
@@ -491,9 +487,8 @@ local blocks = P"\n#+BEGIN" / "" * begin
 -- ********************************************************************
 
 local entry_header do
-  local sol   = P"\n"^-1
-  local echar = tex + entity + uchar
-  
+  local sol      = P"\n"^-1
+  local echar    = tex + entity + uchar
   local acronyms = (P"\n"^-1 * S" \t"^1) / ""
                  * Cmt(
                           C(R"AZ"^1)
@@ -504,28 +499,26 @@ local entry_header do
                           state.abbr[abrev] = expansion
                           return pos,""
                         end)
-  local abbrh    = (sol * P"abbr:") / ""   * acronyms^1
-  
-  local author = sol * P"author:" * Cs(uchar^0)
-  local title  = sol * P"title:"  * Cs(echar^0)
-  local class  = sol * P"class:"  * Cs(echar^0)
-  local status = sol * P"status:" * Cs(echar^0)
-  local date   = sol * P"date:"   * uchar^0
-  local adtag  = sol * P"adtag:"  * Cs(echar^0)
-  local email  = sol * P"email:"  * uchar^0
-  local filter = sol * P"filter:" * uchar^0
-  
-  entry_header = (
-                     author
-                   + title
-                   + class
-                   + status
-                   + date
-                   + adtag
-                   + email
-                   + filter
-                   + abbrh
-                 )^0
+  local abbrh    = (sol * P"abbr:") / "" * acronyms^1
+  local author   = sol * P"author:" * Cs(uchar^0)
+  local title    = sol * P"title:"  * Cs(echar^0)
+  local class    = sol * P"class:"  * Cs(echar^0)
+  local status   = sol * P"status:" * Cs(echar^0)
+  local date     = sol * P"date:"   * uchar^0
+  local adtag    = sol * P"adtag:"  * Cs(echar^0)
+  local email    = sol * P"email:"  * uchar^0
+  local filter   = sol * P"filter:" * uchar^0
+  entry_header   = (
+                       author
+                     + title
+                     + class
+                     + status
+                     + date
+                     + adtag
+                     + email
+                     + filter
+                     + abbrh
+                   )^0
 end
 
 -- ********************************************************************
@@ -538,15 +531,14 @@ local char = blocks
            + cut + italic + bold + strike + code
            + para
            + allchar
-           
 local text = Cs(entry_header * char^0)
 
 -- ********************************************************************
 
 local state =
 {
-  stack     = {},
   email_all = false,
+  stack     = {},
   quote     = {},
   abbr      = {},
 }
