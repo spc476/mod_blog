@@ -100,10 +100,18 @@ local tex = P"``"    / ENTITY.ldquo
           + P"-----" / "<hr>"
           + P"---"   / ENTITY.mdash
           + P"--"    / ENTITY.ndash
+          + P"(TM)"  / ENTITY.trade
+          + P"(C)"   / ENTITY.copy
+          + P"(R)"   / ENTITY.reg
           + P"..."   / "\226\128\166"
           + P".."    / "\226\128\165"
           + P"<-"    / "\226\134\144"
           + P"->"    / "\226\134\146"
+          + P"^st"   / "<sup>ST</sup>"
+          + P"^nd"   / "<sup>ND</sup>"
+          + P"^rd"   / "<sup>RD</sup>"
+          + P"^th"   / "<sup>TH</sup>"
+          + P"\\-"   / ENTITY.shy
           + P"\\ "   / ""
           
         -- -----------------------------------------
