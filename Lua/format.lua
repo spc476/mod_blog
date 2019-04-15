@@ -84,7 +84,10 @@ local abbr = Cmt(
                   C(R"AZ"^1) * Carg(1),
                   function(_,pos,acronym,state)
                     if state.abbr[acronym] then
-                      return pos,state.abbr[acronym]
+                      return pos,string.format('<abbr title="%s">%s</abbr>',
+                        state.abbr[acronym],
+                        acronym
+                      )
                     else
                       return pos
                     end
@@ -150,7 +153,7 @@ local bold   = Cmt(P"**" * Carg(1),stack "b")
 local strike = Cmt(P"+"  * Carg(1),stack "del")
 local code   = Cmt(P"="  * Carg(1),stack "code")
              + Cmt(P"~"  * Carg(1),stack "tt")
-
+             
         -- ----------------------------------
         -- Handle paragraphs automagically
         -- ----------------------------------
@@ -498,7 +501,7 @@ local entry_header do
                         * C(tex + entity + uchar^1)
                         * Carg(1),
                         function(_,pos,abrev,_,expansion,state)
-                          state.abbr[abrev] = string.format('<abbr title="%s">%s</abbr>',expansion,abrev)
+                          state.abbr[abrev] = expansion
                           return pos,""
                         end)
   local abbrh    = (sol * P"abbr:") / ""   * acronyms^1
