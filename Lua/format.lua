@@ -115,8 +115,11 @@ local tex = P"``"    / ENTITY.ldquo
           + P"^rd"   / "<sup>RD</sup>"
           + P"^th"   / "<sup>TH</sup>"
           + P"\\-"   / ENTITY.shy
+          + P"\\_"   / ENTITY.nbsp
           + P"\\ "   / ""
           + P"/\n"   / "<br>\n"
+          + P"\\&"   / "&amp;"
+          + P"\\<"   / "&lt;"
           
         -- -----------------------------------------
         -- convert HTML entities to UTF-8 characters
