@@ -116,6 +116,7 @@ local tex = P"``"    / ENTITY.ldquo
           + P"^th"   / "<sup>TH</sup>"
           + P"\\-"   / ENTITY.shy
           + P"\\ "   / ""
+          + P"/\n"   / "<br>\n"
           
         -- -----------------------------------------
         -- convert HTML entities to UTF-8 characters
@@ -160,8 +161,7 @@ local code   = Cmt(P"="  * Carg(1),stack "code")
         
 local paras = C"\n\n"  * #(uchar - S"#-*") / "%1<p>"
 local parae = C(uchar) * #(P'\n\n' + P'\n' * P(-1) + P(-1)) / "%1</p>"
-local parab = C[[\\]]  * #P"\n" / "<br>"
-local para  = parab + paras + parae
+local para  = paras + parae
 
         -- ------------------------------------------------------------
         -- HTML links.  Formats:
