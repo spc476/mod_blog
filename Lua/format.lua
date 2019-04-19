@@ -35,6 +35,7 @@ local Carg = lpeg.Carg
 local Cmt  = lpeg.Cmt
 local Cc   = lpeg.Cc
 local Cs   = lpeg.Cs
+local B    = lpeg.B
 local C    = lpeg.C
 local P    = lpeg.P
 local R    = lpeg.R
@@ -98,6 +99,11 @@ local abbr = Cmt(
         -- simple substutions
         -- ------------------
         
+local function frac(text,name)
+  return B(P(1) - R"09") * P(text) * #(P(1) - R"09")
+       / ENTITY[name]
+end
+
 local tex = P"``"    / ENTITY.ldquo
           + P"''"    / ENTITY.rdquo
           + P"-----" / "<hr>"
@@ -120,6 +126,22 @@ local tex = P"``"    / ENTITY.ldquo
           + P"/\n"   / "<br>\n"
           + P"\\&"   / "&amp;"
           + P"\\<"   / "&lt;"
+          + P"\\/"   / "/"
+          + frac("1/4",'frac12')
+          + frac("1/2",'frac12')
+          + frac("3/4",'frac34')
+          + frac("1/3",'frac13')
+          + frac("2/3",'frac23')
+          + frac("1/5",'frac15')
+          + frac("2/5",'frac25')
+          + frac("3/5",'frac35')
+          + frac("4/5",'frac45')
+          + frac("1/6",'frac16')
+          + frac("5/6",'frac56')
+          + frac("1/8",'frac18')
+          + frac("3/8",'frac38')
+          + frac("5/8",'frac58')
+          + frac("7/8",'frac78')
           
         -- -----------------------------------------
         -- convert HTML entities to UTF-8 characters
