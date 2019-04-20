@@ -558,7 +558,7 @@ local pf_image = (P"\n" - P"#+END_PF") / ""
                  / function(_,display,_,target,_,title)
                      local width,height = image_size(display)
                      
-                     if link == '-' then
+                     if target == '-' then
                        return string.format(
                           '  <image src="%s" width="%d" height="%d" alt="[%s]" title="%s">\n',
                           display,
