@@ -122,9 +122,21 @@ for mroe information.
 
 ``A random line of dialog.'' 
 
+<div class="foobar">
+
 Take 1/2c of this, 2/3t of that, and 1/4p of the other.  Add in 2/3c of
 sugar, 3/5&hairsp;cc of that and 5/8&prime; of something else.  Mix it all
 together and you'll end up with a mess.
+
+</div>
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua.  Ut enim ad minim
+veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+commodo consequat.  Duis aute irure dolor in reprehenderit in voluptate
+velit esse cillum dolore eu fugiat nulla pariatur.  Excepteur sint occaecat
+cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
+est laborum.
 
 #+BEGIN_PF
 test.jpg	-	This is a test [] of the ``image'' stuff
