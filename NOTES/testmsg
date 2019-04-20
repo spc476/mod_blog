@@ -1,29 +1,33 @@
 author: Sean Conner
-title: ``Ah!'' I said, ``hold me beer ... ''
+title: ``Lorem ipsum,'' I said, ``dolor sit amet.''
 class: testing, debugging, programming
-status: Things go pear shaped when I have someone hold my beer
+status: Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
 email: no
 abbr:	HTML	HyperText Markup Language
 	HTTP	HyperText Transport Protocol
 	TLA	Three Letter Acronym
 filter: html
 
-So,
-in writing =syslogintr= I thought,
-//This is going to be /incredible!/\ //
-But in reality,
-things were +pretty good+ bad.
-And by ``bad,'' I meant /bad./
-Okay, *really bad.*
-<!-- well, it's not <em>quite</em> so bad as I make it out to be,
-but it's still mildly inconvenient. -->
-You can read about it
-[[http://www.conman.org/people/spc/?one=two&three=four][here at this link]].
-There's also [[gopher://floodgap.org/][this link]] and then
-[[2019/03/04.1][there's this page]].
+Lorem ipsum dolor sit amet, //consectetur adipiscing /elit/\ //, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua.  ``<span
+lang="lt" title="Over the years ...">Ut enim ad minim</span> veniam,'' quis
++nostrud exercitation+ ullamco laboris nisi ut aliquip ex ea commodo
+consequat.  Duis aute irure dolor in reprehenderit in voluptate velit esse
+cillum dolore eu fugiat nulla pariatur.  Excepteur sint occaecat cupidatat
+non /proident,/ sunt *in culpa qui* officia deserunt mollit anim id est
+laborum. <!-- text from https://lipsum.com/ --> 
 
-When writing HTML,
-I thought I might do some code---<span lang="fr" title="um ...">merde</span>:
+Fusce ante ex, congue efficitur ligula a, tincidunt placerat dolor.  Vivamus
+sed [[http://www.example.com/?one=1&two=2][dui sit amet est sagittis]]
+rutrum quis eu neque.  In non risus lectus.  Nunc et lorem vitae erat
+[[gopher://gopher.example.com/][molestie aliquet]].  Praesent id
+pellentesque diam.  Duis maximus ipsum [[locallink.html][in urna pulvinar]],
+eu imperdiet risus HTML.  Curabitur quis nibh vel ligula maximus commodo
+ut ac felis.  Nam efficitur erat in ante aliquet, non semper magna aliquam.
+Nunc fermentum turpis HTTP scelerisque mollis.  Phasellus feugiat ligula
+quis consectetur egestas.  Suspendisse potenti.  Vestibulum quis tincidunt
+orci, fermentum interdum erat.  Duis posuere lectus felis, a pretium urna
+vestibulum vitae.
 
 #+BEGIN_SRC C
 #include <stdio.h>
@@ -39,9 +43,9 @@ int main(void)
 
 -----
 
-* This is a sub heading ...
+* Lorem ipsum dolor sit amet
 
-And here we have a table of data:
+Praesent fermentum vitae metus et iaculis.
 
 #+BEGIN_TABLE Some data goes here
 *foo	bar	baz
@@ -51,11 +55,10 @@ And here we have a table of data:
 8	-1	4
 #+END_TABLE
 
-So this is the end of the test.
-But I have *strong* reservations about /stuff./
-And I want to make a **strong** statement about AT\&T<-27&deg;.
-
-``View -> Page Style -> No Style'' is the menu item to select.
+Vestibulum sit amet -> porttitor <- nunc.  Curabitur at lectus purus.  Duis
+congue tempus neque ultrices interdum.  Praesent fermentum vitae metus et
+iaculis.  Aliquam a tincidunt ante.  Cras ullamcorper AT\&T sit amet metus
+sagittis venenatis.  Praesent rutrum egestas dictum.
 
 #+BEGIN_TABLE
 1	2	3	4
@@ -63,29 +66,32 @@ And I want to make a **strong** statement about AT\&T<-27&deg;.
 9	10	11	12
 #+END_TABLE
 
-My location: 27&deg;15&prime;37&Prime;N
-80&deg;32&prime;3&Prime;W.  Shoot me down.
+Lorem ipsum dolor sit amet.
 
 #+BEGIN_EMAIL all
 From: John Doe <{{johndoe@example.net}}>
 To: sean@conman.org
-Subject: Re: This is an example of a
-	Subject line wth a TLA ...
+Subject: Re: Morbi in lorem ut lectus accumsan
+	placerat. Morbi TLA enim id turpis
 Date: Mon, 1 Apr 2019 18:12:41 +0200
-Cc: Sean Conner <spc@conman.org>,
- Comment <comment@noreply.github.com>
+Cc: Sean Conner <sean@example.org>,
+ Comment <comment@noreply.example.com>
 
-Hi Sean,
-
-some other people (from {{example.com}}) have ideas regarding encrypted Gopher
-(I will only throw some links at you, I'm feeling a little bit uncomfortable
-writing longer english texts):
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Donec gravida
+justo et aliquam lobortis.  Quisque {{fringilla id nisi vitae rutrum.  Etiam
+facilisis nec odio vitae ultrices.  Vivamus consectetur nibh vel nunc
+fringilla, et lobortis mauris varius.  Pellentesque a neque sed lorem
+fermentum tincidunt.  Nunc pharetra}} efficitur rutrum.  Sed luctus libero
+nec augue lacinia, vel ultricies tellus bibendum.  Proin mattis nisl massa,
+vel commodo augue porta a.  Vivamus fringilla, arcu et placerat vulputate,
+nulla sem viverra arcu, et egestas lacus elit non lectus.
 
 #+END_EMAIL
 
-That's my story, and I'm sticking to it.  Even with all the {{redactions}}.
-
-Here's a post about it:
+Vestibulum sit amet porttitor nunc.  Curabitur at lectus purus.  Duis congue
+tempus neque ultrices interdum.  Praesent fermentum vitae metus et iaculis.
+Aliquam a {{tincidunt ante}}.  Cras ullamcorper neque sit amet metus
+sagittis venenatis.  Praesent rutrum egestas dictum.
 
 #+ATTR_QUOTE: :cite http://boston.conman.org/2019/04/08.2
 #+ATTR_QUOTE: :title Why the web went bad
@@ -110,23 +116,20 @@ early 1996]].  Javascript was Netscape's reaction to Java.
 
 #+END_QUOTE
 
-So {{an unknown caller calls me, only this one leaves me voice mail.  Usually
-when that happens, it's because it's someone I know calling from an unknown
-number or the car dealership telling me}} my car is ready or something along
-those lines.
+Maecenas mollis [[http://www.example.net/]] venenatis
+[[http://www.example.org/][]] odio id vulputate.  Nunc malesuada odio vitae
+nisi cursus, sit amet sodales velit egestas.  Mauris at odio lobortis,
+viverra orci vel, pretium diam.
 
-Also,
-checkout [[http://www.example.net/]]
-or [[http://www.example.org/][]]
-for mroe information.
-
-``A random line of dialog.'' 
+``Lorem ipsum dolor sit amet, consectetur adipiscing elit.'' 
 
 <div class="foobar">
 
-Take 1/2c of this, 2/3t of that, and 1/4p of the other.  Add in 2/3c of
-sugar, 3/5&hairsp;cc of that and 5/8&prime; of something else.  Mix it all
-together and you'll end up with a mess.
+Donec sed lacus nulla.  Nullam faucibus congue enim vitae hendrerit.
+Praesent 1/2 tempus lacus 2/3 imperdiet neque tristique, a tristique ligula
+porttitor.  Quisque at tincidunt libero, non fringilla quam.  Suspendisse
+finibus, libero sit amet elementum 1/4 egestas, orci 2/3 magna dictum nulla,
+id posuere felis erat id urna.  Vivamus eget 3/5&prime; feugiat lorem.
 
 </div>
 
@@ -147,6 +150,4 @@ Sean Conner/
 122 Main St./
 /Apartment 3/\ /
 Springfield, SW, 55512
-
-1/2 11\/2
 
