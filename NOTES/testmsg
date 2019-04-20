@@ -61,9 +61,9 @@ iaculis.  Aliquam a tincidunt ante.  Cras ullamcorper AT\&T sit amet metus
 sagittis venenatis.  Praesent rutrum egestas dictum.
 
 #+BEGIN_TABLE
-1	2	3	4
-5	6	7	8
-9	10	11	12
+1	2	3	4	bing
+5	6	7	8	bang
+9	10	11	12	bongo
 #+END_TABLE
 
 Lorem ipsum dolor sit amet.

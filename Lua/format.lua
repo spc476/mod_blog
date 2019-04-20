@@ -374,9 +374,9 @@ local table_footer  = P"**" / ""
                     * th^1
                     * Cc'</tr>\n  </tfoot>'
                     * P'\n'
-local td            = Cc'<td class="num">' * number      * Cc'</th>' * (P"\t" / " ")^-1
-                    + Cc'<th>'             * Cs(hchar^1) * Cc'</th>' * (P"\t" / " ")^-1
-local tr            = -P"#+END_TABLE" * Cc'    <tr>' * td^1 * Cc'</td>' * P"\n"
+local td            = Cc'<td class="num">' * number      * Cc'</td>' * (P"\t" / " ")^-1
+                    + Cc'<td>'             * Cs(hchar^1) * Cc'</td>' * (P"\t" / " ")^-1
+local tr            = -P"#+END_TABLE" * Cc'    <tr>' * td^1 * Cc'</tr>' * P"\n"
 local table_body    = Cc'  <tbody>\n'
                     * tr^1
                     * Cc'  </tbody>\n'
