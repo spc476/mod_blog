@@ -42,6 +42,59 @@ local R    = lpeg.R
 local S    = lpeg.S
 
 -- ********************************************************************
+-- Usage:       for chunk,data in jpeg_sections(file) do ... end
+-- Desc:        Iterator to cycle through chunks in a JPEG file
+-- Input:       file (userdata/FILE*) already open JPEG file
+-- Return:      chunk (integer) JPEG chunk type
+--              data (bin) raw data for that chunk
+--
+-- Note:        Not all chunks are decoded propery---this is enough to
+--              get the image size though, which is all I wanted.
+-- ********************************************************************
+
+local function jpeg_sections(file)
+  file:seek('set',2)
+  return function()
+    local chunk = string.unpack(">I2",file:read(2) or "\255\217")
+    if chunk == 0xFFD9 then return nil end
+    
+    local size = string.unpack(">I2",file:read(2))
+    if size == 0 then
+      return chunk,""
+    else
+      return chunk,file:read(size - 2)
+    end
+  end
+end
+
+-- ********************************************************************
+-- Usage:       width,height = image_size(filename)
+-- Desc:        Return the image size in pixels
+-- Input:       filename (string) filename of image
+-- Return:      width (integer) width in pixels
+--              height (integer) height in pixels
+-- ********************************************************************
+
+local function image_size(filename)
+  local f      = io.open(filename,"rb")
+  local header = f:read(32)
+  
+  if header:sub(1,3) == "GIF" then
+    return string.unpack("<I2I2",header,7)
+  elseif header:sub(1,8) == "\137PNG\r\n\26\n" then
+    return string.unpack(">I4I4",header,17)
+  elseif header:sub(1,2) == "\255\216" then
+    for chunk,data in jpeg_sections(f) do
+      if chunk == 0xFFC0 then
+        return string.unpack(">I2I2",data,2)
+      end
+    end
+  end
+  
+  return 0,0
+end
+
+-- ********************************************************************
 
 local function url_class(href)
   local u = url:match(href)
@@ -468,6 +521,58 @@ local begin_comment = (P(1) - P"\n#+END_COMMENT")^0 / "<!-- comment -->"
                     * (P"\n#+END_COMMENT" * #P"\n") / ""
                     
 -- ********************************************************************
+-- #+BEGIN_PF
+--
+--      <sol> #+BEGIN_PF <eol>
+--      <sol> displayfile <sp> linkfile <sp> <text>
+--      <sol> #+END_PF
+--
+-- NOTE:        If linkfile is "-" then no link is generated.
+-- ********************************************************************
+
+local pf_char  = P'[' / '%%5B'
+               + P']' / '%%5D'
+               + P'"' / '&quot;'
+               + P"'" / '&apos;'
+               + P"&" / '&amp;'
+               + tex
+               + entity
+               + uchar
+               
+local pf_image = (P"\n" - P"#+END_PF") / ""
+                 * C(uchar^1) * (S" \t"^1 / "")
+                 * C(uchar^1) * (S" \t"^1 / "")
+                 * Cs(pf_char^1)
+                 / function(_,display,_,target,_,title)
+                     local width,height = image_size(display)
+                     
+                     if link == '-' then
+                       return string.format(
+                          '  <image src="%s" width="%d" height="%d" alt="[%s]" title="%s">\n',
+                          display,
+                          width,
+                          height,
+                          title,
+                          title
+                       )
+                     else
+                       return string.format(
+                         '  <a href="local" class="notype" href="%s"><image src="%s" width="%d" height="%d" alt="[%s]" title="%s"></a>\n', -- luacheck: ignore
+                         target,
+                         display,
+                         width,
+                         height,
+                         title,
+                         title
+                       )
+                     end
+                   end
+                   
+local begin_pf = #P"\n" * Cc'\n<div class="pf">\n'
+               * pf_image^1
+               * (P"\n#+END_PF" * #P"\n" / "</div>\n")
+               
+-- ********************************************************************
 -- #+ATTR_QUOTE
 --
 --      <sol> '#+ATTR_QUOTE:' <sp> [<cite> | <title> | <via-url> | <via-title> ] <eol>
@@ -500,6 +605,7 @@ local begin  = P"_SRC"      / "" * begin_src
              + P"_TABLE"    / "" * begin_table
              + P"_EMAIL"    / "" * begin_email
              + P"_QUOTE"    / "" * begin_quote
+             + P"_PF"       / "" * begin_pf
              + P"_COMMENT"  / "" * begin_comment
              
 local battr  = P"_QUOTE:"   / "" * attr_quote
