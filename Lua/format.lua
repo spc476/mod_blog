@@ -546,7 +546,6 @@ local begin_comment = (P(1) - P"\n#+END_COMMENT")^0 / "<!-- comment -->"
 local pf_char  = P'[' / '%%5B'
                + P']' / '%%5D'
                + P'"' / '&quot;'
-               + P"'" / '&apos;'
                + P"&" / '&amp;'
                + tex
                + entity
