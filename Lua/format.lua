@@ -582,7 +582,7 @@ local pf_image = (P"\n" - P"#+END_PF") / ""
                    
 local begin_pf = #P"\n" * Cc'\n<div class="pf">\n'
                * pf_image^1
-               * (P"\n#+END_PF" * #P"\n" / "</div>\n")
+               * (P"\n#+END_PF" * #P"\n" / "</div>")
                
 -- ********************************************************************
 -- #+ATTR_QUOTE
