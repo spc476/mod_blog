@@ -86,7 +86,8 @@ local function image_size(filename)
   elseif header:sub(1,2) == "\255\216" then
     for chunk,data in jpeg_sections(f) do
       if chunk == 0xFFC0 then
-        return string.unpack(">I2I2",data,2)
+        local height,width = string.unpack(">I2I2",data,2)
+        return width,height
       end
     end
   end
