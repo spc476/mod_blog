@@ -95,6 +95,11 @@ local function image_size(filename)
 end
 
 -- ********************************************************************
+-- Usage:       class = url_class(href)
+-- Desc:        Return a class attribute for a link
+-- Input:       href (string) a URL
+-- Return:      class (string) a class attribute
+-- ********************************************************************
 
 local function url_class(href)
   local u = url:match(href)
@@ -110,6 +115,13 @@ local function url_class(href)
   end
 end
 
+-- ********************************************************************
+-- Usage:       f = stack(tag)
+-- Desc:        Return a function for lpeg.Cmt() to track generated
+--              HTML tags
+-- Input:       tag (string) HTML tag name
+-- Return:      f (function) a function suitable for lpeg.Cmt() to
+--                      | generate an opening or closing tag.
 -- ********************************************************************
 
 local function stack(tag)
