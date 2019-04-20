@@ -560,7 +560,7 @@ local pf_image = (P"\n" - P"#+END_PF") / ""
                      
                      if target == '-' then
                        return string.format(
-                          '  <image src="%s" width="%d" height="%d" alt="[%s]" title="%s">\n',
+                          '  <img src="%s" width="%d" height="%d" alt="[%s]" title="%s">\n',
                           display,
                           width,
                           height,
@@ -569,7 +569,7 @@ local pf_image = (P"\n" - P"#+END_PF") / ""
                        )
                      else
                        return string.format(
-                         '  <a href="local" class="notype" href="%s"><image src="%s" width="%d" height="%d" alt="[%s]" title="%s"></a>\n', -- luacheck: ignore
+                         '  <a href="local" class="notype" href="%s"><img src="%s" width="%d" height="%d" alt="[%s]" title="%s"></a>\n', -- luacheck: ignore
                          target,
                          display,
                          width,
