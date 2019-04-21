@@ -208,6 +208,7 @@ local tex = P"``"    / ENTITY.ldquo
           + fraction("3/8",'frac38')
           + fraction("5/8",'frac58')
           + fraction("7/8",'frac78')
+          + C"\\" * C(uchar) / "%2"
           
         -- -----------------------------------------
         -- convert HTML entities to UTF-8 characters
