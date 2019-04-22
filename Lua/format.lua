@@ -265,9 +265,12 @@ local para  = paras + parae
         --        URIs to 'conman.org' get a CLASS attribute of 'site'
         --        All others get a CLASS attribute of 'external'
         -- ------------------------------------------------------------
-        
-local urltext  = C((ascii - P']')^1)
+
+local urlchar  = P"&" / "&amp;"
+               + ascii - P']'
+local urltext  = Cs(urlchar^1)
 local totext   = abbr + tex + entity + italic + bold + strike + code
+               + (abnf.HTAB + abnf.CRLF) / " "
                + (uchar - P"]")
 local linktext = Cs(totext^1)
 local link     = P"[[" * urltext * P"][" * linktext * P"]]"
@@ -544,12 +547,10 @@ local begin_comment = (P(1) - P"\n#+END_COMMENT")^0 / "<!-- comment -->"
 -- NOTE:        If linkfile is "-" then no link is generated.
 -- ********************************************************************
 
-local pf_char  = P'[' / '%%5B'
-               + P']' / '%%5D'
+local pf_char  = tex
+               + entity
                + P'"' / '&quot;'
                + P"&" / '&amp;'
-               + tex
-               + entity
                + uchar
                
 local pf_image = (P"\n" - P"#+END_PF") / ""

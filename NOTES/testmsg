@@ -1,4 +1,4 @@
-author: Sean Conner
+author: spc
 title: ``Lorem ipsum,'' I said, ``dolor sit amet.''
 class: testing, debugging, programming
 status: Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
@@ -6,7 +6,7 @@ email: no
 abbr:	HTML	HyperText Markup Language
 	HTTP	HyperText Transport Protocol
 	TLA	Three Letter Acronym
-filter: html
+filter: none
 
 Lorem ipsum dolor sit amet, //consectetur adipiscing /elit/\ //, sed do
 eiusmod tempor incididunt ut labore et dolore magna aliqua.  ``<span
