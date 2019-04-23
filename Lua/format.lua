@@ -245,7 +245,8 @@ local bold   = Cmt(P"**" * Carg(1),stack "b")
              + Cmt(P"*"  * Carg(1),stack "strong")
 local strike = Cmt(P"+"  * Carg(1),stack "del")
 local code   = Cmt(P"="  * Carg(1),stack "code")
-             + Cmt(P"~"  * Carg(1),stack "tt")
+             + Cmt(P"~~" * Carg(1),stack "tt")
+             + Cmt(P"~"  * Carg(1),stack "kbd")
              
         -- ----------------------------------
         -- Handle paragraphs automagically
