@@ -239,14 +239,14 @@ local cut      = (P"{{" / '<span class="cut">')
         -- Various shorthand notations for common HTML styling tags
         -- ---------------------------------------------------------
         
-local italic = Cmt(P"//" * Carg(1),stack "i")
-             + Cmt(P"/"  * Carg(1),stack "em")
-local bold   = Cmt(P"**" * Carg(1),stack "b")
-             + Cmt(P"*"  * Carg(1),stack "strong")
-local strike = Cmt(P"+"  * Carg(1),stack "del")
-local code   = Cmt(P"="  * Carg(1),stack "code")
-             + Cmt(P"~~" * Carg(1),stack "tt")
-             + Cmt(P"~"  * Carg(1),stack "kbd")
+local style = Cmt(P"//" * Carg(1),stack "i")
+            + Cmt(P"/"  * Carg(1),stack "em")
+            + Cmt(P"**" * Carg(1),stack "b")
+            + Cmt(P"*"  * Carg(1),stack "strong")
+            + Cmt(P"+"  * Carg(1),stack "del")
+            + Cmt(P"="  * Carg(1),stack "code")
+            + Cmt(P"~~" * Carg(1),stack "tt")
+            + Cmt(P"~"  * Carg(1),stack "kbd")
              
         -- ----------------------------------
         -- Handle paragraphs automagically
@@ -270,7 +270,7 @@ local para  = paras + parae
 local urlchar  = P"&" / "&amp;"
                + ascii - P']'
 local urltext  = Cs(urlchar^1)
-local totext   = abbr + tex + entity + italic + bold + strike + code
+local totext   = abbr + tex + entity + style
                + (abnf.HTAB + abnf.CRLF) / " "
                + (uchar - P"]")
 local linktext = Cs(totext^1)
@@ -422,7 +422,7 @@ local hdr_generic = Cmt(
                       end
                     )
 local email_text  = header + htmltag + abbr + tex + entity + link
-                  + cut + italic + bold + strike + code
+                  + cut + style
                   + para
                   + (allchar - P"#+END_EMAIL")
 local email_hdrs  = (P"From:"    / "    <dt>From</dt>")    * hdr_value * abnf.CRLF
@@ -447,7 +447,7 @@ local begin_email = Cc'\n<blockquote>\n  <dl class="header">' * email_opt^-1 * P
 -- ********************************************************************
 
 local quote_text  = header + htmltag + abbr + tex + entity + link
-                  + cut + italic + bold + strike + code
+                  + cut + style
                   + para
                   + (allchar - P"#+END_QUOTE")
 local begin_quote = Cmt(
@@ -674,7 +674,7 @@ local char = blocks
            + htmltag
            + abbr + tex +  entity
            + link
-           + cut + italic + bold + strike + code
+           + cut + style
            + para
            + allchar
 local text = Cs(entry_header * char^0)
