@@ -189,7 +189,7 @@ local tex = P"``"    / ENTITY.ldquo
           + P"\\-"   / ENTITY.shy
           + P"\\_"   / ENTITY.nbsp
           + P"\\ "   / ""
-          + P"/\n"   / "<br>\n"
+          + P" /\n"  / "<br>\n"
           + P"\\&"   / "&amp;"
           + P"\\<"   / "&lt;"
           + P"\\/"   / "/"
