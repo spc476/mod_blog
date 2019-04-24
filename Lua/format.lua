@@ -42,10 +42,10 @@ local R    = lpeg.R
 local S    = lpeg.S
 
 -- ********************************************************************
--- Usage:       for chunk,data in jpeg_sections(file) do ... end
--- Desc:        Iterator to cycle through chunks in a JPEG file
--- Input:       file (userdata/FILE*) already open JPEG file
--- Return:      chunk (integer) JPEG chunk type
+-- usage:       for chunk,data in jpeg_sections(file) do ... end
+-- desc:        Iterator to cycle through chunks in a JPEG file
+-- input:       file (userdata/FILE*) already open JPEG file
+-- return:      chunk (integer) JPEG chunk type
 --              data (bin) raw data for that chunk
 --
 -- Note:        Not all chunks are decoded propery---this is enough to
@@ -68,10 +68,10 @@ local function jpeg_sections(file)
 end
 
 -- ********************************************************************
--- Usage:       width,height = image_size(filename)
--- Desc:        Return the image size in pixels
--- Input:       filename (string) filename of image
--- Return:      width (integer) width in pixels
+-- usage:       width,height = image_size(filename)
+-- desc:        Return the image size in pixels
+-- input:       filename (string) filename of image
+-- return:      width (integer) width in pixels
 --              height (integer) height in pixels
 -- ********************************************************************
 
@@ -128,10 +128,10 @@ local function image_type(filename)
 end
 
 -- ********************************************************************
--- Usage:       class = url_class(href)
--- Desc:        Return a class attribute for a link
--- Input:       href (string) a URL
--- Return:      class (string) a class attribute
+-- usage:       class = url_class(href)
+-- desc:        Return a class attribute for a link
+-- input:       href (string) a URL
+-- return:      class (string) a class attribute
 -- ********************************************************************
 
 local function url_class(href)
@@ -149,11 +149,11 @@ local function url_class(href)
 end
 
 -- ********************************************************************
--- Usage:       f = stack(tag)
--- Desc:        Return a function for lpeg.Cmt() to track generated
+-- usage:       f = stack(tag)
+-- desc:        Return a function for lpeg.Cmt() to track generated
 --              HTML tags
--- Input:       tag (string) HTML tag name
--- Return:      f (function) a function suitable for lpeg.Cmt() to
+-- input:       tag (string) HTML tag name
+-- return:      f (function) a function suitable for lpeg.Cmt() to
 --                      | generate an opening or closing tag.
 -- ********************************************************************
 
