@@ -77,7 +77,7 @@ end
 
 local function image_size(filename)
   local f      = io.open(filename,"rb")
-  local header = f:read(32)
+  local header = f:read(24)
   local width
   local height
   
