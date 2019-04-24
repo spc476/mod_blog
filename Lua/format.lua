@@ -68,34 +68,63 @@ local function jpeg_sections(file)
 end
 
 -- ********************************************************************
--- Usage:       width,height,mime = image_size(filename)
+-- Usage:       width,height = image_size(filename)
 -- Desc:        Return the image size in pixels
 -- Input:       filename (string) filename of image
 -- Return:      width (integer) width in pixels
 --              height (integer) height in pixels
---		mime (string) MIME type of image
 -- ********************************************************************
 
 local function image_size(filename)
   local f      = io.open(filename,"rb")
   local header = f:read(32)
+  local width
+  local height
   
   if header:sub(1,3) == "GIF" then
-    local width,height = string.unpack("<I2I2",header,7)
-    return width,height,"image/gif"
+    width,height = string.unpack("<I2I2",header,7)
   elseif header:sub(1,8) == "\137PNG\r\n\26\n" then
-    local width,height = string.unpack(">I4I4",header,17)
-    return width,height,"image/png"
+    width,height = string.unpack(">I4I4",header,17)
   elseif header:sub(1,2) == "\255\216" then
     for chunk,data in jpeg_sections(f) do
       if chunk == 0xFFC0 then
-        local height,width = string.unpack(">I2I2",data,2)
-        return width,height,"image/jpeg"
+        height,width = string.unpack(">I2I2",data,2)
+        break
       end
     end
+  else
+    width  = 0
+    height = 0
   end
   
-  return 0,0
+  f:close()
+  return width,height
+end
+
+-- ********************************************************************
+-- usage:	mime = image_type(filename)
+-- desc:	Return the image type
+-- input:	filename (string) filename of image
+-- return:	mime (string) MIME type of image
+-- ********************************************************************
+
+local function image_type(filename)
+  local f      = io.open(filename,"r")
+  local header = f:read(8)
+  local mime
+  
+  if header:sub(1,3) == "GIF" then
+    mime = "image/gif"
+  elseif header:sub(1,8) == "\137PNG\r\n\26\n" then
+    mime = "image/png"
+  elseif header:sub(1,2) == "\255\216" then
+    mime = "image/jpeg"
+  else
+    mime = "text/plain"
+  end
+  
+  f:close()
+  return mime
 end
 
 -- ********************************************************************
@@ -562,8 +591,7 @@ local pf_image = (P"\n" - P"#+END_PF") / ""
                  * C(uchar^1) * (S" \t"^1 / "")
                  * Cs(pf_char^1)
                  / function(_,display,_,target,_,title)
-                     local width,height,mime = image_size(display)
-                     
+                     local width,height = image_size(display)
                      if target == '-' then
                        return string.format(
                           '  <img src="%s" width="%d" height="%d" alt="[%s]" title="%s">\n',
@@ -574,8 +602,9 @@ local pf_image = (P"\n" - P"#+END_PF") / ""
                           title
                        )
                      else
+                       local mime = image_type(target)
                        return string.format(
-                         '  <a type="%s" href="local" class="notype" href="%s"><img src="%s" width="%d" height="%d" alt="[%s]" title="%s"></a>\n', -- luacheck: ignore
+                         '  <a type="%s" class="notype" href="%s"><img src="%s" width="%d" height="%d" alt="[%s]" title="%s"></a>\n', -- luacheck: ignore
                          mime,
                          target,
                          display,
