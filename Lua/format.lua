@@ -68,11 +68,12 @@ local function jpeg_sections(file)
 end
 
 -- ********************************************************************
--- Usage:       width,height = image_size(filename)
+-- Usage:       width,height,mime = image_size(filename)
 -- Desc:        Return the image size in pixels
 -- Input:       filename (string) filename of image
 -- Return:      width (integer) width in pixels
 --              height (integer) height in pixels
+--		mime (string) MIME type of image
 -- ********************************************************************
 
 local function image_size(filename)
@@ -80,14 +81,16 @@ local function image_size(filename)
   local header = f:read(32)
   
   if header:sub(1,3) == "GIF" then
-    return string.unpack("<I2I2",header,7)
+    local width,height = string.unpack("<I2I2",header,7)
+    return width,height,"image/gif"
   elseif header:sub(1,8) == "\137PNG\r\n\26\n" then
-    return string.unpack(">I4I4",header,17)
+    local width,height = string.unpack(">I4I4",header,17)
+    return width,height,"image/png"
   elseif header:sub(1,2) == "\255\216" then
     for chunk,data in jpeg_sections(f) do
       if chunk == 0xFFC0 then
         local height,width = string.unpack(">I2I2",data,2)
-        return width,height
+        return width,height,"image/jpeg"
       end
     end
   end
@@ -559,7 +562,7 @@ local pf_image = (P"\n" - P"#+END_PF") / ""
                  * C(uchar^1) * (S" \t"^1 / "")
                  * Cs(pf_char^1)
                  / function(_,display,_,target,_,title)
-                     local width,height = image_size(display)
+                     local width,height,mime = image_size(display)
                      
                      if target == '-' then
                        return string.format(
@@ -572,7 +575,8 @@ local pf_image = (P"\n" - P"#+END_PF") / ""
                        )
                      else
                        return string.format(
-                         '  <a href="local" class="notype" href="%s"><img src="%s" width="%d" height="%d" alt="[%s]" title="%s"></a>\n', -- luacheck: ignore
+                         '  <a type="%s" href="local" class="notype" href="%s"><img src="%s" width="%d" height="%d" alt="[%s]" title="%s"></a>\n', -- luacheck: ignore
+                         mime,
                          target,
                          display,
                          width,
