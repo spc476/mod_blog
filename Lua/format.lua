@@ -398,7 +398,7 @@ local begin_src = C(S" \t"^0) * C(R("AZ","az")^1) * C(P"\n")
 local int           = P"0" + (R"19" * R"09"^0)
 local frac          = P"." * R"09"^1
 local exp           = S"Ee" * S"+-"^-1 * R"09"^1
-local number        = (P"-"^-1 * int * frac^-1 * exp^-1)
+local number        = (P"-"^-1 * int * frac^-1 * exp^-1) * #S"\t\n"
 local table_caption = C(S" \t"^0) * Cs(hchar^1) * C"\n"
                     / "  <caption>%2</caption>\n"
                     + P"\n" / ""
