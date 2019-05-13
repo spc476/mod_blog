@@ -138,7 +138,9 @@ local function url_class(href)
   local u = url:match(href)
   
   if u.scheme then
-    if u.host:match "conman.org" then
+    if not u.host then
+      return "external"
+    elseif u.host:match "conman.org" then
       return "site"
     else
       return "external"
