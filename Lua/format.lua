@@ -480,6 +480,12 @@ local begin_email = Cc'\n<blockquote>\n  <dl class="header">' * email_opt^-1 * P
 --
 -- ********************************************************************
 
+local title_char  = P"&" / "&amp;"
+                  + P"<" / "&lt;"
+                  + P">" / "&gt;"
+                  + P'"' / "&quot;"
+                  + allchar
+local title_text  = Cs(title_char^1)
 local quote_text  = header + htmltag + abbr + tex + entity + link
                   + cut + style
                   + para
@@ -489,10 +495,10 @@ local begin_quote = Cmt(
                       function(_,pos,state)
                         local htag = '\n<blockquote'
                         if state.quote.cite then
-                          htag = htag .. string.format(" cite=%q",state.quote.cite)
+                          htag = htag .. string.format(" cite=%q",title_text:match(state.quote.cite))
                         end
                         if state.quote.title then
-                          htag = htag .. string.format(" title=%q",state.quote.title)
+                          htag = htag .. string.format(" title=%q",title_text:match(state.quote.title))
                         end
                         htag = htag .. ">"
                         return pos,htag
