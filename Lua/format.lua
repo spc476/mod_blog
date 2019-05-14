@@ -180,9 +180,10 @@ end
         -- acronym expansion into
         --    <abbr title="expansion">ABBR</abbr>
         -- ----------------------------------------
-        
-local abbr = Cmt(
-                  C(R"AZ"^1) * Carg(1),
+
+local abbrex = C(R"AZ" * ((R"ax" * #R"AZ") + R"AZ")^1)
+local abbr   = Cmt(
+                  abbrex * Carg(1),
                   function(_,pos,acronym,state)
                     if state.abbr[acronym] then
                       return pos,string.format('<abbr title="%s">%s</abbr>',
@@ -678,7 +679,7 @@ local entry_header do
   local echar    = tex + entity + uchar
   local acronyms = (P"\n"^-1 * S" \t"^1) / ""
                  * Cmt(
-                          C(R"AZ"^1)
+                          abbrex
                         * C(S" \t"^1)
                         * C(tex + entity + uchar^1)
                         * Carg(1),
