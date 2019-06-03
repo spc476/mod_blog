@@ -406,7 +406,27 @@ static void calculate_previous(struct btm const start)
             )
            gd.f.navprev = false;
          else
+         {
            btm_dec_month(&gd.previous);
+           gd.previous.day  = max_monthday(gd.previous.year,gd.previous.month);
+           gd.previous.part = 1;
+           
+           while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
+           {
+             BlogEntry *entry = BlogEntryRead(g_blog,&gd.previous);
+             if (entry == NULL)
+             {
+               btm_dec_day(&gd.previous);
+               continue;
+             }
+             
+             assert(entry->valid);
+             BlogEntryFree(entry);
+             return;
+           }
+           
+           gd.f.navprev = false;
+         }
          break;
          
     case UNIT_DAY:
@@ -415,6 +435,7 @@ static void calculate_previous(struct btm const start)
          else
          {
            btm_dec_day(&gd.previous);
+           gd.previous.part = 1;
            
            while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
            {
@@ -486,7 +507,27 @@ static void calculate_next(struct btm const end)
             )
            gd.f.navnext = false;
          else
+         {
            btm_inc_month(&gd.next);
+           gd.next.day  = 1;
+           gd.next.part = 1;
+           
+           while(btm_cmp(&gd.next,&g_blog->now) <= 0)
+           {
+             BlogEntry *entry = BlogEntryRead(g_blog,&gd.next);
+             if (entry == NULL)
+             {
+               btm_inc_day(&gd.next);
+               continue;
+             }
+             
+             assert(entry->valid);
+             BlogEntryFree(entry);
+             return;
+           }
+           
+           gd.f.navnext = false;
+         }
          break;
          
     case UNIT_DAY:
