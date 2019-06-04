@@ -349,7 +349,7 @@ local attr      = P"title" *  EQ * htmltrans
                 + P"alt"   *  EQ * htmltrans
                 + aname    * (EQ * value)^-1
 local attrs     = SPACE^0 * attr
-local htmltag   = P"<"    * tag * attrs^0 * P">"
+local htmltag   = P"<"    * tag * attrs^0 * SPACE^0 * P">"
                 + P"<!--" * (P(1) - P"-->")^0 * P"-->"
                 + P"</"   * tag * P">"
                 
