@@ -357,7 +357,7 @@ local htmltag   = P"<"    * tag * attrs^0 * SPACE^0 * P">"
         -- Shorthand for <H1> .. <H5>
         -- -----------------------------
         
-local hchar  = abbr + tex + entity + uchar
+local hchar  = cut + abbr + tex + entity + uchar
 local header = C"\n***** " * Cs(hchar^1) * #P"\n" / "\n<h5>%2</h5>"
              + C"\n**** "  * Cs(hchar^1) * #P"\n" / "\n<h4>%2</h4>"
              + C"\n*** "   * Cs(hchar^1) * #P"\n" / "\n<h3>%2</h3>"
