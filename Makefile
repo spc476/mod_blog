@@ -96,5 +96,4 @@ src/main_cgi.o: src/globals.h src/backend.h
 src/main_cli.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
 src/main_cli.o: src/blog.h src/blogutil.h src/globals.h src/backend.h
 src/timeutil.o: src/timeutil.h src/wbtum.h
-src/wbtum.o: src/wbtum.h src/timeutil.h src/globals.h src/frontend.h
-src/wbtum.o: src/blog.h src/backend.h
+src/wbtum.o: src/wbtum.h src/timeutil.h

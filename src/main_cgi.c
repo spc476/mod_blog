@@ -159,7 +159,7 @@ static int cmd_cgi_get_show(Request *req)
   else
   {
     req->reqtumbler++;
-    if (tumbler_new(&req->tumbler,req->reqtumbler))
+    if (tumbler_new(&req->tumbler,req->reqtumbler,&g_blog->first,&g_blog->last))
     {
     
       if (req->tumbler.redirect)

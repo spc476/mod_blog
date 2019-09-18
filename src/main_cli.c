@@ -252,7 +252,7 @@ static int cmd_cli_show(Request *req)
     }
     else
     {
-      if (tumbler_new(&req->tumbler,req->reqtumbler))
+      if (tumbler_new(&req->tumbler,req->reqtumbler,&g_blog->first,&g_blog->last))
       {
         if (req->tumbler.redirect)
         {
