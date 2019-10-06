@@ -274,15 +274,11 @@ local cut      = (P"{{" / '<span class="cut">')
         -- Various shorthand notations for common HTML styling tags
         -- ---------------------------------------------------------
         
-local style = Cmt(P"//" * Carg(1),stack "i")
-            + Cmt(P"/"  * Carg(1),stack "em")
-            + Cmt(P"**" * Carg(1),stack "b")
-            + Cmt(P"*"  * Carg(1),stack "strong")
+local style = Cmt(P"**" * Carg(1),stack "strong")
+            + Cmt(P"*"  * Carg(1),stack "em")
+            + Cmt(P"`"  * Carg(1),stack "code")
             + Cmt(P"+"  * Carg(1),stack "del")
-            + Cmt(P"="  * Carg(1),stack "code")
-            + Cmt(P"~~" * Carg(1),stack "tt")
-            + Cmt(P"~"  * Carg(1),stack "kbd")
-             
+            
         -- ----------------------------------
         -- Handle paragraphs automagically
         -- ----------------------------------
