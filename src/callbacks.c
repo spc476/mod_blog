@@ -753,6 +753,7 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
        && (strncmp(src->value,"nntp:",5)        != 0)
        && (strncmp(src->value,"news:",5)        != 0)
        && (strncmp(src->value,"file:",5)        != 0)
+       && (strncmp(src->value,"about:",6)       != 0)
      )
   {
     char        buffer[BUFSIZ];
