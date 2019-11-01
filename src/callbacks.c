@@ -727,6 +727,26 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
 
 /*************************************************************************/
 
+static bool uri_scheme(char const *s)
+{
+  if (!isalpha(*s++)) return false;
+  
+  while(*s)
+  {
+    if (*s == ':')
+      return true;
+    
+    if (isalpha(*s) || isdigit(*s) || (*s == '+') || (*s == '-') || (*s == '.'))
+      s++;
+    else
+      return false;
+  }
+  
+  return false;
+}
+
+/*************************************************************************/
+
 static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
 {
   struct pair *src;
@@ -740,22 +760,7 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
   handle_aflinks(token,attrib);
   
   src = HtmlParseGetPair(token,attrib);
-  if (
-       (src != NULL)
-       && (src->value[0] != '/')
-       && (src->value[0] != '#')
-       && (strncmp(src->value,"http:",5)        != 0)
-       && (strncmp(src->value,"https:",6)       != 0)
-       && (strncmp(src->value,"gopher:",7)      != 0)
-       && (strncmp(src->value,"gemini:",7)      != 0)
-       && (strncmp(src->value,"mailto:",7)      != 0)
-       && (strncmp(src->value,"ftp:",4)         != 0)
-       && (strncmp(src->value,"javascript:",11) != 0)
-       && (strncmp(src->value,"nntp:",5)        != 0)
-       && (strncmp(src->value,"news:",5)        != 0)
-       && (strncmp(src->value,"file:",5)        != 0)
-       && (strncmp(src->value,"about:",6)       != 0)
-     )
+  if ((src != NULL) && !uri_scheme(src->value))
   {
     char        buffer[BUFSIZ];
     char const *baseurl;
