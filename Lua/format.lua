@@ -277,7 +277,7 @@ local cut      = (P"{{" / '<span class="cut">')
 local style = Cmt(P"**" * Carg(1),stack "strong")
             + Cmt(P"*"  * Carg(1),stack "em")
             + Cmt(P"`"  * Carg(1),stack "code")
-            + Cmt(P"+"  * Carg(1),stack "del")
+            + Cmt(P"++" * Carg(1),stack "del")
             
         -- ----------------------------------
         -- Handle paragraphs automagically
