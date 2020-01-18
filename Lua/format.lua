@@ -181,7 +181,9 @@ end
         --    <abbr title="expansion">ABBR</abbr>
         -- ----------------------------------------
 
-local abbrex = C(R"AZ" * ((R"ax" * #R"AZ") + R"AZ")^1)
+local abbrex = C("IPv4")
+             + C("IPv6")
+             + C(R"AZ" * ((R"ax" * #R"AZ") + R"AZ")^1)
 local abbr   = Cmt(
                   abbrex * Carg(1),
                   function(_,pos,acronym,state)
