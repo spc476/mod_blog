@@ -709,35 +709,32 @@ char *tumbler_canonical(tumbler__s const *tum)
 
 bool thisday_new(tumbler__s *tum,char const *text)
 {
-  unsigned long int  ul;
-  char              *p;
+  struct value month;
+  struct value day;
   
-  assert(tum != NULL);
-  assert(text != NULL);
+  memset(&month,0,sizeof(month));
+  memset(&day,  0,sizeof(day));
   
-  if (!isdigit(*text)) return false;
-  ul = strtoul(text,&p,10); /* month */
-  if (ul <  1) return false;
-  if (ul > 12) return false;
-  tum->start.month = ul;
-  if (*p != '/') return false;
-  p++;
+  if (!parse_num(&month,&text,1,12))
+    return false;
+  if (*text != '/')
+    return false;
+  tum->start.month = month.val;
+  text++;
   
-  if (!isdigit(*p)) return false;
-  ul = strtoul(p,&p,10); /* day */
-  if (ul <  1) return false;
-  if (ul > 31) return false;
-  tum->start.day = ul;
-  if (*p != '\0') return false;
+  if (!parse_num(&day,&text,1,31))
+    return false;
+  if (*text != '\0')
+    return false;
+  tum->start.day = day.val;
   
-  tum->redirect    = ((tum->start.month < 10) && (text[0] != '0'))
-                  || ((tum->start.day   < 10) && (text[3] != '0'));
+  tum->redirect    = (month.len == 1) | (day.len == 1);
   tum->file        = false;
   tum->range       = false;
   tum->ustart      = UNIT_PART;
   tum->ustop       = UNIT_PART;
-  tum->filename[0] = '\0';
   tum->segments    = 0;
+  tum->filename[0] = '\0';
   
   return true;
 }
