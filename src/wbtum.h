@@ -52,9 +52,11 @@ typedef struct tumbler__s
   char       filename[FILENAME_MAX];
 } tumbler__s;
 
+
 /***********************************************************************/
 
 extern bool  tumbler_new       (tumbler__s *,char const *,struct btm const *,struct btm const *);
 extern char *tumbler_canonical (tumbler__s const *);
+extern bool  thisday_new       (tumbler__s *,char const *);
 
 #endif

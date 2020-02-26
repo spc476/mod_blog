@@ -50,7 +50,7 @@ static void        free_entries       (List *);
 
 /************************************************************************/
 
-int generate_thisday(struct btm when)
+int generate_thisday(FILE *out,struct btm when)
 {
   struct callback_data  cbd;
   char                 *tags;
@@ -79,7 +79,7 @@ int generate_thisday(struct btm when)
   tags = tag_collect(&cbd.list);
   cbd.adtag = tag_pick(tags);
   free(tags);
-  generic_cb("main",stdout,&cbd);
+  generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
   free(cbd.adtag);
   return 0;

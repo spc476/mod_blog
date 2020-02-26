@@ -706,3 +706,40 @@ char *tumbler_canonical(tumbler__s const *tum)
 }
 
 /************************************************************************/
+
+bool thisday_new(tumbler__s *tum,char const *text)
+{
+  unsigned long int  ul;
+  char              *p;
+  
+  assert(tum != NULL);
+  assert(text != NULL);
+  
+  if (!isdigit(*text)) return false;
+  ul = strtoul(text,&p,10); /* month */
+  if (ul <  1) return false;
+  if (ul > 12) return false;
+  tum->start.month = ul;
+  if (*p != '/') return false;
+  p++;
+  
+  if (!isdigit(*p)) return false;
+  ul = strtoul(p,&p,10); /* day */
+  if (ul <  1) return false;
+  if (ul > 31) return false;
+  tum->start.day = ul;
+  if (*p != '\0') return false;
+  
+  tum->redirect    = ((tum->start.month < 10) && (text[0] != '0'))
+                  || ((tum->start.day   < 10) && (text[3] != '0'));
+  tum->file        = false;
+  tum->range       = false;
+  tum->ustart      = UNIT_PART;
+  tum->ustop       = UNIT_PART;
+  tum->filename[0] = '\0';
+  tum->segments    = 0;
+  
+  return true;
+}
+
+/************************************************************************/

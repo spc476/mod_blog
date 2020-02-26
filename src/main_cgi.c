@@ -245,20 +245,62 @@ static int cmd_cgi_get_overview(Request *req)
 static int cmd_cgi_get_today(Request *req)
 {
   assert(req != NULL);
-  fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
   
+  char *tpath = CgiListGetValue(gd.cgi,"path");
   char *twhen = CgiListGetValue(gd.cgi,"day");
-  if (twhen)
+  
+  if ((tpath == NULL) && (twhen == NULL))
   {
-    char       *p;
-    struct btm  when;
-    
-    when.month = strtoul(twhen,&p,10); p++;
-    when.day   = strtoul(p,NULL,10);
-    return generate_thisday(when);
+    fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
+    return generate_thisday(req->out,g_blog->now);
   }
-  else
-    return generate_thisday(g_blog->now);
+    
+  if (tpath == NULL)
+    return (*req->error)(req,HTTP_BADREQ,"bad request");
+  
+  if ((twhen == NULL) || (*twhen == '\0'))
+  {
+    fprintf(
+      req->out,
+      "Status: %d\r\n"
+      "Content-Type: text/html\r\n"
+      "Location: %s/%s\r\n"
+      "\r\n"
+      "<HTML>\n"
+      "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
+      "  <BODY><A HREF='%s/%s'>Go here</A></BODY>\n"
+      "</HTML>\n",
+      HTTP_MOVEPERM,
+      c_fullbaseurl,tpath,
+      c_fullbaseurl,tpath
+    );
+    return 0;
+  }
+  
+  if (!thisday_new(&req->tumbler,twhen))
+    return (*req->error)(req,HTTP_BADREQ,"bad request");
+  
+  if (req->tumbler.redirect)
+  {
+    fprintf(
+      req->out,
+      "Status: %d\r\n"
+      "Content-Type: text/html\r\n"
+      "Location: %s/%s/%02d/%02d\r\n"
+      "\r\n"
+      "<HTML>\n"
+      "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
+      "  <BODY><A HREF='%s/%s/%02d/%02d'>Go here</A></BODY>\n"
+      "</HTML>\n",
+      HTTP_MOVEPERM,
+      c_fullbaseurl,tpath,req->tumbler.start.month,req->tumbler.start.day,
+      c_fullbaseurl,tpath,req->tumbler.start.month,req->tumbler.start.day
+    );
+    return 0;
+  }
+  
+  fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
+  return generate_thisday(req->out,req->tumbler.start);
 }
 
 /**********************************************************************/

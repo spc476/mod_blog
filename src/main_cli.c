@@ -107,7 +107,6 @@ int main_cli(int argc,char *argv[])
   
   while(true)
   {
-    char *p;
     int   option = 0;
     int   c;
     
@@ -146,9 +145,8 @@ int main_cli(int argc,char *argv[])
            gd.req.f.today = true;
            break;
       case OPT_THISDAY:
-           gd.req.f.thisday = true;
-           gd.thisday.month = strtoul(optarg,&p,10); p++;
-           gd.thisday.day   = strtoul(p,NULL,10);
+           gd.req.f.thisday  = true;
+           gd.req.reqtumbler = optarg;
            break;
       case OPT_CMD:
            get_cli_command(&gd.req,optarg);
@@ -252,9 +250,16 @@ static int cmd_cli_show(Request *req)
   if (req->f.regenerate)
     rc = generate_pages();
   else if (req->f.today)
-    rc = generate_thisday(g_blog->now);
+    rc = generate_thisday(req->out,g_blog->now);
   else if (req->f.thisday)
-    rc = generate_thisday(gd.thisday);
+  {
+    if (!thisday_new(&req->tumbler,req->reqtumbler))
+      rc = (*req->error)(req,HTTP_BADREQ,"bad request");
+    else if (req->tumbler.redirect)
+      rc = (*req->error)(req,HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
+    else
+      rc = generate_thisday(req->out,req->tumbler.start);
+  }
   else
   {
     if (req->reqtumbler == NULL)
