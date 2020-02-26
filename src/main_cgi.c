@@ -42,6 +42,7 @@ static int  cmd_cgi_get_new        (Request *);
 static int  cmd_cgi_get_show       (Request *);
 static int  cmd_cgi_get_edit       (Request *);
 static int  cmd_cgi_get_overview   (Request *);
+static int  cmd_cgi_get_today      (Request *);
 static void set_m_cgi_post_command (char *,Request *);
 static void set_m_author           (char *,Request *);
 static int  cmd_cgi_post_new       (Request *);
@@ -106,6 +107,8 @@ static void set_m_cgi_get_command(char *value,Request *req)
     req->command = cmd_cgi_get_edit;
   else if (strcmp(value,"OVERVIEW") == 0)
     req->command = cmd_cgi_get_overview;
+  else if (strcmp(value,"TODAY") == 0)
+    req->command = cmd_cgi_get_today;
 }
 
 /***********************************************************************/
@@ -235,6 +238,27 @@ static int cmd_cgi_get_overview(Request *req)
   fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
   generic_cb("main",req->out,&days);
   return 0;
+}
+
+/**********************************************************************/
+
+static int cmd_cgi_get_today(Request *req)
+{
+  assert(req != NULL);
+  fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
+  
+  char *twhen = CgiListGetValue(gd.cgi,"day");
+  if (twhen)
+  {
+    char       *p;
+    struct btm  when;
+    
+    when.month = strtoul(twhen,&p,10); p++;
+    when.day   = strtoul(p,NULL,10);
+    return generate_thisday(when);
+  }
+  else
+    return generate_thisday(g_blog->now);
 }
 
 /**********************************************************************/

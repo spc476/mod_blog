@@ -50,6 +50,43 @@ static void        free_entries       (List *);
 
 /************************************************************************/
 
+int generate_thisday(struct btm when)
+{
+  struct callback_data  cbd;
+  char                 *tags;
+  
+  memset(&cbd,0,sizeof(struct callback_data));
+  ListInit(&cbd.list);
+  
+  for(when.year = g_blog->first.year ; when.year <= g_blog->now.year ; when.year++)
+  {
+    if (btm_cmp_date(&when,&g_blog->first) < 0)
+      continue;
+    
+    for (when.part = 1 ; ; when.part++)
+    {
+      BlogEntry *entry = BlogEntryRead(g_blog,&when);
+      if (entry)
+      {
+        assert(entry->valid);
+        ListAddTail(&cbd.list,&entry->node);
+      }
+      else
+        break;
+    }
+  }
+  
+  tags = tag_collect(&cbd.list);
+  cbd.adtag = tag_pick(tags);
+  free(tags);
+  generic_cb("main",stdout,&cbd);
+  free_entries(&cbd.list);
+  free(cbd.adtag);
+  return 0;
+}
+
+/************************************************************************/
+
 int generate_pages(void)
 {
   for (size_t i = 0 ; i < c_numtemplates; i++)

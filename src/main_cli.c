@@ -58,6 +58,8 @@ enum
   OPT_ENTRY,
   OPT_REGENERATE,
   OPT_FORCENOTIFY,
+  OPT_TODAY,
+  OPT_THISDAY,
   OPT_HELP,
   OPT_DEBUG
 };
@@ -84,6 +86,8 @@ static struct option const coptions[] =
   { "update"       , required_argument  , NULL  , OPT_UPDATE      } ,
   { "entry"        , required_argument  , NULL  , OPT_ENTRY       } ,
   { "force-notify" , no_argument        , NULL  , OPT_FORCENOTIFY } ,
+  { "today"        , no_argument        , NULL  , OPT_TODAY       } ,
+  { "thisday"      , required_argument  , NULL  , OPT_THISDAY     } ,
   { "help"         , no_argument        , NULL  , OPT_HELP        } ,
   { "debug"        , no_argument        , NULL  , OPT_DEBUG       } ,
   { NULL           , 0                  , NULL  , 0               }
@@ -103,8 +107,9 @@ int main_cli(int argc,char *argv[])
   
   while(true)
   {
-    int option = 0;
-    int c;
+    char *p;
+    int   option = 0;
+    int   c;
     
     c = getopt_long_only(argc,argv,"",coptions,&option);
     if (c == EOF)
@@ -137,6 +142,14 @@ int main_cli(int argc,char *argv[])
       case OPT_FORCENOTIFY:
            forcenotify = true;
            break;
+      case OPT_TODAY:
+           gd.req.f.today = true;
+           break;
+      case OPT_THISDAY:
+           gd.req.f.thisday = true;
+           gd.thisday.month = strtoul(optarg,&p,10); p++;
+           gd.thisday.day   = strtoul(p,NULL,10);
+           break;
       case OPT_CMD:
            get_cli_command(&gd.req,optarg);
            break;
@@ -153,6 +166,8 @@ int main_cli(int argc,char *argv[])
                 "\t--update ('new' * | 'modify' | 'template' | 'other')\n"
                 "\t--entry <tumbler>\n"
                 "\t--force-notify\n"
+                "\t--today\n"
+                "\t--thisday <month>/<day>\n"
                 "\t--help\n"
                 "\t--debug\n"
                 "\n"
@@ -236,6 +251,10 @@ static int cmd_cli_show(Request *req)
   
   if (req->f.regenerate)
     rc = generate_pages();
+  else if (req->f.today)
+    rc = generate_thisday(g_blog->now);
+  else if (req->f.thisday)
+    rc = generate_thisday(gd.thisday);
   else
   {
     if (req->reqtumbler == NULL)
