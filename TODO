@@ -1,9 +1,9 @@
-2017-12-31T06:20-05:00
+2017-12-31T06:20-0500
 
 	Look into https://indieweb.org/
 	also webmention
 
-2007-08-28T18:40-05:00
+2007-08-28T18:40-0500
 
 	Some quick notes on adding the archive section.  Create
 	"cmd=archive" with parameters "unit=MONTH|DAY".  For "unit=MONTH",
