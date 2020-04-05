@@ -1754,7 +1754,7 @@ static void cb_overview_date(FILE *out,void *data __attribute__((unused)))
 static void cb_overview_list(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs("<li>OVERVIEW</li>",out);
+  fputs("OVERVIEW",out);
 }
 
 /**********************************************************************/
