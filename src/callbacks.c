@@ -954,7 +954,7 @@ static void cb_cond_hr(FILE *out,void *data)
   if (btm_cmp_date(&entry->when,&cbd->last) == 0)
   {
     if (entry->when.part != cbd->last.part)
-      fputs("<hr class=\"next\">",out);
+      generic_cb("cond.hr",out,data);
   }
 }
 
