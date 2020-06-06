@@ -183,6 +183,8 @@ end
 
 local abbrex = C("IPv4")
              + C("IPv6")
+             + C("GHz")
+             + C("MHz")
              + C("D&amp;D")
              + P"D&D" / "D&amp;D"
              + C(R"AZ" * ((R"ax" * #R"AZ") + R"AZ")^1)
