@@ -71,8 +71,18 @@ String *tag_split(size_t *pnum,char const *tag)
 
 char *fromstring(String const src)
 {
+  char *s;
+  
   assert(src.d != NULL);
-  return strdup(src.d);
+  
+  s = malloc(src.s + 1);
+  if (s != NULL)
+  {
+    memcpy(s,src.d,src.s);
+    s[src.s] = '\0';
+  }
+  
+  return s;
 }
 
 /*********************************************************************/
