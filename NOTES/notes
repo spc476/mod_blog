@@ -1,3 +1,34 @@
+Thinking of redoing this (sigh)
+
+https://developers.facebook.com/docs/pages/getting-started
+
+The curl command:
+	-i include headers
+	-X POST use method
+
+or maybe
+
+https://developers.facebook.com/docs/sharing/reference/send-dialog
+
+But then:
+
+	The publish_actions permission will be deprecated.  This permission
+	granted apps access to publish posts to Facebook as the logged in
+	user.  Apps created from today onwards will not have access to this
+	permission.  Apps created before today that have been previously
+	approved to request publish_actions can continue to do so until
+	August 1, 2018.  No further apps will be approved to use
+	publish_actions via app review.  Developers currently utilizing
+	publish_actions are encouraged to switch to Facebook's Share dialogs
+	for web, iOS and Android.
+
+https://developers.facebook.com/blog/post/2018/04/24/new-facebook-platform-product-changes-policy-updates/
+
+---
+
+
+
+
 NOTE:  	A lot of this is outdated information, but kept here for hysterical
 	rasins.
 
