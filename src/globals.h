@@ -70,8 +70,6 @@ extern void              (*const c_conversion)(FILE *restrict,FILE *restrict);
 extern int         const         c_days;
 extern size_t      const         c_af_uid;
 extern size_t      const         c_af_name;
-extern int         const         c_tzhour;
-extern int         const         c_tzmin;
 extern bool        const         cf_emailupdate;
 extern size_t      const         c_numtemplates;
 extern size_t      const         c_numaflinks;

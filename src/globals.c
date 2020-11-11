@@ -90,8 +90,6 @@ void        (*c_conversion)(FILE *restrict,FILE *restrict) =  html_conversion;
 int           c_days;
 size_t        c_af_uid;
 size_t        c_af_name;
-int           c_tzhour;
-int           c_tzmin;
 bool          cf_emailupdate = true;
 size_t        c_numtemplates;
 size_t        c_numaflinks;
@@ -203,15 +201,6 @@ int GlobalsInit(char const *conf)
   if (c_emaildb == NULL)
     cf_emailupdate = false;
     
-  {
-    char const *timezone = get_string(g_L,"timezone","-5:00");
-    char       *p;
-    
-    c_tzhour = strtol(timezone,&p,10);
-    p++;
-    c_tzmin  = strtoul(p,NULL,10);
-  }
-  
   set_c_conversion(get_string(g_L,"conversion","html"));
   set_c_url       (get_string(g_L,"url",NULL));
   

@@ -557,32 +557,13 @@ static void cb_entry_description(FILE *out,void *data)
 static void cb_entry_pubdate(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry            *entry;
-  time_t                ts;
-  struct tm            *ptm;
-  char                  buffer[BUFSIZ];
+  char                  buffer[24];
   
   assert(out  != NULL);
   assert(data != NULL);
+  assert(cbd->entry->valid);
   
-  entry = cbd->entry;
-  assert(entry->valid);
-  ts    = entry->timestamp;
-  ptm   = localtime(&ts);
-  
-  sprintf(
-        buffer,
-        "%04d-%02d-%02dT%02d:%02d:%02d%+03d:%02d",
-        ptm->tm_year + 1900,
-        ptm->tm_mon + 1,
-        ptm->tm_mday,
-        ptm->tm_hour,
-        ptm->tm_min,
-        ptm->tm_sec,
-        c_tzhour,
-        c_tzmin
-  );
-  
+  strftime(buffer,sizeof(buffer),"%FT%TZ",gmtime(&cbd->entry->timestamp));
   fputs(buffer,out);
 }
 
@@ -1386,12 +1367,12 @@ static void cb_now_year(FILE *out,void *data __attribute__((unused)))
 
 static void cb_update_time(FILE *out,void *data __attribute__((unused)))
 {
-  char tmpbuf[20];
+  char tmpbuf[24];
   
   assert(out != NULL);
   
-  strftime(tmpbuf,sizeof(tmpbuf),"%Y-%m-%dT%H:%M:%S",localtime(&g_blog->tnow));
-  fprintf(out,"%s%+03d:%02d",tmpbuf,c_tzhour,c_tzmin);
+  strftime(tmpbuf,sizeof(tmpbuf),"%FT%TZ",gmtime(&g_blog->tnow));
+  fputs(tmpbuf,out);
 }
 
 /*******************************************************************/
