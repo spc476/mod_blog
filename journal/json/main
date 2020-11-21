@@ -1,9 +1,10 @@
 {
-  "version"       : "https://jsonfeed.org/version/1",
+  "version"       : "https://jsonfeed.org/version/1,1",
   "title"         : "%{blog.name}%",
-  "description"   : "%{blog.description}%",
-  "author"        : { "name" : "%{blog.author}%" },
   "home_page_url" : "%{blog.url.home}%",
   "feed_url"      : "%{blog.url.home}%/index.json",
+  "description"   : "%{blog.description}%",
+  "authors"       : [ { "name" : "%{blog.author}%" } ],
+  "language"      : "en-US",
   "items"         : [ %{json.item}% ]
 }

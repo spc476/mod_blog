@@ -1,10 +1,10 @@
 {
   "id"             : "%{rss.item.url}%",
-  "content_html"   : "%{entry.body.jsonified}%",
   "url"            : "%{rss.item.url}%",
   "title"          : "%{entry.title}%",
+  "content_html"   : "%{entry.body.jsonified}%",
   "date_published" : "%{entry.pubdate}%",
-  "author"         : "%{entry.author}%",
-  "tags"           : [ %{entry.class.jsonified}% ]
+  "authors"        : [ { "name" : "%{entry.author}%" } ],
+  "tags"           : [ %{entry.class.jsonified}% ],
+  "language"       : "en-US"
 }
-
