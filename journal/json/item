@@ -3,7 +3,7 @@
   "url"            : "%{rss.item.url}%",
   "title"          : "%{entry.title}%",
   "content_html"   : "%{entry.body.jsonified}%",
-  "date_published" : "%{entry.pubdate}%",
+  "date_published" : "%{entry.pubdatetime}%",
   "authors"        : [ { "name" : "%{entry.author}%" } ],
   "tags"           : [ %{entry.class.jsonified}% ],
   "language"       : "en-US"

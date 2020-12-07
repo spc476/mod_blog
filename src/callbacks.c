@@ -102,6 +102,7 @@ static void cb_entry_id               (FILE *,void *);
 static void cb_entry_name             (FILE *,void *);
 static void cb_entry_path             (FILE *,void *);
 static void cb_entry_pubdate          (FILE *,void *);
+static void cb_entry_pubdatetime      (FILE *,void *);
 static void cb_entry_status           (FILE *,void *);
 static void cb_entry_title            (FILE *,void *);
 static void cb_entry_url              (FILE *,void *);
@@ -203,6 +204,7 @@ static struct chunk_callback const m_callbacks[] =
   { "entry.name"                , cb_entry_name                 } ,
   { "entry.path"                , cb_entry_path                 } ,
   { "entry.pubdate"             , cb_entry_pubdate              } ,
+  { "entry.pubdatetime"         , cb_entry_pubdatetime          } ,
   { "entry.status"              , cb_entry_status               } ,
   { "entry.title"               , cb_entry_title                } ,
   { "entry.url"                 , cb_entry_url                  } ,
@@ -555,6 +557,21 @@ static void cb_entry_description(FILE *out,void *data)
 /*********************************************************************/
 
 static void cb_entry_pubdate(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  char                  buffer[12];
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  assert(cbd->entry->valid);
+  
+  strftime(buffer,sizeof(buffer),"%F",localtime(&cbd->entry->timestamp));
+  fputs(buffer,out);
+}
+
+/*********************************************************************/
+
+static void cb_entry_pubdatetime(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   char                  buffer[24];
