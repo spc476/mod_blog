@@ -99,6 +99,8 @@ static void cb_entry_cond_date        (FILE *,void *);
 static void cb_entry_date             (FILE *,void *);
 static void cb_entry_description      (FILE *,void *);
 static void cb_entry_id               (FILE *,void *);
+static void cb_entry_linkdate         (FILE *,void *);
+static void cb_entry_linkdated        (FILE *,void *);
 static void cb_entry_name             (FILE *,void *);
 static void cb_entry_path             (FILE *,void *);
 static void cb_entry_pubdate          (FILE *,void *);
@@ -201,6 +203,8 @@ static struct chunk_callback const m_callbacks[] =
   { "entry.date"                , cb_entry_date                 } ,
   { "entry.description"         , cb_entry_description          } ,
   { "entry.id"                  , cb_entry_id                   } ,
+  { "entry.linkdate"            , cb_entry_linkdate             } ,
+  { "entry.linkdated"           , cb_entry_linkdated            } ,
   { "entry.name"                , cb_entry_name                 } ,
   { "entry.path"                , cb_entry_path                 } ,
   { "entry.pubdate"             , cb_entry_pubdate              } ,
@@ -505,6 +509,36 @@ static void cb_entry_url(FILE *out,void *data)
 /**********************************************************************/
 
 static void cb_entry_id(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry            *entry;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  entry = cbd->entry;
+  assert(entry->valid);
+  print_nav_name(out,&entry->when,UNIT_DAY,'-');
+}
+
+/**********************************************************************/
+
+static void cb_entry_linkdate(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  BlogEntry            *entry;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  entry = cbd->entry;
+  assert(entry->valid);
+  print_nav_name(out,&entry->when,UNIT_PART,'/');
+}
+
+/**********************************************************************/
+
+static void cb_entry_linkdated(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   BlogEntry            *entry;
