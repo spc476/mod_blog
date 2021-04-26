@@ -36,7 +36,7 @@ struct entity_conv
 
 /********************************************************************/
 
-static bool    char_entity (char **,size_t *,int);
+static bool    char_entity (char const **,size_t *,int);
 static ssize_t fer_read    (void *,char *,size_t);
 static ssize_t few_write   (void *,char const *,size_t);
 
@@ -2150,7 +2150,7 @@ char *entity_conversion(char const *s)
 
 /***********************************************************************/
 
-static bool char_entity(char **tag,size_t *ps,int c)
+static bool char_entity(char const **tag,size_t *ps,int c)
 {
   assert(tag != NULL);
   assert(ps  != NULL);
@@ -2195,11 +2195,11 @@ FILE *fentity_encode_onwrite(FILE *out)
 
 static ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
 {
-  FILE   *realin = cookie;
-  size_t  s      = 0;
-  char   *replace;
-  size_t  repsize;
-  int     c;
+  FILE       *realin = cookie;
+  size_t      s      = 0;
+  char const *replace;
+  size_t      repsize;
+  int         c;
   
   assert(buffer != NULL);
   
@@ -2239,10 +2239,10 @@ static ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
 
 static ssize_t few_write(void *cookie,char const *buffer,size_t bytes)
 {
-  FILE   *realout = cookie;
-  size_t  size    = bytes;
-  char   *replace;
-  size_t  repsize;
+  FILE       *realout = cookie;
+  size_t      size    = bytes;
+  char const *replace;
+  size_t      repsize;
   
   assert(buffer != NULL);
   
