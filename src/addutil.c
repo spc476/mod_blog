@@ -45,6 +45,7 @@ int entry_add(Request *req)
 {
   BlogEntry *entry;
   char      *p;
+  int       rc = 0;
   
   assert(req != NULL);
   
@@ -85,8 +86,31 @@ int entry_add(Request *req)
   if (c_authorfile) BlogUnlock(g_blog);
   
   req->when = entry->when;
+  
+  if (c_posthook != NULL)
+  {
+    char const *argv[3];
+    char        url[1024];
+    
+    snprintf(
+      url,
+      sizeof(url),
+      "%s/%04d/%02d/%02d.%d",
+      c_fullbaseurl,
+      entry->when.year,
+      entry->when.month,
+      entry->when.day,
+      entry->when.part
+    );
+    
+    argv[0] = c_posthook;
+    argv[1] = url;
+    argv[2] = NULL;
+    rc      = run_hook(argv[0],argv);
+  }
+  
   free(entry);
-  return 0;
+  return rc;
 }
 
 /************************************************************************/

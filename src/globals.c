@@ -81,6 +81,7 @@ char const   *c_emailsubject;            /* no free */
 char const   *c_emailmsg;                /* no free */
 char const   *c_overview;                /* no free */
 char const   *c_adtag;                   /* no free */
+char const   *c_posthook;                /* no free */
 char         *c_baseurl;
 char         *c_fullbaseurl;
 char         *c_htmltemplates;
@@ -193,6 +194,7 @@ int GlobalsInit(char const *conf)
   c_emailsubject = get_string(g_L,"email.subject",NULL);
   c_emailmsg     = get_string(g_L,"email.message",NULL);
   c_adtag        = get_string(g_L,"adtag","programming");
+  c_posthook     = get_string(g_L,"posthook",NULL);
   cf_emailupdate = get_bool  (g_L,"email.notify",true);
   
   gf_debug       = get_bool  (g_L,"debug",false);
@@ -243,12 +245,14 @@ int GlobalsInit(char const *conf)
     lua_pushinteger(g_L,i + 1);
     lua_gettable(g_L,-2);
     
-    lua_getfield(g_L,-1,"template");
-    lua_getfield(g_L,-2,"reverse");
-    lua_getfield(g_L,-3,"fullurl");
-    lua_getfield(g_L,-4,"output");
-    lua_getfield(g_L,-5,"items");
+    lua_getfield(g_L,-1,"posthook");
+    lua_getfield(g_L,-2,"template");
+    lua_getfield(g_L,-3,"reverse");
+    lua_getfield(g_L,-4,"fullurl");
+    lua_getfield(g_L,-5,"output");
+    lua_getfield(g_L,-6,"items");
     
+    c_templates[i].posthook = lua_tostring(g_L,-6);
     c_templates[i].template = lua_tostring(g_L,-5);
     c_templates[i].reverse  = lua_toboolean(g_L,-4);
     c_templates[i].fullurl  = lua_toboolean(g_L,-3);
@@ -286,7 +290,7 @@ int GlobalsInit(char const *conf)
       return EINVAL;
     }
     
-    lua_pop(g_L,6);
+    lua_pop(g_L,7);
   }
   lua_pop(g_L,1);
   

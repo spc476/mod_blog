@@ -102,8 +102,19 @@ int generate_pages(void)
     
     (*c_templates[i].pagegen)(&c_templates[i],out,g_blog);
     fclose(out);
+    
+    if (c_templates[i].posthook)
+    {
+      char const *argv[3];
+      
+      argv[0] = c_templates[i].posthook;
+      argv[1] = c_templates[i].file;
+      argv[2] = NULL;
+      
+      return run_hook(argv[0],argv);
+    }
   }
-  
+
   return 0;
 }
 

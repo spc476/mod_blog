@@ -61,6 +61,7 @@ extern char        const  *const c_emailsubject;
 extern char        const  *const c_emailmsg;
 extern char        const  *const c_overview;
 extern char        const  *const c_adtag;
+extern char        const  *const c_posthook;
 extern char        const  *const c_baseurl;
 extern char        const  *const c_fullbaseurl;
 extern char        const  *const c_htmltemplates;
