@@ -81,7 +81,7 @@ int run_hook(char const *script,char const **argv)
         syslog(LOG_ERR,"posthook='%s' rc=%d",script,rc);
     }
     else
-      syslog(LOG_ERR,"posthook='%s' terminated='%s'",script,strsignal(rc));
+      syslog(LOG_ERR,"posthook='%s' terminated='%s'",script,strsignal(WTERMSIG(rc)));
   }
   
   return 0;
