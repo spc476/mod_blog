@@ -67,18 +67,17 @@ int run_hook(char const *script,char const **argv)
   else
   {
     int status;
-    int rc;
     
     if (waitpid(child,&status,0) != child)
       return errno;
     if (WIFEXITED(status))
     {
-      rc = WEXITSTATUS(status);
+      int rc = WEXITSTATUS(status);
       if (rc != 0)
         syslog(LOG_ERR,"posthook='%s' rc=%d",script,rc);
     }
     else
-      syslog(LOG_ERR,"posthook='%s' terminated='%s'",script,strsignal(WTERMSIG(rc)));
+      syslog(LOG_ERR,"posthook='%s' terminated='%s'",script,strsignal(WTERMSIG(status)));
   }
   
   return 0;
