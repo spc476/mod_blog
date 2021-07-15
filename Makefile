@@ -89,7 +89,6 @@ src/conversion.o: src/conversion.h src/frontend.h src/wbtum.h src/timeutil.h
 src/conversion.o: src/blog.h src/blogutil.h
 src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
 src/globals.o: src/timeutil.h src/blog.h src/backend.h
-src/hooks.o: src/blog.h src/timeutil.h src/wbtum.h src/backend.h
 src/main.o: src/globals.h src/frontend.h src/wbtum.h src/timeutil.h
 src/main.o: src/blog.h src/backend.h
 src/main_cgi.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
