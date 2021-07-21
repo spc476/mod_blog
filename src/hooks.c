@@ -38,18 +38,16 @@
 
 int run_hook(char const *script,char const **argv)
 {
-  extern char **environ;
-  pid_t         child;
-  
   assert(script != NULL);
   assert(argv   != NULL);
   
-  child = fork();
+  pid_t child = fork();
   
   if (child == -1)
     return errno;
   else if (child == 0)
   {
+    extern char **environ;
     int devnull = open("/dev/null",O_RDWR);
     if (devnull == -1)
       _Exit(EX_UNAVAILABLE);
@@ -73,9 +71,8 @@ int run_hook(char const *script,char const **argv)
       return errno;
     if (WIFEXITED(status))
     {
-      int rc = WEXITSTATUS(status);
-      if (rc != 0)
-        syslog(LOG_ERR,"posthook='%s' rc=%d",script,rc);
+      if (WEXITSTATUS(status) != 0)
+        syslog(LOG_ERR,"posthook='%s' rc=%d",script,WEXITSTATUS(status));
     }
     else
       syslog(LOG_ERR,"posthook='%s' terminated='%s'",script,strsignal(WTERMSIG(status)));
