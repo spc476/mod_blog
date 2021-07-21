@@ -59,8 +59,9 @@ int run_hook(char const *script,char const **argv)
       _Exit(EX_OSERR);
     if (dup2(devnull,STDERR_FILENO) == -1)
       _Exit(EX_OSERR);
-    if (close(devnull) == -1)
-      _Exit(EX_OSERR);
+    for (int fh = STDERR_FILENO + 1 ; fh <= devnull ; fh++)
+      if (close(fh) == -1)
+        _Exit(EX_OSERR);
     if (execve(script,(char **)argv,environ) == -1)
       _Exit(EX_UNAVAILABLE);
   }
