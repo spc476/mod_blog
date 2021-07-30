@@ -797,6 +797,13 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
     char        buffer[BUFSIZ];
     char const *baseurl;
     
+    /*---------------------------------------------------------------
+    ; If pointing to an anchor point, no further processing required
+    ;----------------------------------------------------------------*/
+    
+    if (src->value[0] == '#')
+      return;
+    
     /*-----------------------------------------------------
     ; Which URL to use?  Full or partial?
     ;-----------------------------------------------------*/
