@@ -198,9 +198,11 @@ static int cmd_cgi_get_show(Request *req)
     }
     else
     {
+      char  filename[FILENAME_MAX];
       FILE *in;
       
-      in   = fopen(getenv("PATH_TRANSLATED"),"r");
+      snprintf(filename,sizeof(filename),"%s%s",getenv("DOCUMENT_ROOT"),getenv("PATH_INFO"));
+      in = fopen(filename,"r");
       if (in == NULL)
         rc = (*req->error)(req,HTTP_BADREQ,"bad request");
       else
