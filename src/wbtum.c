@@ -262,7 +262,12 @@ bool tumbler_new(
     goto tumbler_new_range;
     
   if (*text == '/')
-    goto tumbler_new_file;
+  {
+    if (text[1] == '\0')
+      return tum->redirect |= true;
+    else
+      goto tumbler_new_file;
+  }
     
   if (*text != '.')
     return false;
