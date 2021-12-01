@@ -188,6 +188,7 @@ local abbrex = C("IPv4")
              + C("D&amp;D")
              + C("NaNoWriMo")
              + C("NaNoGenMo")
+             + P"D&D5" / "D&amp;D5"
              + P"D&D" / "D&amp;D"
              + C(R"AZ" * ((R"ax" * #R"AZ") + R"AZ")^1)
 local abbr   = Cmt(
