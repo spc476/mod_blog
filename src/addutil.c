@@ -106,7 +106,7 @@ int entry_add(Request *req)
     argv[0] = c_posthook;
     argv[1] = url;
     argv[2] = NULL;
-    rc      = run_hook(argv);
+    rc      = run_hook("entry-post-hook",argv);
   }
   
   free(entry);

@@ -111,7 +111,7 @@ int generate_pages(void)
       argv[1] = c_templates[i].file;
       argv[2] = NULL;
       
-      run_hook(argv);
+      run_hook("template-post-hook",argv);
     }
   }
 
