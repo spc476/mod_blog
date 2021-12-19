@@ -81,6 +81,7 @@ char const   *c_emailsubject;            /* no free */
 char const   *c_emailmsg;                /* no free */
 char const   *c_overview;                /* no free */
 char const   *c_adtag;                   /* no free */
+char const   *c_prehook;                 /* no free */
 char const   *c_posthook;                /* no free */
 char         *c_baseurl;
 char         *c_fullbaseurl;
@@ -194,6 +195,7 @@ int GlobalsInit(char const *conf)
   c_emailsubject = get_string(g_L,"email.subject",NULL);
   c_emailmsg     = get_string(g_L,"email.message",NULL);
   c_adtag        = get_string(g_L,"adtag","programming");
+  c_prehook      = get_string(g_L,"prehook",NULL);
   c_posthook     = get_string(g_L,"posthook",NULL);
   cf_emailupdate = get_bool  (g_L,"email.notify",true);
   

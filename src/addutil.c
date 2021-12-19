@@ -23,6 +23,9 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
+
+#include <syslog.h>
 
 #include <cgilib6/mail.h>
 #include <cgilib6/util.h>
@@ -50,6 +53,34 @@ bool entry_add(Request *req)
   assert(req != NULL);
   
   fix_entry(req);
+  
+  if (c_prehook != NULL)
+  {
+    FILE *fp;
+    char  filename[L_tmpnam];
+    
+    tmpnam(filename);
+    fp = fopen(filename,"w");
+    if (fp != NULL)
+    {
+      char const *argv[3];
+      
+      fprintf(fp,req->body);
+      fclose(fp);
+      argv[0] = c_prehook;
+      argv[1] = filename;
+      argv[2] = NULL;
+      rc      = run_hook("entry-pre-hook",argv);
+      remove(filename);
+      if (!rc)
+        return rc;
+    }
+    else
+    {
+      syslog(LOG_ERR,"entry_add: %s: %s",filename,strerror(errno));
+      return false;
+    }
+  }
   
   entry = BlogEntryNew(g_blog);
   
