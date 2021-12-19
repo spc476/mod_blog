@@ -77,6 +77,7 @@ bool run_hook(char const *tag,char const **argv)
       syslog(LOG_ERR,"%s='%s' waitpid()='%s'",tag,argv[0],strerror(errno));
       return false;
     }
+    
     if (WIFEXITED(status))
     {
       if (WEXITSTATUS(status) != 0)
