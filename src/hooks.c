@@ -73,10 +73,16 @@ int run_hook(char const *tag,char const **argv)
     if (WIFEXITED(status))
     {
       if (WEXITSTATUS(status) != 0)
+      {
         syslog(LOG_ERR,"%s='%s' rc=%d",tag,argv[0],WEXITSTATUS(status));
+        return -1;
+      }
     }
     else
+    {
       syslog(LOG_ERR,"%s='%s' terminated='%s'",tag,argv[0],strsignal(WTERMSIG(status)));
+      return -1;
+    }
   }
   
   return 0;
