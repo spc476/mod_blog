@@ -45,7 +45,10 @@ int run_hook(char const *tag,char const **argv)
   pid_t child = fork();
   
   if (child == -1)
+  {
+    syslog(LOG_ERR,"%s='%s' fork()='%s'",tag,argv[0],strerror(errno));
     return errno;
+  }
   else if (child == 0)
   {
     extern char **environ;
@@ -69,7 +72,10 @@ int run_hook(char const *tag,char const **argv)
     int status;
     
     if (waitpid(child,&status,0) != child)
+    {
+      syslog(LOG_ERR,"%s='%s' waitpid()='%s'",tag,argv[0],strerror(errno));
       return errno;
+    }
     if (WIFEXITED(status))
     {
       if (WEXITSTATUS(status) != 0)
