@@ -20,6 +20,7 @@
 *
 ************************************************/
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -36,7 +37,7 @@
 
 /************************************************************************/
 
-int run_hook(char const *tag,char const **argv)
+bool run_hook(char const *tag,char const **argv)
 {
   assert(tag     != NULL);
   assert(argv    != NULL);
@@ -47,7 +48,7 @@ int run_hook(char const *tag,char const **argv)
   if (child == -1)
   {
     syslog(LOG_ERR,"%s='%s' fork()='%s'",tag,argv[0],strerror(errno));
-    return errno;
+    return false;
   }
   else if (child == 0)
   {
@@ -74,24 +75,24 @@ int run_hook(char const *tag,char const **argv)
     if (waitpid(child,&status,0) != child)
     {
       syslog(LOG_ERR,"%s='%s' waitpid()='%s'",tag,argv[0],strerror(errno));
-      return errno;
+      return false;
     }
     if (WIFEXITED(status))
     {
       if (WEXITSTATUS(status) != 0)
       {
         syslog(LOG_ERR,"%s='%s' rc=%d",tag,argv[0],WEXITSTATUS(status));
-        return -1;
+        return false;
       }
     }
     else
     {
       syslog(LOG_ERR,"%s='%s' terminated='%s'",tag,argv[0],strsignal(WTERMSIG(status)));
-      return -1;
+      return false;
     }
   }
   
-  return 0;
+  return true;
 }
 
 /************************************************************************/

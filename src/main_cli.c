@@ -227,15 +227,15 @@ static int cmd_cli_new(Request *req)
     
   if (rc != 0)
     return EXIT_FAILURE;
-    
-  rc = entry_add(req);
-  if (rc == 0)
+  
+  if (entry_add(req))
   {
     if (cf_emailupdate) notify_emaillist(req);
     generate_pages();
+    return 0;
   }
-  
-  return rc;
+  else
+    return EXIT_FAILURE;
 }
 
 /****************************************************************************/

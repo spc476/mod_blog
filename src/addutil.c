@@ -41,11 +41,11 @@
 
 /*********************************************************************/
 
-int entry_add(Request *req)
+bool entry_add(Request *req)
 {
   BlogEntry *entry;
   char      *p;
-  int       rc = 0;
+  bool       rc = true;
   
   assert(req != NULL);
   

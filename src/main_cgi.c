@@ -392,12 +392,9 @@ static void set_m_author(char *value,Request *req)
 
 static int cmd_cgi_post_new(Request *req)
 {
-  int rc;
-  
   assert(req != NULL);
   
-  rc = entry_add(req);
-  if (rc == 0)
+  if (entry_add(req))
   {
     if (cf_emailupdate) notify_emaillist(req);
     generate_pages();
@@ -416,11 +413,10 @@ static int cmd_cgi_post_new(Request *req)
         c_fullbaseurl
         
     );
+    return 0;
   }
   else
-    rc = (*req->error)(req,HTTP_ISERVERERR,"couldn't add entry");
-    
-  return rc;
+    return (*req->error)(req,HTTP_ISERVERERR,"couldn't add entry");
 }
 
 /***********************************************************************/
