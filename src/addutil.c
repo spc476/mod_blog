@@ -65,7 +65,7 @@ bool entry_add(Request *req)
     {
       char const *argv[3];
       
-      fprintf(fp,req->body);
+      fputs(req->body,fp);
       fclose(fp);
       argv[0] = c_prehook;
       argv[1] = filename;
