@@ -78,6 +78,13 @@ bool entry_add(Request *req)
     fp = fopen(fnmeta,"w");
     if (fp != NULL)
     {
+      char ts[12];
+      
+      if (req->date == NULL)
+        snprintf(ts,sizeof(ts),"%04d/%02d/%02d",g_blog->now.year,g_blog->now.month,g_blog->now.day);
+      else
+        snprintf(ts,sizeof(ts),"%s",req->date);
+        
       fprintf(
         fp,
         "Author: %s\n"
@@ -91,7 +98,7 @@ bool entry_add(Request *req)
         req->title,
         req->class,
         req->status,
-        req->date,
+        ts,
         req->adtag
       );
       fclose(fp);
