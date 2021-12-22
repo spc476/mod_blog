@@ -57,29 +57,59 @@ bool entry_add(Request *req)
   if (c_prehook != NULL)
   {
     FILE *fp;
-    char  filename[L_tmpnam];
+    char  fnbody[L_tmpnam];
+    char  fnmeta[L_tmpnam];
     
-    tmpnam(filename);
-    fp = fopen(filename,"w");
+    tmpnam(fnbody);
+    tmpnam(fnmeta);
+    
+    fp = fopen(fnbody,"w");
     if (fp != NULL)
     {
-      char const *argv[3];
-      
       fputs(req->body,fp);
       fclose(fp);
-      argv[0] = c_prehook;
-      argv[1] = filename;
-      argv[2] = NULL;
-      rc      = run_hook("entry-pre-hook",argv);
-      remove(filename);
-      if (!rc)
-        return rc;
     }
     else
     {
-      syslog(LOG_ERR,"entry_add: %s: %s",filename,strerror(errno));
+      syslog(LOG_ERR,"entry_add: tmp-body: %s",strerror(errno));
       return false;
     }
+    
+    fp = fopen(fnmeta,"w");
+    if (fp != NULL)
+    {
+      fprintf(
+        fp,
+        "Author: %s\n"
+        "Title: %s\n"
+        "Class: %s\n"
+        "Status: %s\n"
+        "Date: %s\n"
+        "Adtag: %s\n"
+        "\n",
+        req->author,
+        req->title,
+        req->class,
+        req->status,
+        req->date,
+        req->adtag
+      );
+      fclose(fp);
+    }
+    else
+    {
+      remove(fnbody);
+      syslog(LOG_ERR,"entry_add: tmp-meta: %s",strerror(errno));
+      return false;
+    }
+    
+    rc = run_hook("entry-pre-hook",(char const *[]){ c_prehook , fnbody , fnmeta , NULL });
+    
+    remove(fnmeta);
+    remove(fnbody);
+    
+    if (!rc)
+      return rc;
   }
   
   entry = BlogEntryNew(g_blog);
@@ -120,8 +150,7 @@ bool entry_add(Request *req)
   
   if (c_posthook != NULL)
   {
-    char const *argv[3];
-    char        url[1024];
+    char url[1024];
     
     snprintf(
       url,
@@ -134,10 +163,7 @@ bool entry_add(Request *req)
       entry->when.part
     );
     
-    argv[0] = c_posthook;
-    argv[1] = url;
-    argv[2] = NULL;
-    rc      = run_hook("entry-post-hook",argv);
+    rc = run_hook("entry-post-hook",(char const *[]){ c_posthook , url , NULL });
   }
   
   free(entry);
