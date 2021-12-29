@@ -206,7 +206,10 @@ int main_cli(int argc,char *argv[])
       return EXIT_SUCCESS;
     }
     else
+    {
+      fprintf(stderr,"Cannot force notify\n");
       return EXIT_FAILURE;
+    }
   }
   
   return (*gd.req.command)(&gd.req);
@@ -226,7 +229,10 @@ static int cmd_cli_new(Request *req)
     rc = mailfile_readdata(req);
     
   if (rc != 0)
+  {
+    fprintf(stderr,"Cannot process new entry\n");
     return EXIT_FAILURE;
+  }
   
   if (entry_add(req))
   {
@@ -235,7 +241,10 @@ static int cmd_cli_new(Request *req)
     return 0;
   }
   else
+  {
+    fprintf(stderr,"Failed to create new entry\n");
     return EXIT_FAILURE;
+  }
 }
 
 /****************************************************************************/
