@@ -117,16 +117,8 @@ struct display  gd =
 
 /****************************************************/
 
-#if LUA_VERSION_NUM > 501
-static size_t lua_objlen(lua_State *L,int index)
-{
-  size_t len;
-  
-  lua_len(L,index);
-  len = lua_tointeger(L,-1);
-  lua_pop(L,1);
-  return len;
-}
+#if LUA_VERSION_NUM == 501
+#  define lua_rawlen(L,idx)	lua_objlen((L),(idx))
 #endif
 
 /****************************************************/
@@ -219,7 +211,7 @@ int GlobalsInit(char const *conf)
     return ENOENT;
   }
   
-  c_numtemplates = lua_objlen(g_L,-1);
+  c_numtemplates = lua_rawlen(g_L,-1);
   
   if (c_numtemplates == 0)
   {
@@ -307,7 +299,7 @@ int GlobalsInit(char const *conf)
   lua_getglobal(g_L,"affiliate");
   if (!lua_isnil(g_L,-1))
   {
-    c_numaflinks = lua_objlen(g_L,-1);
+    c_numaflinks = lua_rawlen(g_L,-1);
     
     if (c_numaflinks > 0)
     {
