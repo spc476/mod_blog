@@ -580,9 +580,8 @@ static void globals_free(void)
     gd.cgi = NULL;
   }
   
-  if (gd.req.in  != stdin)  fclose(gd.req.in);
-  if (gd.req.out != stdout) fclose(gd.req.out);
-  
+  fclose(gd.req.in);
+  fclose(gd.req.out);
   free(gd.req.update);
   free(gd.req.origauthor);
   free(gd.req.author);
