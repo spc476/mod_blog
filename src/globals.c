@@ -352,26 +352,26 @@ int GlobalsInit(char const *conf)
 
 void set_c_updatetype(char const *value)
 {
-  if (value == NULL) return;
-  if (empty_string(value)) return;
-  
-  if (strcmp(value,"new") == 0)
-    c_updatetype = "NewEntry";
-  else if (strcmp(value,"modify") == 0)
-    c_updatetype = "ModifiedEntry";
-  else if (strcmp(value,"edit") == 0)
-    c_updatetype = "ModifiedEntry";
-  else if (strcmp(value,"template") == 0)
-    c_updatetype = "TemplateChange";
-  else
-    c_updatetype = "Other";
+  if (!emptynull_string(value))
+  {
+    if (strcmp(value,"new") == 0)
+      c_updatetype = "NewEntry";
+    else if (strcmp(value,"modify") == 0)
+      c_updatetype = "ModifiedEntry";
+    else if (strcmp(value,"edit") == 0)
+      c_updatetype = "ModifiedEntry";
+    else if (strcmp(value,"template") == 0)
+      c_updatetype = "TemplateChange";
+    else
+      c_updatetype = "Other";
+  }
 }
 
 /************************************************************************/
 
 void set_cf_emailupdate(char const *value)
 {
-  if (value && !empty_string(value))
+  if (!emptynull_string(value))
   {
     if (strcmp(value,"no") == 0)
       cf_emailupdate = false;
@@ -384,17 +384,17 @@ void set_cf_emailupdate(char const *value)
 
 void set_c_conversion(char const *value)
 {
-  if (value == NULL) return;
-  if (empty_string(value)) return;
-  
-  if (strcmp(value,"text") == 0)
-    c_conversion = text_conversion;
-  else if (strcmp(value,"mixed") == 0)
-    c_conversion = mixed_conversion;
-  else if (strcmp(value,"html") == 0)
-    c_conversion = html_conversion;
-  else if (strcmp(value,"none") == 0)
-    c_conversion = no_conversion;
+  if (!emptynull_string(value))
+  {
+    if (strcmp(value,"text") == 0)
+      c_conversion = text_conversion;
+    else if (strcmp(value,"mixed") == 0)
+      c_conversion = mixed_conversion;
+    else if (strcmp(value,"html") == 0)
+      c_conversion = html_conversion;
+    else if (strcmp(value,"none") == 0)
+      c_conversion = no_conversion;
+  }
 }
 
 /**************************************************************************/
