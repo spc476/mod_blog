@@ -574,11 +574,9 @@ static void seed_rng(void)
 
 static void globals_free(void)
 {
-  if (gd.cgi != NULL)
-  {
-    CgiFree(gd.cgi);
-    gd.cgi = NULL;
-  }
+  if (gd.cgi != NULL) CgiFree(gd.cgi);
+  if (g_blog != NULL) BlogFree(g_blog);
+  if (g_L    != NULL) lua_close(g_L);
   
   fclose(gd.req.in);
   fclose(gd.req.out);
@@ -592,10 +590,6 @@ static void globals_free(void)
   free(gd.req.adtag);
   free(gd.req.origbody);
   free(gd.req.body);
-  
-  if (g_blog != NULL) BlogFree(g_blog);
-  if (g_L    != NULL) lua_close(g_L);
-  
   free(c_aflinks);
   free(c_templates);
   free(c_baseurl);
