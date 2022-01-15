@@ -226,10 +226,10 @@ local tex = P"``"    / ENTITY.ldquo
           + P".."    / "\226\128\165"
           + P"<-"    / "\226\134\144"
           + P"->"    / "\226\134\146"
-          + P"^st"   / "<sup>ST</sup>"
-          + P"^nd"   / "<sup>ND</sup>"
-          + P"^rd"   / "<sup>RD</sup>"
-          + P"^th"   / "<sup>TH</sup>"
+          + P"^st"   / "<sup>st</sup>"
+          + P"^nd"   / "<sup>nd</sup>"
+          + P"^rd"   / "<sup>rd</sup>"
+          + P"^th"   / "<sup>th</sup>"
           + P"\\-"   / ENTITY.shy
           + P"\\_"   / ENTITY.nbsp
           + P"\\ "   / ""
