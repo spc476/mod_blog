@@ -370,34 +370,34 @@ local header = C"\n***** " * Cs(hchar^1) * #P"\n" / "\n<h5>%2</h5>"
              + C"\n* "     * Cs(hchar^1) * #P"\n" / "\n<h1>%2</h1>"
              
 -- ********************************************************************
--- #+BEGIN blocks.  We start with #+BEGIN_SRC
+-- #+BEGIN blocks.  We start with #+source
 --
 --      <sol> = start-of-line
 --      <eol> = end-of-line
 --      <sp>  = whitespace
 --
---      <sol> '#+BEGIN_SRC' <space> <language> <eol>
+--      <sol> '#+source' <space> <language> <eol>
 --      <raw text>
---      <sol> '#+END_SRC' <eol>
+--      <sol> '#-source' <eol>
 --
 -- ********************************************************************
 
 local src_char  = P"<" / "&lt;"
                 + P"&" / "&amp;"
-                + allchar - P"\n#+END_SRC\n"
+                + allchar - P"\n#-source\n"
 local begin_src = C(S" \t"^0) * C(R("AZ","az")^1) * C(P"\n")
                 / '\n<pre class="language-%2" title="%2">\n'
                 * Cs(src_char^0)
-                * (P"\n#+END_SRC" * #P"\n" / "\n</pre>\n")
+                * (P"\n#-source" * #P"\n" / "\n</pre>\n")
                 
 -- ********************************************************************
--- #+BEGIN_TABLE
+-- #+table
 --
---      <sol> '#+BEGIN_TABLE' <eol>
+--      <sol> '#+table' <eol>
 --      [ <sol> '*'  <text> 0(<ht> <text>) <eol> ] -- header row
 --      [ <sol> '**' <text> 0(<ht> <text>) <eol> ] -- footer row
 --      1(<sol> <text>      0(<ht> <text>) <eol> ) -- data row
---      <sol> '#+END_TABLE' <eol>
+--      <sol> '#-table' <eol>
 --
 -- ********************************************************************
 
@@ -421,7 +421,7 @@ local table_footer  = P"**" / ""
                     * P'\n'
 local td            = Cc'<td class="num">' * number      * Cc'</td>' * (P"\t" / " ")^-1
                     + Cc'<td>'             * Cs(hchar^1) * Cc'</td>' * (P"\t" / " ")^-1
-local tr            = -P"#+END_TABLE" * Cc'    <tr>' * td^1 * Cc'</tr>' * P"\n"
+local tr            = -P"#-table" * Cc'    <tr>' * td^1 * Cc'</tr>' * P"\n"
 local table_body    = Cc'  <tbody>\n'
                     * tr^1
                     * Cc'  </tbody>\n'
@@ -429,16 +429,16 @@ local begin_table   = Cc"\n<table>\n" * table_caption
                     * table_header^-1
                     * table_footer^-1
                     * table_body
-                    * (P"#+END_TABLE" * #P"\n" / "</table>\n")
+                    * (P"#-table" * #P"\n" / "</table>\n")
                     
 -- ********************************************************************
--- #+BEGIN_EMAIL
+-- #+email
 --
---      <sol> '#+BEGIN_EMAIL' [ <sp> 'all' <sp>0 ] <eol>
+--      <sol> '#+email' [ <sp> 'all' <sp>0 ] <eol>
 --      <email headers>
 --      <eol>
 --      <email body>
---      <sol> '#+END_EMAIL' <eol>
+--      <sol> '#-email' <eol>
 --
 -- ********************************************************************
 
@@ -464,7 +464,7 @@ local hdr_generic = Cmt(
 local email_text  = header + htmltag + abbr + tex + entity + link
                   + cut + style
                   + para
-                  + (allchar - P"#+END_EMAIL")
+                  + (allchar - P"#-email")
 local email_hdrs  = (P"From:"    / "    <dt>From</dt>")    * hdr_value * abnf.CRLF
                   + (P"To:"      / "    <dt>To</dt>")      * hdr_value * abnf.CRLF
                   + (P"Subject:" / "    <dt>Subject</dt>") * hdr_value * abnf.CRLF
@@ -475,14 +475,14 @@ local begin_email = Cc'\n<blockquote>\n  <dl class="header">' * email_opt^-1 * P
                   * Cc'  </dl>\n'
                   * abnf.CRLF * Cc'<p>'
                   * email_text^0
-                  * (P"#+END_EMAIL" * #P"\n" / "\n</blockquote>")
+                  * (P"#-email" * #P"\n" / "\n</blockquote>")
                   
 -- ********************************************************************
--- #+BEGIN_QUOTE
+-- #+quote
 --
---      <sol> #+BEGIN_QUOTE
+--      <sol> #+quote
 --      <text>
---      <sol> #+END_QUOTE
+--      <sol> #-quote
 --
 -- ********************************************************************
 
@@ -495,7 +495,7 @@ local title_text  = Cs(title_char^1)
 local quote_text  = header + htmltag + abbr + tex + entity + link
                   + cut + style
                   + para
-                  + (allchar - P"#+END_QUOTE")
+                  + (allchar - P"#-quote")
 local begin_quote = Cmt(
                       Carg(1),
                       function(_,pos,state)
@@ -512,7 +512,7 @@ local begin_quote = Cmt(
                     )
                   * quote_text^0
                   * Cmt(
-                      P"#+END_QUOTE" * #P"\n" * Carg(1),
+                      P"#-quote" * #P"\n" * Carg(1),
                       function(_,pos,state)
                         local via
                         local cite
@@ -572,24 +572,25 @@ local begin_quote = Cmt(
                     )
                     
 -- ********************************************************************
--- #+BEGIN_COMMENT
+-- #+comment
 --
---      <sol> #+BEGIN_COMMENT <eol>
+--      <sol> #-comment <eol>
 --      text
---      <sol> #+END_COMMENT <eol>
+--      <sol> #-comment <eol>
 --
 -- NOTE:        These blocks cannot nest.  Bad things will happen.
+-- XXX:		does not display for some reason
 -- ********************************************************************
 
-local begin_comment = (P(1) - P"\n#+END_COMMENT")^0 / "<!-- comment -->"
-                    * (P"\n#+END_COMMENT" * #P"\n") / ""
+local begin_comment = (P(1) - P"\n#-comment")^0 / "<!-- comment -->"
+                    * (P"\n#-comment" * #P"\n") / ""
                     
 -- ********************************************************************
--- #+BEGIN_PF
+-- #+photo
 --
---      <sol> #+BEGIN_PF <eol>
+--      <sol> #+photo <eol>
 --      <sol> displayfile <sp> linkfile <sp> <text>
---      <sol> #+END_PF
+--      <sol> #-photo
 --
 -- NOTE:        If linkfile is "-" then no link is generated.
 -- ********************************************************************
@@ -600,7 +601,7 @@ local pf_char  = tex
                + P"&" / '&amp;'
                + uchar
                
-local pf_image = (P"\n" - P"#+END_PF") / ""
+local pf_image = (P"\n" - P"#-photo") / ""
                  * C(uchar^1) * (S" \t"^1 / "")
                  * C(uchar^1) * (S" \t"^1 / "")
                  * Cs(pf_char^1)
@@ -632,7 +633,7 @@ local pf_image = (P"\n" - P"#+END_PF") / ""
                    
 local begin_pf = #P"\n" * Cc'\n<div class="pf">\n'
                * pf_image^1
-               * (P"\n#+END_PF" * #P"\n" / "</div>")
+               * (P"\n#-photo" * #P"\n" / "</div>")
                
 -- ********************************************************************
 -- #+ATTR_QUOTE
@@ -663,16 +664,16 @@ local attr_quote  = S" \t"^1 / ""
 -- Top level #+BEGIN blocks definition
 -- ********************************************************************
 
-local begin  = P"_SRC"      / "" * begin_src
-             + P"_TABLE"    / "" * begin_table
-             + P"_EMAIL"    / "" * begin_email
-             + P"_QUOTE"    / "" * begin_quote
-             + P"_PF"       / "" * begin_pf
-             + P"_COMMENT"  / "" * begin_comment
+local begin  = P"source"  / "" * begin_src
+             + P"table"   / "" * begin_table
+             + P"email"   / "" * begin_email
+             + P"quote"   / "" * begin_quote
+             + P"photo"   / "" * begin_pf
+             + P"comment" / "" * begin_comment
              
 local battr  = P"_QUOTE:"   / "" * attr_quote
 
-local blocks = P"\n#+BEGIN" / "" * begin
+local blocks = P"\n#+"      / "" * begin
              + P"\n#+ATTR"  / "" * battr
              
 -- ********************************************************************

@@ -29,7 +29,7 @@ quis consectetur egestas.  Suspendisse potenti.  Vestibulum quis tincidunt
 orci, fermentum interdum erat.  Duis posuere lectus felis, a pretium urna
 vestibulum vitae.
 
-#+BEGIN_SRC C
+#+source C
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,7 +39,7 @@ int main(void)
   puts("Hello, world!");
   return EXIT_SUCCESS;
 }
-#+END_SRC
+#-source
 
 -----
 
@@ -47,28 +47,28 @@ int main(void)
 
 Praesent fermentum vitae metus et iaculis.
 
-#+BEGIN_TABLE Some data goes here
+#+table Some data goes here
 *foo	bar	baz
 **foo	bar	baz
 3	14	15
 92	62	82
 8	-1	4
-#+END_TABLE
+#-table
 
 Vestibulum sit amet -> porttitor <- nunc.  Curabitur at lectus purus.  Duis
 congue tempus neque ultrices interdum.  Praesent fermentum vitae metus et
 iaculis.  Aliquam a tincidunt ante.  Cras ullamcorper AT\&T sit amet metus
 sagittis venenatis.  Praesent rutrum egestas dictum.
 
-#+BEGIN_TABLE
+#+table
 1	2	3	4	bing
 5	6	7	8	bang
 9	10	11	12	bongo
-#+END_TABLE
+#-table
 
 Lorem ipsum dolor sit amet.
 
-#+BEGIN_EMAIL all
+#+email all
 From: John Doe <{{johndoe@example.net}}>
 To: sean@conman.org
 Subject: Re: Morbi in lorem ut lectus accumsan
@@ -86,7 +86,7 @@ nec augue lacinia, vel ultricies tellus bibendum.  Proin mattis nisl massa,
 vel commodo augue porta a.  Vivamus fringilla, arcu et placerat vulputate,
 nulla sem viverra arcu, et egestas lacus elit non lectus.
 
-#+END_EMAIL
+#-email
 
 Vestibulum sit amet porttitor nunc.  Curabitur at lectus purus.  Duis congue
 tempus neque ultrices interdum.  Praesent fermentum vitae metus et iaculis.
@@ -97,7 +97,7 @@ sagittis venenatis.  Praesent rutrum egestas dictum.
 #+ATTR_QUOTE: :title Why the web went bad
 #+ATTR_QUOTE: :via-url http://www.example.net/links-today/2018/04/12
 #+ATTR_QUOTE: :via-title Link's O' the Day
-#+BEGIN_QUOTE
+#+quote
 
 In my opinion, the point where HTTP and HTML “went off the rails” into the
 current trainwreck of the modern web happened when browsers gained the
@@ -114,7 +114,7 @@ zombie corpse is following the command of
 of [[https://en.wikipedia.org/wiki/Java_(software_platform)#History][Java in
 early 1996]].  Javascript was Netscape's reaction to Java.
 
-#+END_QUOTE
+#-quote
 
 Maecenas mollis [[http://www.example.net/]] venenatis
 [[http://www.example.org/][]] odio id vulputate.  Nunc malesuada odio vitae
@@ -141,10 +141,14 @@ velit esse cillum dolore eu fugiat nulla pariatur.  Excepteur sint occaecat
 cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
 est laborum.
 
-#+BEGIN_PF
+#+photo
 test.jpg	-	This is a test [] of the ``image'' stuff
 test.png	test.gif	This is yet another &rarr; test of the stuff
-#+END_PF
+#-photo
+
+#+comment
+This is a comment.  This is only a comment.
+#-comment
 
 Sean Conner /
 122 Main St. /
