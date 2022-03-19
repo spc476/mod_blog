@@ -81,9 +81,9 @@ static bool parse_num(
 /************************************************************************/
 
 static bool check_dates(
-        tumbler__s       *tum,
-        struct btm const *first,
-        struct btm const *last
+        tumbler__s const *tum,
+        struct btm const *restrict first,
+        struct btm const *restrict last
 )
 {
   bool start_okay = false;
@@ -145,8 +145,8 @@ static bool check_dates(
 bool tumbler_new(
         tumbler__s       *tum,
         char const       *text,
-        struct btm const *first,
-        struct btm const *last
+        struct btm const *restrict first,
+        struct btm const *restrict last
 )
 {
   /*----------------------------------------------------------------------

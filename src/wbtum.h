@@ -55,7 +55,7 @@ typedef struct tumbler__s
 
 /***********************************************************************/
 
-extern bool  tumbler_new       (tumbler__s *,char const *,struct btm const *,struct btm const *);
+extern bool  tumbler_new       (tumbler__s *,char const *,struct btm const *restrict ,struct btm const *restrict);
 extern char *tumbler_canonical (tumbler__s const *);
 extern bool  thisday_new       (tumbler__s *,char const *);
 
