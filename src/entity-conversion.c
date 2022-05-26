@@ -2199,7 +2199,6 @@ static ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
   size_t      s      = 0;
   char const *replace;
   size_t      repsize;
-  int         c;
   
   assert(buffer != NULL);
   
@@ -2208,7 +2207,7 @@ static ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
     
   while(bytes)
   {
-    c = fgetc(realin);
+    int c = fgetc(realin);
     if (c == EOF) return s;
     
     if (char_entity(&replace,&repsize,c))

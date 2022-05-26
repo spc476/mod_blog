@@ -774,9 +774,7 @@ static char *blog_meta_entry(char const *name,struct btm const *date)
   FILE         *fp;
   char         *text;
   size_t        size;
-  ssize_t       bytes;
   unsigned int  num;
-  char         *nl;
   
   assert(name != NULL);
   assert(date != NULL);
@@ -788,7 +786,7 @@ static char *blog_meta_entry(char const *name,struct btm const *date)
   
   while(!feof(fp) && (num--))
   {
-    bytes = getline(&text,&size,fp);
+    ssize_t bytes = getline(&text,&size,fp);
     if (bytes == -1)
     {
       fclose(fp);
@@ -801,7 +799,7 @@ static char *blog_meta_entry(char const *name,struct btm const *date)
   
   if (text)
   {
-    nl = strchr(text,'\n');
+    char *nl = strchr(text,'\n');
     if (nl) *nl = '\0';
   }
   else
@@ -822,7 +820,6 @@ static size_t blog_meta_read(
   size_t   i;
   size_t   size;
   FILE    *fp;
-  char    *nl;
   
   assert(plines != NULL);
   assert(name   != NULL);
@@ -845,7 +842,8 @@ static size_t blog_meta_read(
   
   for(i = 0 ; i < 100 ; i++)
   {
-    ssize_t bytes;
+    char    *nl;
+    ssize_t  bytes;
     
     lines[i] = NULL;
     size     = 0;

@@ -411,8 +411,7 @@ static void cb_blog_description(FILE *out,void *data __attribute__((unused)))
 
 static void cb_blog_adtag(FILE *out,void *data)
 {
-  struct callback_data *cbd;
-  char                 *tag;
+  char *tag;
   
   assert(out != NULL);
   
@@ -420,7 +419,7 @@ static void cb_blog_adtag(FILE *out,void *data)
     tag = UrlEncodeString(c_adtag);
   else
   {
-    cbd = data;
+    struct callback_data *cbd = data;
     tag = UrlEncodeString(cbd->adtag);
   }
   
@@ -1098,8 +1097,6 @@ static void cb_atom_categories(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   String  *cats;
-  char    *tag;
-  size_t   i;
   size_t   num;
   
   assert(out  != NULL);
@@ -1107,9 +1104,9 @@ static void cb_atom_categories(FILE *out,void *data)
   
   cats = tag_split(&num,cbd->entry->class);
   
-  for (i = 0 ; i < num ; i++)
+  for (size_t i = 0 ; i < num ; i++)
   {
-    tag = fromstring(cats[i]);
+    char *tag = fromstring(cats[i]);
     generic_cb("categories",out,tag);
     free(tag);
   }
@@ -1559,15 +1556,13 @@ static void cb_edit_adtag(FILE *out,void *data __attribute__((unused)))
 
 static void cb_edit_author(FILE *out,void *data __attribute__((unused)))
 {
-  char *name;
-  
   assert(out != NULL);
   
   if (gd.req.origauthor != NULL)
     fputs(gd.req.origauthor,out);
   else
   {
-    name = get_remote_user();
+    char *name = get_remote_user();
     fputs(name,out);
     free(name);
   }
@@ -1597,18 +1592,16 @@ static void cb_edit_status(FILE *out,void *data __attribute__ ((unused)))
 
 static void cb_edit_date(FILE *out,void *data __attribute__((unused)))
 {
-  time_t     now;
-  struct tm *ptm;
-  char       buffer[BUFSIZ];
-  
   assert(out != NULL);
   
   if (gd.req.date != NULL)
     fputs(gd.req.date,out);
   else
   {
-    now = time(NULL);
-    ptm = localtime(&now);
+    char       buffer[BUFSIZ];
+    
+    time_t     now = time(NULL);
+    struct tm *ptm = localtime(&now);
     strftime(buffer,sizeof(buffer),"%Y/%m/%d",ptm);
     fputs(buffer,out);
   }

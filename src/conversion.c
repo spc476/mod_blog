@@ -373,14 +373,13 @@ static void entify_char(char *d,size_t ds,char *s,char e,char const *entity)
 
 static void html_handle_string(struct nested_params *local)
 {
-  FILE *in;
-  char *text = HtmlParseValue(local->token);
-  
   assert(local != NULL);
+
+  char *text = HtmlParseValue(local->token);
   
   if (!local->pre)
   {
-    in = fmemopen(text,strlen(text),"r");
+    FILE *in = fmemopen(text,strlen(text),"r");
     if (in != NULL)
     {
       buff_conversion(in,local->out);
@@ -404,8 +403,6 @@ static void html_handle_comment(struct nested_params *local)
 
 void buff_conversion(FILE *restrict in,FILE *restrict out)
 {
-  int c;
-  
   /*----------------------------------------------------
   ; this is basically the macro substitution module.
   ;-----------------------------------------------------*/
@@ -424,7 +421,7 @@ void buff_conversion(FILE *restrict in,FILE *restrict out)
   
   while(!feof(in))
   {
-    c = fgetc(in);
+    int c = fgetc(in);
     switch(c)
     {
       case EOF:  break;

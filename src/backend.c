@@ -806,7 +806,6 @@ static char const *mime_type(char const *filename)
     { ".zip"            , "application/zip"                     } ,
   };
   
-  struct dstring const *v;
   char const           *ext;
   
   assert(filename != NULL);
@@ -815,7 +814,7 @@ static char const *mime_type(char const *filename)
   
   if (ext != NULL)
   {
-    v = bsearch(
+    struct dstring const *v = bsearch(
                  ext,
                  types,
                  sizeof(types)/sizeof(struct dstring),
@@ -938,7 +937,6 @@ static char *tag_pick(char const *tag)
 {
   String *pool;
   size_t  num;
-  size_t  r;
   char   *pick;
   
   assert(tag != NULL);
@@ -955,9 +953,9 @@ static char *tag_pick(char const *tag)
   
   if (num)
   {
-    r    = (((double)rand() / (double)RAND_MAX) * (double)num);
+    size_t r = (((double)rand() / (double)RAND_MAX) * (double)num);
     assert(r < num);
-    pick = fromstring(pool[r]);
+    pick     = fromstring(pool[r]);
   }
   else
     pick = strdup(c_adtag);
