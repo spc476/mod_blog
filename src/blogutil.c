@@ -46,7 +46,10 @@ String *tag_split(size_t *pnum,char const *tag)
     if (num == max)
     {
       max += 1024;
-      pool = realloc(pool,max * sizeof(String));
+      String *newpool = realloc(pool,max * sizeof(String));
+      if (newpool == NULL)
+        break;
+      pool = newpool;
     }
     
     for (p = tag ; (*p) && (*p != ',') ; p++)
