@@ -63,7 +63,7 @@ int main(int argc,char *argv[],char *envp[])
     {
       case GET:  return main_cgi_get (gd.cgi);
       case POST: return main_cgi_post(gd.cgi);
-      case HEAD: return main_cgi_head(gd.cgi);
+      case HEAD: return main_cgi_get (gd.cgi);
       default:   return EXIT_FAILURE;
     }
   }

@@ -52,21 +52,6 @@ static int  cgi_error              (Request *,int,char const *, ... );
 
 /*************************************************************************/
 
-int main_cgi_head(Cgi cgi)
-{
-  int rc;
-  
-  assert(cgi != NULL);
-  
-  rc = cgi_init(cgi,&gd.req);
-  if (rc != 0)
-    return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
-    
-  return (*gd.req.error)(&gd.req,HTTP_METHODNOTALLOWED,"HEAD method not supported");
-}
-
-/**********************************************************************/
-
 int main_cgi_get(Cgi cgi)
 {
   int rc;

@@ -88,7 +88,6 @@ extern void set_cf_emailupdate (char const *);
 extern void set_c_conversion   (char const *);
 extern void set_c_url          (char const *);
 extern void set_time           (void);
-extern int  main_cgi_head      (Cgi);
 extern int  main_cgi_get       (Cgi);
 extern int  main_cgi_post      (Cgi);
 extern int  main_cli           (int,char *[]);
