@@ -175,9 +175,6 @@ Blog *BlogNew(char const *restrict location,char const *restrict lockfile)
 
 bool BlogLock(Blog *blog)
 {
-  struct flock lockdata;
-  int          rc;
-  
   assert(blog != NULL);
   
   blog->lock = open(blog->lockfile,O_CREAT | O_RDWR, 0666);
@@ -187,13 +184,17 @@ bool BlogLock(Blog *blog)
     return false;
   }
   
-  lockdata.l_type   = F_WRLCK;
-  lockdata.l_start  = 0;
-  lockdata.l_whence = SEEK_SET;
-  lockdata.l_len    = 0;
-  
-  rc = fcntl(blog->lock,F_SETLKW,&lockdata);
-  
+  int rc = fcntl(
+                  blog->lock,
+                  F_SETLKW,
+                  &(struct flock) {
+                    .l_type   = F_WRLCK,
+                    .l_start  = 0,
+                    .l_whence = SEEK_SET,
+                    .l_len    = 0,
+                  }
+                );
+                
   if (rc < 0)
   {
     syslog(LOG_ERR,"SETLOCK %s: %s",blog->lockfile,strerror(errno));
@@ -208,18 +209,20 @@ bool BlogLock(Blog *blog)
 
 bool BlogUnlock(Blog *blog)
 {
-  struct flock lockdata;
-  int          rc;
-  
   assert(blog       != NULL);
   assert(blog->lock >  0);
   
-  lockdata.l_type   = F_UNLCK;
-  lockdata.l_start  = 0;
-  lockdata.l_whence = SEEK_SET;
-  lockdata.l_len    = 0;
-  
-  rc = fcntl(blog->lock,F_SETLK,&lockdata);
+  int rc = fcntl(
+                  blog->lock,
+                  F_SETLK,
+                  &(struct flock) {
+                    .l_type   = F_UNLCK,
+                    .l_start  = 0,
+                    .l_whence = SEEK_SET,
+                    .l_len    = 0,
+                  }
+                );
+                
   if (rc == 0)
   {
     close(blog->lock);

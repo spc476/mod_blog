@@ -47,23 +47,6 @@
 #  include <gdbm.h>
 #endif
 
-enum
-{
-  OPT_NONE,
-  OPT_CONFIG,
-  OPT_CMD,
-  OPT_FILE,
-  OPT_EMAIL,
-  OPT_UPDATE,
-  OPT_ENTRY,
-  OPT_REGENERATE,
-  OPT_FORCENOTIFY,
-  OPT_TODAY,
-  OPT_THISDAY,
-  OPT_HELP,
-  OPT_DEBUG
-};
-
 /*******************************************************************/
 
 static int  cmd_cli_new       (Request *);
@@ -75,28 +58,43 @@ static int  cli_error         (Request *,int,char const *, ... );
 
 /*************************************************************************/
 
-static struct option const coptions[] =
-{
-  { "config"       , required_argument  , NULL  , OPT_CONFIG      } ,
-  { "regenerate"   , no_argument        , NULL  , OPT_REGENERATE  } ,
-  { "regen"        , no_argument        , NULL  , OPT_REGENERATE  } ,
-  { "cmd"          , required_argument  , NULL  , OPT_CMD         } ,
-  { "file"         , required_argument  , NULL  , OPT_FILE        } ,
-  { "email"        , no_argument        , NULL  , OPT_EMAIL       } ,
-  { "update"       , required_argument  , NULL  , OPT_UPDATE      } ,
-  { "entry"        , required_argument  , NULL  , OPT_ENTRY       } ,
-  { "force-notify" , no_argument        , NULL  , OPT_FORCENOTIFY } ,
-  { "today"        , no_argument        , NULL  , OPT_TODAY       } ,
-  { "thisday"      , required_argument  , NULL  , OPT_THISDAY     } ,
-  { "help"         , no_argument        , NULL  , OPT_HELP        } ,
-  { "debug"        , no_argument        , NULL  , OPT_DEBUG       } ,
-  { NULL           , 0                  , NULL  , 0               }
-};
-
-/*************************************************************************/
-
 int main_cli(int argc,char *argv[])
 {
+  enum
+  {
+    OPT_NONE,
+    OPT_CONFIG,
+    OPT_CMD,
+    OPT_FILE,
+    OPT_EMAIL,
+    OPT_UPDATE,
+    OPT_ENTRY,
+    OPT_REGENERATE,
+    OPT_FORCENOTIFY,
+    OPT_TODAY,
+    OPT_THISDAY,
+    OPT_HELP,
+    OPT_DEBUG
+  };
+  
+  static struct option const coptions[] =
+  {
+    { "config"       , required_argument  , NULL  , OPT_CONFIG      } ,
+    { "regenerate"   , no_argument        , NULL  , OPT_REGENERATE  } ,
+    { "regen"        , no_argument        , NULL  , OPT_REGENERATE  } ,
+    { "cmd"          , required_argument  , NULL  , OPT_CMD         } ,
+    { "file"         , required_argument  , NULL  , OPT_FILE        } ,
+    { "email"        , no_argument        , NULL  , OPT_EMAIL       } ,
+    { "update"       , required_argument  , NULL  , OPT_UPDATE      } ,
+    { "entry"        , required_argument  , NULL  , OPT_ENTRY       } ,
+    { "force-notify" , no_argument        , NULL  , OPT_FORCENOTIFY } ,
+    { "today"        , no_argument        , NULL  , OPT_TODAY       } ,
+    { "thisday"      , required_argument  , NULL  , OPT_THISDAY     } ,
+    { "help"         , no_argument        , NULL  , OPT_HELP        } ,
+    { "debug"        , no_argument        , NULL  , OPT_DEBUG       } ,
+    { NULL           , 0                  , NULL  , 0               }
+  };
+  
   char *config      = NULL;
   int   forcenotify = false;
   

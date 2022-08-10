@@ -40,8 +40,6 @@
 
 char *get_remote_user(void)
 {
-  char *name;
-  
   /*-------------------------------------------------------
   ; A change in Apache 2.0.48:
   ;     Remember an authenticated user during internal redirects if the
@@ -53,12 +51,13 @@ char *get_remote_user(void)
   ; to check both REMOTE_USER and REDIRECT_REMOTE_USER.
   ;------------------------------------------------------*/
   
-  name = getenv("REMOTE_USER");
+  char const *name = getenv("REMOTE_USER");
+
   if (name == NULL)
   {
     name = getenv("REDIRECT_REMOTE_USER");
     if (name == NULL)
-      return strdup("");
+      name = "";
   }
   
   return strdup(name);
