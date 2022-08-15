@@ -33,12 +33,6 @@
 #include "frontend.h"
 #include "config.h"
 
-/***********************************************************/
-
-extern void set_c_updatetype   (char const *);
-extern void set_cf_emailupdate (char const *);
-extern void set_c_conversion   (char const *);
-
 /************************************************************/
 
 char const     *c_updatetype = "NewEntry"; /* no free */
