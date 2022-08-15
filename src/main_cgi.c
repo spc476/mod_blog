@@ -106,7 +106,7 @@ static int cmd_cgi_get_new(Request *req)
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
-  cbd.adtag = (char *)c_adtag;
+  cbd.adtag = (char *)g_config->adtag;
   gd.f.edit = 1;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
   generic_cb("main",req->out,&cbd);
@@ -381,7 +381,7 @@ static int cmd_cgi_post_new(Request *req)
   
   if (entry_add(req))
   {
-    if (cf_emailupdate) notify_emaillist(req);
+    if (g_config->email.notify) notify_emaillist(req);
     generate_pages();
     fprintf(
         req->out,
@@ -422,7 +422,7 @@ static int cmd_cgi_post_show(Request *req)
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
-  cbd.adtag = (char *)c_adtag;
+  cbd.adtag = (char *)g_config->adtag;
   fix_entry(req);
   entry = BlogEntryNew(g_blog);
   

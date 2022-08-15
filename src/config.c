@@ -34,6 +34,10 @@
 #include "config.h"
 #include "conversion.h"
 
+#if LUA_VERSION_NUM == 501
+#  define lua_rawlen(L,idx)     lua_objlen((L),(idx))
+#endif
+
 /***************************************************************************/
 
 static conversion__f confluaL_toconversion(lua_State *L,int idx,char const *def)

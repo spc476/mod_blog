@@ -356,7 +356,7 @@ static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_name,out);
+  fputs(g_config->name,out);
 }
 
 /*********************************************************************/
@@ -372,7 +372,7 @@ static void cb_blog_title(FILE *out,void *data)
       fprintf(out,"%s - ",entry->title);
   }
   
-  fputs(c_name,out);
+  fputs(g_config->name,out);
 }
 
 /*********************************************************************/
@@ -380,7 +380,7 @@ static void cb_blog_title(FILE *out,void *data)
 static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_author,out);
+  fputs(g_config->author.name,out);
 }
 
 /********************************************************************/
@@ -388,7 +388,7 @@ static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_email,out);
+  fputs(g_config->author.email,out);
 }
 
 /**********************************************************************/
@@ -396,7 +396,7 @@ static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_class(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_class,out);
+  fputs(g_config->class,out);
 }
 
 /**********************************************************************/
@@ -404,7 +404,7 @@ static void cb_blog_class(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_description(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_description,out);
+  fputs(g_config->description,out);
 }
 
 /*********************************************************************/
@@ -416,7 +416,7 @@ static void cb_blog_adtag(FILE *out,void *data)
   assert(out != NULL);
   
   if (data == NULL)
-    tag = UrlEncodeString(c_adtag);
+    tag = UrlEncodeString(g_config->adtag);
   else
   {
     struct callback_data *cbd = data;
@@ -438,7 +438,7 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
   assert(out != NULL);
   
   if (data == NULL)
-    tag = c_adtag;
+    tag = g_config->adtag;
   else
   {
     cbd = data;
@@ -566,7 +566,7 @@ static void cb_entry_date(FILE *out,void *data)
 
 static void cb_entry_description(FILE *out,void *data)
 {
-  char const *msg = c_description;
+  char const *msg = g_config->description;
   
   assert(out != NULL);
   
@@ -634,7 +634,7 @@ static void cb_entry_title(FILE *out,void *data)
 
 static void cb_entry_class(FILE *out,void *data)
 {
-  char const *msg = c_class;
+  char const *msg = g_config->class;
   
   assert(out  != NULL);
   
@@ -733,9 +733,9 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
   src = HtmlParseGetPair(token,attrib);
   if (src != NULL)
   {
-    for (size_t i = 0 ; i < c_numaflinks ; i++)
+    for (size_t i = 0 ; i < g_config->affiliatenum ; i++)
     {
-      if (strncmp(src->value,c_aflinks[i].proto,c_aflinks[i].psize) == 0)
+      if (strncmp(src->value,g_config->affiliates[i].proto,g_config->affiliates[i].psize) == 0)
       {
         char buffer[BUFSIZ];
         struct pair *np;
@@ -743,8 +743,8 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
         snprintf(
                 buffer,
                 sizeof(buffer),
-                c_aflinks[i].format,
-                &src->value[c_aflinks[i].psize + 1]
+                g_config->affiliates[i].format,
+                &src->value[g_config->affiliates[i].psize + 1]
         );
         np = PairCreate(attrib,buffer);
         NodeInsert(&src->node,&np->node);
@@ -1715,7 +1715,7 @@ static void cb_entry_cond_author(FILE *out,void *data)
   
   assert(cbd->entry->valid);
   
-  if (strcmp(c_author,cbd->entry->author) != 0)
+  if (strcmp(g_config->author.name,cbd->entry->author) != 0)
     generic_cb("entry.cond.author",out,data);
 }
 

@@ -34,6 +34,7 @@
 #include "backend.h"
 #include "timeutil.h"
 #include "blog.h"
+#include "config.h"
 
 #define GENERATOR       "mod_blog" " " PROG_VERSION
 
@@ -46,40 +47,14 @@
 *
 ****************************************************************************/
 
-extern char        const  *const c_name;
-extern char        const  *const c_description;
-extern char        const  *const c_class;
-extern char        const  *const c_basedir;
-extern char        const  *const c_webdir;
-extern char        const  *const c_author;
-extern char        const  *const c_email;
-extern char        const  *const c_authorfile;
-extern char        const  *const c_updatetype;
-extern char        const  *const c_lockfile;
-extern char        const  *const c_emaildb;
-extern char        const  *const c_emailsubject;
-extern char        const  *const c_emailmsg;
-extern char        const  *const c_overview;
-extern char        const  *const c_adtag;
-extern char        const  *const c_prehook;
-extern char        const  *const c_posthook;
-extern char        const  *const c_baseurl;
-extern char        const  *const c_fullbaseurl;
-extern char        const  *const c_htmltemplates;
-extern template__t const  *const c_templates;
-extern aflink__t   const  *const c_aflinks;
-extern void              (*const c_conversion)(FILE *restrict,FILE *restrict);
-extern int         const         c_days;
-extern size_t      const         c_af_uid;
-extern size_t      const         c_af_name;
-extern bool        const         cf_emailupdate;
-extern size_t      const         c_numtemplates;
-extern size_t      const         c_numaflinks;
+extern char        const  *const c_updatetype;  /* work on */
+extern char        const  *const c_baseurl;     /* work on */
+extern char        const  *const c_fullbaseurl; /* work on */
 
-extern lua_State      *g_L;
 extern char const     *g_templates;      /* work on */
-extern bool volatile   gf_debug;
+extern bool volatile   gf_debug;         /* remove? */
 extern Blog           *g_blog;
+extern config__s      *g_config;
 extern struct display  gd;               /* work on */
 
 extern int  GlobalsInit        (char const *);

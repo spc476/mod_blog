@@ -119,7 +119,7 @@ char *get_remote_user(void)
     assert(req         != NULL);
     assert(req->author != NULL);
     
-    return strcmp(req->author,c_author) == 0;
+    return strcmp(req->author,g_config->author.name) == 0;
   }
   
   /************************************************************************/
@@ -135,10 +135,10 @@ char *get_remote_user(void)
     assert(req         != NULL);
     assert(req->author != NULL);
     
-    if (c_authorfile == NULL)
-      return strcmp(req->author,c_author) == 0;
+    if (g_config->author.file == NULL)
+      return strcmp(req->author,g_config->author.name) == 0;
       
-    list = gdbm_open((char *)c_authorfile,DB_BLOCK,GDBM_READER,0,dbcritical);
+    list = gdbm_open((char *)g_config->author.file,DB_BLOCK,GDBM_READER,0,dbcritical);
     if (list == NULL)
       return false;
       
@@ -162,24 +162,24 @@ char *get_remote_user(void)
     assert(req         != NULL);
     assert(req->author != NULL);
     
-    if (c_authorfile == NULL)
-      return strcmp(req->author,c_author) == 0;
+    if (g_config->author.file == NULL)
+      return strcmp(req->author,g_config->author.name) == 0;
       
-    in = fopen(c_authorfile,"r");
+    in = fopen(g_config->author.file,"r");
     if (in == NULL)
     {
-      syslog(LOG_ERR,"%s: %s",c_authorfile,strerror(errno));
+      syslog(LOG_ERR,"%s: %s",g_config->author.file,strerror(errno));
       return false;
     }
     
     while((cnt = breakline(lines,10,in)))
     {
-      if ((c_af_uid < cnt) && (strcmp(req->author,lines[c_af_uid]) == 0))
+      if ((g_config->author.fields.uid < cnt) && (strcmp(req->author,lines[g_config->author.fields.uid]) == 0))
       {
-        if (c_af_name < cnt)
+        if (g_config->author.fields.name < cnt)
         {
           free(req->author);
-          req->author = strdup(lines[c_af_name]);
+          req->author = strdup(lines[g_config->author.fields.name]);
           fclose(in);
           free(lines[0]); // see comment below
           return true;

@@ -234,7 +234,7 @@ static int cmd_cli_new(Request *req)
   
   if (entry_add(req))
   {
-    if (cf_emailupdate) notify_emaillist(req);
+    if (g_config->email.notify) notify_emaillist(req);
     generate_pages();
     return 0;
   }
@@ -273,8 +273,8 @@ static int cmd_cli_show(Request *req)
     {
       template__t template;
       
-      template.template = (char *)c_htmltemplates;
-      template.items    = c_days;
+      template.template = g_config->templates[0].template;
+      template.items    = g_config->templates[0].items;
       template.pagegen  = pagegen_days;
       template.reverse  = true;
       template.fullurl  = false;

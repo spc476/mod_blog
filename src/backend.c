@@ -89,26 +89,25 @@ int generate_thisday(FILE *out,struct btm when)
 
 int generate_pages(void)
 {
-  for (size_t i = 0 ; i < c_numtemplates; i++)
+  for (size_t i = 0 ; i < g_config->templatenum ; i++)
   {
-    FILE *out;
+    FILE *out = fopen(g_config->templates[i].file,"w");
     
-    out = fopen(c_templates[i].file,"w");
     if (out == NULL)
     {
-      syslog(LOG_ERR,"%s: %s",c_templates[i].file,strerror(errno));
+      syslog(LOG_ERR,"%s: %s",g_config->templates[i].file,strerror(errno));
       continue;
     }
     
-    (*c_templates[i].pagegen)(&c_templates[i],out,g_blog);
+    (*g_config->templates[i].pagegen)(&g_config->templates[i],out,g_blog);
     fclose(out);
     
-    if (c_templates[i].posthook)
+    if (g_config->templates[i].posthook)
     {
       char const *argv[3];
       
-      argv[0] = c_templates[i].posthook;
-      argv[1] = c_templates[i].file;
+      argv[0] = g_config->templates[i].posthook;
+      argv[1] = g_config->templates[i].file;
       argv[2] = NULL;
       
       run_hook("template-post-hook",argv);
@@ -928,7 +927,7 @@ static char *tag_collect(List *list)
       return strdup(entry->class);
   }
   
-  return strdup(c_adtag);
+  return strdup(g_config->adtag);
 }
 
 /********************************************************************/
@@ -942,7 +941,7 @@ static char *tag_pick(char const *tag)
   assert(tag != NULL);
   
   if (empty_string(tag))
-    return strdup(c_adtag);
+    return strdup(g_config->adtag);
     
   pool = tag_split(&num,tag);
   
@@ -958,7 +957,7 @@ static char *tag_pick(char const *tag)
     pick     = fromstring(pool[r]);
   }
   else
-    pick = strdup(c_adtag);
+    pick = strdup(g_config->adtag);
     
   free(pool);
   return pick;

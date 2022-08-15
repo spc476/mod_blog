@@ -54,7 +54,7 @@ bool entry_add(Request *req)
   
   fix_entry(req);
   
-  if (c_prehook != NULL)
+  if (g_config->prehook != NULL)
   {
     FILE *fp;
     char  fnbody[L_tmpnam];
@@ -110,7 +110,7 @@ bool entry_add(Request *req)
       return false;
     }
     
-    rc = run_hook("entry-pre-hook",(char const *[]){ c_prehook , fnbody , fnmeta , NULL });
+    rc = run_hook("entry-pre-hook",(char const *[]){ g_config->prehook , fnbody , fnmeta , NULL });
     
     remove(fnmeta);
     remove(fnbody);
@@ -147,15 +147,15 @@ bool entry_add(Request *req)
   entry->adtag     = req->adtag;
   entry->body      = req->body;
   
-  if (c_authorfile) BlogLock(g_blog);
+  if (g_config->author.file) BlogLock(g_blog);
   
     BlogEntryWrite(entry);
     
-  if (c_authorfile) BlogUnlock(g_blog);
+  if (g_config->author.file) BlogUnlock(g_blog);
   
   req->when = entry->when;
   
-  if (c_posthook != NULL)
+  if (g_config->posthook != NULL)
   {
     char url[1024];
     
@@ -170,7 +170,7 @@ bool entry_add(Request *req)
       entry->when.part
     );
     
-    rc = run_hook("entry-post-hook",(char const *[]){ c_posthook , url , NULL });
+    rc = run_hook("entry-post-hook",(char const *[]){ g_config->posthook , url , NULL });
   }
   
   free(entry);
@@ -237,7 +237,7 @@ void fix_entry(Request *req)
     out  = open_memstream(&tmp,&size);
     in   = fmemopen(req->body,strlen(req->body),"r");
     
-    (*c_conversion)(in,out);
+    (*g_config->conversion)(in,out);
     fclose(in);
     fclose(out);
     free(req->body);
@@ -445,13 +445,13 @@ void notify_emaillist(Request *req)
   
   assert(req != NULL);
   
-  list = gdbm_open((char *)c_emaildb,DB_BLOCK,GDBM_READER,0,dbcritical);
+  list = gdbm_open((char *)g_config->email.list,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
     return;
     
   email          = EmailNew();
-  email->from    = strdup(c_email);
-  email->subject = strdup(c_emailsubject);
+  email->from    = strdup(g_config->author.email);
+  email->subject = strdup(g_config->email.subject);
   
   PairListCreate(&email->headers,"MIME-Version","1.0");
   PairListCreate(&email->headers,"Content-Type","text/plain; charset=UTF-8; format=flowed");
@@ -459,7 +459,7 @@ void notify_emaillist(Request *req)
   
   templates = ChunkNew("",m_emcallbacks,m_emcbnum);
   out       = open_memstream(&tmp,&size);
-  ChunkProcess(templates,c_emailmsg,out,req);
+  ChunkProcess(templates,g_config->email.message,out,req);
   ChunkFree(templates);
   fclose(out);
   
