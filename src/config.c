@@ -303,6 +303,7 @@ config__s *config_lua(char const *conf)
   if (config == NULL)
   {
     syslog(LOG_ERR,"no memory to allocate config structure");
+    free(config);
     return NULL;
   }
   
@@ -315,6 +316,7 @@ config__s *config_lua(char const *conf)
       if (conf == NULL)
       {
         syslog(LOG_ERR,"env BLOG_CONFIG not defined");
+        free(config);
         return NULL;
       }
     }
@@ -324,6 +326,7 @@ config__s *config_lua(char const *conf)
   if (L == NULL)
   {
     syslog(LOG_ERR,"cannot create Lua state");
+    free(config);
     return NULL;
   }
 
@@ -336,6 +339,7 @@ config__s *config_lua(char const *conf)
   {
     syslog(LOG_ERR,"Lua error: (%d) %s",rc,lua_tostring(L,-1));
     lua_close(L);
+    free(config);
     return NULL;
   }
   
@@ -344,6 +348,7 @@ config__s *config_lua(char const *conf)
   {
     syslog(LOG_ERR,"Lua error: (%d) %s",rc,lua_tostring(L,-1));
     lua_close(L);
+    free(config);
     return NULL;
   }
   
