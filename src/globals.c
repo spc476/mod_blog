@@ -20,44 +20,24 @@
 *
 *****************************************************/
 
-#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <locale.h>
-#include <stdarg.h>
-#include <time.h>
-#include <stdbool.h>
 #include <errno.h>
-#include <assert.h>
 
 #include <syslog.h>
-
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-
 #include <cgilib6/url.h>
 #include <cgilib6/util.h>
 
-#include "conf.h"
 #include "conversion.h"
 #include "frontend.h"
-#include "backend.h"
-#include "timeutil.h"
-#include "blog.h"
 #include "config.h"
-
-#define MAX_ITEMS(type) (((SIZE_MAX - sizeof(type)) + 1) / sizeof(type))
 
 /***********************************************************/
 
 extern void set_c_updatetype   (char const *);
-extern void set_gf_emailupdate (char const *);
+extern void set_cf_emailupdate (char const *);
 extern void set_c_conversion   (char const *);
-extern void set_c_url          (char const *);
-static void seed_rng           (void);
-static void globals_free       (void);
 
 /************************************************************/
 
@@ -86,82 +66,7 @@ struct display  gd =
 
 /****************************************************/
 
-int GlobalsInit(char const *conf)
-{
-  atexit(globals_free);
-  seed_rng();
-  g_config = config_lua(conf);  
-  if (g_config == NULL)
-    return ENOMEM;
-    
-  g_blog = BlogNew(g_config->basedir,g_config->lockfile);
-  if (g_blog == NULL)
-    return ENOMEM;
-    
-  set_c_url(g_config->url);
-  
-  /*-------------------------------------------------------
-  ; for most sorting routines, I just assume C sorting
-  ; conventions---this makes sure I have those for sorting
-  ; and searching only.
-  ;--------------------------------------------------------*/
-  
-  setlocale(LC_COLLATE,"C");
-  return 0;
-}
-
-/********************************************************************/
-
-void set_c_updatetype(char const *value)
-{
-  if (!emptynull_string(value))
-  {
-    if (strcmp(value,"new") == 0)
-      c_updatetype = "NewEntry";
-    else if (strcmp(value,"modify") == 0)
-      c_updatetype = "ModifiedEntry";
-    else if (strcmp(value,"edit") == 0)
-      c_updatetype = "ModifiedEntry";
-    else if (strcmp(value,"template") == 0)
-      c_updatetype = "TemplateChange";
-    else
-      c_updatetype = "Other";
-  }
-}
-
-/************************************************************************/
-
-void set_cf_emailupdate(char const *value)
-{
-  if (!emptynull_string(value))
-  {
-    if (strcmp(value,"no") == 0)
-      g_config->email.notify = false;
-    else if (strcmp(value,"yes") == 0)
-      g_config->email.notify = true;
-  }
-}
-
-/***************************************************************************/
-
-void set_c_conversion(char const *value)
-{
-  if (!emptynull_string(value))
-  {
-    if (strcmp(value,"text") == 0)
-      g_config->conversion = text_conversion;
-    else if (strcmp(value,"mixed") == 0)
-      g_config->conversion = mixed_conversion;
-    else if (strcmp(value,"html") == 0)
-      g_config->conversion = html_conversion;
-    else if (strcmp(value,"none") == 0)
-      g_config->conversion = no_conversion;
-  }
-}
-
-/**************************************************************************/
-
-void set_c_url(char const *turl)
+static void set_c_url(char const *turl)
 {
   url__t *url;
   size_t  len;
@@ -256,3 +161,78 @@ static void globals_free(void)
 }
 
 /***********************************************************************/
+
+int GlobalsInit(char const *conf)
+{
+  atexit(globals_free);
+  seed_rng();
+  g_config = config_lua(conf);
+  if (g_config == NULL)
+    return ENOMEM;
+    
+  g_blog = BlogNew(g_config->basedir,g_config->lockfile);
+  if (g_blog == NULL)
+    return ENOMEM;
+    
+  set_c_url(g_config->url);
+  
+  /*-------------------------------------------------------
+  ; for most sorting routines, I just assume C sorting
+  ; conventions---this makes sure I have those for sorting
+  ; and searching only.
+  ;--------------------------------------------------------*/
+  
+  setlocale(LC_COLLATE,"C");
+  return 0;
+}
+
+/********************************************************************/
+
+void set_c_updatetype(char const *value)
+{
+  if (!emptynull_string(value))
+  {
+    if (strcmp(value,"new") == 0)
+      c_updatetype = "NewEntry";
+    else if (strcmp(value,"modify") == 0)
+      c_updatetype = "ModifiedEntry";
+    else if (strcmp(value,"edit") == 0)
+      c_updatetype = "ModifiedEntry";
+    else if (strcmp(value,"template") == 0)
+      c_updatetype = "TemplateChange";
+    else
+      c_updatetype = "Other";
+  }
+}
+
+/************************************************************************/
+
+void set_cf_emailupdate(char const *value)
+{
+  if (!emptynull_string(value))
+  {
+    if (strcmp(value,"no") == 0)
+      g_config->email.notify = false;
+    else if (strcmp(value,"yes") == 0)
+      g_config->email.notify = true;
+  }
+}
+
+/***************************************************************************/
+
+void set_c_conversion(char const *value)
+{
+  if (!emptynull_string(value))
+  {
+    if (strcmp(value,"text") == 0)
+      g_config->conversion = text_conversion;
+    else if (strcmp(value,"mixed") == 0)
+      g_config->conversion = mixed_conversion;
+    else if (strcmp(value,"html") == 0)
+      g_config->conversion = html_conversion;
+    else if (strcmp(value,"none") == 0)
+      g_config->conversion = no_conversion;
+  }
+}
+
+/**************************************************************************/

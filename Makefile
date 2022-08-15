@@ -75,27 +75,28 @@ depend:
 
 src/addutil.o: src/conf.h src/blog.h src/timeutil.h src/conversion.h
 src/addutil.o: src/frontend.h src/wbtum.h src/globals.h src/backend.h
-src/addutil.o: src/blogutil.h
+src/addutil.o: src/config.h src/blogutil.h
 src/authenticate.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
-src/authenticate.o: src/blog.h src/globals.h src/backend.h
+src/authenticate.o: src/blog.h src/globals.h src/backend.h src/config.h
 src/backend.o: src/blogutil.h src/frontend.h src/wbtum.h src/timeutil.h
-src/backend.o: src/blog.h src/backend.h src/globals.h
+src/backend.o: src/blog.h src/backend.h src/globals.h src/config.h
 src/blog.o: src/conf.h src/blog.h src/timeutil.h src/wbtum.h
 src/blogutil.o: src/blogutil.h
 src/callbacks.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
 src/callbacks.o: src/wbtum.h src/blogutil.h src/conversion.h src/globals.h
-src/callbacks.o: src/backend.h
+src/callbacks.o: src/backend.h src/config.h
 src/config.o: src/config.h src/blog.h src/timeutil.h src/wbtum.h
 src/config.o: src/backend.h src/conversion.h
 src/conversion.o: src/conversion.h src/frontend.h src/wbtum.h src/timeutil.h
 src/conversion.o: src/blog.h src/blogutil.h
-src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h
-src/globals.o: src/timeutil.h src/blog.h src/backend.h
+src/globals.o: src/conversion.h src/frontend.h src/wbtum.h src/timeutil.h
+src/globals.o: src/blog.h src/config.h src/backend.h
 src/main.o: src/globals.h src/frontend.h src/wbtum.h src/timeutil.h
-src/main.o: src/blog.h src/backend.h
+src/main.o: src/blog.h src/backend.h src/config.h
 src/main_cgi.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
-src/main_cgi.o: src/globals.h src/backend.h
+src/main_cgi.o: src/globals.h src/backend.h src/config.h
 src/main_cli.o: src/conf.h src/frontend.h src/wbtum.h src/timeutil.h
 src/main_cli.o: src/blog.h src/blogutil.h src/globals.h src/backend.h
+src/main_cli.o: src/config.h
 src/timeutil.o: src/timeutil.h src/wbtum.h
 src/wbtum.o: src/wbtum.h src/timeutil.h
