@@ -85,6 +85,8 @@ src/blogutil.o: src/blogutil.h
 src/callbacks.o: src/conf.h src/blog.h src/timeutil.h src/frontend.h
 src/callbacks.o: src/wbtum.h src/blogutil.h src/conversion.h src/globals.h
 src/callbacks.o: src/backend.h
+src/config.o: src/config.h src/blog.h src/timeutil.h src/wbtum.h
+src/config.o: src/backend.h src/conversion.h
 src/conversion.o: src/conversion.h src/frontend.h src/wbtum.h src/timeutil.h
 src/conversion.o: src/blog.h src/blogutil.h
 src/globals.o: src/conf.h src/conversion.h src/frontend.h src/wbtum.h

@@ -25,6 +25,8 @@
 
 #include <stdio.h>
 
+typedef void (*conversion__f)(FILE *restrict,FILE *restrict);
+
 extern void  no_conversion        (FILE *restrict,FILE *restrict);
 extern void  text_conversion      (FILE *restrict,FILE *restrict);
 extern void  mixed_conversion     (FILE *restrict,FILE *restrict);
