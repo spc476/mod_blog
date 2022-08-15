@@ -51,11 +51,11 @@ extern char const *const c_updatetype;  /* work on */
 extern char const *const c_baseurl;     /* work on */
 extern char const *const c_fullbaseurl; /* work on */
 
-extern char const     *g_templates;      /* work on */
-extern bool volatile   gf_debug;         /* remove? */
+extern char const     *g_templates;     /* work on */
+extern bool volatile   gf_debug;        /* remove? */
 extern Blog           *g_blog;
-extern config__s      *g_config;
-extern struct display  gd;               /* work on */
+extern config__s      *g_config;        /* work on */
+extern struct display  gd;              /* work on */
 
 extern int  GlobalsInit        (char const *);
 extern void set_c_updatetype   (char const *);
