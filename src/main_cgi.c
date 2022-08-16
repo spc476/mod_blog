@@ -306,7 +306,6 @@ int main_cgi_post(Cgi cgi)
   
   CgiListMake(cgi);
   
-  set_c_updatetype      (CgiListGetValue(cgi,"updatetype"));
   set_cf_emailupdate    (CgiListGetValue(cgi,"email"));
   set_c_conversion      (CgiListGetValue(cgi,"filter"));
   set_m_author          (CgiListGetValue(cgi,"author"),&gd.req);

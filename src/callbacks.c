@@ -137,7 +137,6 @@ static void cb_rss_item_url           (FILE *,void *);
 static void cb_rss_pubdate            (FILE *,void *);
 static void cb_rss_url                (FILE *,void *);
 static void cb_update_time            (FILE *,void *);
-static void cb_update_type            (FILE *,void *);
 static void cb_xyzzy                  (FILE *,void *);
 
 static void print_nav_url             (FILE *,struct btm const *,int);
@@ -241,7 +240,6 @@ static struct chunk_callback const m_callbacks[] =
   { "rss.pubdate"               , cb_rss_pubdate                } ,
   { "rss.url"                   , cb_rss_url                    } ,
   { "update.time"               , cb_update_time                } ,
-  { "update.type"               , cb_update_type                } ,
   { "xyzzy"                     , cb_xyzzy                      } ,
 };
 
@@ -1428,14 +1426,6 @@ static void cb_update_time(FILE *out,void *data __attribute__((unused)))
   
   strftime(tmpbuf,sizeof(tmpbuf),"%FT%TZ",gmtime(&g_blog->tnow));
   fputs(tmpbuf,out);
-}
-
-/*******************************************************************/
-
-static void cb_update_type(FILE *out,void *data __attribute__((unused)))
-{
-  assert(out != NULL);
-  fputs(g_config->updatetype,out);
 }
 
 /*******************************************************************/

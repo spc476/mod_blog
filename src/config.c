@@ -450,7 +450,6 @@ config__s *config_lua(char const *conf)
   lua_pop(L,15);
   
   set_url(config,config->url);
-  config->updatetype = "NewEntry";
   config->user       = L;
   return config;
 }

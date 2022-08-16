@@ -44,7 +44,6 @@ extern config__s      *g_config;        /* work on */
 extern struct display  gd;              /* work on */
 
 extern int  GlobalsInit        (char const *);
-extern void set_c_updatetype   (char const *);
 extern void set_cf_emailupdate (char const *);
 extern void set_c_conversion   (char const *);
 extern int  main_cgi_get       (Cgi);

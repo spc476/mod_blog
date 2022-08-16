@@ -67,7 +67,6 @@ int main_cli(int argc,char *argv[])
     OPT_CMD,
     OPT_FILE,
     OPT_EMAIL,
-    OPT_UPDATE,
     OPT_ENTRY,
     OPT_REGENERATE,
     OPT_FORCENOTIFY,
@@ -84,7 +83,6 @@ int main_cli(int argc,char *argv[])
     { "cmd"          , required_argument  , NULL  , OPT_CMD         } ,
     { "file"         , required_argument  , NULL  , OPT_FILE        } ,
     { "email"        , no_argument        , NULL  , OPT_EMAIL       } ,
-    { "update"       , required_argument  , NULL  , OPT_UPDATE      } ,
     { "entry"        , required_argument  , NULL  , OPT_ENTRY       } ,
     { "force-notify" , no_argument        , NULL  , OPT_FORCENOTIFY } ,
     { "today"        , no_argument        , NULL  , OPT_TODAY       } ,
@@ -122,9 +120,6 @@ int main_cli(int argc,char *argv[])
       case OPT_EMAIL:
            gd.req.f.emailin = true;
            break;
-      case OPT_UPDATE:
-           set_c_updatetype(optarg);
-           break;
       case OPT_ENTRY:
            gd.req.reqtumbler = optarg;
            break;
@@ -154,13 +149,11 @@ int main_cli(int argc,char *argv[])
                 "\t--cmd ('new' | 'show' * | 'preview')\n"
                 "\t--file file\n"
                 "\t--email\n"
-                "\t--update ('new' * | 'modify' | 'template' | 'other')\n"
                 "\t--entry <tumbler>\n"
                 "\t--force-notify\n"
                 "\t--today\n"
                 "\t--thisday <month>/<day>\n"
                 "\t--help\n"
-                "\t--debug\n"
                 "\n"
                 "\tVersion: " GENERATOR "\n"
                 "\t\t%s\n"

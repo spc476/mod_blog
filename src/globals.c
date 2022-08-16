@@ -116,25 +116,6 @@ int GlobalsInit(char const *conf)
 
 /********************************************************************/
 
-void set_c_updatetype(char const *value)
-{
-  if (!emptynull_string(value))
-  {
-    if (strcmp(value,"new") == 0)
-      g_config->updatetype = "NewEntry";
-    else if (strcmp(value,"modify") == 0)
-      g_config->updatetype = "ModifiedEntry";
-    else if (strcmp(value,"edit") == 0)
-      g_config->updatetype = "ModifiedEntry";
-    else if (strcmp(value,"template") == 0)
-      g_config->updatetype = "TemplateChange";
-    else
-      g_config->updatetype = "Other";
-  }
-}
-
-/************************************************************************/
-
 void set_cf_emailupdate(char const *value)
 {
   if (!emptynull_string(value))
