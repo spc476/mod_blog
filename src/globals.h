@@ -38,10 +38,9 @@
 
 #define GENERATOR       "mod_blog" " " PROG_VERSION
 
-extern char const     *g_templates;     /* work on */
 extern Blog           *g_blog;
-extern config__s      *g_config;        /* work on */
-extern struct display  gd;              /* work on */
+extern config__s      *g_config; /* work on */
+extern struct display  gd;       /* work on */
 
 extern int  GlobalsInit        (char const *);
 extern void set_cf_emailupdate (char const *);

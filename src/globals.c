@@ -33,7 +33,6 @@
 
 /************************************************************/
 
-char const     *g_templates;
 Blog           *g_blog;
 config__s      *g_config;
 struct display  gd =

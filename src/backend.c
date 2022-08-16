@@ -133,7 +133,7 @@ int pagegen_items(
   assert(out      != NULL);
   assert(blog     != NULL);
   
-  g_templates  = template->template;
+  gd.template  = template->template;
   gd.f.fullurl = template->fullurl;
   gd.f.reverse = template->reverse;
   thisday      = blog->now;
@@ -174,7 +174,7 @@ int pagegen_days(
   assert(out      != NULL);
   assert(blog     != NULL);
   
-  g_templates  = template->template;
+  gd.template  = template->template;
   gd.f.fullurl = false;
   gd.f.reverse = true;
   thisday      = blog->now;

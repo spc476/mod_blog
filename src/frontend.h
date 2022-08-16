@@ -79,6 +79,7 @@ typedef struct display
   unit__e         navunit;
   FILE           *htmldump;
   Cgi             cgi;
+  char const     *template;
   struct request  req;
   struct btm      previous;
   struct btm      next;
