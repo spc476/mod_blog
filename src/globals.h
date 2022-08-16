@@ -48,7 +48,6 @@
 ****************************************************************************/
 
 extern char const     *g_templates;     /* work on */
-extern bool volatile   gf_debug;        /* remove? */
 extern Blog           *g_blog;
 extern config__s      *g_config;        /* work on */
 extern struct display  gd;              /* work on */

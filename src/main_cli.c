@@ -74,7 +74,6 @@ int main_cli(int argc,char *argv[])
     OPT_TODAY,
     OPT_THISDAY,
     OPT_HELP,
-    OPT_DEBUG
   };
   
   static struct option const coptions[] =
@@ -91,7 +90,6 @@ int main_cli(int argc,char *argv[])
     { "today"        , no_argument        , NULL  , OPT_TODAY       } ,
     { "thisday"      , required_argument  , NULL  , OPT_THISDAY     } ,
     { "help"         , no_argument        , NULL  , OPT_HELP        } ,
-    { "debug"        , no_argument        , NULL  , OPT_DEBUG       } ,
     { NULL           , 0                  , NULL  , 0               }
   };
   
@@ -129,9 +127,6 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_ENTRY:
            gd.req.reqtumbler = optarg;
-           break;
-      case OPT_DEBUG:
-           gf_debug = true;
            break;
       case OPT_REGENERATE:
            gd.req.f.regenerate = true;

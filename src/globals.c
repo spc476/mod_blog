@@ -36,7 +36,6 @@
 /************************************************************/
 
 char const     *g_templates;
-bool volatile   gf_debug = false;
 Blog           *g_blog;
 config__s      *g_config;
 struct display  gd =

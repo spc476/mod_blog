@@ -37,24 +37,6 @@ int main(int argc,char *argv[],char *envp[])
   crashreport_with(argc,argv,envp);
   crashreport_core();
 
-  /*-----------------------------------------------------------------------
-  ; WTF?  This isn't a WTF.  This is a debugging techique.  While gf_debug
-  ; is normally set to false by default, changing it to true in the source
-  ; code will cause the program to spin right here when run.  And that is
-  ; the behavior I want.
-  ;
-  ; When running this from a webserver, certain contitions (and especially
-  ; core dumps) are nearly impossible to debug.  But by setting gf_debug to
-  ; true and making a request, the process will hang, allowing me to run gdb
-  ; against the running process.  Once hooked up, I set gf_debug to false
-  ; and then continue with the execution.  Then, I can see where it crashes,
-  ; single step, what have you, without having to set up a huge fake "web"
-  ; environment.  It's something I rarely do, but when I need it, I need it.
-  ;-------------------------------------------------------------------------*/
-  
-  while(gf_debug)
-    ;
-    
   gd.cgi = CgiNew(NULL);
   
   if (gd.cgi != NULL)
