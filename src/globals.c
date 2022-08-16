@@ -25,8 +25,6 @@
 #include <locale.h>
 #include <errno.h>
 
-#include <syslog.h>
-#include <cgilib6/url.h>
 #include <cgilib6/util.h>
 
 #include "conversion.h"
@@ -54,62 +52,6 @@ struct display  gd =
 };
 
 /****************************************************/
-#if 0
-static void set_c_url(char const *turl)
-{
-  url__t *url;
-  size_t  len;
-  char   *fbu;
-  char   *bu;
-  
-  assert(turl != NULL);
-  
-  fbu = strdup(turl);
-  url = UrlNew(turl);
-  
-  if (url == NULL)
-  {
-    free(fbu);
-    syslog(LOG_ERR,"unparsable URL");
-    return;
-  }
-  
-  if (url->scheme == URL_HTTP)
-    bu = strdup(url->http.path);
-  else if (url->scheme == URL_GOPHER)
-    bu = strdup(url->gopher.selector);
-  else
-  {
-    free(fbu);
-    UrlFree(url);
-    syslog(LOG_WARNING,"unsupported URL type");
-    return;
-  }
-  
-  /*-----------------------------------------------------------------------
-  ; because of the way link generation happens, both of these *CAN'T* end
-  ; with a '/'.  So make sure they don't end with a '/'.
-  ;
-  ; The reason we go through an intermediate variable is that c_fullbaseurl
-  ; and c_baseurl are declared as 'const char *' and we can't modify a
-  ; constant memory location.
-  ;-----------------------------------------------------------------------*/
-  
-  len = strlen(fbu);
-  if (len) len--;
-  if (fbu[len] == '/') fbu[len] = '\0';
-  
-  len = strlen(bu);
-  if (len) len--;
-  if (bu[len] == '/') bu[len] = '\0';
-  
-  c_fullbaseurl = fbu;
-  c_baseurl     = bu;
-  UrlFree(url);
-}
-#endif
-
-/**************************************************************************/
 
 static void seed_rng(void)
 {
