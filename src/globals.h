@@ -38,15 +38,6 @@
 
 #define GENERATOR       "mod_blog" " " PROG_VERSION
 
-/***************************************************************************
-*
-* Global variables---some defaults are defined in "globals.c" but these can
-* be overwritten (or defined for those without a default) by the
-* configuration file.  If any are added here, add them to "globals.c" and
-* add don't forget to update GlobalsInit()
-*
-****************************************************************************/
-
 extern char const     *g_templates;     /* work on */
 extern Blog           *g_blog;
 extern config__s      *g_config;        /* work on */

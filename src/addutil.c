@@ -122,15 +122,7 @@ bool entry_add(Request *req)
   entry = BlogEntryNew(g_blog);
   
   if ((req->date == NULL) || (empty_string(req->date)))
-  {
-    /*----------------------------------------------------------------------
-    ; if this is the case, then we need to ensure we update the main pages.
-    ; By calling BlogDatesInit() after we update we ensure we generate the
-    ; content properly.
-    ;---------------------------------------------------------------------*/
-    
     entry->when = g_blog->now;
-  }
   else
   {
     entry->when.year  = strtoul(req->date,&p,10); p++;

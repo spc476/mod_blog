@@ -28,12 +28,6 @@
 
 int main(int argc,char *argv[],char *envp[])
 {
-  /*-----------------------------------------------------------------------
-  ; due to a crash for no apparent reason, I decided to log a bit more
-  ; information when it does happen, so log information when a signal that
-  ; causes a coredump happens.
-  ;-----------------------------------------------------------------------*/
-  
   crashreport_with(argc,argv,envp);
   crashreport_core();
 
