@@ -32,7 +32,6 @@
 #include <unistd.h>
 #include <syslog.h>
 
-#include "conf.h"
 #include "blog.h"
 #include "wbtum.h"
 
@@ -74,7 +73,11 @@ Blog *BlogNew(char const *restrict location,char const *restrict lockfile)
   assert(location != NULL);
   assert(lockfile != NULL);
   
-  umask(DEFAULT_PERMS);
+  /*---------------------------------------------------------------
+  ; We're assuming a SETUID program, so set the umask accordingly.
+  ;----------------------------------------------------------------*/
+  
+  umask(022);
   rc = chdir(location);
   if (rc != 0)
   {

@@ -32,20 +32,16 @@
 
 #include <syslog.h>
 #include <getopt.h>
+#include <gdbm.h>
 
 #include <cgilib6/conf.h>
 #include <cgilib6/rfc822.h>
 #include <cgilib6/util.h>
 
-#include "conf.h"
 #include "frontend.h"
 #include "blog.h"
 #include "blogutil.h"
 #include "globals.h"
-
-#ifdef EMAIL_NOTIFY
-#  include <gdbm.h>
-#endif
 
 /*******************************************************************/
 
@@ -158,17 +154,13 @@ int main_cli(int argc,char *argv[])
                 "\tVersion: " GENERATOR "\n"
                 "\t\t%s\n"
                 "\t\t%s\n"
-#ifdef EMAIL_NOTIFY
                 "\t\t%s\n"
-#endif
                 "\t* default value\n"
                 "",
                 argv[0],
                 cgilib_version,
-                LUA_RELEASE
-#ifdef EMAIL_NOTIFY
-                ,gdbm_version
-#endif
+                LUA_RELEASE,
+                gdbm_version
               );
            return EXIT_FAILURE;
     }

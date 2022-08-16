@@ -28,13 +28,8 @@
 #include <syslog.h>
 #include <cgilib6/util.h>
 
-#include "conf.h"
 #include "frontend.h"
 #include "globals.h"
-
-#ifdef USE_GDBM
-#  include <gdbm.h>
-#endif
 
 /*************************************************************************/
 
@@ -65,139 +60,92 @@ char *get_remote_user(void)
 
 /************************************************************************/
 
-#if defined(USE_HTPASSWD)
-
-  static size_t breakline(char **dest,size_t dsize,FILE *in)
+static size_t breakline(char **dest,size_t dsize,FILE *in)
+{
+  char   *line = NULL;
+  char   *p;
+  char   *colon;
+  size_t  cnt;
+  size_t  size = 0;
+  ssize_t rc;
+  
+  assert(dest  != NULL);
+  assert(dsize >  0);
+  assert(in    != NULL);
+  
+  rc = getline(&line,&size,in);
+  if ((rc == -1) || (emptynull_string(line)))
   {
-    char   *line = NULL;
-    char   *p;
-    char   *colon;
-    size_t  cnt;
-    size_t  size = 0;
-    ssize_t rc;
-    
-    assert(dest  != NULL);
-    assert(dsize >  0);
-    assert(in    != NULL);
-    
-    rc = getline(&line,&size,in);
-    if ((rc == -1) || (emptynull_string(line)))
-    {
-      free(line);
-      return 0;
-    }
-    
-    if (line[rc - 1] == '\n')
-      line[rc - 1] = '\0';
-      
-    p   = line;
-    cnt = 0;
-    
-    do
-    {
-      dest[cnt] = p;
-      colon = strchr(p,':');
-      if (colon != NULL)
-      {
-        *colon = '\0';
-        p      = colon + 1;
-      }
-      cnt++;
-    } while ((colon != NULL) && (cnt < dsize));
-    
-    return cnt;
+    free(line);
+    return 0;
   }
   
-#endif
+  if (line[rc - 1] == '\n')
+    line[rc - 1] = '\0';
+    
+  p   = line;
+  cnt = 0;
+  
+  do
+  {
+    dest[cnt] = p;
+    colon = strchr(p,':');
+    if (colon != NULL)
+    {
+      *colon = '\0';
+      p      = colon + 1;
+    }
+    cnt++;
+  } while ((colon != NULL) && (cnt < dsize));
+  
+  return cnt;
+}
 
 /************************************************************************/
 
-#if defined(USE_NONE)
-
-  bool authenticate_author(Request *req)
-  {
-    assert(req         != NULL);
-    assert(req->author != NULL);
-    
+bool authenticate_author(Request *req)
+{
+  FILE   *in;
+  char   *lines[10];
+  size_t  cnt;
+  
+  assert(req         != NULL);
+  assert(req->author != NULL);
+  
+  if (g_config->author.file == NULL)
     return strcmp(req->author,g_config->author.name) == 0;
-  }
-  
-  /************************************************************************/
-  
-#elif defined(USE_GDBM)
-
-  bool authenticate_author(Request *req)
+    
+  in = fopen(g_config->author.file,"r");
+  if (in == NULL)
   {
-    GDBM_FILE list;
-    datum     key;
-    int       rc;
-    
-    assert(req         != NULL);
-    assert(req->author != NULL);
-    
-    if (g_config->author.file == NULL)
-      return strcmp(req->author,g_config->author.name) == 0;
-      
-    list = gdbm_open((char *)g_config->author.file,DB_BLOCK,GDBM_READER,0,dbcritical);
-    if (list == NULL)
-      return false;
-      
-    key.dptr  = req->author;
-    key.dsize = strlen(req->author) + 1;
-    rc        = gdbm_exists(list,key);
-    gdbm_close(list);
-    return rc;
-  }
-  
-  /***********************************************************************/
-  
-#elif defined (USE_HTPASSWD)
-
-  bool authenticate_author(Request *req)
-  {
-    FILE   *in;
-    char   *lines[10];
-    size_t  cnt;
-    
-    assert(req         != NULL);
-    assert(req->author != NULL);
-    
-    if (g_config->author.file == NULL)
-      return strcmp(req->author,g_config->author.name) == 0;
-      
-    in = fopen(g_config->author.file,"r");
-    if (in == NULL)
-    {
-      syslog(LOG_ERR,"%s: %s",g_config->author.file,strerror(errno));
-      return false;
-    }
-    
-    while((cnt = breakline(lines,10,in)))
-    {
-      if ((g_config->author.fields.uid < cnt) && (strcmp(req->author,lines[g_config->author.fields.uid]) == 0))
-      {
-        if (g_config->author.fields.name < cnt)
-        {
-          free(req->author);
-          req->author = strdup(lines[g_config->author.fields.name]);
-          fclose(in);
-          free(lines[0]); // see comment below
-          return true;
-        }
-      }
-      
-      /*------------------------------------------------------------------
-      ; Some tight coupling between this routine and breakline().  The first
-      ; element of lines[] needs to be freed, but not the rest.
-      ;--------------------------------------------------------------------*/
-      
-      free(lines[0]);
-    }
-    
-    fclose(in);
+    syslog(LOG_ERR,"%s: %s",g_config->author.file,strerror(errno));
     return false;
   }
   
-#endif
+  while((cnt = breakline(lines,10,in)))
+  {
+    if ((g_config->author.fields.uid < cnt) && (strcmp(req->author,lines[g_config->author.fields.uid]) == 0))
+    {
+      if (g_config->author.fields.name < cnt)
+      {
+        free(req->author);
+        req->author = strdup(lines[g_config->author.fields.name]);
+        fclose(in);
+        free(lines[0]); // see comment below
+        return true;
+      }
+    }
+    
+    /*------------------------------------------------------------------
+    ; Some tight coupling between this routine and breakline().  The first
+    ; element of lines[] needs to be freed, but not the rest.
+    ;--------------------------------------------------------------------*/
+    
+    free(lines[0]);
+  }
+  
+  fclose(in);
+  return false;
+}
 
 /**************************************************************************/

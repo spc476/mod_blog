@@ -26,21 +26,17 @@
 #include <errno.h>
 
 #include <syslog.h>
+#include <gdbm.h>
 
 #include <cgilib6/mail.h>
 #include <cgilib6/util.h>
 #include <cgilib6/chunk.h>
 
-#include "conf.h"
 #include "blog.h"
 #include "conversion.h"
 #include "frontend.h"
 #include "globals.h"
 #include "blogutil.h"
-
-#ifdef EMAIL_NOTIFY
-#  include <gdbm.h>
-#endif
 
 /*********************************************************************/
 
@@ -246,16 +242,6 @@ void dbcritical(char const *msg)
 }
 
 /************************************************************************/
-
-#ifndef EMAIL_NOTIFY
-
-void notify_emaillist(Request *req __attribute__((unused)))
-{
-}
-
-/************************************************************************/
-
-#else
 
 static void cb_email_title  (FILE *,void *);
 static void cb_email_url    (FILE *,void *);
@@ -549,5 +535,3 @@ static void cb_email_author(FILE *out,void *data)
 }
 
 /*************************************************************************/
-
-#endif

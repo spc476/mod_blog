@@ -31,13 +31,13 @@
 #include <time.h>
 
 #include <unistd.h>
+#include <gdbm.h>
 
 #include <cgilib6/conf.h>
 #include <cgilib6/htmltok.h>
 #include <cgilib6/chunk.h>
 #include <cgilib6/util.h>
 
-#include "conf.h"
 #include "blog.h"
 #include "timeutil.h"
 #include "frontend.h"
@@ -45,9 +45,6 @@
 #include "conversion.h"
 #include "globals.h"
 
-#ifdef EMAIL_NOTIFY
-#  include <gdbm.h>
-#endif
 
 /*****************************************************************/
 
@@ -1798,7 +1795,6 @@ static void cb_generator(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-#ifdef EMAIL_NOTIFY
   fprintf(
     out,
     "mod_blog %s, %s, %s, %s"
@@ -1808,16 +1804,6 @@ static void cb_generator(FILE *out,void *data __attribute__((unused)))
     LUA_RELEASE,
     gdbm_version
   );
-#else
-  fprintf(
-    out,
-    "mod_blog %s, %s, %s"
-    "",
-    PROG_VERSION,
-    cgilib_version,
-    LUA_RELEASE
-  );
-#endif
 }
 
 /*********************************************************************/
