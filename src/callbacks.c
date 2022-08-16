@@ -348,7 +348,7 @@ static void cb_blog_url(FILE *out,void *data)
 static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_fullbaseurl,out);
+  fputs(g_config->fullbaseurl,out);
 }
 
 /**********************************************************************/
@@ -808,9 +808,9 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
     ;-----------------------------------------------------*/
     
     if (gd.f.fullurl)
-      baseurl = c_fullbaseurl;
+      baseurl = g_config->fullbaseurl;
     else
-      baseurl = c_baseurl;
+      baseurl = g_config->baseurl;
       
     /*---------------------------------------------------------
     ; all this to reassign the value, without ``knowing'' how the pair stuff
@@ -1015,7 +1015,7 @@ static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
 static void cb_rss_url(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fprintf(out,"%s/",c_fullbaseurl);
+  fprintf(out,"%s/",g_config->fullbaseurl);
 }
 
 /*******************************************************************/
@@ -1055,7 +1055,7 @@ static void cb_rss_item_url(FILE *out,void *data)
   assert(data != NULL);
   
   assert(cbd->entry->valid);
-  fprintf(out,"%s",c_fullbaseurl);
+  fprintf(out,"%s",g_config->fullbaseurl);
   print_nav_url(out,&cbd->entry->when,UNIT_PART);
 }
 
@@ -1371,7 +1371,7 @@ static void print_nav_url(FILE *out,struct btm const *date,int unit)
   assert(out  != NULL);
   assert(date != NULL);
   
-  fprintf(out,"%s/",c_baseurl);
+  fprintf(out,"%s/",g_config->baseurl);
   print_nav_name(out,date,unit,'/');
 }
 
@@ -1435,7 +1435,7 @@ static void cb_update_time(FILE *out,void *data __attribute__((unused)))
 static void cb_update_type(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_updatetype,out);
+  fputs(g_config->updatetype,out);
 }
 
 /*******************************************************************/
@@ -1798,7 +1798,7 @@ static void cb_request_url(FILE *out,void *data __attribute__((unused)))
   assert(out != NULL);
   
   tum = tumbler_canonical(&gd.req.tumbler);
-  fprintf(out,"%s/%s",c_fullbaseurl,tum);
+  fprintf(out,"%s/%s",g_config->fullbaseurl,tum);
   free(tum);
 }
 

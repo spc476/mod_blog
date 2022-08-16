@@ -35,10 +35,6 @@
 
 /************************************************************/
 
-char const     *c_updatetype = "NewEntry"; /* no free */
-char           *c_baseurl;
-char           *c_fullbaseurl;
-
 char const     *g_templates;
 bool volatile   gf_debug = false;
 Blog           *g_blog;
@@ -59,7 +55,7 @@ struct display  gd =
 };
 
 /****************************************************/
-
+#if 0
 static void set_c_url(char const *turl)
 {
   url__t *url;
@@ -112,6 +108,7 @@ static void set_c_url(char const *turl)
   c_baseurl     = bu;
   UrlFree(url);
 }
+#endif
 
 /**************************************************************************/
 
@@ -150,8 +147,6 @@ static void globals_free(void)
   free(gd.req.adtag);
   free(gd.req.origbody);
   free(gd.req.body);
-  free(c_baseurl);
-  free(c_fullbaseurl);
 }
 
 /***********************************************************************/
@@ -168,8 +163,6 @@ int GlobalsInit(char const *conf)
   if (g_blog == NULL)
     return ENOMEM;
     
-  set_c_url(g_config->url);
-  
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting
   ; conventions---this makes sure I have those for sorting
@@ -187,15 +180,15 @@ void set_c_updatetype(char const *value)
   if (!emptynull_string(value))
   {
     if (strcmp(value,"new") == 0)
-      c_updatetype = "NewEntry";
+      g_config->updatetype = "NewEntry";
     else if (strcmp(value,"modify") == 0)
-      c_updatetype = "ModifiedEntry";
+      g_config->updatetype = "ModifiedEntry";
     else if (strcmp(value,"edit") == 0)
-      c_updatetype = "ModifiedEntry";
+      g_config->updatetype = "ModifiedEntry";
     else if (strcmp(value,"template") == 0)
-      c_updatetype = "TemplateChange";
+      g_config->updatetype = "TemplateChange";
     else
-      c_updatetype = "Other";
+      g_config->updatetype = "Other";
   }
 }
 

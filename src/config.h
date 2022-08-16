@@ -74,6 +74,9 @@ typedef struct
   struct bemail   email;
   aflink__t      *affiliates;
   size_t          affiliatenum;
+  char const     *updatetype;  /* at some time, remove this */
+  char           *baseurl;     /* work on removing the need for this */
+  char           *fullbaseurl; /* work on removing the need for this */
   void           *user;
 } config__s;
 
