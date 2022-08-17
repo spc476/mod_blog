@@ -20,10 +20,6 @@
 *
 ************************************************/
 
-#ifndef __GNUC__
-#  define __attribute__(x)
-#endif
-
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
