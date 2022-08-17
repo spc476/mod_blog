@@ -79,12 +79,9 @@ static void cb_edit_author            (FILE *,void *);
 static void cb_edit_body              (FILE *,void *);
 static void cb_edit_class             (FILE *,void *);
 static void cb_edit_date              (FILE *,void *);
-static void cb_edit_email             (FILE *,void *);
-static void cb_edit_filter            (FILE *,void *);
 static void cb_edit_status            (FILE *,void *);
 static void cb_edit_title             (FILE *,void *);
 static void cb_entry                  (FILE *,void *);
-static void cb_entry_adtag            (FILE *,void *);
 static void cb_entry_author           (FILE *,void *);
 static void cb_entry_body             (FILE *,void *);
 static void cb_entry_body_entified    (FILE *,void *);
@@ -179,12 +176,9 @@ static struct chunk_callback const m_callbacks[] =
   { "edit.body"                 , cb_edit_body                  } ,
   { "edit.class"                , cb_edit_class                 } ,
   { "edit.date"                 , cb_edit_date                  } ,
-  { "edit.email"                , cb_edit_email                 } ,
-  { "edit.filter"               , cb_edit_filter                } ,
   { "edit.status"               , cb_edit_status                } ,
   { "edit.title"                , cb_edit_title                 } ,
   { "entry"                     , cb_entry                      } ,
-  { "entry.adtag"               , cb_entry_adtag                } ,
   { "entry.author"              , cb_entry_author               } ,
   { "entry.body"                , cb_entry_body                 } ,
   { "entry.body.entified"       , cb_entry_body_entified        } ,
@@ -685,14 +679,6 @@ static void cb_entry_status(FILE *out,void *data)
 }
 
 /************************************************************************/
-
-static void cb_entry_adtag(FILE *out,void *data __attribute__((unused)))
-{
-  assert(out != NULL);
-  fputs("Soon young Skywalker.  Soon.",out);
-}
-
-/**********************************************************************/
 
 static void cb_entry_author(FILE *out,void *data)
 {
@@ -1594,20 +1580,6 @@ static void cb_edit_class(FILE *out,void *data __attribute__((unused)))
 }
 
 /********************************************************************/
-
-static void cb_edit_email(FILE *out __attribute__((unused)),void *data __attribute__((unused)))
-{
-  /* XXX */
-}
-
-/*******************************************************************/
-
-static void cb_edit_filter(FILE *out __attribute__((unused)),void *data __attribute__((unused)))
-{
-  /* XXX */
-}
-
-/*******************************************************************/
 
 static void cb_edit_body(FILE *out,void *data __attribute__((unused)))
 {
