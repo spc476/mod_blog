@@ -38,6 +38,8 @@
 #include "globals.h"
 #include "blogutil.h"
 
+#define DB_BLOCK 1024
+
 /*********************************************************************/
 
 bool entry_add(Request *req)

@@ -30,8 +30,6 @@
 #include "blog.h"
 #include "config.h"
 
-#define DB_BLOCK 1024
-
 typedef struct rflags
 {
   unsigned int emailin    : 1;
