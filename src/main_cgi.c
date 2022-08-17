@@ -532,8 +532,6 @@ static int cgi_init(Cgi cgi,Request *req)
   req->error = cgi_error;
   req->in    = stdin;
   req->out   = stdout;
-  gd.cgi     = cgi;
-  
   
   return GlobalsInit(NULL);
 }
