@@ -374,9 +374,7 @@ config__s *config_lua(char const *conf)
     return NULL;
   }
   
-  lua_gc(L,LUA_GCSTOP,0);
   luaL_openlibs(L);
-  lua_gc(L,LUA_GCRESTART,0);
   
   rc = luaL_loadfile(L,conf);
   if (rc != LUA_OK)
