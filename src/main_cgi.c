@@ -73,8 +73,8 @@ static void set_m_cgi_get_command(char *value,Request *req)
 {
   assert(req != NULL);
   
-  syslog(LOG_DEBUG,"set_m_cgi_get_command('%s')",value);
-  if (emptynull_string(value)) return;
+  if (emptynull_string(value))
+    return;
   up_string(value);
   
   if (strcmp(value,"NEW") == 0)
