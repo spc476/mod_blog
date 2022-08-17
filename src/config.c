@@ -222,12 +222,8 @@ static void confluaL_toemail(lua_State *L,int idx,struct bemail *email)
     email->message = luaL_optstring(L,-1,NULL);
     lua_getfield(L,idx,"subject");
     email->subject = luaL_optstring(L,-1,NULL);
-    lua_getfield(L,idx,"notify");
-    if (lua_isnil(L,-1))
-      email->notify = true;
-    else
-      email->notify = lua_toboolean(L,-1);
-    lua_pop(L,4);
+    email->notify  = true;
+    lua_pop(L,3);
   }
 }
 
