@@ -374,7 +374,7 @@ static void entify_char(char *d,size_t ds,char *s,char e,char const *entity)
 static void html_handle_string(struct nested_params *local)
 {
   assert(local != NULL);
-
+  
   char *text = HtmlParseValue(local->token);
   
   if (!local->pre)

@@ -394,8 +394,8 @@ config__s *config_lua(char const *conf)
     free(config);
     return NULL;
   }
-
-  lua_gc(L,LUA_GCSTOP,0);  
+  
+  lua_gc(L,LUA_GCSTOP,0);
   luaL_openlibs(L);
   lua_gc(L,LUA_GCRESTART,0);
   
@@ -459,12 +459,12 @@ config__s *config_lua(char const *conf)
 void config_free(config__s *config)
 {
   assert(config != NULL);
-
+  
   free(config->fullbaseurl);
   free(config->baseurl);
   free(config->affiliates);
   free(config->templates);
-  lua_close(config->user);  
+  lua_close(config->user);
   free(config);
 }
 

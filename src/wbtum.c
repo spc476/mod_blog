@@ -268,7 +268,7 @@ bool tumbler_new(
     else
       goto tumbler_new_file;
   }
-    
+  
   if (*text != '.')
     return false;
     

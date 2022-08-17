@@ -237,10 +237,10 @@ static int cmd_cgi_get_today(Request *req)
     fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
     return generate_thisday(req->out,g_blog->now);
   }
-    
+  
   if (tpath == NULL)
     return (*req->error)(req,HTTP_BADREQ,"bad request");
-  
+    
   if ((twhen == NULL) || (*twhen == '\0'))
   {
     fprintf(
@@ -262,7 +262,7 @@ static int cmd_cgi_get_today(Request *req)
   
   if (!thisday_new(&req->tumbler,twhen))
     return (*req->error)(req,HTTP_BADREQ,"bad request");
-  
+    
   if (req->tumbler.redirect)
   {
     fprintf(

@@ -30,7 +30,7 @@ int main(int argc,char *argv[],char *envp[])
 {
   crashreport_with(argc,argv,envp);
   crashreport_core();
-
+  
   gd.cgi = CgiNew(NULL);
   
   if (gd.cgi != NULL)

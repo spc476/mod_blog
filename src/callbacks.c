@@ -761,7 +761,7 @@ static bool uri_scheme(char const *s)
   {
     if (*s == ':')
       return true;
-    
+      
     if (isalpha(*s) || isdigit(*s) || (*s == '+') || (*s == '-') || (*s == '.'))
       s++;
     else
@@ -797,7 +797,7 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
     
     if (src->value[0] == '#')
       return;
-    
+      
     /*-----------------------------------------------------
     ; Which URL to use?  Full or partial?
     ;-----------------------------------------------------*/

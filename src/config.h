@@ -43,7 +43,7 @@ struct author
   char const    *name;
   char const    *email;
   char const    *file;
-  struct fields  fields;  
+  struct fields  fields;
 };
 
 struct bemail

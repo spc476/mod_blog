@@ -58,7 +58,7 @@ int generate_thisday(FILE *out,struct btm when)
   {
     if (btm_cmp_date(&when,&g_blog->first) < 0)
       continue;
-    
+      
     for (when.part = 1 ; ; when.part++)
     {
       BlogEntry *entry = BlogEntryRead(g_blog,&when);
@@ -109,7 +109,7 @@ int generate_pages(void)
       run_hook("template-post-hook",argv);
     }
   }
-
+  
   return 0;
 }
 
@@ -918,7 +918,7 @@ static char *tag_collect(List *list)
   {
     if (!empty_string(entry->adtag))
       return strdup(entry->adtag);
-  
+      
     if (!empty_string(entry->class))
       return strdup(entry->class);
   }

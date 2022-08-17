@@ -47,7 +47,7 @@ char *get_remote_user(void)
   ;------------------------------------------------------*/
   
   char const *name = getenv("REMOTE_USER");
-
+  
   if (name == NULL)
   {
     name = getenv("REDIRECT_REMOTE_USER");

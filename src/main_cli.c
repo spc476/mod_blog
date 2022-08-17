@@ -385,7 +385,7 @@ static int mailfile_readdata(Request *req)
     req->author = strdup(req->author);
   else
     req->author = strdup("");
-  
+    
   if (req->title  != NULL)
     req->title  = strdup(req->title);
   else
