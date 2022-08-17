@@ -151,7 +151,7 @@ bool entry_add(Request *req)
       url,
       sizeof(url),
       "%s/%04d/%02d/%02d.%d",
-      g_config->fullbaseurl,
+      gd.fullbaseurl,
       entry->when.year,
       entry->when.month,
       entry->when.day,
@@ -225,7 +225,7 @@ void fix_entry(Request *req)
     out  = open_memstream(&tmp,&size);
     in   = fmemopen(req->body,strlen(req->body),"r");
     
-    (*g_config->conversion)(in,out);
+    (*gd.conversion)(in,out);
     fclose(in);
     fclose(out);
     free(req->body);
@@ -517,7 +517,7 @@ static void cb_email_url(FILE *out,void *data)
   fprintf(
            out,
            "%s/%04d/%02d/%02d.%d",
-           g_config->fullbaseurl,
+           gd.fullbaseurl,
            req->when.year,
            req->when.month,
            req->when.day,

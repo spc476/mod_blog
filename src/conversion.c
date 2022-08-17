@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <syslog.h>
 #include <cgilib6/util.h>
 #include <cgilib6/htmltok.h>
 
@@ -56,6 +57,27 @@ static void handle_backquote        (FILE *restrict,FILE *restrict);
 static void handle_quote            (FILE *restrict,FILE *restrict);
 static void handle_dash             (FILE *restrict,FILE *restrict);
 static void handle_period           (FILE *restrict,FILE *restrict);
+
+/**********************************************************************/
+
+conversion__f TO_conversion(char const *name)
+{
+  assert(name != NULL);
+  
+  if (strcmp(name,"text") == 0)
+    return text_conversion;
+  else if (strcmp(name,"mixed") == 0)
+    return mixed_conversion;
+  else if (strcmp(name,"html") == 0)
+    return html_conversion;
+  else if (strcmp(name,"none") == 0)
+    return no_conversion;
+  else
+  {
+    syslog(LOG_WARNING,"conversion '%s' unsupported",name);
+    return no_conversion;
+  }
+}
 
 /**********************************************************************/
 

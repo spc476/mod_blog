@@ -244,6 +244,7 @@ void generic_cb(char const *which,FILE *out,void *data)
   
   assert(which != NULL);
   assert(out   != NULL);
+  //assert(data  != NULL); /* XXX */
   
   templates = ChunkNew(gd.template,m_callbacks,m_cbnum);
   ChunkProcess(templates,which,out,data);
@@ -337,7 +338,7 @@ static void cb_blog_url(FILE *out,void *data)
 static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(g_config->fullbaseurl,out);
+  fputs(gd.fullbaseurl,out);
 }
 
 /**********************************************************************/
@@ -791,9 +792,9 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
     ;-----------------------------------------------------*/
     
     if (gd.f.fullurl)
-      baseurl = g_config->fullbaseurl;
+      baseurl = gd.fullbaseurl;
     else
-      baseurl = g_config->baseurl;
+      baseurl = gd.baseurl;
       
     /*---------------------------------------------------------
     ; all this to reassign the value, without ``knowing'' how the pair stuff
@@ -998,7 +999,7 @@ static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
 static void cb_rss_url(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fprintf(out,"%s/",g_config->fullbaseurl);
+  fprintf(out,"%s/",gd.fullbaseurl);
 }
 
 /*******************************************************************/
@@ -1038,7 +1039,7 @@ static void cb_rss_item_url(FILE *out,void *data)
   assert(data != NULL);
   
   assert(cbd->entry->valid);
-  fprintf(out,"%s",g_config->fullbaseurl);
+  fprintf(out,"%s",gd.fullbaseurl);
   print_nav_url(out,&cbd->entry->when,UNIT_PART);
 }
 
@@ -1354,7 +1355,7 @@ static void print_nav_url(FILE *out,struct btm const *date,int unit)
   assert(out  != NULL);
   assert(date != NULL);
   
-  fprintf(out,"%s/",g_config->baseurl);
+  fprintf(out,"%s/",gd.baseurl);
   print_nav_name(out,date,unit,'/');
 }
 
@@ -1749,7 +1750,7 @@ static void cb_request_url(FILE *out,void *data __attribute__((unused)))
   assert(out != NULL);
   
   tum = tumbler_canonical(&gd.req.tumbler);
-  fprintf(out,"%s/%s",g_config->fullbaseurl,tum);
+  fprintf(out,"%s/%s",gd.fullbaseurl,tum);
   free(tum);
 }
 

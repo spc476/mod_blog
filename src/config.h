@@ -23,13 +23,8 @@
 #ifndef I_B6A18852_A703_5C27_8A63_33F63C0D5D40
 #define I_B6A18852_A703_5C27_8A63_33F63C0D5D40
 
-#include <stdio.h>
 #include <stddef.h>
 #include <stdbool.h>
-
-#include "blog.h"
-#include "wbtum.h"
-#include "backend.h"
 
 struct fields
 {
@@ -54,6 +49,24 @@ struct bemail
   bool        notify;
 };
 
+typedef struct template
+{
+  char const *template;
+  char const *file;
+  char const *posthook;
+  size_t      items;
+  char const *pagegen;
+  bool        reverse;
+  bool        fullurl;
+} template__t;
+
+typedef struct aflink
+{
+  char const *proto;
+  size_t      psize;
+  char const *format;
+} aflink__t;
+
 typedef struct
 {
   char const     *name;
@@ -67,15 +80,13 @@ typedef struct
   char const     *posthook;
   char const     *adtag;
   bool            debug;
-  void          (*conversion)(FILE *restrict,FILE *restrict);
+  char const     *conversion;
   struct author   author;
   template__t    *templates;
   size_t          templatenum;
   struct bemail   email;
   aflink__t      *affiliates;
   size_t          affiliatenum;
-  char           *baseurl;     /* work on removing the need for this */
-  char           *fullbaseurl; /* work on removing the need for this */
   void           *user;
 } config__s;
 

@@ -23,6 +23,8 @@
 #ifndef I_5B8ED10A_F8F4_5F83_A7EA_CD76EE7A05D8
 #define I_5B8ED10A_F8F4_5F83_A7EA_CD76EE7A05D8
 
+#include "config.h"
+#if 0
 typedef struct template
 {
   char const  *template;
@@ -40,6 +42,9 @@ typedef struct aflink
   size_t      psize;
   char const *format;
 } aflink__t;
+#endif
+
+typedef int (*pagegen__f)(struct template const *,FILE *,Blog *);
 
 struct callback_data
 {
@@ -52,12 +57,13 @@ struct callback_data
 
 /************************************************/
 
-extern int  generate_thisday (FILE *,struct btm);
-extern int  generate_pages   (void);
-extern int  pagegen_items    (template__t const *,FILE *,Blog *);
-extern int  pagegen_days     (template__t const *,FILE *,Blog *);
-extern int  tumbler_page     (FILE *,tumbler__s *);
-extern void generic_cb       (char const *,FILE *,void *);
-extern bool run_hook         (char const *,char const **);
+extern pagegen__f TO_pagegen       (char const *);
+extern int        generate_thisday (FILE *,struct btm);
+extern int        generate_pages   (void);
+extern int        pagegen_items    (template__t const *,FILE *,Blog *);
+extern int        pagegen_days     (template__t const *,FILE *,Blog *);
+extern int        tumbler_page     (FILE *,tumbler__s *);
+extern void       generic_cb       (char const *,FILE *,void *);
+extern bool       run_hook         (char const *,char const **);
 
 #endif

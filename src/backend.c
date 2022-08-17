@@ -46,6 +46,19 @@ static void        free_entries       (List *);
 
 /************************************************************************/
 
+pagegen__f TO_pagegen(char const *name)
+{
+  assert(name != NULL);
+  if (strcmp(name,"items") == 0)
+    return pagegen_items;
+  else if (strcmp(name,"days") == 0)
+    return pagegen_days;
+  else
+    assert(0);
+}
+
+/************************************************************************/
+
 int generate_thisday(FILE *out,struct btm when)
 {
   struct callback_data  cbd;
@@ -87,7 +100,8 @@ int generate_pages(void)
 {
   for (size_t i = 0 ; i < g_config->templatenum ; i++)
   {
-    FILE *out = fopen(g_config->templates[i].file,"w");
+    FILE  *out = fopen(g_config->templates[i].file,"w");
+    int  (*pagegen)(struct template const *,FILE *,Blog *);
     
     if (out == NULL)
     {
@@ -95,7 +109,9 @@ int generate_pages(void)
       continue;
     }
     
-    (*g_config->templates[i].pagegen)(&g_config->templates[i],out,g_blog);
+    pagegen = TO_pagegen(g_config->templates[i].pagegen);
+    (*pagegen)(&g_config->templates[i],out,g_blog);
+    //(*g_config->templates[i].pagegen)(&g_config->templates[i],out,g_blog);
     fclose(out);
     
     if (g_config->templates[i].posthook)

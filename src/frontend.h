@@ -28,6 +28,7 @@
 #include "wbtum.h"
 #include "timeutil.h"
 #include "blog.h"
+#include "config.h"
 
 #define DB_BLOCK 1024
 
@@ -74,15 +75,19 @@ typedef struct dflags
 
 typedef struct display
 {
-  DFlags          f;
-  unit__e         navunit;
-  FILE           *htmldump;
-  Cgi             cgi;
-  char const     *template;
-  struct request  req;
-  struct btm      previous;
-  struct btm      next;
-  struct btm      thisday;
+  DFlags           f;
+  unit__e          navunit;
+  FILE            *htmldump;
+  Cgi              cgi;
+  char const      *template;
+  struct request   req;
+  struct btm       previous;
+  struct btm       next;
+  struct btm       thisday;
+  void           (*conversion)(FILE *restrict,FILE *restrict);
+  int            (*pagegen)(struct template const *,FILE *,Blog *);
+  char            *baseurl;
+  char            *fullbaseurl;
 } Display;
 
 /************************************************/

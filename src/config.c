@@ -26,14 +26,12 @@
 #include <assert.h>
 
 #include <syslog.h>
-#include <cgilib6/url.h>
 
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
 
 #include "config.h"
-#include "conversion.h"
 
 #if LUA_VERSION_NUM == 501
 #  define LUA_OK                0
@@ -47,30 +45,6 @@
             ;
    }
 #endif
-
-/***************************************************************************/
-
-static conversion__f confluaL_toconversion(lua_State *L,int idx,char const *def)
-{
-  assert(L   != NULL);
-  assert(idx != 0);
-  assert(def != NULL);
-  
-  char const *c = luaL_optstring(L,idx,def);
-  if (strcmp(c,"text") == 0)
-    return text_conversion;
-  else if (strcmp(c,"mixed") == 0)
-    return mixed_conversion;
-  else if (strcmp(c,"html") == 0)
-    return html_conversion;
-  else if (strcmp(c,"none") == 0)
-    return no_conversion;
-  else
-  {
-    syslog(LOG_WARNING,"conversion '%s' unsupported",c);
-    return no_conversion;
-  }
-}
 
 /***************************************************************************/
 
@@ -140,7 +114,7 @@ static void confluaL_toitems(lua_State *L,int idx,template__t *temp)
   if (lua_isnumber(L,idx))
   {
     temp->items = lua_tointeger(L,-1);
-    temp->pagegen = pagegen_items;
+    temp->pagegen = "items";
   }
   else if (lua_isstring(L,idx))
   {
@@ -155,18 +129,18 @@ static void confluaL_toitems(lua_State *L,int idx,template__t *temp)
       case 'm': temp->items *= 30; break;
       default:  break;
     }
-    temp->pagegen = pagegen_days;
+    temp->pagegen = "days";
   }
   else if (lua_isnil(L,-1))
   {
     temp->items   = 15;
-    temp->pagegen = pagegen_items;
+    temp->pagegen = "items";
   }
   else
   {
     syslog(LOG_ERR,"wrong type for items");
     temp->items   = 15;
-    temp->pagegen = pagegen_items;
+    temp->pagegen = "items";
   }
 }
 
@@ -303,61 +277,6 @@ static size_t confluaL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
 
 /***************************************************************************/
 
-static void set_url(config__s *config,char const *turl)
-{
-  url__t *url;
-  size_t  len;
-  char   *fbu;
-  char   *bu;
-  
-  assert(turl != NULL);
-  
-  fbu = strdup(turl);
-  url = UrlNew(turl);
-  
-  if (url == NULL)
-  {
-    free(fbu);
-    syslog(LOG_ERR,"unparsable URL");
-    return;
-  }
-  
-  if (url->scheme == URL_HTTP)
-    bu = strdup(url->http.path);
-  else if (url->scheme == URL_GOPHER)
-    bu = strdup(url->gopher.selector);
-  else
-  {
-    free(fbu);
-    UrlFree(url);
-    syslog(LOG_WARNING,"unsupported URL type");
-    return;
-  }
-  
-  /*-----------------------------------------------------------------------
-  ; because of the way link generation happens, both of these *CAN'T* end
-  ; with a '/'.  So make sure they don't end with a '/'.
-  ;
-  ; The reason we go through an intermediate variable is that c_fullbaseurl
-  ; and c_baseurl are declared as 'const char *' and we can't modify a
-  ; constant memory location.
-  ;-----------------------------------------------------------------------*/
-  
-  len = strlen(fbu);
-  if (len) len--;
-  if (fbu[len] == '/') fbu[len] = '\0';
-  
-  len = strlen(bu);
-  if (len) len--;
-  if (bu[len] == '/') bu[len] = '\0';
-  
-  config->fullbaseurl = fbu;
-  config->baseurl     = bu;
-  UrlFree(url);
-}
-
-/***************************************************************************/
-
 config__s *config_lua(char const *conf)
 {
   config__s *config;
@@ -438,7 +357,7 @@ config__s *config_lua(char const *conf)
   lua_getglobal(L,"adtag");
   config->adtag = luaL_optstring(L,-1,"programming");
   lua_getglobal(L,"conversion");
-  config->conversion = confluaL_toconversion(L,-1,"html");
+  config->conversion = luaL_optstring(L,-1,"html");
   lua_getglobal(L,"author");
   confluaL_toauthor(L,-1,&config->author);
   lua_getglobal(L,"templates");
@@ -449,8 +368,7 @@ config__s *config_lua(char const *conf)
   config->affiliatenum = confluaL_toaffiliates(L,-1,&config->affiliates);
   lua_pop(L,15);
   
-  set_url(config,config->url);
-  config->user       = L;
+  config->user = L;
   return config;
 }
 
@@ -460,8 +378,6 @@ void config_free(config__s *config)
 {
   assert(config != NULL);
   
-  free(config->fullbaseurl);
-  free(config->baseurl);
   free(config->affiliates);
   free(config->templates);
   lua_close(config->user);

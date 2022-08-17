@@ -25,6 +25,8 @@
 #include <locale.h>
 #include <errno.h>
 
+#include <syslog.h>
+#include <cgilib6/url.h>
 #include <cgilib6/util.h>
 
 #include "conversion.h"
@@ -74,38 +76,66 @@ static void globals_free(void)
   free(gd.req.adtag);
   free(gd.req.origbody);
   free(gd.req.body);
+  free(gd.fullbaseurl);
+  free(gd.baseurl);
 }
 
 /***********************************************************************/
 
-int GlobalsInit(char const *conf)
+static void set_url(char const *turl)
 {
-  atexit(globals_free);
-  seed_rng();
-  g_config = config_lua(conf);
-  if (g_config == NULL)
-    return ENOMEM;
-    
-  g_blog = BlogNew(g_config->basedir,g_config->lockfile);
-  if (g_blog == NULL)
-    return ENOMEM;
-    
-  gd.template  = g_config->templates[0].template; /* XXX hack fix */
-  gd.navunit   = UNIT_PART;
-  gd.f.navprev = true;
-  gd.f.navnext = true;
+  url__t *url;
+  size_t  len;
+  char   *fbu;
+  char   *bu;
   
-  /*-------------------------------------------------------
-  ; for most sorting routines, I just assume C sorting
-  ; conventions---this makes sure I have those for sorting
-  ; and searching only.
-  ;--------------------------------------------------------*/
+  assert(turl != NULL);
   
-  setlocale(LC_COLLATE,"C");
-  return 0;
+  fbu = strdup(turl);
+  url = UrlNew(turl);
+  
+  if (url == NULL)
+  {
+    free(fbu);
+    syslog(LOG_ERR,"unparsable URL");
+    return;
+  }
+  
+  if (url->scheme == URL_HTTP)
+    bu = strdup(url->http.path);
+  else if (url->scheme == URL_GOPHER)
+    bu = strdup(url->gopher.selector);
+  else
+  {
+    free(fbu);
+    UrlFree(url);
+    syslog(LOG_WARNING,"unsupported URL type");
+    return;
+  }
+  
+  /*-----------------------------------------------------------------------
+  ; because of the way link generation happens, both of these *CAN'T* end
+  ; with a '/'.  So make sure they don't end with a '/'.
+  ;
+  ; The reason we go through an intermediate variable is that c_fullbaseurl
+  ; and c_baseurl are declared as 'const char *' and we can't modify a
+  ; constant memory location.
+  ;-----------------------------------------------------------------------*/
+  
+  len = strlen(fbu);
+  if (len) len--;
+  if (fbu[len] == '/') fbu[len] = '\0';
+  
+  len = strlen(bu);
+  if (len) len--;
+  if (bu[len] == '/') bu[len] = '\0';
+  
+  gd.fullbaseurl = fbu;
+  gd.baseurl     = bu;
+  UrlFree(url);
 }
 
-/********************************************************************/
+/***************************************************************************/
 
 void set_cf_emailupdate(char const *value)
 {
@@ -123,16 +153,38 @@ void set_cf_emailupdate(char const *value)
 void set_c_conversion(char const *value)
 {
   if (!emptynull_string(value))
-  {
-    if (strcmp(value,"text") == 0)
-      g_config->conversion = text_conversion;
-    else if (strcmp(value,"mixed") == 0)
-      g_config->conversion = mixed_conversion;
-    else if (strcmp(value,"html") == 0)
-      g_config->conversion = html_conversion;
-    else if (strcmp(value,"none") == 0)
-      g_config->conversion = no_conversion;
-  }
+    gd.conversion = TO_conversion(value);
 }
 
 /**************************************************************************/
+
+int GlobalsInit(char const *conf)
+{
+  atexit(globals_free);
+  seed_rng();
+  g_config = config_lua(conf);
+  if (g_config == NULL)
+    return ENOMEM;
+    
+  g_blog = BlogNew(g_config->basedir,g_config->lockfile);
+  if (g_blog == NULL)
+    return ENOMEM;
+
+  set_url(g_config->url);
+  set_c_conversion(g_config->conversion);
+  gd.template  = g_config->templates[0].template; /* XXX hack fix */
+  gd.navunit   = UNIT_PART;
+  gd.f.navprev = true;
+  gd.f.navnext = true;
+  
+  /*-------------------------------------------------------
+  ; for most sorting routines, I just assume C sorting
+  ; conventions---this makes sure I have those for sorting
+  ; and searching only.
+  ;--------------------------------------------------------*/
+  
+  setlocale(LC_COLLATE,"C");
+  return 0;
+}
+
+/********************************************************************/

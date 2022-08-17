@@ -255,7 +255,7 @@ static int cmd_cli_show(Request *req)
       
       template.template = g_config->templates[0].template;
       template.items    = g_config->templates[0].items;
-      template.pagegen  = pagegen_days;
+      template.pagegen  = "days";
       template.reverse  = true;
       template.fullurl  = false;
       
