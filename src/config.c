@@ -48,7 +48,34 @@
 
 /***************************************************************************/
 
-static void confluaL_tofields(lua_State *L,int idx,struct fields *fields)
+static char const *confL_checklstring(lua_State *L,int idx,size_t *ps,char const *table,char const *field)
+{
+  assert(L     != NULL);
+  assert(idx   != 0);
+  assert(table != NULL);
+  assert(field != NULL);
+  
+  char const *s = lua_tolstring(L,idx,ps);
+  if (s == NULL)
+    luaL_error(L,"table '%s' missing mandatory field '%s'",table,field);
+  return s;
+}
+
+/***************************************************************************/
+
+static char const *confL_checkstring(lua_State *L,int idx,char const *table,char const *field)
+{
+  assert(L     != NULL);
+  assert(idx   != 0);
+  assert(table != NULL);
+  assert(field != NULL);
+  
+  return confL_checklstring(L,idx,NULL,table,field);
+}
+
+/***************************************************************************/
+
+static void confL_tofields(lua_State *L,int idx,struct fields *fields)
 {
   assert(L      != NULL);
   assert(idx    != 0);
@@ -75,7 +102,7 @@ static void confluaL_tofields(lua_State *L,int idx,struct fields *fields)
 
 /***************************************************************************/
 
-static void confluaL_toauthor(lua_State *L,int idx,struct author *auth)
+static void confL_toauthor(lua_State *L,int idx,struct author *auth)
 {
   assert(L    != NULL);
   assert(idx  != 0);
@@ -99,14 +126,43 @@ static void confluaL_toauthor(lua_State *L,int idx,struct author *auth)
     lua_getfield(L,idx,"file");
     auth->file = luaL_optstring(L,-1,NULL);
     lua_getfield(L,idx,"fields");
-    confluaL_tofields(L,-1,&auth->fields);
+    confL_tofields(L,-1,&auth->fields);
     lua_pop(L,4);
   }
 }
 
 /***************************************************************************/
 
-static void confluaL_toitems(lua_State *L,int idx,template__t *temp)
+static void confL_toemail(lua_State *L,int idx,struct bemail *email)
+{
+  assert(L     != NULL);
+  assert(idx   != 0);
+  assert(email != NULL);
+  
+  idx = lua_absindex(L,idx);
+  if (lua_isnil(L,idx))
+  {
+    email->list    = NULL;
+    email->message = NULL;
+    email->subject = NULL;
+    email->notify  = false;
+  }
+  else
+  {
+    lua_getfield(L,idx,"list");
+    email->list = confL_checkstring(L,-1,"email","list");
+    lua_getfield(L,idx,"message");
+    email->message = confL_checkstring(L,-1,"email","message");
+    lua_getfield(L,idx,"subject");
+    email->subject = confL_checkstring(L,-1,"email","subject");
+    email->notify  = true;
+    lua_pop(L,3);
+  }
+}
+
+/***************************************************************************/
+
+static void confL_toitems(lua_State *L,int idx,template__t *temp)
 {
   assert(L    != NULL);
   assert(idx  != 0);
@@ -147,7 +203,7 @@ static void confluaL_toitems(lua_State *L,int idx,template__t *temp)
 
 /***************************************************************************/
 
-static size_t confluaL_totemplates(lua_State *L,int idx,template__t **ptemps)
+static size_t confL_totemplates(lua_State *L,int idx,template__t **ptemps)
 {
   size_t       max;
   template__t *temps;
@@ -158,19 +214,14 @@ static size_t confluaL_totemplates(lua_State *L,int idx,template__t **ptemps)
   
   idx = lua_absindex(L,idx);
   if (lua_isnil(L,idx))
-  {
-    *ptemps = NULL;
-    return 0;
-  }
+    return luaL_error(L,"missing template secton");
+    
+  max = lua_rawlen(L,idx);
   
-  max   = lua_rawlen(L,idx);
-  temps = calloc(max,sizeof(template__t));
-  if (temps == NULL)
-  {
-    syslog(LOG_ERR,"cannot alloate memory for templates");
-    *ptemps = NULL;
-    return 0;
-  }
+  if (max == 0)
+    return luaL_error(L,"at least one template file is required");
+    
+  temps = lua_newuserdata(L,max * sizeof(template__t));
   
   for (size_t i = 0 ; i < max ; i++)
   {
@@ -180,11 +231,11 @@ static size_t confluaL_totemplates(lua_State *L,int idx,template__t **ptemps)
     lua_gettable(L,idx);
     tidx = lua_gettop(L);
     lua_getfield(L,tidx,"template");
-    temps[i].template = luaL_checkstring(L,-1);
+    temps[i].template = confL_checkstring(L,-1,"template","template");
     lua_getfield(L,tidx,"output");
-    temps[i].file = luaL_checkstring(L,-1);
+    temps[i].file = confL_checkstring(L,-1,"template","output");
     lua_getfield(L,tidx,"items");
-    confluaL_toitems(L,-1,&temps[i]);
+    confL_toitems(L,-1,&temps[i]);
     lua_getfield(L,tidx,"reverse");
     temps[i].reverse = lua_toboolean(L,-1);
     lua_getfield(L,tidx,"fullurl");
@@ -200,36 +251,7 @@ static size_t confluaL_totemplates(lua_State *L,int idx,template__t **ptemps)
 
 /***************************************************************************/
 
-static void confluaL_toemail(lua_State *L,int idx,struct bemail *email)
-{
-  assert(L     != NULL);
-  assert(idx   != 0);
-  assert(email != NULL);
-  
-  idx = lua_absindex(L,idx);
-  if (lua_isnil(L,idx))
-  {
-    email->list    = NULL;
-    email->message = NULL;
-    email->subject = NULL;
-    email->notify  = false;
-  }
-  else
-  {
-    lua_getfield(L,idx,"list");
-    email->list = luaL_optstring(L,-1,NULL);
-    lua_getfield(L,idx,"message");
-    email->message = luaL_optstring(L,-1,NULL);
-    lua_getfield(L,idx,"subject");
-    email->subject = luaL_optstring(L,-1,NULL);
-    email->notify  = true;
-    lua_pop(L,3);
-  }
-}
-
-/***************************************************************************/
-
-static size_t confluaL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
+static size_t confL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
 {
   size_t     max;
   aflink__t *affs;
@@ -246,13 +268,13 @@ static size_t confluaL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
   }
   
   max = lua_rawlen(L,idx);
-  affs = calloc(max,sizeof(aflink__t));
-  if (affs == NULL)
+  if (max == 0)
   {
-    syslog(LOG_ERR,"cannot allocate memory for affiliates");
     *paffs = NULL;
     return 0;
   }
+  
+  affs = lua_newuserdata(L,max * sizeof(aflink__t));
   
   for (size_t i = 0 ; i < max ; i++)
   {
@@ -262,9 +284,9 @@ static size_t confluaL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
     lua_gettable(L,idx);
     tidx = lua_gettop(L);
     lua_getfield(L,tidx,"proto");
-    affs[i].proto = luaL_checklstring(L,-1,&affs[i].psize);
+    affs[i].proto = confL_checklstring(L,-1,&affs[i].psize,"affiliate","proto");
     lua_getfield(L,tidx,"link");
-    affs[i].format = luaL_checkstring(L,-1);
+    affs[i].format = confL_checkstring(L,-1,"affiliate","link");
     lua_pop(L,3);
   }
   
@@ -274,12 +296,50 @@ static size_t confluaL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
 
 /***************************************************************************/
 
+static int confL_config(lua_State *L)
+{
+  config__s *config = lua_touserdata(L,1);
+  lua_getglobal(L,"name");
+  config->name = luaL_optstring(L,-1,"A Blog Grows in Cyberspace");
+  lua_getglobal(L,"description");
+  config->description = luaL_optstring(L,-1,"A place where I talk about stuff in cyberspace");
+  lua_getglobal(L,"class");
+  config->class = luaL_optstring(L,-1,"blog, rants, random stuff, programming");
+  lua_getglobal(L,"basedir");
+  config->basedir = luaL_optstring(L,-1,".");
+  lua_getglobal(L,"webdir");
+  config->webdir = luaL_optstring(L,-1,"htdocs");
+  lua_getglobal(L,"lockfile");
+  config->lockfile = luaL_optstring(L,-1,".mod_blog.lock");
+  lua_getglobal(L,"url");
+  config->url = luaL_optstring(L,-1,"http://www.example.com/blog/");
+  lua_getglobal(L,"adtag");
+  config->adtag = luaL_optstring(L,-1,"programming");
+  lua_getglobal(L,"conversion");
+  config->conversion = luaL_optstring(L,-1,"html");
+  lua_getglobal(L,"prehook");
+  config->prehook = luaL_optstring(L,-1,NULL);
+  lua_getglobal(L,"posthook");
+  config->posthook = luaL_optstring(L,-1,NULL);
+  lua_getglobal(L,"author");
+  confL_toauthor(L,-1,&config->author);
+  lua_getglobal(L,"email");
+  confL_toemail(L,-1,&config->email);
+  lua_getglobal(L,"templates");
+  config->templatenum = confL_totemplates(L,-1,&config->templates);
+  lua_getglobal(L,"affiliate");
+  config->affiliatenum = confL_toaffiliates(L,-1,&config->affiliates);
+  return 0;
+}
+
+/***************************************************************************/
+
 config__s *config_lua(char const *conf)
 {
   config__s *config;
   lua_State *L;
   int        rc;
-  
+
   config = malloc(sizeof(config__s));
   if (config == NULL)
   {
@@ -333,37 +393,23 @@ config__s *config_lua(char const *conf)
     return NULL;
   }
   
-  lua_getglobal(L,"name");
-  config->name = luaL_optstring(L,-1,"A Blog Grows in Cyberspace");
-  lua_getglobal(L,"description");
-  config->description = luaL_optstring(L,-1,"A place where I talk about stuff in cyberspace");
-  lua_getglobal(L,"class");
-  config->class = luaL_optstring(L,-1,"blog, rants, random stuff, programming");
-  lua_getglobal(L,"basedir");
-  config->basedir = luaL_optstring(L,-1,"journal");
-  lua_getglobal(L,"lockfile");
-  config->lockfile = luaL_optstring(L,-1,".mod_blog.lock");
-  lua_getglobal(L,"webdir");
-  config->webdir = luaL_optstring(L,-1,"./htdocs");
-  lua_getglobal(L,"url");
-  config->url = luaL_optstring(L,-1,"http://www.example.com/blog/");
-  lua_getglobal(L,"prehook");
-  config->prehook = luaL_optstring(L,-1,NULL);
-  lua_getglobal(L,"posthook");
-  config->posthook = luaL_optstring(L,-1,NULL);
-  lua_getglobal(L,"adtag");
-  config->adtag = luaL_optstring(L,-1,"programming");
-  lua_getglobal(L,"conversion");
-  config->conversion = luaL_optstring(L,-1,"html");
-  lua_getglobal(L,"author");
-  confluaL_toauthor(L,-1,&config->author);
-  lua_getglobal(L,"templates");
-  config->templatenum = confluaL_totemplates(L,-1,&config->templates);
-  lua_getglobal(L,"email");
-  confluaL_toemail(L,-1,&config->email);
-  lua_getglobal(L,"affiliate");
-  config->affiliatenum = confluaL_toaffiliates(L,-1,&config->affiliates);
-  lua_pop(L,15);
+  /*-----------------------------------------------------------------------
+  ; Some items aren't optional, so let Lua do the error checking for us and
+  ; return an error, which is caught here; otherwise, things might blow up.
+  ; Besides, catching common configuration errors is always a good thing.
+  ;------------------------------------------------------------------------*/
+  
+  lua_pushcfunction(L,confL_config);
+  lua_pushlightuserdata(L,config);
+
+  rc = lua_pcall(L,1,0,0);
+  if (rc != LUA_OK)
+  {
+    syslog(LOG_ERR,"Lua error: (%d) %s",rc,lua_tostring(L,-1));
+    lua_close(L);
+    free(config);
+    return NULL;
+  }
   
   config->user = L;
   return config;
@@ -376,8 +422,6 @@ void config_free(config__s *config)
   assert(config       != NULL);
   assert(config->user != NULL);
   
-  free(config->affiliates);
-  free(config->templates);
   lua_close(config->user);
   free(config);
 }
