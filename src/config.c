@@ -67,7 +67,7 @@ static conversion__f confluaL_toconversion(lua_State *L,int idx,char const *def)
     return no_conversion;
   else
   {
-    syslog(LOG_DEBUG,"conversion '%s' unsupported",c);
+    syslog(LOG_WARNING,"conversion '%s' unsupported",c);
     return no_conversion;
   }
 }
