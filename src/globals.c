@@ -103,6 +103,8 @@ int GlobalsInit(char const *conf)
   if (g_blog == NULL)
     return ENOMEM;
     
+  gd.template = g_config->templates[0].template; /* XXX hack fix */
+
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting
   ; conventions---this makes sure I have those for sorting
