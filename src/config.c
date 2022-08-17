@@ -182,10 +182,11 @@ static void confL_toitems(lua_State *L,int idx,template__t *temp)
     switch(*p)
     {
       case 'd': break;
-      case 'w': temp->items *= 7; break;
+      case 'w': temp->items *=  7; break;
       case 'm': temp->items *= 30; break;
       default:  break;
     }
+    
     temp->pagegen = "days";
   }
   else if (lua_isnil(L,-1))
@@ -222,6 +223,8 @@ static size_t confL_totemplates(lua_State *L,int idx,template__t **ptemps)
     return luaL_error(L,"at least one template file is required");
     
   temps = lua_newuserdata(L,max * sizeof(template__t));
+  lua_pushvalue(L,-1);
+  luaL_ref(L,LUA_REGISTRYINDEX); /* prevent GC */
   
   for (size_t i = 0 ; i < max ; i++)
   {
@@ -275,6 +278,8 @@ static size_t confL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
   }
   
   affs = lua_newuserdata(L,max * sizeof(aflink__t));
+  lua_pushvalue(L,-1);
+  luaL_ref(L,LUA_REGISTRYINDEX); /* prevent GC */
   
   for (size_t i = 0 ; i < max ; i++)
   {
