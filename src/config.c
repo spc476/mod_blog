@@ -224,7 +224,7 @@ static size_t confL_totemplates(lua_State *L,int idx,template__t **ptemps)
     
   temps = lua_newuserdata(L,max * sizeof(template__t));
   lua_pushvalue(L,-1);
-  luaL_ref(L,LUA_REGISTRYINDEX); /* prevent GC */
+  luaL_ref(L,LUA_REGISTRYINDEX); /* prevent GC reclaiming thie memory  */
   
   for (size_t i = 0 ; i < max ; i++)
   {
@@ -279,7 +279,7 @@ static size_t confL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
   
   affs = lua_newuserdata(L,max * sizeof(aflink__t));
   lua_pushvalue(L,-1);
-  luaL_ref(L,LUA_REGISTRYINDEX); /* prevent GC */
+  luaL_ref(L,LUA_REGISTRYINDEX); /* prevent GC reclaiming this memory */
   
   for (size_t i = 0 ; i < max ; i++)
   {
