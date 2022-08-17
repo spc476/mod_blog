@@ -21,7 +21,7 @@
   <link rel="alternate"     href="/index.rss"            type="application/rss+xml"     title="RSS 0.91">
   <link rev="Made"          href="%{blog.author.email}%" title="%{blog.author}%">
   
-  <title>%{cond.blog.title}%%{blog.name}%</title>
+  <title>%{blog.title}%%{blog.name}%</title>
   
 </head>
 
