@@ -124,9 +124,6 @@ static void cb_navigation_next_url    (FILE *,void *);
 static void cb_navigation_prev_title  (FILE *,void *);
 static void cb_navigation_prev_url    (FILE *,void *);
 static void cb_now_year               (FILE *,void *);
-static void cb_overview               (FILE *,void *);
-static void cb_overview_date          (FILE *,void *);
-static void cb_overview_list          (FILE *,void *);
 static void cb_request_url            (FILE *,void *);
 static void cb_robots_index           (FILE *,void *);
 static void cb_rss_item               (FILE *,void *);
@@ -227,9 +224,6 @@ static struct chunk_callback const m_callbacks[] =
   { "navigation.prev.title"     , cb_navigation_prev_title      } ,
   { "navigation.prev.url"       , cb_navigation_prev_url        } ,
   { "now.year"                  , cb_now_year                   } ,
-  { "overview"                  , cb_overview                   } ,
-  { "overview.date"             , cb_overview_date              } ,
-  { "overview.list"             , cb_overview_list              } ,
   { "request.url"               , cb_request_url                } ,
   { "robots.index"              , cb_robots_index               } ,
   { "rss.item"                  , cb_rss_item                   } ,
@@ -459,12 +453,6 @@ static void cb_entry(FILE *out,void *data)
   {
     if (gd.htmldump)
       fcopy(out,gd.htmldump);
-    return;
-  }
-  
-  if (gd.f.overview)
-  {
-    generic_cb("overview",out,data);
     return;
   }
   
@@ -1750,30 +1738,6 @@ static void cb_entry_path(FILE *out,void *data)
   entry = cbd->entry;
   assert(entry->valid);
   print_nav_name(out,&entry->when,UNIT_PART,'/');
-}
-
-/**********************************************************************/
-
-static void cb_overview(FILE *out __attribute__((unused)),void *data __attribute__((unused)))
-{
-  assert(out  != NULL);
-  assert(data != NULL);
-}
-
-/***********************************************************************/
-
-static void cb_overview_date(FILE *out,void *data __attribute__((unused)))
-{
-  assert(out != NULL);
-  fputs("DATE",out);
-}
-
-/***********************************************************************/
-
-static void cb_overview_list(FILE *out,void *data __attribute__((unused)))
-{
-  assert(out != NULL);
-  fputs("OVERVIEW",out);
 }
 
 /**********************************************************************/

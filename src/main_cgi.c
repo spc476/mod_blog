@@ -36,8 +36,6 @@ static int  cgi_init               (Cgi,Request *);
 static void set_m_cgi_get_command  (char *,Request *);
 static int  cmd_cgi_get_new        (Request *);
 static int  cmd_cgi_get_show       (Request *);
-static int  cmd_cgi_get_edit       (Request *);
-static int  cmd_cgi_get_overview   (Request *);
 static int  cmd_cgi_get_today      (Request *);
 static void set_m_cgi_post_command (char *,Request *);
 static void set_m_author           (char *,Request *);
@@ -75,6 +73,7 @@ static void set_m_cgi_get_command(char *value,Request *req)
 {
   assert(req != NULL);
   
+  syslog(LOG_DEBUG,"set_m_cgi_get_command('%s')",value);
   if (emptynull_string(value)) return;
   up_string(value);
   
@@ -84,10 +83,6 @@ static void set_m_cgi_get_command(char *value,Request *req)
     req->command = cmd_cgi_get_show;
   else if (strcmp(value,"PREVIEW") == 0)
     req->command = cmd_cgi_get_show;
-  else if (strcmp(value,"EDIT") == 0)
-    req->command = cmd_cgi_get_edit;
-  else if (strcmp(value,"OVERVIEW") == 0)
-    req->command = cmd_cgi_get_overview;
   else if (strcmp(value,"TODAY") == 0)
     req->command = cmd_cgi_get_today;
 }
@@ -202,28 +197,6 @@ static int cmd_cgi_get_show(Request *req)
 }
 
 /********************************************************************/
-
-static int cmd_cgi_get_edit(Request *req)
-{
-  assert(req != NULL);
-  return (*req->error)(req,HTTP_BADREQ,"bad request");
-}
-
-/***********************************************************************/
-
-static int cmd_cgi_get_overview(Request *req)
-{
-  List days;
-  assert(req != NULL);
-  
-  ListInit(&days);
-  gd.f.overview = true;
-  fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
-  generic_cb("main",req->out,&days);
-  return 0;
-}
-
-/**********************************************************************/
 
 static int cmd_cgi_get_today(Request *req)
 {
