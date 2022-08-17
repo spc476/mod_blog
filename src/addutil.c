@@ -237,8 +237,7 @@ void fix_entry(Request *req)
 
 void dbcritical(char const *msg)
 {
-  if (msg)
-    fprintf(stderr,"critical error: %s\n",msg);
+  syslog(LOG_ERR,"gdbm_open() = %s",msg);
 }
 
 /************************************************************************/
