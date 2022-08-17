@@ -344,13 +344,6 @@ config__s *config_lua(char const *conf)
   config__s *config;
   lua_State *L;
   int        rc;
-
-  config = malloc(sizeof(config__s));
-  if (config == NULL)
-  {
-    syslog(LOG_ERR,"no memory to allocate config structure");
-    return NULL;
-  }
   
   if (conf == NULL)
   {
@@ -361,10 +354,16 @@ config__s *config_lua(char const *conf)
       if (conf == NULL)
       {
         syslog(LOG_ERR,"env BLOG_CONFIG not defined");
-        free(config);
         return NULL;
       }
     }
+  }
+  
+  config = malloc(sizeof(config__s));
+  if (config == NULL)
+  {
+    syslog(LOG_ERR,"no memory to allocate config structure");
+    return NULL;
   }
   
   L = luaL_newstate();
