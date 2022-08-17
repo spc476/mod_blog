@@ -57,8 +57,9 @@ static void confluaL_tofields(lua_State *L,int idx,struct fields *fields)
   idx = lua_absindex(L,idx);
   if (lua_isnil(L,idx))
   {
-    fields->uid  = 0;
-    fields->name = 0;
+    fields->uid   = 0;
+    fields->name  = 0;
+    fields->email = 0;
   }
   else
   {
@@ -343,17 +344,17 @@ config__s *config_lua(char const *conf)
   lua_getglobal(L,"class");
   config->class = luaL_optstring(L,-1,"blog, rants, random stuff, programming");
   lua_getglobal(L,"basedir");
-  config->basedir = luaL_optstring(L,-1,"/path/to/basedir");
+  config->basedir = luaL_optstring(L,-1,"journal");
   lua_getglobal(L,"lockfile");
-  config->lockfile = luaL_optstring(L,-1,"/tmp/.mod_blog.lock");
+  config->lockfile = luaL_optstring(L,-1,".mod_blog.lock");
   lua_getglobal(L,"webdir");
-  config->webdir = luaL_optstring(L,-1,"/path/to/webdir");
+  config->webdir = luaL_optstring(L,-1,"./htdocs");
   lua_getglobal(L,"url");
   config->url = luaL_optstring(L,-1,"http://www.example.com/blog/");
   lua_getglobal(L,"prehook");
-  config->prehook = luaL_optstring(L,-1,"/path/to/prehook");
+  config->prehook = luaL_optstring(L,-1,NULL);
   lua_getglobal(L,"posthook");
-  config->posthook = luaL_optstring(L,-1,"/path/to/posthook");
+  config->posthook = luaL_optstring(L,-1,NULL);
   lua_getglobal(L,"adtag");
   config->adtag = luaL_optstring(L,-1,"programming");
   lua_getglobal(L,"conversion");
@@ -376,7 +377,8 @@ config__s *config_lua(char const *conf)
 
 void config_free(config__s *config)
 {
-  assert(config != NULL);
+  assert(config       != NULL);
+  assert(config->user != NULL);
   
   free(config->affiliates);
   free(config->templates);
