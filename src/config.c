@@ -384,7 +384,7 @@ config__s *config_lua(char const *conf)
     return NULL;
   }
   
-  rc = lua_pcall(L,0,LUA_MULTRET,0);
+  rc = lua_pcall(L,0,0,0);
   if (rc != LUA_OK)
   {
     syslog(LOG_ERR,"Lua error: (%d) %s",rc,lua_tostring(L,-1));
