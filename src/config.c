@@ -349,7 +349,6 @@ config__s *config_lua(char const *conf)
   if (config == NULL)
   {
     syslog(LOG_ERR,"no memory to allocate config structure");
-    free(config);
     return NULL;
   }
   
