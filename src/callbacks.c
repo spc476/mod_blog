@@ -1240,13 +1240,15 @@ static void cb_navigation_next_title(FILE *out,void *data __attribute__((unused)
 
 /********************************************************************/
 
-static void cb_navigation_prev_title(FILE *out,void *data __attribute__((unused)))
+static void cb_navigation_prev_title(FILE *out,void *data)
 {
-  struct btm tmp;
+  struct callback_data *cbd = data;
+  struct btm            tmp;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  tmp = gd.previous;
+  tmp = cbd->previous;
   print_nav_title(out,&tmp,gd.navunit);
 }
 
@@ -1264,13 +1266,15 @@ static void cb_navigation_next_url(FILE *out,void *data __attribute__((unused)))
 
 /*******************************************************************/
 
-static void cb_navigation_prev_url(FILE *out,void *data __attribute__((unused)))
+static void cb_navigation_prev_url(FILE *out,void *data)
 {
-  struct btm tmp;
+  struct callback_data *cbd = data;
+  struct btm            tmp;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  tmp = gd.previous;
+  tmp = cbd->previous;
   print_nav_url(out,&tmp,gd.navunit);
 }
 

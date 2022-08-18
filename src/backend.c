@@ -36,7 +36,7 @@
 
 /*****************************************************************/
 
-static void        calculate_previous (struct btm const);
+static struct btm  calculate_previous (struct btm const);
 static void        calculate_next     (struct btm const);
 static char const *mime_type          (char const *);
 static int         display_file       (FILE *,tumbler__s const *);
@@ -382,7 +382,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
                     ? spec->ustart
                     : spec->ustop
                     ;
-    calculate_previous(start);
+    cbd.previous = calculate_previous(start);
     calculate_next(end);
   }
   else
@@ -446,9 +446,9 @@ int tumbler_page(FILE *out,tumbler__s *spec)
 
 /******************************************************************/
 
-static void calculate_previous(struct btm const start)
+static struct btm calculate_previous(struct btm const start)
 {
-  gd.previous = start;
+  struct btm previous = start;
   
   switch(gd.navunit)
   {
@@ -456,7 +456,7 @@ static void calculate_previous(struct btm const start)
          if (start.year == g_blog->first.year)
            gd.f.navprev = false;
          else
-           gd.previous.year = start.year - 1;
+           previous.year = start.year - 1;
          break;
          
     case UNIT_MONTH:
@@ -467,22 +467,22 @@ static void calculate_previous(struct btm const start)
            gd.f.navprev = false;
          else
          {
-           btm_dec_month(&gd.previous);
-           gd.previous.day  = max_monthday(gd.previous.year,gd.previous.month);
-           gd.previous.part = 1;
+           btm_dec_month(&previous);
+           previous.day  = max_monthday(previous.year,previous.month);
+           previous.part = 1;
            
-           while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
+           while(btm_cmp(&previous,&g_blog->first) >= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&gd.previous);
+             BlogEntry *entry = BlogEntryRead(g_blog,&previous);
              if (entry == NULL)
              {
-               btm_dec_day(&gd.previous);
+               btm_dec_day(&previous);
                continue;
              }
              
              assert(entry->valid);
              BlogEntryFree(entry);
-             return;
+             return previous;
            }
            
            gd.f.navprev = false;
@@ -494,21 +494,21 @@ static void calculate_previous(struct btm const start)
            gd.f.navprev = false;
          else
          {
-           btm_dec_day(&gd.previous);
-           gd.previous.part = 1;
+           btm_dec_day(&previous);
+           previous.part = 1;
            
-           while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
+           while(btm_cmp(&previous,&g_blog->first) >= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&gd.previous);
+             BlogEntry *entry = BlogEntryRead(g_blog,&previous);
              if (entry == NULL)
              {
-               btm_dec_day(&gd.previous);
+               btm_dec_day(&previous);
                continue;
              }
              
              assert(entry->valid);
              BlogEntryFree(entry);
-             return;
+             return previous;
            }
            
            gd.f.navprev = false;
@@ -520,20 +520,20 @@ static void calculate_previous(struct btm const start)
            gd.f.navprev = false;
          else
          {
-           btm_dec_part(&gd.previous);
+           btm_dec_part(&previous);
            
-           while(btm_cmp(&gd.previous,&g_blog->first) >= 0)
+           while(btm_cmp(&previous,&g_blog->first) >= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&gd.previous);
+             BlogEntry *entry = BlogEntryRead(g_blog,&previous);
              if (entry == NULL)
              {
-               btm_dec_part(&gd.previous);
+               btm_dec_part(&previous);
                continue;
              }
              
              assert(entry->valid);
              BlogEntryFree(entry);
-             return;
+             return previous;
            }
            
            gd.f.navprev = false;
@@ -543,6 +543,8 @@ static void calculate_previous(struct btm const start)
     default:
          assert(0);
   }
+  
+  return previous;
 }
 
 /******************************************************************/

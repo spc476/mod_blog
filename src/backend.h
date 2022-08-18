@@ -53,6 +53,7 @@ struct callback_data
   BlogEntry  *entry;    /* current entry being processed */
   FILE       *ad;       /* file containing ad */
   char       *adtag;
+  struct btm  previous;
 };
 
 /************************************************/
