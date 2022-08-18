@@ -237,7 +237,7 @@ void fix_entry(Request *req)
 
 /*************************************************************************/
 
-void dbcritical(char const *msg)
+static void dbcritical(char const *msg)
 {
   assert(msg != NULL);
   syslog(LOG_ERR,"gdbm_open() = %s",msg);
