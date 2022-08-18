@@ -116,10 +116,6 @@ static void set_url(char const *turl)
   /*-----------------------------------------------------------------------
   ; because of the way link generation happens, both of these *CAN'T* end
   ; with a '/'.  So make sure they don't end with a '/'.
-  ;
-  ; The reason we go through an intermediate variable is that c_fullbaseurl
-  ; and c_baseurl are declared as 'const char *' and we can't modify a
-  ; constant memory location.
   ;-----------------------------------------------------------------------*/
   
   len = strlen(fbu);
