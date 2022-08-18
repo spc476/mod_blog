@@ -171,6 +171,12 @@ int main_cli(int argc,char *argv[])
     
   if (forcenotify)
   {
+    if (!g_config->email.notify)
+    {
+      fprintf(stderr,"No email notifiation list\n");
+      return EXIT_FAILURE;
+    }
+    
     BlogEntry *entry = BlogEntryRead(g_blog,&g_blog->last);
     
     if (entry != NULL)
