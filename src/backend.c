@@ -866,7 +866,7 @@ static int display_file(FILE *out,tumbler__s const *spec)
       spec->filename
   );
   
-  if (gd.cgi)
+  if (gd.f.cgi)
   {
     struct stat  status;
     FILE        *in;

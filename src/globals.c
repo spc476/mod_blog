@@ -60,7 +60,6 @@ static void seed_rng(void)
 
 static void globals_free(void)
 {
-  if (gd.cgi   != NULL) CgiFree(gd.cgi);
   if (g_blog   != NULL) BlogFree(g_blog);
   if (g_config != NULL) config_free(g_config);
   

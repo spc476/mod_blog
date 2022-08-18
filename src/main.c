@@ -28,23 +28,29 @@
 
 int main(int argc,char *argv[],char *envp[])
 {
+  Cgi cgi;
+  int rc;
+  
   crashreport_with(argc,argv,envp);
   crashreport_core();
   
-  gd.cgi = CgiNew(NULL);
+  cgi = CgiNew(NULL);
   
-  if (gd.cgi != NULL)
+  if (cgi != NULL)
   {
-    switch(CgiMethod(gd.cgi))
+    switch(CgiMethod(cgi))
     {
-      case GET:  return main_cgi_get (gd.cgi);
-      case POST: return main_cgi_post(gd.cgi);
-      case HEAD: return main_cgi_get (gd.cgi);
-      default:   return EXIT_FAILURE;
+      case GET:  rc = main_cgi_get (cgi); break;
+      case POST: rc = main_cgi_post(cgi); break;
+      case HEAD: rc = main_cgi_get (cgi); break;
+      default:   rc = EXIT_FAILURE;       break;
     }
+    CgiFree(cgi);
   }
-  
-  return main_cli(argc,argv);
+  else
+    rc = main_cli(argc,argv);
+    
+  return rc;
 }
 
 /***********************************************************************/

@@ -522,6 +522,7 @@ static int cgi_init(Cgi cgi,Request *req)
   (void)cgi;
   
   gd.error = cgi_error;
+  gd.f.cgi = true;
   req->in  = stdin;
   req->out = stdout;
   
