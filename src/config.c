@@ -303,6 +303,8 @@ static size_t confL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
 
 static int confL_config(lua_State *L)
 {
+  assert(L != NULL);
+  
   config__s *config = lua_touserdata(L,1);
   lua_getglobal(L,"name");
   config->name = luaL_optstring(L,-1,"A Blog Grows in Cyberspace");
