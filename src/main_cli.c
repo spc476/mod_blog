@@ -177,7 +177,7 @@ int main_cli(int argc,char *argv[])
     {
       gd.req.title  = strdup(entry->title);
       gd.req.author = strdup(entry->author);
-      gd.req.status = strdup("");
+      gd.req.status = strdup(entry->status);
       gd.req.when   = entry->when;
       notify_emaillist(&gd.req);
       BlogEntryFree(entry);
