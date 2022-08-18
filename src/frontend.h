@@ -41,7 +41,6 @@ typedef struct rflags
 
 typedef struct request
 {
-  int       (*error)  (struct request *,int,char const *, ... );
   RFlags      f;
   FILE       *in;
   FILE       *out;
@@ -79,7 +78,8 @@ typedef struct display
   char const      *template;
   struct request   req;
   void           (*conversion)(FILE *restrict,FILE *restrict);
-  int            (*pagegen)(struct template const *,FILE *,Blog *);
+  int            (*pagegen)   (struct template const *,FILE *,Blog *);
+  int            (*error)     (struct request *,int,char const *, ... );
   char            *baseurl;
   char            *fullbaseurl;
 } Display;

@@ -877,18 +877,18 @@ static int display_file(FILE *out,tumbler__s const *spec)
     if (rc == -1)
     {
       if (errno == ENOENT)
-        (*gd.req.error)(&gd.req,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
+        (*gd.error)(&gd.req,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
       else if (errno == EACCES)
-        (*gd.req.error)(&gd.req,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
+        (*gd.error)(&gd.req,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
       else
-        (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
+        (*gd.error)(&gd.req,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
       return 1;
     }
     
     in = fopen(fname,"r");
     if (in == NULL)
     {
-      (*gd.req.error)(&gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
+      (*gd.error)(&gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
       return 1;
     }
     
