@@ -37,7 +37,7 @@
 /*****************************************************************/
 
 static struct btm  calculate_previous (struct btm const);
-static void        calculate_next     (struct btm const);
+static struct btm  calculate_next     (struct btm const);
 static char const *mime_type          (char const *);
 static int         display_file       (FILE *,tumbler__s const *);
 static char       *tag_collect        (List *);
@@ -383,7 +383,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
                     : spec->ustop
                     ;
     cbd.previous = calculate_previous(start);
-    calculate_next(end);
+    cbd.next     = calculate_next(end);
   }
   else
   {
@@ -549,9 +549,9 @@ static struct btm calculate_previous(struct btm const start)
 
 /******************************************************************/
 
-static void calculate_next(struct btm const end)
+static struct btm calculate_next(struct btm const end)
 {
-  gd.next = end;
+  struct btm next = end;
   
   switch(gd.navunit)
   {
@@ -559,7 +559,7 @@ static void calculate_next(struct btm const end)
          if (end.year == g_blog->now.year)
            gd.f.navnext = false;
          else
-           gd.next.year  = end.year + 1;
+           next.year  = end.year + 1;
          break;
          
     case UNIT_MONTH:
@@ -570,22 +570,22 @@ static void calculate_next(struct btm const end)
            gd.f.navnext = false;
          else
          {
-           btm_inc_month(&gd.next);
-           gd.next.day  = 1;
-           gd.next.part = 1;
+           btm_inc_month(&next);
+           next.day  = 1;
+           next.part = 1;
            
-           while(btm_cmp(&gd.next,&g_blog->now) <= 0)
+           while(btm_cmp(&next,&g_blog->now) <= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&gd.next);
+             BlogEntry *entry = BlogEntryRead(g_blog,&next);
              if (entry == NULL)
              {
-               btm_inc_day(&gd.next);
+               btm_inc_day(&next);
                continue;
              }
              
              assert(entry->valid);
              BlogEntryFree(entry);
-             return;
+             return next;
            }
            
            gd.f.navnext = false;
@@ -597,21 +597,21 @@ static void calculate_next(struct btm const end)
            gd.f.navnext = false;
          else
          {
-           btm_inc_day(&gd.next);
-           gd.next.part = 1;
+           btm_inc_day(&next);
+           next.part = 1;
            
-           while(btm_cmp(&gd.next,&g_blog->now) <= 0)
+           while(btm_cmp(&next,&g_blog->now) <= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&gd.next);
+             BlogEntry *entry = BlogEntryRead(g_blog,&next);
              if (entry == NULL)
              {
-               btm_inc_day(&gd.next);
+               btm_inc_day(&next);
                continue;
              }
              
              assert(entry->valid);
              BlogEntryFree(entry);
-             return;
+             return next;
            }
            
            gd.f.navnext = false;
@@ -623,21 +623,21 @@ static void calculate_next(struct btm const end)
            gd.f.navnext = false;
          else
          {
-           gd.next.part++;
+           next.part++;
            
-           while(btm_cmp(&gd.next,&g_blog->now) <= 0)
+           while(btm_cmp(&next,&g_blog->now) <= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&gd.next);
+             BlogEntry *entry = BlogEntryRead(g_blog,&next);
              if (entry == NULL)
              {
-               gd.next.part = 1;
-               btm_inc_day(&gd.next);
+               next.part = 1;
+               btm_inc_day(&next);
                continue;
              }
              
              assert(entry->valid);
              BlogEntryFree(entry);
-             return;
+             return next;
            }
            gd.f.navnext = false;
          }
@@ -646,6 +646,8 @@ static void calculate_next(struct btm const end)
     default:
          assert(0);
   }
+  
+  return next;
 }
 
 /******************************************************************/

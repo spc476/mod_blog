@@ -79,7 +79,6 @@ typedef struct display
   Cgi              cgi;
   char const      *template;
   struct request   req;
-  struct btm       next;
   struct btm       thisday;
   void           (*conversion)(FILE *restrict,FILE *restrict);
   int            (*pagegen)(struct template const *,FILE *,Blog *);

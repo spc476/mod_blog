@@ -54,6 +54,7 @@ struct callback_data
   FILE       *ad;       /* file containing ad */
   char       *adtag;
   struct btm  previous;
+  struct btm  next;
 };
 
 /************************************************/
