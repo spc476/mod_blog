@@ -609,6 +609,7 @@ static ssize_t fj_write(void *cookie,char const *buffer,size_t bytes)
 
 FILE *fjson_encode_onwrite(FILE *out)
 {
+  assert(out != NULL);
   return fopencookie(out,"w",(cookie_io_functions_t) {
                                NULL,
                                fj_write,

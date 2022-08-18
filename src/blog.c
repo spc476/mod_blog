@@ -178,7 +178,8 @@ Blog *BlogNew(char const *restrict location,char const *restrict lockfile)
 
 bool BlogLock(Blog *blog)
 {
-  assert(blog != NULL);
+  assert(blog       != NULL);
+  assert(blog->lock == 0);
   
   blog->lock = open(blog->lockfile,O_CREAT | O_RDWR, 0666);
   if (blog->lock == -1)
@@ -723,6 +724,7 @@ static bool date_check(struct btm const *date)
   char tname[FILENAME_MAX];
   struct stat status;
   
+  assert(date != NULL);
   date_to_dir(tname,date);
   return stat(tname,&status) == 0;
 }

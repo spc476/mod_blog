@@ -64,6 +64,7 @@ int generate_thisday(FILE *out,struct btm when)
   struct callback_data  cbd;
   char                 *tags;
   
+  assert(out != NULL);
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
   
@@ -652,6 +653,9 @@ static int dstring_cmp(void const *needle,void const *haystack)
   char const           *key   = needle;
   struct dstring const *value = haystack;
   
+  assert(needle   != NULL);
+  assert(haystack != NULL);
+  
   return strcmp(key,value->s1);
 }
 
@@ -979,11 +983,11 @@ static char *tag_pick(char const *tag)
 
 static void free_entries(List *list)
 {
-  BlogEntry *entry;
+  assert(list != NULL);
   
   for
   (
-    entry = (BlogEntry *)ListRemHead(list);
+    BlogEntry *entry = (BlogEntry *)ListRemHead(list);
     NodeValid(&entry->node);
     entry = (BlogEntry *)ListRemHead(list)
   )

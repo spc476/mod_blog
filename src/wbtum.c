@@ -89,7 +89,9 @@ static bool check_dates(
   bool start_okay = false;
   bool stop_okay  = false;
   
-  assert(tum != NULL);
+  assert(tum   != NULL);
+  assert(first != NULL);
+  assert(last  != NULL);
   
   switch(tum->ustart)
   {
@@ -164,8 +166,10 @@ bool tumbler_new(
   struct value u4;
   bool         part = false;
   
-  assert(tum  != NULL);
-  assert(text != NULL);
+  assert(tum   != NULL);
+  assert(text  != NULL);
+  assert(first != NULL);
+  assert(last  != NULL);
   
   memset(tum,0,sizeof(tumbler__s));
   memset(&u1,0,sizeof(u1));
@@ -716,6 +720,9 @@ bool thisday_new(tumbler__s *tum,char const *text)
 {
   struct value month;
   struct value day;
+  
+  assert(tum  != NULL);
+  assert(text != NULL);
   
   memset(&month,0,sizeof(month));
   memset(&day,  0,sizeof(day));

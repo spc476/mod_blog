@@ -239,6 +239,7 @@ void fix_entry(Request *req)
 
 void dbcritical(char const *msg)
 {
+  assert(msg != NULL);
   syslog(LOG_ERR,"gdbm_open() = %s",msg);
 }
 
@@ -503,6 +504,9 @@ static void cb_email_title(FILE *out,void *data)
 {
   Request *req = data;
   
+  assert(out  != NULL);
+  assert(data != NULL);
+  
   if (!empty_string(req->status))
     fprintf(out,"%s",req->status);
   else
@@ -514,6 +518,9 @@ static void cb_email_title(FILE *out,void *data)
 static void cb_email_url(FILE *out,void *data)
 {
   Request *req = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
   
   fprintf(
            out,
@@ -532,6 +539,8 @@ static void cb_email_author(FILE *out,void *data)
 {
   Request *req = data;
   
+  assert(out  != NULL);
+  assert(data != NULL);
   fprintf(out,"%s",req->author);
 }
 

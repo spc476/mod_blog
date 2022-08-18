@@ -2169,6 +2169,7 @@ static bool char_entity(char const **tag,size_t *ps,int c)
 
 FILE *fentity_encode_onread(FILE *in)
 {
+  assert(in != NULL);
   return fopencookie(in,"r",(cookie_io_functions_t)
                                 {
                                   fer_read,
@@ -2182,6 +2183,7 @@ FILE *fentity_encode_onread(FILE *in)
 
 FILE *fentity_encode_onwrite(FILE *out)
 {
+  assert(out != NULL);
   return fopencookie(out,"w",(cookie_io_functions_t)
                                 {
                                   NULL,
@@ -2201,6 +2203,7 @@ static ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
   size_t      repsize;
   
   assert(buffer != NULL);
+  assert(cookie != NULL);
   
   if (feof(realin))
     return 0;
@@ -2244,6 +2247,7 @@ static ssize_t few_write(void *cookie,char const *buffer,size_t bytes)
   size_t      repsize;
   
   assert(buffer != NULL);
+  assert(cookie != NULL);
   
   while(bytes)
   {
