@@ -195,11 +195,7 @@ static void confL_toitems(lua_State *L,int idx,template__t *temp)
     temp->pagegen = "items";
   }
   else
-  {
-    syslog(LOG_ERR,"wrong type for items");
-    temp->items   = 15;
-    temp->pagegen = "items";
-  }
+    luaL_error(L,"wrong type for items");
 }
 
 /***************************************************************************/
