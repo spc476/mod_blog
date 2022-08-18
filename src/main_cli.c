@@ -43,12 +43,20 @@
 #include "blogutil.h"
 #include "globals.h"
 
-typedef int (*clicmd__f)(Request *);
+struct options
+{
+  bool emailin;
+  bool regenerate;
+  bool today;
+  bool thisday;
+};
+
+typedef int (*clicmd__f)(Request *,struct options const *);
 
 /*******************************************************************/
 
-static int       cmd_cli_new       (Request *);
-static int       cmd_cli_show      (Request *);
+static int       cmd_cli_new       (Request *,struct options const *);
+static int       cmd_cli_show      (Request *,struct options const *);
 static clicmd__f get_cli_command   (char const *);
 static int       mail_setup_data   (Request *);
 static int       mailfile_readdata (Request *);
@@ -89,13 +97,18 @@ int main_cli(int argc,char *argv[])
     { NULL           , 0                  , NULL  , 0               }
   };
   
-  char  *config                     = NULL;
-  int    forcenotify                = false;
-  int  (*command)(struct request *) = cmd_cli_show;
+  char            *config     = NULL;
+  int             forcenotify = false;
+  clicmd__f       command     = cmd_cli_show;
+  struct options  options;
   
-  gd.error   = cli_error;
-  gd.req.in  = stdin;
-  gd.req.out = stdout;
+  gd.error           = cli_error;
+  gd.req.in          = stdin;
+  gd.req.out         = stdout;
+  options.emailin    = false;
+  options.regenerate = false;
+  options.today      = false;
+  options.thisday    = false;
   
   while(true)
   {
@@ -116,22 +129,22 @@ int main_cli(int argc,char *argv[])
              return (*gd.error)(&gd.req,HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
            break;
       case OPT_EMAIL:
-           gd.req.f.emailin = true;
+           options.emailin = true;
            break;
       case OPT_ENTRY:
            gd.req.reqtumbler = optarg;
            break;
       case OPT_REGENERATE:
-           gd.req.f.regenerate = true;
+           options.regenerate = true;
            break;
       case OPT_FORCENOTIFY:
            forcenotify = true;
            break;
       case OPT_TODAY:
-           gd.req.f.today = true;
+           options.today = true;
            break;
       case OPT_THISDAY:
-           gd.req.f.thisday  = true;
+           options.thisday  = true;
            gd.req.reqtumbler = optarg;
            break;
       case OPT_CMD:
@@ -198,18 +211,19 @@ int main_cli(int argc,char *argv[])
     }
   }
   
-  return (command)(&gd.req);
+  return (command)(&gd.req,&options);
 }
 
 /************************************************************************/
 
-static int cmd_cli_new(Request *req)
+static int cmd_cli_new(Request *req,struct options const *options)
 {
   int rc;
   
-  assert(req != NULL);
+  assert(req     != NULL);
+  assert(options != NULL);
   
-  if (req->f.emailin)
+  if (options->emailin)
     rc = mail_setup_data(req);
   else
     rc = mailfile_readdata(req);
@@ -235,18 +249,18 @@ static int cmd_cli_new(Request *req)
 
 /****************************************************************************/
 
-static int cmd_cli_show(Request *req)
+static int cmd_cli_show(Request *req,struct options const *options)
 {
   int rc = -1;
   
-  assert(req            != NULL);
-  assert(req->f.emailin == false);
+  assert(req     != NULL);
+  assert(options != NULL);
   
-  if (req->f.regenerate)
+  if (options->regenerate)
     rc = generate_pages();
-  else if (req->f.today)
+  else if (options->today)
     rc = generate_thisday(req->out,g_blog->now);
-  else if (req->f.thisday)
+  else if (options->thisday)
   {
     if (!thisday_new(&req->tumbler,req->reqtumbler))
       rc = (*gd.error)(req,HTTP_BADREQ,"bad request");
@@ -319,8 +333,7 @@ static int mail_setup_data(Request *req)
   char   *line;
   size_t  size;
   
-  assert(req            != NULL);
-  assert(req->f.emailin == true);
+  assert(req != NULL);
   
   line = NULL;
   size = 0;

@@ -30,18 +30,8 @@
 #include "blog.h"
 #include "config.h"
 
-typedef struct rflags
-{
-  unsigned int emailin    : 1;
-  unsigned int preview    : 1;
-  unsigned int regenerate : 1;
-  unsigned int today      : 1;
-  unsigned int thisday    : 1;
-} RFlags;
-
 typedef struct request
 {
-  RFlags      f;
   FILE       *in;
   FILE       *out;
   char       *update;
