@@ -30,25 +30,28 @@
 #include "frontend.h"
 #include "globals.h"
 
+typedef int (*cgicmd__f)(Cgi,struct request *);
+
 /**************************************************************************/
 
-static int  cgi_init               (Cgi,Request *);
-static void set_m_cgi_get_command  (char *,Request *);
-static int  cmd_cgi_get_new        (Request *);
-static int  cmd_cgi_get_show       (Request *);
-static int  cmd_cgi_get_today      (Request *);
-static void set_m_cgi_post_command (char *,Request *);
-static void set_m_author           (char *,Request *);
-static int  cmd_cgi_post_new       (Request *);
-static int  cmd_cgi_post_show      (Request *);
-static int  cmd_cgi_post_edit      (Request *);
-static int  cgi_error              (Request *,int,char const *, ... );
+static int       cgi_init               (Cgi,Request *);
+static cgicmd__f set_m_cgi_get_command  (char const *);
+static int       cmd_cgi_get_new        (Cgi,Request *);
+static int       cmd_cgi_get_show       (Cgi,Request *);
+static int       cmd_cgi_get_today      (Cgi,Request *);
+static cgicmd__f set_m_cgi_post_command (char const *);
+static void      set_m_author           (char *,Request *);
+static int       cmd_cgi_post_new       (Cgi,Request *);
+static int       cmd_cgi_post_show      (Cgi,Request *);
+static int       cmd_cgi_post_edit      (Cgi,Request *);
+static int       cgi_error              (Request *,int,char const *, ... );
 
 /*************************************************************************/
 
 int main_cgi_get(Cgi cgi)
 {
-  int rc;
+  cgicmd__f command = cmd_cgi_get_show;
+  int       rc;
   
   assert(cgi != NULL);
   
@@ -56,44 +59,47 @@ int main_cgi_get(Cgi cgi)
   if (rc != 0)
     return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
     
-  gd.req.command    = cmd_cgi_get_show;
   gd.req.reqtumbler = getenv("PATH_INFO");
   
   CgiListMake(cgi);
   
-  set_m_cgi_get_command(CgiListGetValue(cgi,"cmd"),&gd.req);
+  set_m_cgi_get_command(CgiListGetValue(cgi,"cmd"));
   
-  rc = (*gd.req.command)(&gd.req);
+  rc = (*command)(cgi,&gd.req);
   return rc;
 }
 
 /************************************************************************/
 
-static void set_m_cgi_get_command(char *value,Request *req)
+static cgicmd__f set_m_cgi_get_command(char const *value)
 {
-  assert(req != NULL);
-  
   if (emptynull_string(value))
-    return;
-  up_string(value);
+    return cmd_cgi_get_show;
   
   if (strcmp(value,"NEW") == 0)
-    req->command = cmd_cgi_get_new;
+    return cmd_cgi_get_new;
   else if (strcmp(value,"SHOW") == 0)
-    req->command = cmd_cgi_get_show;
+    return cmd_cgi_get_show;
   else if (strcmp(value,"PREVIEW") == 0)
-    req->command = cmd_cgi_get_show;
+    return cmd_cgi_get_show;
   else if (strcmp(value,"TODAY") == 0)
-    req->command = cmd_cgi_get_today;
+    return cmd_cgi_get_today;
+  else
+  {
+    syslog(LOG_WARNING,"'%s' not supported, using 'show'",value);
+    return cmd_cgi_get_show;
+  }
 }
 
 /***********************************************************************/
 
-static int cmd_cgi_get_new(Request *req)
+static int cmd_cgi_get_new(Cgi cgi,Request *req)
 {
   struct callback_data cbd;
   
   assert(req != NULL);
+  assert(cgi != NULL);
+  (void)cgi;
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
@@ -106,14 +112,15 @@ static int cmd_cgi_get_new(Request *req)
 
 /**********************************************************************/
 
-static int cmd_cgi_get_show(Request *req)
+static int cmd_cgi_get_show(Cgi cgi,Request *req)
 {
   char *status;
   int   rc = -1;
   
   assert(req != NULL);
+  assert(cgi != NULL);
   
-  status = CgiListGetValue(gd.cgi,"status");
+  status = CgiListGetValue(cgi,"status");
   if (emptynull_string(status))
     status = strdup("200");
     
@@ -198,12 +205,13 @@ static int cmd_cgi_get_show(Request *req)
 
 /********************************************************************/
 
-static int cmd_cgi_get_today(Request *req)
+static int cmd_cgi_get_today(Cgi cgi,Request *req)
 {
   assert(req != NULL);
+  assert(cgi != NULL);
   
-  char *tpath = CgiListGetValue(gd.cgi,"path");
-  char *twhen = CgiListGetValue(gd.cgi,"day");
+  char *tpath = CgiListGetValue(cgi,"path");
+  char *twhen = CgiListGetValue(cgi,"day");
   
   if ((tpath == NULL) && (twhen == NULL))
   {
@@ -263,7 +271,8 @@ static int cmd_cgi_get_today(Request *req)
 
 int main_cgi_post(Cgi cgi)
 {
-  int rc;
+  cgicmd__f command = cmd_cgi_post_new;
+  int       rc;
   
   assert(cgi != NULL);
   
@@ -271,14 +280,12 @@ int main_cgi_post(Cgi cgi)
   if (rc != 0)
     return (*gd.req.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
     
-  gd.req.command = cmd_cgi_post_new;
-  
   CgiListMake(cgi);
   
+  command = set_m_cgi_post_command(CgiListGetValue(cgi,"cmd"));
   set_cf_emailupdate    (CgiListGetValue(cgi,"email"));
   set_c_conversion      (CgiListGetValue(cgi,"filter"));
   set_m_author          (CgiListGetValue(cgi,"author"),&gd.req);
-  set_m_cgi_post_command(CgiListGetValue(cgi,"cmd"),&gd.req);
   
   gd.req.title    = strdup(CgiListGetValue(cgi,"title"));
   gd.req.class    = strdup(CgiListGetValue(cgi,"class"));
@@ -306,25 +313,30 @@ int main_cgi_post(Cgi cgi)
     return (*gd.req.error)(&gd.req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",gd.req.author,CgiListGetValue(cgi,"author"));
   }
   
-  rc = (*gd.req.command)(&gd.req);
+  rc = (*command)(cgi,&gd.req);
   return rc;
 }
 
 /************************************************************************/
 
-static void set_m_cgi_post_command(char *value,Request *req)
+static cgicmd__f set_m_cgi_post_command(char const *value)
 {
-  assert(req != NULL);
+  assert(value != NULL);
   
-  if (emptynull_string(value)) return;
-  up_string(value);
+  if (emptynull_string(value))
+    return cmd_cgi_post_show;
   
-  if (strcmp(value,"NEW") == 0)
-    req->command = cmd_cgi_post_new;
-  else if (strcmp(value,"SHOW") == 0)
-    req->command = cmd_cgi_post_show;
-  else if (strcmp(value,"EDIT") == 0)
-    req->command = cmd_cgi_post_edit;
+  if (strcmp(value,"new") == 0)
+    return cmd_cgi_post_new;
+  else if (strcmp(value,"show") == 0)
+    return cmd_cgi_post_show;
+  else if (strcmp(value,"edit") == 0)
+    return cmd_cgi_post_edit;
+  else
+  {
+    syslog(LOG_WARNING,"'%s' not supported, using 'show'",value);
+    return cmd_cgi_post_show;
+  }
 }
 
 /************************************************************************/
@@ -343,9 +355,11 @@ static void set_m_author(char *value,Request *req)
 
 /************************************************************************/
 
-static int cmd_cgi_post_new(Request *req)
+static int cmd_cgi_post_new(Cgi cgi,Request *req)
 {
   assert(req != NULL);
+  assert(cgi != NULL);
+  (void)cgi;
   
   if (entry_add(req))
   {
@@ -374,13 +388,15 @@ static int cmd_cgi_post_new(Request *req)
 
 /***********************************************************************/
 
-static int cmd_cgi_post_show(Request *req)
+static int cmd_cgi_post_show(Cgi cgi,Request *req)
 {
   struct callback_data cbd;
   BlogEntry           *entry;
   char                *p;
   
   assert(req != NULL);
+  assert(cgi != NULL);
+  (void)cgi;
   
   /*----------------------------------------------------
   ; this routine is a mixture between entry_add() and
@@ -421,9 +437,11 @@ static int cmd_cgi_post_show(Request *req)
 
 /**********************************************************************/
 
-static int cmd_cgi_post_edit(Request *req)
+static int cmd_cgi_post_edit(Cgi cgi,Request *req)
 {
   assert(req != NULL);
+  assert(cgi != NULL);
+  (void)cgi;
   
   return (req->error)(req,HTTP_BADREQ,"bad request");
 }
@@ -501,6 +519,7 @@ static int cgi_init(Cgi cgi,Request *req)
 {
   assert(cgi != NULL);
   assert(req != NULL);
+  (void)cgi;
   
   req->error = cgi_error;
   req->in    = stdin;

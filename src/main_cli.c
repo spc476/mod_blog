@@ -43,14 +43,16 @@
 #include "blogutil.h"
 #include "globals.h"
 
+typedef int (*clicmd__f)(Request *);
+
 /*******************************************************************/
 
-static int  cmd_cli_new       (Request *);
-static int  cmd_cli_show      (Request *);
-static void get_cli_command   (Request *,char *);
-static int  mail_setup_data   (Request *);
-static int  mailfile_readdata (Request *);
-static int  cli_error         (Request *,int,char const *, ... );
+static int       cmd_cli_new       (Request *);
+static int       cmd_cli_show      (Request *);
+static clicmd__f get_cli_command   (char const *);
+static int       mail_setup_data   (Request *);
+static int       mailfile_readdata (Request *);
+static int       cli_error         (Request *,int,char const *, ... );
 
 /*************************************************************************/
 
@@ -87,10 +89,10 @@ int main_cli(int argc,char *argv[])
     { NULL           , 0                  , NULL  , 0               }
   };
   
-  char *config      = NULL;
-  int   forcenotify = false;
+  char  *config                     = NULL;
+  int    forcenotify                = false;
+  int  (*command)(struct request *) = cmd_cli_show;
   
-  gd.req.command = cmd_cli_show;
   gd.req.error   = cli_error;
   gd.req.in      = stdin;
   gd.req.out     = stdout;
@@ -133,7 +135,7 @@ int main_cli(int argc,char *argv[])
            gd.req.reqtumbler = optarg;
            break;
       case OPT_CMD:
-           get_cli_command(&gd.req,optarg);
+           command = get_cli_command(optarg);
            break;
       case OPT_HELP:
       default:
@@ -196,7 +198,7 @@ int main_cli(int argc,char *argv[])
     }
   }
   
-  return (*gd.req.command)(&gd.req);
+  return (command)(&gd.req);
 }
 
 /************************************************************************/
@@ -291,19 +293,22 @@ static int cmd_cli_show(Request *req)
 
 /********************************************************************/
 
-static void get_cli_command(Request *req,char *value)
+static clicmd__f get_cli_command(char const *value)
 {
-  assert(req != NULL);
-  
-  if (emptynull_string(value)) return;
-  up_string(value);
-  
-  if (strcmp(value,"NEW") == 0)
-    req->command = cmd_cli_new;
-  else if (strcmp(value,"SHOW") == 0)
-    req->command = cmd_cli_show;
-  else if (strcmp(value,"PREVIEW") == 0)
-    req->command = cmd_cli_show;
+  if (emptynull_string(value))
+    return cmd_cli_show;
+    
+  if (strcmp(value,"new") == 0)
+    return cmd_cli_new;
+  else if (strcmp(value,"show") == 0)
+    return cmd_cli_show;
+  else if (strcmp(value,"preview") == 0)
+    return cmd_cli_show;
+  else
+  {
+    fprintf(stderr,"'%s' not supported, using 'show'\n",value);
+    return cmd_cli_show;
+  }
 }
 
 /*************************************************************************/
