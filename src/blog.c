@@ -693,9 +693,7 @@ static FILE *open_file_r(char const *name,struct btm const *date)
   ; because the code was written using a different IO
   ; model (that is, if there's no data in the file to
   ; begin with, we automatically end up in EOF mode,
-  ; let's trigger EOF.  Sigh. (see comment below in
-  ; blog_cache_day() for some more commentary on this
-  ; sad state of affairs.
+  ; let's trigger EOF.  Sigh.
   ;-------------------------------------------------*/
   
   ungetc(fgetc(in),in);
