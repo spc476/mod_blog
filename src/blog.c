@@ -61,104 +61,87 @@ static inline size_t max(size_t a,size_t b)
 
 /***********************************************************************/
 
+static bool set_date(char const *file,struct btm *when,struct btm *now)
+{
+  assert(file != NULL);
+  assert(when != NULL);
+  assert(now  != NULL);
+  
+  FILE *fp = fopen(file,"r");
+  if (fp == NULL)
+  {
+    fp = fopen(file,"w");
+    if (fp != NULL)
+    {
+      *when = *now;
+      fprintf(
+        fp,
+        "%4d/%02d/%02d.%d\n",
+        now->year,
+        now->month,
+        now->day,
+        now->part
+      );
+      fclose(fp);
+    }
+    else
+    {
+      syslog(LOG_ERR,"%s: %s",file,strerror(errno));
+      return false;
+    }
+  }
+  else
+  {
+    char buffer[128];
+    char *p;
+    
+    fgets(buffer,sizeof(buffer),fp);
+    when->year  = strtoul(buffer,&p,10); p++;
+    when->month = strtoul(p,&p,10); p++;
+    when->day   = strtoul(p,&p,10); p++;
+    when->part  = strtoul(p,&p,10);
+    fclose(fp);
+  }
+  
+  return true;
+}
+
+/***********************************************************************/
+
 Blog *BlogNew(char const *restrict location,char const *restrict lockfile)
 {
   Blog      *blog;
-  FILE      *fp;
   struct tm *ptm;
-  char       buffer[128];
-  char      *p;
-  int        rc;
-  
+
   assert(location != NULL);
   assert(lockfile != NULL);
   
-  /*---------------------------------------------------------------
-  ; We're assuming a SETUID program, so set the umask accordingly.
-  ;----------------------------------------------------------------*/
-  
   umask(022);
-  rc = chdir(location);
-  if (rc != 0)
+  if (chdir(location) != 0)
   {
     syslog(LOG_ERR,"%s: %s",location,strerror(errno));
     return NULL;
   }
   
   blog = calloc(1,sizeof(struct blog));
+  if (blog == NULL)
+  {
+    syslog(LOG_ERR,"Can't allocate blog memory");
+    return NULL;
+  }
+  
+  ptm             = localtime(&blog->tnow);
   blog->lockfile  = lockfile;
   blog->tnow      = time(NULL);
-  ptm             = localtime(&blog->tnow);
   blog->now.year  = ptm->tm_year + 1900;
   blog->now.month = ptm->tm_mon  + 1;
   blog->now.day   = ptm->tm_mday;
   blog->now.part  = 1;
   
-  fp = fopen(".first","r");
-  if (fp == NULL)
+  if (!set_date(".first",&blog->first,&blog->now) || !set_date(".last",&blog->last,&blog->now))
   {
-    fp = fopen(".first","w");
-    if (fp)
-    {
-      blog->first = blog->now;
-      fprintf(
-        fp,
-        "%4d/%02d/%02d.%d\n",
-        blog->now.year,
-        blog->now.month,
-        blog->now.day,
-        blog->now.part
-      );
-      fclose(fp);
-    }
-    else
-    {
-      syslog(LOG_ERR,".first: %s",strerror(errno));
-      BlogFree(blog);
-      return NULL;
-    }
-  }
-  else
-  {
-    fgets(buffer,sizeof(buffer),fp);
-    blog->first.year  = strtoul(buffer,&p,10); p++;
-    blog->first.month = strtoul(p,&p,10); p++;
-    blog->first.day   = strtoul(p,&p,10); p++;
-    blog->first.part  = strtoul(p,&p,10);
-    fclose(fp);
-  }
-  
-  fp = fopen(".last","r");
-  if (fp == NULL)
-  {
-    fp = fopen(".last","w");
-    if (fp)
-    {
-      fprintf(
-        fp,
-        "%4d/%02d/%02d.%d\n",
-        blog->now.year,
-        blog->now.month,
-        blog->now.day,
-        blog->now.part
-      );
-      fclose(fp);
-    }
-    else
-    {
-      syslog(LOG_ERR,".last: %s",strerror(errno));
-      BlogFree(blog);
-      return NULL;
-    }
-  }
-  else
-  {
-    fgets(buffer,sizeof(buffer),fp);
-    blog->last.year  = strtoul(buffer,&p,10); p++;
-    blog->last.month = strtoul(p,&p,10); p++;
-    blog->last.day   = strtoul(p,&p,10); p++;
-    blog->last.part  = strtoul(p,&p,10);
-    fclose(fp);
+    BlogFree(blog);
+    return NULL;
   }
   
   if (
