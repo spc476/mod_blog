@@ -39,13 +39,14 @@ struct callback_data
 
 /************************************************/
 
-extern pagegen__f TO_pagegen       (char const *);
-extern int        generate_thisday (FILE *,struct btm);
-extern int        generate_pages   (void);
-extern int        pagegen_items    (template__t const *,FILE *,Blog *);
-extern int        pagegen_days     (template__t const *,FILE *,Blog *);
-extern int        tumbler_page     (FILE *,tumbler__s *);
-extern void       generic_cb       (char const *,FILE *,void *);
-extern bool       run_hook         (char const *,char const **);
+extern struct callback_data *callback_init    (struct callback_data *);
+extern pagegen__f            TO_pagegen       (char const *);
+extern int                   generate_thisday (FILE *,struct btm);
+extern int                   generate_pages   (void);
+extern int                   pagegen_items    (template__t const *,FILE *,Blog *);
+extern int                   pagegen_days     (template__t const *,FILE *,Blog *);
+extern int                   tumbler_page     (FILE *,tumbler__s *);
+extern void                  generic_cb       (char const *,FILE *,void *);
+extern bool                  run_hook         (char const *,char const **);
 
 #endif

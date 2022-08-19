@@ -101,12 +101,9 @@ static int cmd_cgi_get_new(Cgi cgi,Request *req)
   assert(cgi != NULL);
   (void)cgi;
   
-  memset(&cbd,0,sizeof(struct callback_data));
-  ListInit(&cbd.list);
-  cbd.navunit = UNIT_PART;
   gd.f.edit   = 1;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
-  generic_cb("main",stdout,&cbd);
+  generic_cb("main",stdout,callback_init(&cbd));
   return 0;
 }
 
@@ -191,12 +188,8 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
         struct callback_data cbd;
         
         gd.f.htmldump = true;
-        memset(&cbd,0,sizeof(struct callback_data));
-        ListInit(&cbd.list);
-        cbd.navunit = UNIT_PART;
-        
         fprintf(stdout,"Status: %s\r\nContent-type: text/html\r\n\r\n",status);
-        generic_cb("main",stdout,&cbd);
+        generic_cb("main",stdout,callback_init(&cbd));
         rc = 0;
       }
     }
@@ -408,10 +401,7 @@ static int cmd_cgi_post_show(Cgi cgi,Request *req)
   ; at some point.
   ;-------------------------------------------------------*/
   
-  memset(&cbd,0,sizeof(struct callback_data));
-  ListInit(&cbd.list);
-  cbd.navunit = UNIT_PART;
-  
+  callback_init(&cbd);
   fix_entry(req);
   entry = BlogEntryNew(g_blog);
   
@@ -499,10 +489,7 @@ static int cgi_error(Request *req,int level,char const *msg, ... )
     struct callback_data cbd;
     
     gd.f.htmldump = true;
-    memset(&cbd,0,sizeof(struct callback_data));
-    ListInit(&cbd.list);
-    cbd.navunit = UNIT_PART;
-    
+
     fprintf(
         stdout,
         "Status: %d\r\n"
@@ -512,7 +499,7 @@ static int cgi_error(Request *req,int level,char const *msg, ... )
         level,
         errmsg
       );
-    generic_cb("main",stdout,&cbd);
+    generic_cb("main",stdout,callback_init(&cbd));
   }
   
   free(file);

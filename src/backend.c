@@ -46,6 +46,18 @@ static void        free_entries       (List *);
 
 /************************************************************************/
 
+struct callback_data *callback_init(struct callback_data *cbd)
+{
+  assert(cbd != NULL);
+  
+  memset(cbd,0,sizeof(struct callback_data));
+  ListInit(&cbd->list);
+  cbd->navunit = UNIT_PART;
+  return cbd;
+}
+
+/************************************************************************/
+
 pagegen__f TO_pagegen(char const *name)
 {
   assert(name != NULL);
@@ -65,9 +77,7 @@ int generate_thisday(FILE *out,struct btm when)
   char                 *tags;
   
   assert(out != NULL);
-  memset(&cbd,0,sizeof(struct callback_data));
-  ListInit(&cbd.list);
-  cbd.navunit = UNIT_PART;
+  callback_init(&cbd);
   
   for(when.year = g_blog->first.year ; when.year <= g_blog->now.year ; when.year++)
   {
@@ -152,9 +162,7 @@ int pagegen_items(
   gd.f.reverse = template->reverse;
   thisday      = blog->now;
   
-  memset(&cbd,0,sizeof(struct callback_data));
-  ListInit(&cbd.list);
-  cbd.navunit = UNIT_PART;
+  callback_init(&cbd);
   
   if (template->reverse)
     BlogEntryReadXD(g_blog,&cbd.list,&thisday,template->items);
@@ -194,9 +202,7 @@ int pagegen_days(
   gd.f.reverse = true;
   thisday      = blog->now;
   
-  memset(&cbd,0,sizeof(struct callback_data));
-  ListInit(&cbd.list);
-  cbd.navunit = UNIT_PART;
+  callback_init(&cbd);
   
   for (days = 0 , added = false ; days < template->items ; )
   {
@@ -354,8 +360,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
     return 0; /* XXX hack for now */
   }
   
-  memset(&cbd,0,sizeof(cbd));
-  ListInit(&cbd.list);
+  callback_init(&cbd);
   
   /*----------------------------------------------------------------------
   ; from here to the comment about sanity checking replaced around 100 very
@@ -398,7 +403,6 @@ int tumbler_page(FILE *out,tumbler__s *spec)
       end          = newtum.stop;
       gd.f.reverse = true;
     }
-    cbd.navunit = UNIT_PART;
   }
   
   assert(end.day <= max_monthday(end.year,end.month));
@@ -901,12 +905,8 @@ static int display_file(FILE *out,tumbler__s const *spec)
       struct callback_data cbd;
       
       gd.f.htmldump = true;
-      memset(&cbd,0,sizeof(struct callback_data));
-      ListInit(&cbd.list);
-      cbd.navunit = UNIT_PART;
-      
       fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",out);
-      generic_cb("main",out,&cbd);
+      generic_cb("main",out,callback_init(&cbd));
     }
     else
     {
