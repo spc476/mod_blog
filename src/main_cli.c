@@ -183,7 +183,7 @@ int main_cli(int argc,char *argv[])
     
   if (forcenotify)
   {
-    if (!g_config->email.notify)
+    if (!c_config->email.notify)
     {
       fprintf(stderr,"No email notifiation list\n");
       return EXIT_FAILURE;
@@ -233,7 +233,7 @@ static int cmd_cli_new(Request *req,struct options const *options)
   
   if (entry_add(req))
   {
-    if (g_config->email.notify) notify_emaillist(req);
+    if (c_config->email.notify) notify_emaillist(req);
     generate_pages();
     return 0;
   }
@@ -272,8 +272,8 @@ static int cmd_cli_show(Request *req,struct options const *options)
     {
       template__t template;
       
-      template.template = g_config->templates[0].template;
-      template.items    = g_config->templates[0].items;
+      template.template = c_config->templates[0].template;
+      template.items    = c_config->templates[0].items;
       template.pagegen  = "days";
       template.reverse  = true;
       template.fullurl  = false;

@@ -112,24 +112,24 @@ bool authenticate_author(Request *req)
   assert(req         != NULL);
   assert(req->author != NULL);
   
-  if (g_config->author.file == NULL)
-    return strcmp(req->author,g_config->author.name) == 0;
+  if (c_config->author.file == NULL)
+    return strcmp(req->author,c_config->author.name) == 0;
     
-  in = fopen(g_config->author.file,"r");
+  in = fopen(c_config->author.file,"r");
   if (in == NULL)
   {
-    syslog(LOG_ERR,"%s: %s",g_config->author.file,strerror(errno));
+    syslog(LOG_ERR,"%s: %s",c_config->author.file,strerror(errno));
     return false;
   }
   
   while((cnt = breakline(lines,10,in)))
   {
-    if ((g_config->author.fields.uid < cnt) && (strcmp(req->author,lines[g_config->author.fields.uid]) == 0))
+    if ((c_config->author.fields.uid < cnt) && (strcmp(req->author,lines[c_config->author.fields.uid]) == 0))
     {
-      if (g_config->author.fields.name < cnt)
+      if (c_config->author.fields.name < cnt)
       {
         free(req->author);
-        req->author = strdup(lines[g_config->author.fields.name]);
+        req->author = strdup(lines[c_config->author.fields.name]);
         fclose(in);
         free(lines[0]); // see comment below
         return true;

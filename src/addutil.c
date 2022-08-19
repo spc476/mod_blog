@@ -52,7 +52,7 @@ bool entry_add(Request *req)
   
   fix_entry(req);
   
-  if (g_config->prehook != NULL)
+  if (c_config->prehook != NULL)
   {
     FILE *fp;
     char  fnbody[L_tmpnam];
@@ -108,7 +108,7 @@ bool entry_add(Request *req)
       return false;
     }
     
-    rc = run_hook("entry-pre-hook",(char const *[]){ g_config->prehook , fnbody , fnmeta , NULL });
+    rc = run_hook("entry-pre-hook",(char const *[]){ c_config->prehook , fnbody , fnmeta , NULL });
     
     remove(fnmeta);
     remove(fnbody);
@@ -141,7 +141,7 @@ bool entry_add(Request *req)
     
   req->when = entry->when;
   
-  if (g_config->posthook != NULL)
+  if (c_config->posthook != NULL)
   {
     char url[1024];
     
@@ -156,7 +156,7 @@ bool entry_add(Request *req)
       entry->when.part
     );
     
-    rc = run_hook("entry-post-hook",(char const *[]){ g_config->posthook , url , NULL });
+    rc = run_hook("entry-post-hook",(char const *[]){ c_config->posthook , url , NULL });
   }
   
   free(entry);
@@ -421,13 +421,13 @@ void notify_emaillist(Request *req)
   
   assert(req != NULL);
   
-  list = gdbm_open((char *)g_config->email.list,DB_BLOCK,GDBM_READER,0,dbcritical);
+  list = gdbm_open((char *)c_config->email.list,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
     return;
     
   email          = EmailNew();
-  email->from    = strdup(g_config->author.email);
-  email->subject = strdup(g_config->email.subject);
+  email->from    = strdup(c_config->author.email);
+  email->subject = strdup(c_config->email.subject);
   
   PairListCreate(&email->headers,"MIME-Version","1.0");
   PairListCreate(&email->headers,"Content-Type","text/plain; charset=UTF-8; format=flowed");
@@ -435,7 +435,7 @@ void notify_emaillist(Request *req)
   
   templates = ChunkNew("",m_emcallbacks,m_emcbnum);
   out       = open_memstream(&tmp,&size);
-  ChunkProcess(templates,g_config->email.message,out,req);
+  ChunkProcess(templates,c_config->email.message,out,req);
   ChunkFree(templates);
   fclose(out);
   

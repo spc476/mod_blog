@@ -35,8 +35,8 @@
 
 /************************************************************/
 
+config__s      *c_config;
 Blog           *g_blog;
-config__s      *g_config;
 struct display  gd;
 
 /****************************************************/
@@ -61,7 +61,7 @@ static void seed_rng(void)
 static void globals_free(void)
 {
   if (g_blog   != NULL) BlogFree(g_blog);
-  if (g_config != NULL) config_free(g_config);
+  if (c_config != NULL) config_free(c_config);
   
   free(gd.req.update);
   free(gd.req.origauthor);
@@ -135,9 +135,9 @@ void set_cf_emailupdate(char const *value)
   if (!emptynull_string(value))
   {
     if (strcmp(value,"no") == 0)
-      g_config->email.notify = false;
+      c_config->email.notify = false;
     else if (strcmp(value,"yes") == 0)
-      g_config->email.notify = true;
+      c_config->email.notify = true;
   }
 }
 
@@ -155,17 +155,17 @@ int GlobalsInit(char const *conf)
 {
   atexit(globals_free);
   seed_rng();
-  g_config = config_lua(conf);
-  if (g_config == NULL)
+  c_config = config_lua(conf);
+  if (c_config == NULL)
     return ENOMEM;
     
-  g_blog = BlogNew(g_config->basedir,g_config->lockfile);
+  g_blog = BlogNew(c_config->basedir,c_config->lockfile);
   if (g_blog == NULL)
     return ENOMEM;
 
-  set_url(g_config->url);
-  set_c_conversion(g_config->conversion);
-  gd.template  = g_config->templates[0].template; /* XXX hack fix */
+  set_url(c_config->url);
+  set_c_conversion(c_config->conversion);
+  gd.template  = c_config->templates[0].template; /* XXX hack fix */
   gd.f.navprev = true;
   gd.f.navnext = true;
   

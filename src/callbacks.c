@@ -340,7 +340,7 @@ static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(g_config->name,out);
+  fputs(c_config->name,out);
 }
 
 /*********************************************************************/
@@ -360,7 +360,7 @@ static void cb_blog_title(FILE *out,void *data)
     }
   }
   
-  fputs(g_config->name,out);
+  fputs(c_config->name,out);
 }
 
 /*********************************************************************/
@@ -368,7 +368,7 @@ static void cb_blog_title(FILE *out,void *data)
 static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(g_config->author.name,out);
+  fputs(c_config->author.name,out);
 }
 
 /********************************************************************/
@@ -376,7 +376,7 @@ static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(g_config->author.email,out);
+  fputs(c_config->author.email,out);
 }
 
 /**********************************************************************/
@@ -384,7 +384,7 @@ static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_class(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(g_config->class,out);
+  fputs(c_config->class,out);
 }
 
 /**********************************************************************/
@@ -392,7 +392,7 @@ static void cb_blog_class(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_description(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(g_config->description,out);
+  fputs(c_config->description,out);
 }
 
 /*********************************************************************/
@@ -406,7 +406,7 @@ static void cb_blog_adtag(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->adtag == NULL)
-    tag = UrlEncodeString(g_config->adtag);
+    tag = UrlEncodeString(c_config->adtag);
   else
     tag = UrlEncodeString(cbd->adtag);
   fputs(tag,out);
@@ -425,7 +425,7 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->adtag == NULL)
-    tag = g_config->adtag;
+    tag = c_config->adtag;
   else
     tag = cbd->adtag;
 
@@ -544,7 +544,7 @@ static void cb_entry_date(FILE *out,void *data)
 
 static void cb_entry_description(FILE *out,void *data)
 {
-  char const *msg = g_config->description;
+  char const *msg = c_config->description;
   
   assert(out != NULL);
   
@@ -615,7 +615,7 @@ static void cb_entry_title(FILE *out,void *data)
 
 static void cb_entry_class(FILE *out,void *data)
 {
-  char const *msg = g_config->class;
+  char const *msg = c_config->class;
   
   assert(out  != NULL);
   
@@ -706,9 +706,9 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
   src = HtmlParseGetPair(token,attrib);
   if (src != NULL)
   {
-    for (size_t i = 0 ; i < g_config->affiliatenum ; i++)
+    for (size_t i = 0 ; i < c_config->affiliatenum ; i++)
     {
-      if (strncmp(src->value,g_config->affiliates[i].proto,g_config->affiliates[i].psize) == 0)
+      if (strncmp(src->value,c_config->affiliates[i].proto,c_config->affiliates[i].psize) == 0)
       {
         char buffer[BUFSIZ];
         struct pair *np;
@@ -716,8 +716,8 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
         snprintf(
                 buffer,
                 sizeof(buffer),
-                g_config->affiliates[i].format,
-                &src->value[g_config->affiliates[i].psize + 1]
+                c_config->affiliates[i].format,
+                &src->value[c_config->affiliates[i].psize + 1]
         );
         np = PairCreate(attrib,buffer);
         NodeInsert(&src->node,&np->node);
@@ -1667,7 +1667,7 @@ static void cb_entry_cond_author(FILE *out,void *data)
   
   assert(cbd->entry->valid);
   
-  if (strcmp(g_config->author.name,cbd->entry->author) != 0)
+  if (strcmp(c_config->author.name,cbd->entry->author) != 0)
     generic_cb("entry.cond.author",out,data);
 }
 

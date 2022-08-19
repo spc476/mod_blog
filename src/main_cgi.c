@@ -343,7 +343,7 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
   
   if (entry_add(req))
   {
-    if (g_config->email.notify) notify_emaillist(req);
+    if (c_config->email.notify) notify_emaillist(req);
     generate_pages();
     fprintf(
         stdout,
