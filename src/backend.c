@@ -123,7 +123,6 @@ int generate_pages(void)
     
     pagegen = TO_pagegen(g_config->templates[i].pagegen);
     (*pagegen)(&g_config->templates[i],out,g_blog);
-    //(*g_config->templates[i].pagegen)(&g_config->templates[i],out,g_blog);
     fclose(out);
     
     if (g_config->templates[i].posthook)
