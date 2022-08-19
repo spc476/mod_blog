@@ -28,10 +28,10 @@ typedef int (*pagegen__f)(struct template const *,FILE *,Blog *);
 struct callback_data
 {
   List        list;
-  struct btm  last;     /* timestamp of previous entry */
   BlogEntry  *entry;    /* current entry being processed */
   FILE       *ad;       /* file containing ad */
   char       *adtag;
+  struct btm  last;     /* timestamp of previous entry */
   struct btm  previous;
   struct btm  next;
   unit__e     navunit;
