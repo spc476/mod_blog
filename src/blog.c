@@ -86,8 +86,7 @@ Blog *BlogNew(char const *restrict location,char const *restrict lockfile)
   }
   
   blog = calloc(1,sizeof(struct blog));
-  blog->lockfile = lockfile;
-  
+  blog->lockfile  = lockfile;
   blog->tnow      = time(NULL);
   ptm             = localtime(&blog->tnow);
   blog->now.year  = ptm->tm_year + 1900;
@@ -186,26 +185,28 @@ void BlogFree(Blog *blog)
 
 BlogEntry *BlogEntryNew(Blog *blog)
 {
-  BlogEntry *pbe;
-  
   assert(blog != NULL);
   
-  pbe               = malloc(sizeof(struct blogentry));
-  pbe->node.ln_Succ = NULL;
-  pbe->node.ln_Pred = NULL;
-  pbe->blog         = blog;
-  pbe->valid        = true;
-  pbe->when.year    = blog->now.year;
-  pbe->when.month   = blog->now.month;
-  pbe->when.day     = blog->now.day;
-  pbe->when.part    = 0;
-  pbe->title        = NULL;
-  pbe->class        = NULL;
-  pbe->author       = NULL;
-  pbe->status       = NULL;
-  pbe->adtag        = NULL;
-  pbe->body         = NULL;
-  
+  BlogEntry *pbe = malloc(sizeof(struct blogentry));
+  if (pbe != NULL)
+  {
+    pbe->node.ln_Succ = NULL;
+    pbe->node.ln_Pred = NULL;
+    pbe->blog         = blog;
+    pbe->valid        = true;
+    pbe->timestamp    = time(NULL);
+    pbe->when.year    = blog->now.year;
+    pbe->when.month   = blog->now.month;
+    pbe->when.day     = blog->now.day;
+    pbe->when.part    = 0;
+    pbe->title        = NULL;
+    pbe->class        = NULL;
+    pbe->author       = NULL;
+    pbe->status       = NULL;
+    pbe->adtag        = NULL;
+    pbe->body         = NULL;
+  }
+    
   return pbe;
 }
 
@@ -230,7 +231,10 @@ BlogEntry *BlogEntryRead(Blog *blog,struct btm const *which)
   if (access(pname,R_OK) != 0)
     return NULL;
     
-  entry               = malloc(sizeof(struct blogentry));
+  entry = malloc(sizeof(struct blogentry));
+  if (entry == NULL)
+    return NULL;
+    
   entry->node.ln_Succ = NULL;
   entry->node.ln_Pred = NULL;
   entry->valid        = true;

@@ -54,8 +54,8 @@ typedef struct template
   char const *template;
   char const *file;
   char const *posthook;
-  size_t      items;
   char const *pagegen;
+  size_t      items;
   bool        reverse;
   bool        fullurl;
 } template__t;
@@ -69,24 +69,24 @@ typedef struct aflink
 
 typedef struct
 {
-  char const     *name;
-  char const     *description;
-  char const     *class;
-  char const     *basedir;
-  char const     *lockfile;
-  char const     *webdir;
-  char const     *url;
-  char const     *prehook;
-  char const     *posthook;
-  char const     *adtag;
-  char const     *conversion;
-  struct author   author;
-  template__t    *templates;
-  size_t          templatenum;
-  struct bemail   email;
-  aflink__t      *affiliates;
-  size_t          affiliatenum;
-  void           *user;
+  char const    *name;
+  char const    *description;
+  char const    *class;
+  char const    *basedir;
+  char const    *lockfile;
+  char const    *webdir;
+  char const    *url;
+  char const    *prehook;
+  char const    *posthook;
+  char const    *adtag;
+  char const    *conversion;
+  struct author  author;
+  template__t   *templates;
+  size_t         templatenum;
+  struct bemail  email;
+  aflink__t     *affiliates;
+  size_t         affiliatenum;
+  void          *user;
 } config__s;
 
 extern config__s *config_lua (char const *);
