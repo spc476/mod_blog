@@ -1173,16 +1173,14 @@ static void cb_navigation_current(FILE *out,void *data)
 static void cb_navigation_first_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct btm            tmp;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  tmp = g_blog->first;
   if (gd.f.navigation == false)
-    print_nav_url(out,&tmp,UNIT_PART);
+    print_nav_url(out,&g_blog->first,UNIT_PART);
   else
-    print_nav_url(out,&tmp,cbd->navunit);
+    print_nav_url(out,&g_blog->first,cbd->navunit);
 }
 
 /********************************************************************/
@@ -1190,16 +1188,14 @@ static void cb_navigation_first_url(FILE *out,void *data)
 static void cb_navigation_first_title(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct btm            tmp;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  tmp = g_blog->first;
   if (gd.f.navigation == false)
-    print_nav_title(out,&tmp,UNIT_PART);
+    print_nav_title(out,&g_blog->first,UNIT_PART);
   else
-    print_nav_title(out,&tmp,cbd->navunit);
+    print_nav_title(out,&g_blog->first,cbd->navunit);
 }
 
 /*******************************************************************/
@@ -1207,16 +1203,14 @@ static void cb_navigation_first_title(FILE *out,void *data)
 static void cb_navigation_last_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct btm            tmp;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  tmp = g_blog->last;
   if (gd.f.navigation == false)
-    print_nav_url(out,&tmp,UNIT_PART);
+    print_nav_url(out,&g_blog->last,UNIT_PART);
   else
-    print_nav_url(out,&tmp,cbd->navunit);
+    print_nav_url(out,&g_blog->last,cbd->navunit);
 }
 
 /******************************************************************/
@@ -1224,16 +1218,14 @@ static void cb_navigation_last_url(FILE *out,void *data)
 static void cb_navigation_last_title(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct btm            tmp;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  tmp = g_blog->last;
   if (gd.f.navigation == false)
-    print_nav_title(out,&tmp,UNIT_PART);
+    print_nav_title(out,&g_blog->last,UNIT_PART);
   else
-    print_nav_title(out,&tmp,cbd->navunit);
+    print_nav_title(out,&g_blog->last,cbd->navunit);
 }
 
 /*****************************************************************/
@@ -1241,13 +1233,11 @@ static void cb_navigation_last_title(FILE *out,void *data)
 static void cb_navigation_next_title(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct btm            tmp;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  tmp = cbd->next;
-  print_nav_title(out,&tmp,cbd->navunit);
+  print_nav_title(out,&cbd->next,cbd->navunit);
 }
 
 /********************************************************************/
@@ -1255,13 +1245,11 @@ static void cb_navigation_next_title(FILE *out,void *data)
 static void cb_navigation_prev_title(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct btm            tmp;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  tmp = cbd->previous;
-  print_nav_title(out,&tmp,cbd->navunit);
+  print_nav_title(out,&cbd->previous,cbd->navunit);
 }
 
 /*******************************************************************/
@@ -1269,13 +1257,11 @@ static void cb_navigation_prev_title(FILE *out,void *data)
 static void cb_navigation_next_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct btm            tmp;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  tmp = cbd->next;
-  print_nav_url(out,&tmp,cbd->navunit);
+  print_nav_url(out,&cbd->next,cbd->navunit);
 }
 
 /*******************************************************************/
@@ -1283,25 +1269,19 @@ static void cb_navigation_next_url(FILE *out,void *data)
 static void cb_navigation_prev_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct btm            tmp;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  tmp = cbd->previous;
-  print_nav_url(out,&tmp,cbd->navunit);
+  print_nav_url(out,&cbd->previous,cbd->navunit);
 }
 
 /********************************************************************/
 
 static void cb_navigation_current_url(FILE *out,void *data __attribute__((unused)))
 {
-  struct btm tmp;
-  
   assert(out != NULL);
-  
-  tmp = g_blog->last;
-  print_nav_url(out,&tmp,UNIT_MONTH);
+  print_nav_url(out,&g_blog->last,UNIT_MONTH);
 }
 
 /*********************************************************************/
