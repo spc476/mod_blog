@@ -56,12 +56,12 @@ typedef struct dflags
   unsigned int navnext    : 1;
   unsigned int edit       : 1;
   unsigned int cgi        : 1;
+  unsigned int htmldump   : 1;
 } DFlags;
 
 typedef struct display
 {
   DFlags           f;
-  FILE            *htmldump;
   char const      *template;
   struct request   req;
   void           (*conversion)(FILE *restrict,FILE *restrict);

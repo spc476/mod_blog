@@ -103,7 +103,6 @@ static int cmd_cgi_get_new(Cgi cgi,Request *req)
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
-  cbd.adtag   = (char *)g_config->adtag;
   cbd.navunit = UNIT_PART;
   gd.f.edit   = 1;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
@@ -182,18 +181,22 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
     }
     else
     {
-      char  filename[FILENAME_MAX];
-      FILE *in;
+      char filename[FILENAME_MAX];
       
       snprintf(filename,sizeof(filename),"%s%s",getenv("DOCUMENT_ROOT"),getenv("PATH_INFO"));
-      in = fopen(filename,"r");
-      if (in == NULL)
+      if (freopen(filename,"r",stdin) == NULL)
         rc = (*gd.error)(req,HTTP_BADREQ,"bad request");
       else
       {
-        gd.htmldump = in;
+        struct callback_data cbd;
+        
+        gd.f.htmldump = true;
+        memset(&cbd,0,sizeof(struct callback_data));
+        ListInit(&cbd.list);
+        cbd.navunit = UNIT_PART;
+        
         fprintf(stdout,"Status: %s\r\nContent-type: text/html\r\n\r\n",status);
-        generic_cb("main",stdout,NULL);
+        generic_cb("main",stdout,&cbd);
         rc = 0;
       }
     }
@@ -407,7 +410,6 @@ static int cmd_cgi_post_show(Cgi cgi,Request *req)
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
-  cbd.adtag   = (char *)g_config->adtag;
   cbd.navunit = UNIT_PART;
   
   fix_entry(req);
@@ -453,7 +455,6 @@ static int cmd_cgi_post_edit(Cgi cgi,Request *req)
 
 static int cgi_error(Request *req,int level,char const *msg, ... )
 {
-  FILE    *in;
   va_list  args;
   char    *file   = NULL;
   char    *errmsg = NULL;
@@ -468,8 +469,7 @@ static int cgi_error(Request *req,int level,char const *msg, ... )
   
   asprintf(&file,"%s/errors/%d.html",getenv("DOCUMENT_ROOT"),level);
   
-  in = fopen(file,"r");
-  if (in == NULL)
+  if (freopen(file,"r",stdin) == NULL)
   {
     fprintf(
         stdout,
@@ -496,7 +496,13 @@ static int cgi_error(Request *req,int level,char const *msg, ... )
   }
   else
   {
-    gd.htmldump = in;
+    struct callback_data cbd;
+    
+    gd.f.htmldump = true;
+    memset(&cbd,0,sizeof(struct callback_data));
+    ListInit(&cbd.list);
+    cbd.navunit = UNIT_PART;
+    
     fprintf(
         stdout,
         "Status: %d\r\n"
@@ -506,8 +512,7 @@ static int cgi_error(Request *req,int level,char const *msg, ... )
         level,
         errmsg
       );
-    generic_cb("main",stdout,NULL);
-    fclose(in);
+    generic_cb("main",stdout,&cbd);
   }
   
   free(file);

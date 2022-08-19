@@ -238,7 +238,7 @@ void generic_cb(char const *which,FILE *out,void *data)
   
   assert(which != NULL);
   assert(out   != NULL);
-  //assert(data  != NULL); /* XXX */
+  assert(data  != NULL);
   
   templates = ChunkNew(gd.template,m_callbacks,m_cbnum);
   ChunkProcess(templates,which,out,data);
@@ -399,18 +399,16 @@ static void cb_blog_description(FILE *out,void *data __attribute__((unused)))
 
 static void cb_blog_adtag(FILE *out,void *data)
 {
-  char *tag;
+  struct callback_data *cbd = data;
+  char                 *tag;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  if (data == NULL)
+  if (cbd->adtag == NULL)
     tag = UrlEncodeString(g_config->adtag);
   else
-  {
-    struct callback_data *cbd = data;
     tag = UrlEncodeString(cbd->adtag);
-  }
-  
   fputs(tag,out);
   free(tag);
 }
@@ -419,20 +417,18 @@ static void cb_blog_adtag(FILE *out,void *data)
 
 static void cb_blog_adtag_entity(FILE *out,void *data)
 {
-  struct callback_data *cbd;
+  struct callback_data *cbd = data;
   FILE                 *entityout;
   char const          *tag;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  if (data == NULL)
+  if (cbd->adtag == NULL)
     tag = g_config->adtag;
   else
-  {
-    cbd = data;
     tag = cbd->adtag;
-  }
-  
+
   entityout = fentity_encode_onwrite(out);
   if (entityout == NULL) return;
   fputs(tag,entityout);
@@ -446,12 +442,12 @@ static void cb_entry(FILE *out,void *data)
   struct callback_data *cbd = data;
   BlogEntry            *entry;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  if (data == NULL)
+  if (gd.f.htmldump)
   {
-    if (gd.htmldump)
-      fcopy(out,gd.htmldump);
+    fcopy(out,stdin);
     return;
   }
   

@@ -873,7 +873,6 @@ static int display_file(FILE *out,tumbler__s const *spec)
   if (gd.f.cgi)
   {
     struct stat  status;
-    FILE        *in;
     char const  *type;
     int          rc;
     
@@ -889,8 +888,7 @@ static int display_file(FILE *out,tumbler__s const *spec)
       return 1;
     }
     
-    in = fopen(fname,"r");
-    if (in == NULL)
+    if (freopen(fname,"r",stdin) == NULL)
     {
       (*gd.error)(&gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
       return 1;
@@ -900,9 +898,15 @@ static int display_file(FILE *out,tumbler__s const *spec)
     
     if (strcmp(type,"text/x-html") == 0)
     {
-      gd.htmldump = in;
+      struct callback_data cbd;
+      
+      gd.f.htmldump = true;
+      memset(&cbd,0,sizeof(struct callback_data));
+      ListInit(&cbd.list);
+      cbd.navunit = UNIT_PART;
+      
       fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",out);
-      generic_cb("main",out,NULL);
+      generic_cb("main",out,&cbd);
     }
     else
     {
@@ -916,9 +920,9 @@ static int display_file(FILE *out,tumbler__s const *spec)
         (unsigned long)status.st_size
       );
       
-      fcopy(out,in);
+      fcopy(out,stdin);
     }
-    fclose(in);
+    fclose(stdin);
   }
   else
     fprintf(out,"File to open: %s\n",fname);
