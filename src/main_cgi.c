@@ -60,12 +60,9 @@ int main_cgi_get(Cgi cgi)
     return (*gd.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
     
   gd.req.reqtumbler = getenv("PATH_INFO");
-  
   CgiListMake(cgi);
-  
-  set_m_cgi_get_command(CgiListGetValue(cgi,"cmd"));
-  
-  rc = (*command)(cgi,&gd.req);
+  command = set_m_cgi_get_command(CgiListGetValue(cgi,"cmd"));
+  rc      = (*command)(cgi,&gd.req);
   return rc;
 }
 
@@ -76,13 +73,14 @@ static cgicmd__f set_m_cgi_get_command(char const *value)
   if (emptynull_string(value))
     return cmd_cgi_get_show;
   
-  if (strcmp(value,"NEW") == 0)
+  syslog(LOG_NOTICE,"get command='%s'",value);
+  if (strcmp(value,"new") == 0)
     return cmd_cgi_get_new;
-  else if (strcmp(value,"SHOW") == 0)
+  else if (strcmp(value,"show") == 0)
     return cmd_cgi_get_show;
-  else if (strcmp(value,"PREVIEW") == 0)
+  else if (strcmp(value,"preview") == 0)
     return cmd_cgi_get_show;
-  else if (strcmp(value,"TODAY") == 0)
+  else if (strcmp(value,"today") == 0)
     return cmd_cgi_get_today;
   else
   {
