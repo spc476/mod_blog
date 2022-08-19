@@ -32,8 +32,7 @@
 
 typedef struct blog
 {
-  char       *lockfile;
-  int         lock;
+  char const *lockfile;
   struct btm  first;
   struct btm  last;
   struct btm  now;
@@ -58,8 +57,6 @@ typedef struct blogentry
 /*********************************************************************/
 
 extern Blog      *BlogNew               (char const *restrict,char const *restrict);
-extern bool       BlogLock              (Blog *);
-extern bool       BlogUnlock            (Blog *);
 extern void       BlogFree              (Blog *);
 
 extern BlogEntry *BlogEntryNew          (Blog *);

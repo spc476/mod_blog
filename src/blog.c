@@ -86,7 +86,7 @@ Blog *BlogNew(char const *restrict location,char const *restrict lockfile)
   }
   
   blog = calloc(1,sizeof(struct blog));
-  blog->lockfile = strdup(lockfile);
+  blog->lockfile = lockfile;
   
   blog->tnow      = time(NULL);
   ptm             = localtime(&blog->tnow);
@@ -176,81 +176,9 @@ Blog *BlogNew(char const *restrict location,char const *restrict lockfile)
 
 /***********************************************************************/
 
-bool BlogLock(Blog *blog)
-{
-  assert(blog       != NULL);
-  assert(blog->lock == 0);
-  
-  blog->lock = open(blog->lockfile,O_CREAT | O_RDWR, 0666);
-  if (blog->lock == -1)
-  {
-    syslog(LOG_ERR,"%s: %s",blog->lockfile,strerror(errno));
-    return false;
-  }
-  
-  int rc = fcntl(
-                  blog->lock,
-                  F_SETLKW,
-                  &(struct flock) {
-                    .l_type   = F_WRLCK,
-                    .l_start  = 0,
-                    .l_whence = SEEK_SET,
-                    .l_len    = 0,
-                  }
-                );
-                
-  if (rc < 0)
-  {
-    syslog(LOG_ERR,"SETLOCK %s: %s",blog->lockfile,strerror(errno));
-    close(blog->lock);
-    return false;
-  }
-  
-  return true;
-}
-
-/***********************************************************************/
-
-bool BlogUnlock(Blog *blog)
-{
-  assert(blog       != NULL);
-  assert(blog->lock >  0);
-  
-  int rc = fcntl(
-                  blog->lock,
-                  F_SETLK,
-                  &(struct flock) {
-                    .l_type   = F_UNLCK,
-                    .l_start  = 0,
-                    .l_whence = SEEK_SET,
-                    .l_len    = 0,
-                  }
-                );
-                
-  if (rc == 0)
-  {
-    close(blog->lock);
-    remove(blog->lockfile);
-    blog->lock = 0;
-    return true;
-  }
-  else
-  {
-    syslog(LOG_ERR,"UNLOCK %s: %s",blog->lockfile,strerror(errno));
-    return false;
-  }
-}
-
-/***********************************************************************/
-
 void BlogFree(Blog *blog)
 {
   assert(blog != NULL);
-  
-  if (blog->lock > 0)
-    BlogUnlock(blog);
-    
-  free(blog->lockfile);
   free(blog);
 }
 
@@ -486,6 +414,70 @@ void BlogEntryReadXU(
 
 /**************************************************************************/
 
+static int blog_lock(char const *lockfile)
+{
+  if (lockfile)
+  {
+    int lock = open(lockfile,O_CREAT | O_RDWR,0x666);
+    if (lock == -1)
+    {
+      syslog(LOG_ERR,"%s %s",lockfile,strerror(errno));
+      return lock;
+    }
+    
+    int rc = fcntl(
+                    lock,
+                    F_SETLKW,
+                    &(struct flock){
+                      .l_type   = F_WRLCK,
+                      .l_start  = 0,
+                      .l_whence = SEEK_SET,
+                      .l_len    = 0,
+                    }
+                  );
+    if (rc < 0)
+    {
+      syslog(LOG_ERR,"fcntl('%s',F_SETLKW) = %s",lockfile,strerror(errno));
+      close(lock);
+      return -1;
+    }
+    
+    return lock;
+  }
+  
+  return -1;
+}
+
+/***********************************************************************/
+
+static void blog_unlock(char const *lockfile,int lock)
+{
+  assert(lockfile != NULL);
+  
+  if (lock >= 0)
+  {
+    int rc = fcntl(
+               lock,
+               F_SETLK,
+               &(struct flock){
+                 .l_type   = F_UNLCK,
+                 .l_start  = 0,
+                 .l_whence = SEEK_SET,
+                 .l_len    = 0,
+              }
+            );
+    if (rc == 0)
+    {
+      close(lock);
+      remove(lockfile);
+    }
+    else
+      syslog(LOG_ERR,"fcntl('%s',F_UNLCK) = %s",lockfile,strerror(errno));
+  }
+}
+
+/***********************************************************************/
+
 int BlogEntryWrite(BlogEntry *entry)
 {
   char   **authors;
@@ -502,6 +494,7 @@ int BlogEntryWrite(BlogEntry *entry)
   char     filename[FILENAME_MAX];
   FILE    *out;
   int      rc;
+  int      lock;
   
   assert(entry != NULL);
   assert(entry->valid);
@@ -563,6 +556,8 @@ int BlogEntryWrite(BlogEntry *entry)
   blog_meta_write("titles" ,&entry->when,titles, maxnum);
   blog_meta_write("adtag"  ,&entry->when,adtag,  maxnum);
   
+  lock = blog_lock(entry->blog->lockfile);
+  
   /*-------------------------------
   ; update the actual entry body
   ;---------------------------------*/
@@ -617,6 +612,7 @@ int BlogEntryWrite(BlogEntry *entry)
     }
   }
   
+  blog_unlock(entry->blog->lockfile,lock);
   return 0;
 }
 

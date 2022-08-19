@@ -137,12 +137,8 @@ bool entry_add(Request *req)
   entry->adtag     = req->adtag;
   entry->body      = req->body;
   
-  if (g_config->author.file) BlogLock(g_blog);
-  
-    BlogEntryWrite(entry);
+  BlogEntryWrite(entry);
     
-  if (g_config->author.file) BlogUnlock(g_blog);
-  
   req->when = entry->when;
   
   if (g_config->posthook != NULL)
