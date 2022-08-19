@@ -36,8 +36,8 @@
 
 /*****************************************************************/
 
-static struct btm  calculate_previous (struct btm const);
-static struct btm  calculate_next     (struct btm const);
+static struct btm  calculate_previous (struct btm const,unit__e);
+static struct btm  calculate_next     (struct btm const,unit__e);
 static char const *mime_type          (char const *);
 static int         display_file       (FILE *,tumbler__s const *);
 static char       *tag_collect        (List *);
@@ -67,6 +67,7 @@ int generate_thisday(FILE *out,struct btm when)
   assert(out != NULL);
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
+  cbd.navunit = UNIT_PART;
   
   for(when.year = g_blog->first.year ; when.year <= g_blog->now.year ; when.year++)
   {
@@ -152,8 +153,9 @@ int pagegen_items(
   thisday      = blog->now;
   
   memset(&cbd,0,sizeof(struct callback_data));
-  
   ListInit(&cbd.list);
+  cbd.navunit = UNIT_PART;
+  
   if (template->reverse)
     BlogEntryReadXD(g_blog,&cbd.list,&thisday,template->items);
   else
@@ -194,6 +196,7 @@ int pagegen_days(
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
+  cbd.navunit = UNIT_PART;
   
   for (days = 0 , added = false ; days < template->items ; )
   {
@@ -377,13 +380,13 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   
   if (!spec->range)
   {
-    gd.f.navigation = true;
-    gd.navunit      = spec->ustart > spec->ustop
-                    ? spec->ustart
-                    : spec->ustop
-                    ;
-    cbd.previous = calculate_previous(start);
-    cbd.next     = calculate_next(end);
+    gd.f.navigation  = true;
+    cbd.navunit      = spec->ustart > spec->ustop
+                     ? spec->ustart
+                     : spec->ustop
+                     ;
+    cbd.previous = calculate_previous(start,cbd.navunit);
+    cbd.next     = calculate_next(end,cbd.navunit);
   }
   else
   {
@@ -395,6 +398,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
       end          = newtum.stop;
       gd.f.reverse = true;
     }
+    cbd.navunit = UNIT_PART;
   }
   
   assert(end.day <= max_monthday(end.year,end.month));
@@ -446,11 +450,11 @@ int tumbler_page(FILE *out,tumbler__s *spec)
 
 /******************************************************************/
 
-static struct btm calculate_previous(struct btm const start)
+static struct btm calculate_previous(struct btm const start,unit__e navunit)
 {
   struct btm previous = start;
   
-  switch(gd.navunit)
+  switch(navunit)
   {
     case UNIT_YEAR:
          if (start.year == g_blog->first.year)
@@ -549,11 +553,11 @@ static struct btm calculate_previous(struct btm const start)
 
 /******************************************************************/
 
-static struct btm calculate_next(struct btm const end)
+static struct btm calculate_next(struct btm const end,unit__e navunit)
 {
   struct btm next = end;
   
-  switch(gd.navunit)
+  switch(navunit)
   {
     case UNIT_YEAR:
          if (end.year == g_blog->now.year)

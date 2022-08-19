@@ -61,7 +61,6 @@ typedef struct dflags
 typedef struct display
 {
   DFlags           f;
-  unit__e          navunit;
   FILE            *htmldump;
   char const      *template;
   struct request   req;

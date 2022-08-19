@@ -166,7 +166,6 @@ int GlobalsInit(char const *conf)
   set_url(g_config->url);
   set_c_conversion(g_config->conversion);
   gd.template  = g_config->templates[0].template; /* XXX hack fix */
-  gd.navunit   = UNIT_PART;
   gd.f.navprev = true;
   gd.f.navnext = true;
   

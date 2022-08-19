@@ -103,8 +103,9 @@ static int cmd_cgi_get_new(Cgi cgi,Request *req)
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
-  cbd.adtag = (char *)g_config->adtag;
-  gd.f.edit = 1;
+  cbd.adtag   = (char *)g_config->adtag;
+  cbd.navunit = UNIT_PART;
+  gd.f.edit   = 1;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
   generic_cb("main",stdout,&cbd);
   return 0;
@@ -406,7 +407,9 @@ static int cmd_cgi_post_show(Cgi cgi,Request *req)
   
   memset(&cbd,0,sizeof(struct callback_data));
   ListInit(&cbd.list);
-  cbd.adtag = (char *)g_config->adtag;
+  cbd.adtag   = (char *)g_config->adtag;
+  cbd.navunit = UNIT_PART;
+  
   fix_entry(req);
   entry = BlogEntryNew(g_blog);
   

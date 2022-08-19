@@ -347,13 +347,17 @@ static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
 
 static void cb_blog_title(FILE *out,void *data)
 {
-  if ((gd.navunit == UNIT_PART) && (data != NULL))
+  assert(out != NULL);
+  
+  if (data != NULL)
   {
-    struct callback_data *cbd   = data;
-    BlogEntry            *entry = (BlogEntry *)ListGetHead(&cbd->list);
-    
-    if (NodeValid(&entry->node) && entry->valid)
-      fprintf(out,"%s - ",entry->title);
+    struct callback_data *cbd = data;
+    if (cbd->navunit == UNIT_PART)
+    {
+      BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
+      if (NodeValid(&entry->node) && entry->valid)
+        fprintf(out,"%s - ",entry->title);
+    }
   }
   
   fputs(g_config->name,out);
@@ -548,17 +552,20 @@ static void cb_entry_description(FILE *out,void *data)
   
   assert(out != NULL);
   
-  if ((gd.navunit == UNIT_PART) && (data != NULL))
+  if (data != NULL)
   {
-    struct callback_data *cbd   = data;
-    BlogEntry            *entry = (BlogEntry *)ListGetHead(&cbd->list);
-    
-    if (NodeValid(&entry->node) && entry->valid)
+    struct callback_data *cbd = data;
+    if (cbd->navunit == UNIT_PART)
     {
-      if (!empty_string(entry->status))
-        msg = entry->status;
-      else if (!empty_string(entry->title))
-        msg = entry->title;
+      BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
+      
+      if (NodeValid(&entry->node) && entry->valid)
+      {
+        if (!empty_string(entry->status))
+          msg = entry->status;
+        else if (!empty_string(entry->title))
+          msg = entry->title;
+      }
     }
   }
   
@@ -624,7 +631,7 @@ static void cb_entry_class(FILE *out,void *data)
       msg = cbd->entry->class;
     else
     {
-      if (gd.navunit == UNIT_PART)
+      if (cbd->navunit == UNIT_PART)
       {
         BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
         if (NodeValid(&entry->node) && entry->valid)
@@ -950,13 +957,12 @@ static void cb_cond_hr(FILE *out,void *data)
   struct callback_data *cbd = data;
   BlogEntry            *entry;
   
-  assert(out != NULL);
-  
-  if (gd.f.navigation && (gd.navunit == UNIT_PART))
-    return;
-    
+  assert(out  != NULL);
   assert(data != NULL);
   
+  if (gd.f.navigation && (cbd->navunit == UNIT_PART))
+    return;
+    
   entry = cbd->entry;
   assert(entry->valid);
   if (btm_cmp_date(&entry->when,&cbd->last) == 0)
@@ -1168,62 +1174,70 @@ static void cb_navigation_current(FILE *out,void *data)
 
 /********************************************************************/
 
-static void cb_navigation_first_url(FILE *out,void *data __attribute__((unused)))
+static void cb_navigation_first_url(FILE *out,void *data)
 {
-  struct btm tmp;
+  struct callback_data *cbd = data;
+  struct btm            tmp;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   tmp = g_blog->first;
   if (gd.f.navigation == false)
     print_nav_url(out,&tmp,UNIT_PART);
   else
-    print_nav_url(out,&tmp,gd.navunit);
+    print_nav_url(out,&tmp,cbd->navunit);
 }
 
 /********************************************************************/
 
-static void cb_navigation_first_title(FILE *out,void *data __attribute__((unused)))
+static void cb_navigation_first_title(FILE *out,void *data)
 {
-  struct btm tmp;
+  struct callback_data *cbd = data;
+  struct btm            tmp;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   tmp = g_blog->first;
   if (gd.f.navigation == false)
     print_nav_title(out,&tmp,UNIT_PART);
   else
-    print_nav_title(out,&tmp,gd.navunit);
+    print_nav_title(out,&tmp,cbd->navunit);
 }
 
 /*******************************************************************/
 
-static void cb_navigation_last_url(FILE *out,void *data __attribute__((unused)))
+static void cb_navigation_last_url(FILE *out,void *data)
 {
-  struct btm tmp;
+  struct callback_data *cbd = data;
+  struct btm            tmp;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   tmp = g_blog->last;
   if (gd.f.navigation == false)
     print_nav_url(out,&tmp,UNIT_PART);
   else
-    print_nav_url(out,&tmp,gd.navunit);
+    print_nav_url(out,&tmp,cbd->navunit);
 }
 
 /******************************************************************/
 
-static void cb_navigation_last_title(FILE *out,void *data __attribute__((unused)))
+static void cb_navigation_last_title(FILE *out,void *data)
 {
-  struct btm tmp;
+  struct callback_data *cbd = data;
+  struct btm            tmp;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   tmp = g_blog->last;
   if (gd.f.navigation == false)
     print_nav_title(out,&tmp,UNIT_PART);
   else
-    print_nav_title(out,&tmp,gd.navunit);
+    print_nav_title(out,&tmp,cbd->navunit);
 }
 
 /*****************************************************************/
@@ -1233,11 +1247,11 @@ static void cb_navigation_next_title(FILE *out,void *data)
   struct callback_data *cbd = data;
   struct btm            tmp;
   
-  assert(out != NULL);
+  assert(out  != NULL);
   assert(data != NULL);
   
   tmp = cbd->next;
-  print_nav_title(out,&tmp,gd.navunit);
+  print_nav_title(out,&tmp,cbd->navunit);
 }
 
 /********************************************************************/
@@ -1251,7 +1265,7 @@ static void cb_navigation_prev_title(FILE *out,void *data)
   assert(data != NULL);
   
   tmp = cbd->previous;
-  print_nav_title(out,&tmp,gd.navunit);
+  print_nav_title(out,&tmp,cbd->navunit);
 }
 
 /*******************************************************************/
@@ -1259,13 +1273,13 @@ static void cb_navigation_prev_title(FILE *out,void *data)
 static void cb_navigation_next_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  struct btm                  tmp;
+  struct btm            tmp;
   
   assert(out  != NULL);
   assert(data != NULL);
   
   tmp = cbd->next;
-  print_nav_url(out,&tmp,gd.navunit);
+  print_nav_url(out,&tmp,cbd->navunit);
 }
 
 /*******************************************************************/
@@ -1279,7 +1293,7 @@ static void cb_navigation_prev_url(FILE *out,void *data)
   assert(data != NULL);
   
   tmp = cbd->previous;
-  print_nav_url(out,&tmp,gd.navunit);
+  print_nav_url(out,&tmp,cbd->navunit);
 }
 
 /********************************************************************/
@@ -1410,11 +1424,14 @@ static void cb_update_time(FILE *out,void *data __attribute__((unused)))
 
 /*******************************************************************/
 
-static void cb_robots_index(FILE *out,void *data __attribute__((unused)))
+static void cb_robots_index(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (gd.navunit == UNIT_PART)
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->navunit == UNIT_PART)
     fputs("index",out);
   else
     fputs("noindex",out);
@@ -1424,9 +1441,12 @@ static void cb_robots_index(FILE *out,void *data __attribute__((unused)))
 
 static void cb_comments(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (gd.navunit != UNIT_PART)
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->navunit != UNIT_PART)
     return;
     
   generic_cb("comments",out,data);

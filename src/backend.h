@@ -34,6 +34,7 @@ struct callback_data
   char       *adtag;
   struct btm  previous;
   struct btm  next;
+  unit__e     navunit;
 };
 
 /************************************************/
