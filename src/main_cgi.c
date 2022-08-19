@@ -50,20 +50,14 @@ static int       cgi_error              (Request *,int,char const *, ... );
 
 int main_cgi_get(Cgi cgi)
 {
-  cgicmd__f command = cmd_cgi_get_show;
-  int       rc;
-  
   assert(cgi != NULL);
   
-  rc = cgi_init(cgi,&gd.req);
-  if (rc != 0)
+  if (cgi_init(cgi,&gd.req) != 0)
     return (*gd.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
     
   gd.req.reqtumbler = getenv("PATH_INFO");
   CgiListMake(cgi);
-  command = set_m_cgi_get_command(CgiListGetValue(cgi,"cmd"));
-  rc      = (*command)(cgi,&gd.req);
-  return rc;
+  return (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,&gd.req);
 }
 
 /************************************************************************/
@@ -72,9 +66,7 @@ static cgicmd__f set_m_cgi_get_command(char const *value)
 {
   if (emptynull_string(value))
     return cmd_cgi_get_show;
-  
-  syslog(LOG_NOTICE,"get command='%s'",value);
-  if (strcmp(value,"new") == 0)
+  else if (strcmp(value,"new") == 0)
     return cmd_cgi_get_new;
   else if (strcmp(value,"show") == 0)
     return cmd_cgi_get_show;
@@ -266,18 +258,13 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
 
 int main_cgi_post(Cgi cgi)
 {
-  cgicmd__f command = cmd_cgi_post_new;
-  int       rc;
-  
   assert(cgi != NULL);
   
-  rc = cgi_init(cgi,&gd.req);
-  if (rc != 0)
+  if (cgi_init(cgi,&gd.req) != 0)
     return (*gd.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
     
   CgiListMake(cgi);
   
-  command = set_m_cgi_post_command(CgiListGetValue(cgi,"cmd"));
   set_cf_emailupdate    (CgiListGetValue(cgi,"email"));
   set_c_conversion      (CgiListGetValue(cgi,"filter"));
   set_m_author          (CgiListGetValue(cgi,"author"),&gd.req);
@@ -308,8 +295,7 @@ int main_cgi_post(Cgi cgi)
     return (*gd.error)(&gd.req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",gd.req.author,CgiListGetValue(cgi,"author"));
   }
   
-  rc = (*command)(cgi,&gd.req);
-  return rc;
+  return (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,&gd.req);
 }
 
 /************************************************************************/
@@ -320,8 +306,7 @@ static cgicmd__f set_m_cgi_post_command(char const *value)
   
   if (emptynull_string(value))
     return cmd_cgi_post_show;
-  
-  if (strcmp(value,"new") == 0)
+  else if (strcmp(value,"new") == 0)
     return cmd_cgi_post_new;
   else if (strcmp(value,"show") == 0)
     return cmd_cgi_post_show;
