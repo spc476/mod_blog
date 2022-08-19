@@ -79,7 +79,6 @@ typedef struct
   char const     *prehook;
   char const     *posthook;
   char const     *adtag;
-  bool            debug;
   char const     *conversion;
   struct author   author;
   template__t    *templates;
