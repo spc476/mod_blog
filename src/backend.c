@@ -52,6 +52,9 @@ struct callback_data *callback_init(struct callback_data *cbd)
   
   memset(cbd,0,sizeof(struct callback_data));
   ListInit(&cbd->list);
+  cbd->entry   = NULL;
+  cbd->ad      = NULL;
+  cbd->adtag   = NULL;
   cbd->navunit = UNIT_PART;
   return cbd;
 }
