@@ -24,25 +24,6 @@
 #define I_5B8ED10A_F8F4_5F83_A7EA_CD76EE7A05D8
 
 #include "config.h"
-#if 0
-typedef struct template
-{
-  char const  *template;
-  char const  *file;
-  char const  *posthook;
-  size_t       items;
-  int        (*pagegen)(struct template const *,FILE *,Blog *);
-  bool         reverse;
-  bool         fullurl;
-} template__t;
-
-typedef struct aflink
-{
-  char const *proto;
-  size_t      psize;
-  char const *format;
-} aflink__t;
-#endif
 
 typedef int (*pagegen__f)(struct template const *,FILE *,Blog *);
 
