@@ -91,7 +91,7 @@ static int cmd_cgi_get_new(Cgi cgi,Request *req)
   assert(cgi != NULL);
   (void)cgi;
   
-  gd.f.edit   = 1;
+  gd.f.edit   = true;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
   generic_cb("main",stdout,callback_init(&cbd));
   return 0;
@@ -406,7 +406,7 @@ static int cmd_cgi_post_show(Cgi cgi,Request *req)
   entry->body      = req->body;
   
   ListAddTail(&cbd.list,&entry->node);
-  gd.f.edit = 1;
+  gd.f.edit = true;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
   generic_cb("main",stdout,&cbd);
   

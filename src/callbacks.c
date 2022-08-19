@@ -1504,7 +1504,7 @@ static void cb_edit(FILE *out,void *data)
 {
   assert(out != NULL);
   
-  if (gd.f.edit == 0) return;
+  if (gd.f.edit == false) return;
   generic_cb("edit",out,data);
 }
 
