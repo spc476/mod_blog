@@ -105,8 +105,8 @@ static int cmd_cgi_get_new(Cgi cgi,Request *req)
   ListInit(&cbd.list);
   cbd.adtag = (char *)g_config->adtag;
   gd.f.edit = 1;
-  fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
-  generic_cb("main",req->out,&cbd);
+  fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
+  generic_cb("main",stdout,&cbd);
   return 0;
 }
 
@@ -127,7 +127,7 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
   if ((emptynull_string(req->reqtumbler)) || (strcmp(req->reqtumbler,"/") == 0))
   {
     fprintf(
-        req->out,
+        stdout,
         "Status: %d\r\n"
         "Location: %s\r\n"
         "Content-type: text/html\r\n"
@@ -152,7 +152,7 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
       {
         char *tum = tumbler_canonical(&req->tumbler);
         fprintf(
-                req->out,
+                stdout,
                 "Status: %d\r\n"
                 "Location: %s/%s\r\n"
                 "Content-Type: text/html\r\n\r\n"
@@ -172,12 +172,12 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
       
       if (req->tumbler.file == false)
         fprintf(
-                req->out,
+                stdout,
                 "Status: %s\r\n"
                 "Content-type: text/html\r\n\r\n",
                 status
         );
-      rc = tumbler_page(req->out,&req->tumbler);
+      rc = tumbler_page(stdout,&req->tumbler);
     }
     else
     {
@@ -191,8 +191,8 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
       else
       {
         gd.htmldump = in;
-        fprintf(req->out,"Status: %s\r\nContent-type: text/html\r\n\r\n",status);
-        generic_cb("main",req->out,NULL);
+        fprintf(stdout,"Status: %s\r\nContent-type: text/html\r\n\r\n",status);
+        generic_cb("main",stdout,NULL);
         rc = 0;
       }
     }
@@ -215,8 +215,8 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
   
   if ((tpath == NULL) && (twhen == NULL))
   {
-    fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
-    return generate_thisday(req->out,g_blog->now);
+    fprintf(stdout,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
+    return generate_thisday(stdout,g_blog->now);
   }
   
   if (tpath == NULL)
@@ -225,7 +225,7 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
   if ((twhen == NULL) || (*twhen == '\0'))
   {
     fprintf(
-      req->out,
+      stdout,
       "Status: %d\r\n"
       "Content-Type: text/html\r\n"
       "Location: %s/%s\r\n"
@@ -247,7 +247,7 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
   if (req->tumbler.redirect)
   {
     fprintf(
-      req->out,
+      stdout,
       "Status: %d\r\n"
       "Content-Type: text/html\r\n"
       "Location: %s/%s/%02d/%02d\r\n"
@@ -263,8 +263,8 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
     return 0;
   }
   
-  fprintf(req->out,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
-  return generate_thisday(req->out,req->tumbler.start);
+  fprintf(stdout,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
+  return generate_thisday(stdout,req->tumbler.start);
 }
 
 /**********************************************************************/
@@ -366,7 +366,7 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
     if (g_config->email.notify) notify_emaillist(req);
     generate_pages();
     fprintf(
-        req->out,
+        stdout,
         "Status: %d\r\n"
         "Location: %s\r\n"
         "Content-type: text/html\r\n"
@@ -429,8 +429,8 @@ static int cmd_cgi_post_show(Cgi cgi,Request *req)
   
   ListAddTail(&cbd.list,&entry->node);
   gd.f.edit = 1;
-  fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",req->out);
-  generic_cb("main",req->out,&cbd);
+  fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
+  generic_cb("main",stdout,&cbd);
   
   return 0;
 }
@@ -469,7 +469,7 @@ static int cgi_error(Request *req,int level,char const *msg, ... )
   if (in == NULL)
   {
     fprintf(
-        req->out,
+        stdout,
         "Status: %d\r\n"
         "X-Error: %s\r\n"
         "Content-type: text/html\r\n"
@@ -495,7 +495,7 @@ static int cgi_error(Request *req,int level,char const *msg, ... )
   {
     gd.htmldump = in;
     fprintf(
-        req->out,
+        stdout,
         "Status: %d\r\n"
         "X-Error: %s\r\n"
         "Content-type: text/html\r\n"
@@ -503,7 +503,7 @@ static int cgi_error(Request *req,int level,char const *msg, ... )
         level,
         errmsg
       );
-    generic_cb("main",req->out,NULL);
+    generic_cb("main",stdout,NULL);
     fclose(in);
   }
   
@@ -523,8 +523,6 @@ static int cgi_init(Cgi cgi,Request *req)
   
   gd.error = cgi_error;
   gd.f.cgi = true;
-  req->in  = stdin;
-  req->out = stdout;
   
   return GlobalsInit(NULL);
 }

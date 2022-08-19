@@ -45,10 +45,10 @@
 
 struct options
 {
-  bool emailin;
-  bool regenerate;
-  bool today;
-  bool thisday;
+  bool  emailin;
+  bool  regenerate;
+  bool  today;
+  bool  thisday;
 };
 
 typedef int (*clicmd__f)(Request *,struct options const *);
@@ -97,14 +97,12 @@ int main_cli(int argc,char *argv[])
     { NULL           , 0                  , NULL  , 0               }
   };
   
-  char            *config     = NULL;
-  int             forcenotify = false;
-  clicmd__f       command     = cmd_cli_show;
+  char               *config     = NULL;
+  int                forcenotify = false;
+  clicmd__f          command     = cmd_cli_show;
   struct options  options;
   
   gd.error           = cli_error;
-  gd.req.in          = stdin;
-  gd.req.out         = stdout;
   options.emailin    = false;
   options.regenerate = false;
   options.today      = false;
@@ -124,8 +122,7 @@ int main_cli(int argc,char *argv[])
            config = optarg;
            break;
       case OPT_FILE:
-           gd.req.in = fopen(optarg,"r");
-           if (gd.req.in == NULL)
+           if (freopen(optarg,"r",stdin) == NULL)
              return (*gd.error)(&gd.req,HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
            break;
       case OPT_EMAIL:
@@ -220,8 +217,8 @@ static int cmd_cli_new(Request *req,struct options const *options)
 {
   int rc;
   
-  assert(req     != NULL);
-  assert(options != NULL);
+  assert(req         != NULL);
+  assert(options     != NULL);
   
   if (options->emailin)
     rc = mail_setup_data(req);
@@ -259,7 +256,7 @@ static int cmd_cli_show(Request *req,struct options const *options)
   if (options->regenerate)
     rc = generate_pages();
   else if (options->today)
-    rc = generate_thisday(req->out,g_blog->now);
+    rc = generate_thisday(stdout,g_blog->now);
   else if (options->thisday)
   {
     if (!thisday_new(&req->tumbler,req->reqtumbler))
@@ -267,7 +264,7 @@ static int cmd_cli_show(Request *req,struct options const *options)
     else if (req->tumbler.redirect)
       rc = (*gd.error)(req,HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
     else
-      rc = generate_thisday(req->out,req->tumbler.start);
+      rc = generate_thisday(stdout,req->tumbler.start);
   }
   else
   {
@@ -281,7 +278,7 @@ static int cmd_cli_show(Request *req,struct options const *options)
       template.reverse  = true;
       template.fullurl  = false;
       
-      rc = pagegen_days(&template,req->out,g_blog);
+      rc = pagegen_days(&template,stdout,g_blog);
     }
     else
     {
@@ -294,7 +291,7 @@ static int cmd_cli_show(Request *req,struct options const *options)
           free(tum);
           return rc;
         }
-        rc = tumbler_page(req->out,&req->tumbler);
+        rc = tumbler_page(stdout,&req->tumbler);
       }
       else
         rc = (*gd.error)(req,HTTP_NOTFOUND,"tumbler error---nothing found");
@@ -339,7 +336,7 @@ static int mail_setup_data(Request *req)
   size = 0;
   
   ListInit(&headers);
-  getline(&line,&size,req->in); /* skip Unix 'From ' line */
+  getline(&line,&size,stdin); /* skip Unix 'From ' line */
   free(line);
   
   /*----------------------------------------------------------------------
@@ -357,7 +354,7 @@ static int mail_setup_data(Request *req)
   ; email.
   ;-----------------------------------------------------------------------*/
   
-  RFC822HeadersRead(req->in,&headers);
+  RFC822HeadersRead(stdin,&headers);
   
   char *encoding = PairListGetValue(&headers,"CONTENT-TRANSFER-ENCODING");
   if (encoding)
@@ -390,11 +387,10 @@ static int mailfile_readdata(Request *req)
   char   *filter;
   size_t  size;
   
-  assert(req     != NULL);
-  assert(req->in != NULL);
+  assert(req != NULL);
   
   ListInit(&headers);
-  RFC822HeadersRead(req->in,&headers);
+  RFC822HeadersRead(stdin,&headers);
   
   req->author = PairListGetValue(&headers,"AUTHOR");
   req->title  = PairListGetValue(&headers,"TITLE");
@@ -443,7 +439,7 @@ static int mailfile_readdata(Request *req)
   }
   
   output = open_memstream(&req->origbody,&size);
-  fcopy(output,req->in);
+  fcopy(output,stdin);
   fclose(output);
   
   req->body = strdup(req->origbody);

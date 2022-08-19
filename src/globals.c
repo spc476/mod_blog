@@ -63,8 +63,6 @@ static void globals_free(void)
   if (g_blog   != NULL) BlogFree(g_blog);
   if (g_config != NULL) config_free(g_config);
   
-  fclose(gd.req.in);
-  fclose(gd.req.out);
   free(gd.req.update);
   free(gd.req.origauthor);
   free(gd.req.author);

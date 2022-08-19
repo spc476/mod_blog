@@ -32,8 +32,6 @@
 
 typedef struct request
 {
-  FILE       *in;
-  FILE       *out;
   char       *update;
   char       *origauthor;
   char       *author;
