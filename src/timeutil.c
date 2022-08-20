@@ -30,9 +30,9 @@ int max_monthday(int year,int month)
 {
   static int const days[] = { 31,0,31,30,31,30,31,31,30,31,30,31 } ;
   
-  assert(year  >  0);
-  assert(month >  0);
-  assert(month < 13);
+  assert(year  > 1969);
+  assert(month >    0);
+  assert(month <   13);
   
   if (month == 2)
   {
