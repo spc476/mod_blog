@@ -20,9 +20,7 @@
 *
 ****************************************************************/
 
-#include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <assert.h>
 
 #include <syslog.h>

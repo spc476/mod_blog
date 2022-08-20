@@ -23,7 +23,6 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include <syslog.h>
 #include <cgilib6/util.h>

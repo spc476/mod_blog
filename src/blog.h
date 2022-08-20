@@ -24,6 +24,7 @@
 #define I_A7907483_71BF_5594_9AA6_58C785CB9FFA
 
 #include <stdbool.h>
+#include <time.h>
 #include <cgilib6/nodelist.h>
 
 #include "timeutil.h"

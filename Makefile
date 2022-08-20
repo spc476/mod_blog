@@ -73,28 +73,27 @@ depend:
 
 # DO NOT DELETE
 
-src/addutil.o: src/blog.h src/timeutil.h src/conversion.h src/frontend.h
-src/addutil.o: src/wbtum.h src/config.h src/globals.h src/backend.h
+src/addutil.o: src/blog.h src/timeutil.h src/conversion.h src/backend.h
+src/addutil.o: src/wbtum.h src/config.h src/frontend.h src/globals.h
 src/addutil.o: src/blogutil.h
 src/authenticate.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
-src/authenticate.o: src/config.h src/globals.h src/backend.h
+src/authenticate.o: src/config.h src/globals.h
 src/backend.o: src/blogutil.h src/frontend.h src/wbtum.h src/timeutil.h
 src/backend.o: src/blog.h src/config.h src/backend.h src/globals.h
 src/blog.o: src/blog.h src/timeutil.h src/wbtum.h
 src/blogutil.o: src/blogutil.h
-src/callbacks.o: src/blog.h src/timeutil.h src/frontend.h src/wbtum.h
-src/callbacks.o: src/config.h src/blogutil.h src/conversion.h src/globals.h
-src/callbacks.o: src/backend.h
+src/callbacks.o: src/backend.h src/blog.h src/timeutil.h src/wbtum.h
+src/callbacks.o: src/config.h src/frontend.h src/blogutil.h src/conversion.h
+src/callbacks.o: src/globals.h
 src/config.o: src/config.h
 src/conversion.o: src/conversion.h src/frontend.h src/wbtum.h src/timeutil.h
 src/conversion.o: src/blog.h src/config.h src/blogutil.h
 src/globals.o: src/conversion.h src/frontend.h src/wbtum.h src/timeutil.h
 src/globals.o: src/blog.h src/config.h
-src/main.o: src/globals.h src/frontend.h src/wbtum.h src/timeutil.h
-src/main.o: src/blog.h src/config.h src/backend.h
-src/main_cgi.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
-src/main_cgi.o: src/config.h src/globals.h src/backend.h
-src/main_cli.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
-src/main_cli.o: src/config.h src/blogutil.h src/globals.h src/backend.h
-src/timeutil.o: src/timeutil.h src/wbtum.h
+src/main.o: src/globals.h src/blog.h src/timeutil.h src/config.h
+src/main_cgi.o: src/backend.h src/blog.h src/timeutil.h src/wbtum.h
+src/main_cgi.o: src/config.h src/frontend.h src/globals.h
+src/main_cli.o: src/backend.h src/blog.h src/timeutil.h src/wbtum.h
+src/main_cli.o: src/config.h src/frontend.h src/blogutil.h src/globals.h
+src/timeutil.o: src/wbtum.h src/timeutil.h
 src/wbtum.o: src/wbtum.h src/timeutil.h

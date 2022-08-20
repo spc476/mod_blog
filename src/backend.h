@@ -23,6 +23,13 @@
 #ifndef I_5B8ED10A_F8F4_5F83_A7EA_CD76EE7A05D8
 #define I_5B8ED10A_F8F4_5F83_A7EA_CD76EE7A05D8
 
+#include <stdio.h>
+
+#include "blog.h"
+#include "timeutil.h"
+#include "wbtum.h"
+#include "config.h"
+
 typedef int (*pagegen__f)(struct template const *,FILE *,Blog *);
 
 struct callback_data

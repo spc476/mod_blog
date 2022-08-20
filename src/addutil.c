@@ -20,7 +20,6 @@
 *
 *********************************************************************/
 
-#include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -34,6 +33,7 @@
 
 #include "blog.h"
 #include "conversion.h"
+#include "backend.h"
 #include "frontend.h"
 #include "globals.h"
 #include "blogutil.h"

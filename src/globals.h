@@ -30,9 +30,9 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-#include "frontend.h"
-#include "backend.h"
-#include "timeutil.h"
+//#include "frontend.h"
+//#include "backend.h"
+//#include "timeutil.h"
 #include "blog.h"
 #include "config.h"
 

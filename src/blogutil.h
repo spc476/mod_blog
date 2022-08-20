@@ -23,6 +23,8 @@
 #ifndef I_F4A408FA_A630_59FB_81C6_846355DD0AFB
 #define I_F4A408FA_A630_59FB_81C6_846355DD0AFB
 
+#include <stdio.h>
+
 /*********************************************************************/
 
 typedef struct mystring

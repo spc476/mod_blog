@@ -25,9 +25,7 @@
 #endif
 
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
-#include <stdio.h>
 #include <errno.h>
 
 #include <syslog.h>
@@ -38,8 +36,8 @@
 #include <cgilib6/rfc822.h>
 #include <cgilib6/util.h>
 
+#include "backend.h"
 #include "frontend.h"
-#include "blog.h"
 #include "blogutil.h"
 #include "globals.h"
 

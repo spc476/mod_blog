@@ -24,11 +24,8 @@
 #  define __attribute__(x)
 #endif
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <time.h>
 
 #include <unistd.h>
 #include <gdbm.h>
@@ -38,8 +35,7 @@
 #include <cgilib6/chunk.h>
 #include <cgilib6/util.h>
 
-#include "blog.h"
-#include "timeutil.h"
+#include "backend.h"
 #include "frontend.h"
 #include "blogutil.h"
 #include "conversion.h"

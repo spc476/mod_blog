@@ -31,7 +31,6 @@
 
 #include "conversion.h"
 #include "frontend.h"
-#include "config.h"
 
 /************************************************************/
 

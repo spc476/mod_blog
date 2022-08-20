@@ -24,9 +24,9 @@
 #include <string.h>
 
 #include <syslog.h>
-#include <cgilib6/cgi.h>
 #include <cgilib6/util.h>
 
+#include "backend.h"
 #include "frontend.h"
 #include "globals.h"
 
