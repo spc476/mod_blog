@@ -97,16 +97,12 @@ int main_cli(int argc,char *argv[])
     { NULL           , 0                  , NULL  , 0               }
   };
   
-  char               *config     = NULL;
-  int                forcenotify = false;
-  clicmd__f          command     = cmd_cli_show;
-  struct options  options;
+  char           *config      = NULL;
+  int             forcenotify = false;
+  clicmd__f       command     = cmd_cli_show;
+  struct options  options     = { .emailin = false , .regenerate = false , .today = false , .thisday = false };
   
-  gd.error           = cli_error;
-  options.emailin    = false;
-  options.regenerate = false;
-  options.today      = false;
-  options.thisday    = false;
+  gd.error = cli_error;
   
   while(true)
   {
