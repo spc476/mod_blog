@@ -340,11 +340,11 @@ static int mail_setup_data(Request *req)
   free(line);
   
   /*----------------------------------------------------------------------
-  ; Recently in the past two months, entries have been sent that have been
-  ; encoded as "quoted-printable".  I'm not sure the exact conditions that
-  ; cause it (recents tests with known non-7bit clean content have been
-  ; passed through unencoded) but it is happening now that I've somewhat
-  ; changed how I write entries with quoted material.
+  ; In the past two months, entries have been sent that have been encoded as
+  ; "quoted-printable".  I'm not sure the exact conditions that cause it
+  ; (recents tests with known non-7bit clean content have been passed
+  ; through unencoded) but it is happening now that I've somewhat changed
+  ; how I write entries with quoted material.
   ;
   ; For now, check for the existence of the Content-Transfer-Encoding header
   ; and if it's not '7bit', '8bit' or 'binary' (which are identity
