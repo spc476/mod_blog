@@ -340,7 +340,7 @@ static int mail_setup_data(Request *req)
   free(line);
   
   /*----------------------------------------------------------------------
-  ; In the past two months, entries have been sent that have been encoded as
+  ; In the past, entries have been sent that have been encoded as
   ; "quoted-printable".  I'm not sure the exact conditions that cause it
   ; (recents tests with known non-7bit clean content have been passed
   ; through unencoded) but it is happening now that I've somewhat changed
