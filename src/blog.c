@@ -130,9 +130,9 @@ Blog *BlogNew(char const *restrict location,char const *restrict lockfile)
     return NULL;
   }
   
-  ptm             = localtime(&blog->tnow);
   blog->lockfile  = lockfile;
   blog->tnow      = time(NULL);
+  ptm             = localtime(&blog->tnow);
   blog->now.year  = ptm->tm_year + 1900;
   blog->now.month = ptm->tm_mon  + 1;
   blog->now.day   = ptm->tm_mday;
