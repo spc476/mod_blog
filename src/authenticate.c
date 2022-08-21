@@ -130,7 +130,7 @@ bool authenticate_author(Request *req)
         free(req->author);
         req->author = strdup(lines[c_config->author.fields.name]);
         fclose(in);
-        free(lines[0]); // see comment below
+        free(lines[0]); /* see comment below */
         return true;
       }
     }
