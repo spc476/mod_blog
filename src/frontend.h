@@ -66,7 +66,6 @@ typedef struct display
   struct request   req;
   void           (*conversion)(FILE *restrict,FILE *restrict);
   int            (*pagegen)   (struct template const *,FILE *,Blog *);
-  int            (*error)     (struct request *,int,char const *, ... );
   char            *baseurl;
   char            *fullbaseurl;
 } Display;

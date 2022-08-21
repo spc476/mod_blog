@@ -39,7 +39,7 @@
 static struct btm  calculate_previous (struct btm const,unit__e);
 static struct btm  calculate_next     (struct btm const,unit__e);
 static char const *mime_type          (char const *);
-static int         display_file       (FILE *,tumbler__s const *);
+static int         display_file       (tumbler__s const *,int (*)(Request *,int,char const *,...));
 static char       *tag_collect        (List *);
 static char       *tag_pick           (char const *);
 static void        free_entries       (List *);
@@ -341,15 +341,15 @@ static void swap_endpoints(tumbler__s *tum)
 
 /************************************************************************/
 
-int tumbler_page(FILE *out,tumbler__s *spec)
+int tumbler_page(tumbler__s *spec,int (*errorf)(Request *,int,char const *,...))
 {
   struct callback_data cbd;
   struct btm           start;
   struct btm           end;
   char                *tags;
   
-  assert(out  != NULL);
   assert(spec != NULL);
+  assert(errorf);
   
   gd.f.fullurl = false; /* XXX why? */
   
@@ -358,7 +358,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
     
   if (spec->file)
   {
-    display_file(out,spec);
+    display_file(spec,errorf);
     return 0; /* XXX hack for now */
   }
   
@@ -448,7 +448,7 @@ int tumbler_page(FILE *out,tumbler__s *spec)
   cbd.adtag = tag_pick(tags);
   
   free(tags);
-  generic_cb("main",out,&cbd);
+  generic_cb("main",stdout,&cbd);
   free_entries(&cbd.list);
   free(cbd.adtag);
   return 0;
@@ -859,12 +859,12 @@ static char const *mime_type(char const *filename)
 
 /******************************************************************/
 
-static int display_file(FILE *out,tumbler__s const *spec)
+static int display_file(tumbler__s const *spec,int (*errorf)(Request *,int,char const *,...))
 {
   char fname[FILENAME_MAX];
   
-  assert(out  != NULL);
   assert(spec != NULL);
+  assert(errorf);
   
   snprintf(
       fname,
@@ -886,17 +886,17 @@ static int display_file(FILE *out,tumbler__s const *spec)
     if (rc == -1)
     {
       if (errno == ENOENT)
-        (*gd.error)(&gd.req,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
+        (*errorf)(&gd.req,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
       else if (errno == EACCES)
-        (*gd.error)(&gd.req,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
+        (*errorf)(&gd.req,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
       else
-        (*gd.error)(&gd.req,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
+        (*errorf)(&gd.req,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
       return 1;
     }
     
     if (freopen(fname,"r",stdin) == NULL)
     {
-      (*gd.error)(&gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
+      (*errorf)(&gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
       return 1;
     }
     
@@ -907,13 +907,13 @@ static int display_file(FILE *out,tumbler__s const *spec)
       struct callback_data cbd;
       
       gd.f.htmldump = true;
-      fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",out);
-      generic_cb("main",out,callback_init(&cbd));
+      fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
+      generic_cb("main",stdout,callback_init(&cbd));
     }
     else
     {
       fprintf(
-        out,
+        stdout,
         "Status: 200\r\n"
         "Content-Type: %s\r\n"
         "Content-Length: %lu\r\n"
@@ -922,12 +922,12 @@ static int display_file(FILE *out,tumbler__s const *spec)
         (unsigned long)status.st_size
       );
       
-      fcopy(out,stdin);
+      fcopy(stdout,stdin);
     }
     fclose(stdin);
   }
   else
-    fprintf(out,"File to open: %s\n",fname);
+    fprintf(stdout,"File to open: %s\n",fname);
     
   return 0;
 }

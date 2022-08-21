@@ -53,7 +53,7 @@ int main_cgi_get(Cgi cgi)
   assert(cgi != NULL);
   
   if (cgi_init(cgi,&gd.req) != 0)
-    return (*gd.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
+    return cgi_error(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
     
   gd.req.reqtumbler = getenv("PATH_INFO");
   CgiListMake(cgi);
@@ -164,7 +164,7 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
                 "Content-type: text/html\r\n\r\n",
                 status
         );
-      rc = tumbler_page(stdout,&req->tumbler);
+      rc = tumbler_page(&req->tumbler,cgi_error);
     }
     else
     {
@@ -172,7 +172,7 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
       
       snprintf(filename,sizeof(filename),"%s%s",getenv("DOCUMENT_ROOT"),getenv("PATH_INFO"));
       if (freopen(filename,"r",stdin) == NULL)
-        rc = (*gd.error)(req,HTTP_BADREQ,"bad request");
+        rc = cgi_error(req,HTTP_BADREQ,"bad request");
       else
       {
         struct callback_data cbd;
@@ -207,7 +207,7 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
   }
   
   if (tpath == NULL)
-    return (*gd.error)(req,HTTP_BADREQ,"bad request");
+    return cgi_error(req,HTTP_BADREQ,"bad request");
     
   if ((twhen == NULL) || (*twhen == '\0'))
   {
@@ -229,7 +229,7 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
   }
   
   if (!thisday_new(&req->tumbler,twhen))
-    return (*gd.error)(req,HTTP_BADREQ,"bad request");
+    return cgi_error(req,HTTP_BADREQ,"bad request");
     
   if (req->tumbler.redirect)
   {
@@ -261,7 +261,7 @@ int main_cgi_post(Cgi cgi)
   assert(cgi != NULL);
   
   if (cgi_init(cgi,&gd.req) != 0)
-    return (*gd.error)(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
+    return cgi_error(&gd.req,HTTP_ISERVERERR,"cgi_init() failed");
     
   CgiListMake(cgi);
   
@@ -283,7 +283,7 @@ int main_cgi_post(Cgi cgi)
        || (emptynull_string(gd.req.body))
      )
   {
-    return (*gd.error)(&gd.req,HTTP_BADREQ,"errors-missing");
+    return cgi_error(&gd.req,HTTP_BADREQ,"errors-missing");
   }
   
   if (gd.req.class == NULL)
@@ -292,7 +292,7 @@ int main_cgi_post(Cgi cgi)
   if (authenticate_author(&gd.req) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",gd.req.author);
-    return (*gd.error)(&gd.req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",gd.req.author,CgiListGetValue(cgi,"author"));
+    return cgi_error(&gd.req,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",gd.req.author,CgiListGetValue(cgi,"author"));
   }
   
   return (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,&gd.req);
@@ -363,7 +363,7 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
     return 0;
   }
   else
-    return (*gd.error)(req,HTTP_ISERVERERR,"couldn't add entry");
+    return cgi_error(req,HTTP_ISERVERERR,"couldn't add entry");
 }
 
 /***********************************************************************/
@@ -421,7 +421,7 @@ static int cmd_cgi_post_edit(Cgi cgi,Request *req)
   assert(cgi != NULL);
   (void)cgi;
   
-  return (gd.error)(req,HTTP_BADREQ,"bad request");
+  return cgi_error(req,HTTP_BADREQ,"bad request");
 }
 
 /***********************************************************************/
@@ -499,7 +499,6 @@ static int cgi_init(Cgi cgi,Request *req)
   assert(req != NULL);
   (void)cgi;
   
-  gd.error = cgi_error;
   gd.f.cgi = true;
   
   return GlobalsInit(NULL);

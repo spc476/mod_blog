@@ -100,8 +100,6 @@ int main_cli(int argc,char *argv[])
   clicmd__f       command     = cmd_cli_show;
   struct options  options     = { .emailin = false , .regenerate = false , .today = false , .thisday = false };
   
-  gd.error = cli_error;
-  
   while(true)
   {
     int   option = 0;
@@ -117,7 +115,7 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_FILE:
            if (freopen(optarg,"r",stdin) == NULL)
-             return (*gd.error)(&gd.req,HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
+             return cli_error(&gd.req,HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
            break;
       case OPT_EMAIL:
            options.emailin = true;
@@ -173,7 +171,7 @@ int main_cli(int argc,char *argv[])
   }
   
   if (GlobalsInit(config) != 0)
-    return (*gd.error)(&gd.req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config);
+    return cli_error(&gd.req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config);
     
   if (forcenotify)
   {
@@ -254,9 +252,9 @@ static int cmd_cli_show(Request *req,struct options const *options)
   else if (options->thisday)
   {
     if (!thisday_new(&req->tumbler,req->reqtumbler))
-      rc = (*gd.error)(req,HTTP_BADREQ,"bad request");
+      rc = cli_error(req,HTTP_BADREQ,"bad request");
     else if (req->tumbler.redirect)
-      rc = (*gd.error)(req,HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
+      rc = cli_error(req,HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
     else
       rc = generate_thisday(stdout,req->tumbler.start);
   }
@@ -281,14 +279,14 @@ static int cmd_cli_show(Request *req,struct options const *options)
         if (req->tumbler.redirect)
         {
           char *tum = tumbler_canonical(&req->tumbler);
-          rc = (*gd.error)(req,HTTP_MOVEPERM,"Redirect: %s",tum);
+          rc = cli_error(req,HTTP_MOVEPERM,"Redirect: %s",tum);
           free(tum);
           return rc;
         }
-        rc = tumbler_page(stdout,&req->tumbler);
+        rc = tumbler_page(&req->tumbler,cli_error);
       }
       else
-        rc = (*gd.error)(req,HTTP_NOTFOUND,"tumbler error---nothing found");
+        rc = cli_error(req,HTTP_NOTFOUND,"tumbler error---nothing found");
     }
   }
   
