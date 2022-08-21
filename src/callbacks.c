@@ -57,6 +57,8 @@ static void print_nav_name(FILE *out,struct btm const *date,int unit,char sep)
 {
   assert(out  != NULL);
   assert(date != NULL);
+  assert(sep  >= ' ');
+  assert(sep  <= '~');
   
   switch(unit)
   {
