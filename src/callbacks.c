@@ -53,7 +53,7 @@ static void tm_init(struct tm *ptm)
 
 /*********************************************************************/
 
-static void print_nav_name(FILE *out,struct btm const *date,int unit,char sep)
+static void print_nav_name(FILE *out,struct btm const *date,unit__e unit,char sep)
 {
   assert(out  != NULL);
   assert(date != NULL);
@@ -82,7 +82,7 @@ static void print_nav_name(FILE *out,struct btm const *date,int unit,char sep)
 
 /********************************************************************/
 
-static void print_nav_url(FILE *out,struct btm const *date,int unit)
+static void print_nav_url(FILE *out,struct btm const *date,unit__e unit)
 {
   assert(out  != NULL);
   assert(date != NULL);
@@ -93,7 +93,7 @@ static void print_nav_url(FILE *out,struct btm const *date,int unit)
 
 /*******************************************************************/
 
-static void print_nav_title(FILE *out,struct btm const *date,int unit)
+static void print_nav_title(FILE *out,struct btm const *date,unit__e unit)
 {
   BlogEntry *entry;
   struct tm  stm;
