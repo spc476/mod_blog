@@ -297,6 +297,8 @@ static size_t confL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
 
 static int confL_config(lua_State *L)
 {
+  size_t urllen;
+  
   assert(L != NULL);
   
   config__s *config = lua_touserdata(L,1);
@@ -313,7 +315,7 @@ static int confL_config(lua_State *L)
   lua_getglobal(L,"lockfile");
   config->lockfile = luaL_optstring(L,-1,".mod_blog.lock");
   lua_getglobal(L,"url");
-  config->url = luaL_optstring(L,-1,"http://www.example.com/blog/");
+  config->url = luaL_optlstring(L,-1,"http://www.example.com/blog/",&urllen);
   lua_getglobal(L,"adtag");
   config->adtag = luaL_optstring(L,-1,"programming");
   lua_getglobal(L,"conversion");
@@ -330,6 +332,19 @@ static int confL_config(lua_State *L)
   config->templatenum = confL_totemplates(L,-1,&config->templates);
   lua_getglobal(L,"affiliate");
   config->affiliatenum = confL_toaffiliates(L,-1,&config->affiliates);
+  
+  /*--------------------------------------
+  ; ensure that the URL ends with a '/'.
+  ;---------------------------------------*/
+  
+  if (config->url[urllen-1] != '/')
+  {
+    lua_pushlstring(L,config->url,urllen);
+    lua_pushliteral(L,"/");
+    lua_concat(L,2);
+    config->url = lua_tostring(L,-1);
+  }
+  
   return 0;
 }
 
