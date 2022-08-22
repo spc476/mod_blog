@@ -39,7 +39,7 @@
 static struct btm  calculate_previous (struct btm const,unit__e);
 static struct btm  calculate_next     (struct btm const,unit__e);
 static char const *mime_type          (char const *);
-static int         display_file       (tumbler__s const *,int (*)(Request *,int,char const *,...));
+static int         display_file       (tumbler__s const *,int (*)(int,char const *,...));
 static char       *tag_collect        (List *);
 static char       *tag_pick           (char const *);
 static void        free_entries       (List *);
@@ -69,7 +69,10 @@ pagegen__f TO_pagegen(char const *name)
   else if (strcmp(name,"days") == 0)
     return pagegen_days;
   else
+  {
     assert(0);
+    return pagegen_items;
+  }
 }
 
 /************************************************************************/
@@ -341,7 +344,7 @@ static void swap_endpoints(tumbler__s *tum)
 
 /************************************************************************/
 
-int tumbler_page(tumbler__s *spec,int (*errorf)(Request *,int,char const *,...))
+int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
 {
   struct callback_data cbd;
   struct btm           start;
@@ -859,7 +862,7 @@ static char const *mime_type(char const *filename)
 
 /******************************************************************/
 
-static int display_file(tumbler__s const *spec,int (*errorf)(Request *,int,char const *,...))
+static int display_file(tumbler__s const *spec,int (*errorf)(int,char const *,...))
 {
   char fname[FILENAME_MAX];
   
@@ -886,17 +889,17 @@ static int display_file(tumbler__s const *spec,int (*errorf)(Request *,int,char 
     if (rc == -1)
     {
       if (errno == ENOENT)
-        (*errorf)(&gd.req,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
+        (*errorf)(HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
       else if (errno == EACCES)
-        (*errorf)(&gd.req,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
+        (*errorf)(HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
       else
-        (*errorf)(&gd.req,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
+        (*errorf)(HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
       return 1;
     }
     
     if (freopen(fname,"r",stdin) == NULL)
     {
-      (*errorf)(&gd.req,HTTP_NOTFOUND,"%s: some internal error",fname);
+      (*errorf)(HTTP_NOTFOUND,"%s: some internal error",fname);
       return 1;
     }
     

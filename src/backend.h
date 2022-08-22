@@ -53,7 +53,7 @@ extern int                   generate_thisday (FILE *,struct btm);
 extern int                   generate_pages   (void);
 extern int                   pagegen_items    (template__t const *,FILE *,Blog *);
 extern int                   pagegen_days     (template__t const *,FILE *,Blog *);
-extern int                   tumbler_page     (tumbler__s *,int (*)(Request *,int,char const *,...));
+extern int                   tumbler_page     (tumbler__s *,int (*)(int,char const *,...));
 extern void                  generic_cb       (char const *,FILE *,void *);
 extern bool                  run_hook         (char const *,char const **);
 

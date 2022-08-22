@@ -20,10 +20,6 @@
 *
 *************************************************************************/
 
-#ifndef __GNUC__
-#  define __attribute__(x)
-#endif
-
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -58,7 +54,7 @@ static int       cmd_cli_show      (Request *,struct options const *);
 static clicmd__f get_cli_command   (char const *);
 static int       mail_setup_data   (Request *);
 static int       mailfile_readdata (Request *);
-static int       cli_error         (Request *,int,char const *, ... );
+static int       cli_error         (int,char const *, ... );
 
 /*************************************************************************/
 
@@ -115,7 +111,7 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_FILE:
            if (freopen(optarg,"r",stdin) == NULL)
-             return cli_error(&gd.req,HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
+             return cli_error(HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
            break;
       case OPT_EMAIL:
            options.emailin = true;
@@ -171,7 +167,7 @@ int main_cli(int argc,char *argv[])
   }
   
   if (GlobalsInit(config) != 0)
-    return cli_error(&gd.req,HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config);
+    return cli_error(HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config);
     
   if (forcenotify)
   {
@@ -252,9 +248,9 @@ static int cmd_cli_show(Request *req,struct options const *options)
   else if (options->thisday)
   {
     if (!thisday_new(&req->tumbler,req->reqtumbler))
-      rc = cli_error(req,HTTP_BADREQ,"bad request");
+      rc = cli_error(HTTP_BADREQ,"bad request");
     else if (req->tumbler.redirect)
-      rc = cli_error(req,HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
+      rc = cli_error(HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
     else
       rc = generate_thisday(stdout,req->tumbler.start);
   }
@@ -279,14 +275,14 @@ static int cmd_cli_show(Request *req,struct options const *options)
         if (req->tumbler.redirect)
         {
           char *tum = tumbler_canonical(&req->tumbler);
-          rc = cli_error(req,HTTP_MOVEPERM,"Redirect: %s",tum);
+          rc = cli_error(HTTP_MOVEPERM,"Redirect: %s",tum);
           free(tum);
           return rc;
         }
         rc = tumbler_page(&req->tumbler,cli_error);
       }
       else
-        rc = cli_error(req,HTTP_NOTFOUND,"tumbler error---nothing found");
+        rc = cli_error(HTTP_NOTFOUND,"tumbler error---nothing found");
     }
   }
   
@@ -440,7 +436,7 @@ static int mailfile_readdata(Request *req)
 
 /***************************************************************************/
 
-static int cli_error(Request *req __attribute__((unused)),int level,char const *msg, ... )
+static int cli_error(int level,char const *msg, ... )
 {
   va_list args;
   
