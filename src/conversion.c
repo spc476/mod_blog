@@ -30,6 +30,7 @@
 #include "conversion.h"
 #include "frontend.h"
 #include "blogutil.h"
+#include "globals.h"
 
 /**********************************************************************/
 
@@ -61,8 +62,9 @@ static void handle_period           (FILE *restrict,FILE *restrict);
 
 conversion__f TO_conversion(char const *name)
 {
-  assert(name != NULL);
-  
+  if (name == NULL)
+    name = c_config->conversion;
+    
   if (strcmp(name,"text") == 0)
     return text_conversion;
   else if (strcmp(name,"mixed") == 0)

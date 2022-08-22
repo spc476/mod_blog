@@ -35,6 +35,7 @@
 #include "backend.h"
 #include "frontend.h"
 #include "blogutil.h"
+#include "conversion.h"
 #include "globals.h"
 
 struct options
@@ -371,8 +372,6 @@ static int mailfile_readdata(Request *req)
 {
   FILE   *output;
   List    headers;
-  char   *email;
-  char   *filter;
   size_t  size;
   
   assert(req != NULL);
@@ -380,14 +379,14 @@ static int mailfile_readdata(Request *req)
   ListInit(&headers);
   RFC822HeadersRead(stdin,&headers);
   
-  req->author = PairListGetValue(&headers,"AUTHOR");
-  req->title  = PairListGetValue(&headers,"TITLE");
-  req->class  = PairListGetValue(&headers,"CLASS");
-  req->status = PairListGetValue(&headers,"STATUS");
-  req->date   = PairListGetValue(&headers,"DATE");
-  req->adtag  = PairListGetValue(&headers,"ADTAG");
-  email       = PairListGetValue(&headers,"EMAIL");
-  filter      = PairListGetValue(&headers,"FILTER");
+  req->author     = PairListGetValue(&headers,"AUTHOR");
+  req->title      = PairListGetValue(&headers,"TITLE");
+  req->class      = PairListGetValue(&headers,"CLASS");
+  req->status     = PairListGetValue(&headers,"STATUS");
+  req->date       = PairListGetValue(&headers,"DATE");
+  req->adtag      = PairListGetValue(&headers,"ADTAG");
+  req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"));
+  set_cf_emailupdate(PairListGetValue(&headers,"EMAIL"));
   
   if (req->author != NULL)
     req->author = strdup(req->author);
@@ -414,10 +413,9 @@ static int mailfile_readdata(Request *req)
   else
     req->adtag = strdup("");
     
-  if (req->date != NULL) req->date = strdup(req->date);
-  if (email     != NULL) set_cf_emailupdate(email);
-  if (filter    != NULL) set_c_conversion(filter);
-  
+  if (req->date != NULL)
+    req->date = strdup(req->date);
+    
   PairListFree(&headers);       /* got everything we need, dump this */
   
   if (authenticate_author(req) == false)

@@ -28,6 +28,7 @@
 
 #include "backend.h"
 #include "frontend.h"
+#include "conversion.h"
 #include "globals.h"
 
 typedef int (*cgicmd__f)(Cgi,struct request *);
@@ -266,7 +267,6 @@ int main_cgi_post(Cgi cgi)
   CgiListMake(cgi);
   
   set_cf_emailupdate    (CgiListGetValue(cgi,"email"));
-  set_c_conversion      (CgiListGetValue(cgi,"filter"));
   set_m_author          (CgiListGetValue(cgi,"author"),&gd.req);
   
   gd.req.title    = strdup(CgiListGetValue(cgi,"title"));
@@ -276,6 +276,7 @@ int main_cgi_post(Cgi cgi)
   gd.req.adtag    = strdup(CgiListGetValue(cgi,"adtag"));
   gd.req.origbody = strdup(CgiListGetValue(cgi,"body"));
   gd.req.body     = strdup(gd.req.origbody);
+  gd.req.conversion = TO_conversion(CgiListGetValue(cgi,"filter"));
   
   if (
        (emptynull_string(gd.req.author))

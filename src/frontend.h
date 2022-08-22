@@ -32,19 +32,20 @@
 
 typedef struct request
 {
-  char       *update;
-  char       *origauthor;
-  char       *author;
-  char       *title;
-  char       *class;
-  char       *status;
-  char       *date;
-  char       *adtag;
-  char       *origbody;
-  char       *body;
-  char       *reqtumbler;
-  struct btm  when;
-  tumbler__s  tumbler;
+  char        *update;
+  char        *origauthor;
+  char        *author;
+  char        *title;
+  char        *class;
+  char        *status;
+  char        *date;
+  char        *adtag;
+  char        *origbody;
+  char        *body;
+  char        *reqtumbler;
+  struct btm   when;
+  tumbler__s   tumbler;
+  void       (*conversion)(FILE *restrict,FILE *restrict);
 } Request;
 
 typedef struct dflags
@@ -61,12 +62,11 @@ typedef struct dflags
 
 typedef struct display
 {
-  DFlags           f;
-  char const      *template;
-  struct request   req;
-  void           (*conversion)(FILE *restrict,FILE *restrict);
-  char            *baseurl;
-  char            *fullbaseurl;
+  DFlags          f;
+  char const     *template;
+  struct request  req;
+  char           *baseurl;
+  char           *fullbaseurl;
 } Display;
 
 /************************************************/

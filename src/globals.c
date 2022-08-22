@@ -142,14 +142,6 @@ void set_cf_emailupdate(char const *value)
 
 /***************************************************************************/
 
-void set_c_conversion(char const *value)
-{
-  if (!emptynull_string(value))
-    gd.conversion = TO_conversion(value);
-}
-
-/**************************************************************************/
-
 int GlobalsInit(char const *conf)
 {
   atexit(globals_free);
@@ -161,12 +153,11 @@ int GlobalsInit(char const *conf)
   g_blog = BlogNew(c_config->basedir,c_config->lockfile);
   if (g_blog == NULL)
     return ENOMEM;
-
+    
   set_url(c_config->url);
-  set_c_conversion(c_config->conversion);
-  gd.template  = c_config->templates[0].template; /* XXX hack fix */
-  gd.f.navprev = true;
-  gd.f.navnext = true;
+  gd.template       = c_config->templates[0].template; /* XXX hack fix */
+  gd.f.navprev      = true;
+  gd.f.navnext      = true;
   
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting
