@@ -26,7 +26,7 @@
 #include <errno.h>
 
 #include <syslog.h>
-#include <cgilib6/url.h>
+//#include <cgilib6/url.h>
 #include <cgilib6/util.h>
 
 #include "conversion.h"
@@ -72,59 +72,23 @@ static void globals_free(void)
   free(gd.req.adtag);
   free(gd.req.origbody);
   free(gd.req.body);
-  free(gd.fullbaseurl);
-  free(gd.baseurl);
 }
 
 /***********************************************************************/
 
 static void set_url(char const *turl)
 {
-  url__t *url;
-  size_t  len;
-  char   *fbu;
-  char   *bu;
-  
   assert(turl != NULL);
   
-  fbu = strdup(turl);
-  url = UrlNew(turl);
+  /*---------------------------------------------------
+  ; XXX - need to think about a messed up URL here ...
+  ;----------------------------------------------------*/
   
-  if (url == NULL)
-  {
-    free(fbu);
-    syslog(LOG_ERR,"unparsable URL");
-    return;
-  }
-  
-  if (url->scheme == URL_HTTP)
-    bu = strdup(url->http.path);
-  else if (url->scheme == URL_GOPHER)
-    bu = strdup(url->gopher.selector);
-  else
-  {
-    free(fbu);
-    UrlFree(url);
-    syslog(LOG_WARNING,"unsupported URL type");
-    return;
-  }
-  
-  /*-----------------------------------------------------------------------
-  ; because of the way link generation happens, both of these *CAN'T* end
-  ; with a '/'.  So make sure they don't end with a '/'.
-  ;-----------------------------------------------------------------------*/
-  
-  len = strlen(fbu);
-  if (len) len--;
-  if (fbu[len] == '/') fbu[len] = '\0';
-  
-  len = strlen(bu);
-  if (len) len--;
-  if (bu[len] == '/') bu[len] = '\0';
-  
-  gd.fullbaseurl = fbu;
-  gd.baseurl     = bu;
-  UrlFree(url);
+  char *s = strchr(turl,'/'); /* first slash in authority section  */
+  s = strchr(++s,'/');        /* second slash in authority section */
+  s = strchr(++s,'/');        /* start of path component */
+  gd.fullbaseurl = turl;
+  gd.baseurl     = s;
 }
 
 /***************************************************************************/

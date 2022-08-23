@@ -87,7 +87,7 @@ static void print_nav_url(FILE *out,struct btm const *date,unit__e unit)
   assert(out  != NULL);
   assert(date != NULL);
   
-  fprintf(out,"%s/",gd.baseurl);
+  fprintf(out,"%s",gd.baseurl);
   print_nav_name(out,date,unit,'/');
 }
 
@@ -241,16 +241,15 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
     ; end up with a double '//'.  We need to make sure we canonicalize all
     ; partial urls to either end in a '/', or not end in a '/'.
     ;----------------------------------------------------------*/
-    
+
     if (src->value[0] == '/')
-      sprintf(buffer,"%s%s",baseurl,src->value);
+      sprintf(buffer,"%s%s",baseurl,&src->value[1]);
     else if (isdigit(src->value[0]))
-      sprintf(buffer,"%s/%s",baseurl,src->value);
+      sprintf(buffer,"%s%s",baseurl,src->value);
     else
-    
-    sprintf(
+      sprintf(
         buffer,
-        "%s/%04d/%02d/%02d/%s",
+        "%s%04d/%02d/%02d/%s",
         baseurl,
         entry->when.year,
         entry->when.month,
@@ -1479,7 +1478,7 @@ static void cb_request_url(FILE *out,void *data __attribute__((unused)))
   assert(out != NULL);
   
   tum = tumbler_canonical(&gd.req.tumbler);
-  fprintf(out,"%s/%s",gd.fullbaseurl,tum);
+  fprintf(out,"%s%s",gd.fullbaseurl,tum);
   free(tum);
 }
 
@@ -1558,7 +1557,7 @@ static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
 static void cb_rss_url(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fprintf(out,"%s/",gd.fullbaseurl);
+  fprintf(out,"%s",gd.fullbaseurl);
 }
 
 /*******************************************************************/
