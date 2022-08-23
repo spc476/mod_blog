@@ -1677,7 +1677,9 @@ void generic_cb(char const *which,FILE *out,void *data)
   assert(out   != NULL);
   assert(data  != NULL);
   
-  Chunk templates = ChunkNew(gd.template,callbacks,sizeof(callbacks) / sizeof(callbacks[0]));
+  struct callback_data *cbd = data;
+  
+  Chunk templates = ChunkNew(cbd->template,callbacks,sizeof(callbacks) / sizeof(callbacks[0]));
   ChunkProcess(templates,which,out,data);
   ChunkFree(templates);
   fflush(out);

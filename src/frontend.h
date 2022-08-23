@@ -62,9 +62,8 @@ typedef struct dflags
 
 typedef struct display
 {
-  DFlags          f;
-  char const     *template;
-  struct request  req;
+  DFlags         f;
+  struct request req;
 } Display;
 
 /************************************************/

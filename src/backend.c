@@ -52,10 +52,11 @@ struct callback_data *callback_init(struct callback_data *cbd)
   
   memset(cbd,0,sizeof(struct callback_data));
   ListInit(&cbd->list);
-  cbd->entry   = NULL;
-  cbd->ad      = NULL;
-  cbd->adtag   = NULL;
-  cbd->navunit = UNIT_PART;
+  cbd->template = c_config->templates[0].template; /* XXX probably document this */
+  cbd->entry    = NULL;
+  cbd->ad       = NULL;
+  cbd->adtag    = NULL;
+  cbd->navunit  = UNIT_PART;
   return cbd;
 }
 
@@ -162,12 +163,12 @@ int pagegen_items(
   assert(out      != NULL);
   assert(blog     != NULL);
   
-  gd.template  = template->template;
   gd.f.fullurl = template->fullurl;
   gd.f.reverse = template->reverse;
   thisday      = blog->now;
   
   callback_init(&cbd);
+  cbd.template = template->template;
   
   if (template->reverse)
     BlogEntryReadXD(g_blog,&cbd.list,&thisday,template->items);
@@ -202,12 +203,12 @@ int pagegen_days(
   assert(out      != NULL);
   assert(blog     != NULL);
   
-  gd.template  = template->template;
   gd.f.fullurl = false;
   gd.f.reverse = true;
   thisday      = blog->now;
   
   callback_init(&cbd);
+  cbd.template = template->template;
   
   for (days = 0 , added = false ; days < template->items ; )
   {

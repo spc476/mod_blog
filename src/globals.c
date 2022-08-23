@@ -100,9 +100,8 @@ int GlobalsInit(char const *conf)
   if (g_blog == NULL)
     return ENOMEM;
     
-  gd.template       = c_config->templates[0].template; /* XXX hack fix */
-  gd.f.navprev      = true;
-  gd.f.navnext      = true;
+  gd.f.navprev = true;
+  gd.f.navnext = true;
   
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting

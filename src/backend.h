@@ -43,6 +43,7 @@ struct callback_data
   struct btm  previous;
   struct btm  next;
   unit__e     navunit;
+  char const *template;
 };
 
 /************************************************/
