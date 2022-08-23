@@ -26,7 +26,6 @@
 #include <errno.h>
 
 #include <syslog.h>
-//#include <cgilib6/url.h>
 #include <cgilib6/util.h>
 
 #include "conversion.h"
@@ -76,7 +75,7 @@ static void globals_free(void)
 
 /***********************************************************************/
 
-static void set_url(char const *turl)
+static char const *baseurl(char const *turl)
 {
   assert(turl != NULL);
   
@@ -84,11 +83,10 @@ static void set_url(char const *turl)
   ; XXX - need to think about a messed up URL here ...
   ;----------------------------------------------------*/
   
-  char *s = strchr(turl,'/'); /* first slash in authority section  */
+  char const *s = strchr(turl,'/'); /* first slash in authority section  */
   s = strchr(++s,'/');        /* second slash in authority section */
   s = strchr(++s,'/');        /* start of path component */
-  gd.fullbaseurl = turl;
-  gd.baseurl     = s;
+  return s;
 }
 
 /***************************************************************************/
@@ -118,10 +116,11 @@ int GlobalsInit(char const *conf)
   if (g_blog == NULL)
     return ENOMEM;
     
-  set_url(c_config->url);
   gd.template       = c_config->templates[0].template; /* XXX hack fix */
   gd.f.navprev      = true;
   gd.f.navnext      = true;
+  gd.fullbaseurl    = c_config->url;
+  gd.baseurl        = baseurl(c_config->url);
   
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting
