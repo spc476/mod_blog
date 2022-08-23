@@ -327,9 +327,10 @@ static void cb_atom_categories(FILE *out,void *data)
   
   for (size_t i = 0 ; i < num ; i++)
   {
-    char *tag = fromstring(cats[i]);
-    generic_cb("categories",out,tag);
-    free(tag);
+    cbd->adcat = fromstring(cats[i]);
+    generic_cb("categories",out,cbd);
+    free(cbd->adcat);
+    cbd->adcat = NULL;
   }
   
   free(cats);
@@ -339,13 +340,15 @@ static void cb_atom_categories(FILE *out,void *data)
 
 static void cb_atom_category(FILE *out,void *data)
 {
-  FILE *eout;
+  struct callback_data *cbd = data;
+  FILE                 *eout;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   eout = fentity_encode_onwrite(out);
   if (eout == NULL) return;
-  fputs(data,eout);
+  fputs(cbd->adcat,eout);
   fclose(eout);
 }
 
@@ -413,7 +416,7 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   FILE                 *entityout;
-  char const          *tag;
+  char const           *tag;
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -1679,7 +1682,7 @@ void generic_cb(char const *which,FILE *out,void *data)
   
   struct callback_data *cbd = data;
   
-  Chunk templates = ChunkNew(cbd->template,callbacks,sizeof(callbacks) / sizeof(callbacks[0]));
+  Chunk templates = ChunkNew(cbd->template->template,callbacks,sizeof(callbacks) / sizeof(callbacks[0]));
   ChunkProcess(templates,which,out,data);
   ChunkFree(templates);
   fflush(out);

@@ -50,8 +50,8 @@ typedef struct request
 
 typedef struct dflags
 {
-  unsigned int fullurl    : 1;
-  unsigned int reverse    : 1;
+  unsigned int fullurl    : 1; /* work on this */
+  unsigned int reverse    : 1; /* work on this */
   unsigned int navigation : 1;
   unsigned int navprev    : 1;
   unsigned int navnext    : 1;

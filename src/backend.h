@@ -35,15 +35,16 @@ typedef int (*pagegen__f)(struct template const *,FILE *,Blog *);
 
 struct callback_data
 {
-  List        list;
-  BlogEntry  *entry;    /* current entry being processed */
-  FILE       *ad;       /* file containing ad */
-  char       *adtag;
-  struct btm  last;     /* timestamp of previous entry */
-  struct btm  previous;
-  struct btm  next;
-  unit__e     navunit;
-  char const *template;
+  List               list;
+  BlogEntry         *entry;    /* current entry being processed */
+  FILE              *ad;       /* file containing ad */
+  char              *adtag;
+  char              *adcat;
+  struct btm         last;     /* timestamp of previous entry */
+  struct btm         previous;
+  struct btm         next;
+  unit__e            navunit;
+  template__t const *template;
 };
 
 /************************************************/

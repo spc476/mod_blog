@@ -52,10 +52,11 @@ struct callback_data *callback_init(struct callback_data *cbd)
   
   memset(cbd,0,sizeof(struct callback_data));
   ListInit(&cbd->list);
-  cbd->template = c_config->templates[0].template; /* XXX probably document this */
+  cbd->template = &c_config->templates[0]; /* XXX probably document this */
   cbd->entry    = NULL;
   cbd->ad       = NULL;
   cbd->adtag    = NULL;
+  cbd->adcat    = NULL;
   cbd->navunit  = UNIT_PART;
   return cbd;
 }
@@ -168,7 +169,7 @@ int pagegen_items(
   thisday      = blog->now;
   
   callback_init(&cbd);
-  cbd.template = template->template;
+  cbd.template = template;
   
   if (template->reverse)
     BlogEntryReadXD(g_blog,&cbd.list,&thisday,template->items);
@@ -208,7 +209,7 @@ int pagegen_days(
   thisday      = blog->now;
   
   callback_init(&cbd);
-  cbd.template = template->template;
+  cbd.template = template;
   
   for (days = 0 , added = false ; days < template->items ; )
   {
@@ -367,6 +368,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   }
   
   callback_init(&cbd);
+  assert(cbd.template->fullurl);
   
   /*----------------------------------------------------------------------
   ; from here to the comment about sanity checking replaced around 100 very
@@ -407,7 +409,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
       swap_endpoints(&newtum);
       start        = newtum.start;
       end          = newtum.stop;
-      gd.f.reverse = true;
+      gd.f.reverse = true; /* XXX */
     }
   }
   
@@ -443,7 +445,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   ; these four lines replaced 65 very confused lines of code.
   ;-----------------------------------------------------------*/
   
-  if (gd.f.reverse)
+  if (cbd.template->reverse)
     BlogEntryReadBetweenD(g_blog,&cbd.list,&end,&start);
   else
     BlogEntryReadBetweenU(g_blog,&cbd.list,&start,&end);
