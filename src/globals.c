@@ -75,15 +75,17 @@ static void globals_free(void)
 
 /***********************************************************************/
 
-void set_cf_emailupdate(char const *value)
+bool TO_email(char const *value)
 {
   if (!emptynull_string(value))
   {
     if (strcmp(value,"no") == 0)
-      c_config->email.notify = false;
+      return false;
     else if (strcmp(value,"yes") == 0)
-      c_config->email.notify = true;
+      return true;
   }
+
+  return c_config->email.notify;
 }
 
 /***************************************************************************/

@@ -46,7 +46,7 @@ struct bemail
   char const *list;
   char const *message;
   char const *subject;
-  bool        notify;
+  bool        notify; /* derived */
 };
 
 typedef struct template

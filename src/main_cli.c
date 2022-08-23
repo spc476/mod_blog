@@ -222,7 +222,7 @@ static int cmd_cli_new(Request *req,struct options const *options)
   
   if (entry_add(req))
   {
-    if (c_config->email.notify) notify_emaillist(req);
+    if (req->f.email) notify_emaillist(req);
     generate_pages();
     return 0;
   }
@@ -386,7 +386,7 @@ static int mailfile_readdata(Request *req)
   req->date       = PairListGetValue(&headers,"DATE");
   req->adtag      = PairListGetValue(&headers,"ADTAG");
   req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"));
-  set_cf_emailupdate(PairListGetValue(&headers,"EMAIL"));
+  req->f.email    = TO_email(PairListGetValue(&headers,"EMAIL"));
   
   if (req->author != NULL)
     req->author = strdup(req->author);

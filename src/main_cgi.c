@@ -265,18 +265,17 @@ int main_cgi_post(Cgi cgi)
     return cgi_error(HTTP_ISERVERERR,"cgi_init() failed");
     
   CgiListMake(cgi);
+  set_m_author(CgiListGetValue(cgi,"author"),&g_request);
   
-  set_cf_emailupdate    (CgiListGetValue(cgi,"email"));
-  set_m_author          (CgiListGetValue(cgi,"author"),&g_request);
-  
-  g_request.title    = strdup(CgiListGetValue(cgi,"title"));
-  g_request.class    = strdup(CgiListGetValue(cgi,"class"));
-  g_request.status   = strdup(CgiListGetValue(cgi,"status"));
-  g_request.date     = strdup(CgiListGetValue(cgi,"date"));
-  g_request.adtag    = strdup(CgiListGetValue(cgi,"adtag"));
-  g_request.origbody = strdup(CgiListGetValue(cgi,"body"));
-  g_request.body     = strdup(g_request.origbody);
+  g_request.title      = strdup(CgiListGetValue(cgi,"title"));
+  g_request.class      = strdup(CgiListGetValue(cgi,"class"));
+  g_request.status     = strdup(CgiListGetValue(cgi,"status"));
+  g_request.date       = strdup(CgiListGetValue(cgi,"date"));
+  g_request.adtag      = strdup(CgiListGetValue(cgi,"adtag"));
+  g_request.origbody   = strdup(CgiListGetValue(cgi,"body"));
+  g_request.body       = strdup(g_request.origbody);
   g_request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"));
+  g_request.f.email    = TO_email(CgiListGetValue(cgi,"email"));
   
   if (
        (emptynull_string(g_request.author))
@@ -342,7 +341,7 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
   
   if (entry_add(req))
   {
-    if (c_config->email.notify) notify_emaillist(req);
+    if (req->f.email) notify_emaillist(req);
     generate_pages();
     fprintf(
         stdout,

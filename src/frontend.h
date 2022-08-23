@@ -56,6 +56,7 @@ typedef struct request
     unsigned int edit       : 1;
     unsigned int cgi        : 1;
     unsigned int htmldump   : 1;
+    unsigned int email      : 1;
   } f;  
 } Request;
 
