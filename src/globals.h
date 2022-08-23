@@ -30,6 +30,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
+#include "frontend.h"
 #include "blog.h"
 #include "config.h"
 
@@ -37,7 +38,7 @@
 
 extern config__s const *c_config;
 extern Blog            *g_blog;
-extern struct display   gd;
+extern Request          g_request;
 
 extern int  GlobalsInit        (char const *);
 extern void set_cf_emailupdate (char const *);

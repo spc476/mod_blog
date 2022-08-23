@@ -225,7 +225,7 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
     ; Which URL to use?  Full or partial?
     ;-----------------------------------------------------*/
     
-    if (gd.f.fullurl)
+    if (g_request.f.fullurl)
       baseurl = c_config->url;
     else
       baseurl = c_config->baseurl;
@@ -620,7 +620,7 @@ static void cb_cond_hr(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (gd.f.navigation && (cbd->navunit == UNIT_PART))
+  if (g_request.f.navigation && (cbd->navunit == UNIT_PART))
     return;
     
   entry = cbd->entry;
@@ -693,7 +693,7 @@ static void cb_edit(FILE *out,void *data)
 {
   assert(out != NULL);
   
-  if (gd.f.edit == false) return;
+  if (g_request.f.edit == false) return;
   generic_cb("edit",out,data);
 }
 
@@ -703,8 +703,8 @@ static void cb_edit_adtag(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req.adtag != NULL)
-    fputs(gd.req.adtag,out);
+  if (g_request.adtag != NULL)
+    fputs(g_request.adtag,out);
 }
 
 /*********************************************************************/
@@ -713,8 +713,8 @@ static void cb_edit_author(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req.origauthor != NULL)
-    fputs(gd.req.origauthor,out);
+  if (g_request.origauthor != NULL)
+    fputs(g_request.origauthor,out);
   else
   {
     char *name = get_remote_user();
@@ -729,8 +729,8 @@ static void cb_edit_body(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req.origbody)
-    fputs(gd.req.origbody,out);
+  if (g_request.origbody)
+    fputs(g_request.origbody,out);
 }
 
 /********************************************************************/
@@ -739,8 +739,8 @@ static void cb_edit_class(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req.class)
-    fputs(gd.req.class,out);
+  if (g_request.class)
+    fputs(g_request.class,out);
 }
 
 /********************************************************************/
@@ -749,8 +749,8 @@ static void cb_edit_date(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req.date != NULL)
-    fputs(gd.req.date,out);
+  if (g_request.date != NULL)
+    fputs(g_request.date,out);
   else
   {
     char       buffer[BUFSIZ];
@@ -768,8 +768,8 @@ static void cb_edit_status(FILE *out,void *data __attribute__ ((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req.status != NULL)
-    fputs(gd.req.status,out);
+  if (g_request.status != NULL)
+    fputs(g_request.status,out);
 }
 
 /**********************************************************************/
@@ -778,8 +778,8 @@ static void cb_edit_title(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
   
-  if (gd.req.title != NULL)
-    fputs(gd.req.title,out);
+  if (g_request.title != NULL)
+    fputs(g_request.title,out);
 }
 
 /********************************************************************/
@@ -792,7 +792,7 @@ static void cb_entry(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (gd.f.htmldump)
+  if (g_request.f.htmldump)
   {
     fcopy(out,stdin);
     return;
@@ -1286,7 +1286,7 @@ static void cb_navigation_bar(FILE *out,void *data)
 {
   assert(out != NULL);
   
-  if (gd.f.navigation == false) return;
+  if (g_request.f.navigation == false) return;
   generic_cb("navigation.bar",out,data);
 }
 
@@ -1296,7 +1296,7 @@ static void cb_navigation_bar_next(FILE *out,void *data)
 {
   assert(out != NULL);
   
-  if (gd.f.navnext == false) return;
+  if (g_request.f.navnext == false) return;
   generic_cb("navigation.bar.next",out,data);
 }
 
@@ -1306,7 +1306,7 @@ static void cb_navigation_bar_prev(FILE *out,void *data)
 {
   assert(out != NULL);
   
-  if (gd.f.navprev == false) return;
+  if (g_request.f.navprev == false) return;
   generic_cb("navigation.bar.prev",out,data);
 }
 
@@ -1335,7 +1335,7 @@ static void cb_navigation_first_title(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (gd.f.navigation == false)
+  if (g_request.f.navigation == false)
     print_nav_title(out,&g_blog->first,UNIT_PART);
   else
     print_nav_title(out,&g_blog->first,cbd->navunit);
@@ -1350,7 +1350,7 @@ static void cb_navigation_first_url(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (gd.f.navigation == false)
+  if (g_request.f.navigation == false)
     print_nav_url(out,&g_blog->first,UNIT_PART);
   else
     print_nav_url(out,&g_blog->first,cbd->navunit);
@@ -1365,7 +1365,7 @@ static void cb_navigation_last_title(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (gd.f.navigation == false)
+  if (g_request.f.navigation == false)
     print_nav_title(out,&g_blog->last,UNIT_PART);
   else
     print_nav_title(out,&g_blog->last,cbd->navunit);
@@ -1380,7 +1380,7 @@ static void cb_navigation_last_url(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (gd.f.navigation == false)
+  if (g_request.f.navigation == false)
     print_nav_url(out,&g_blog->last,UNIT_PART);
   else
     print_nav_url(out,&g_blog->last,cbd->navunit);
@@ -1392,7 +1392,7 @@ static void cb_navigation_link(FILE *out,void *data)
 {
   assert(out != NULL);
   
-  if (gd.f.navigation == false) return;
+  if (g_request.f.navigation == false) return;
   generic_cb("navigation.link",out,data);
 }
 
@@ -1402,7 +1402,7 @@ static void cb_navigation_link_next(FILE *out,void *data)
 {
   assert(out != NULL);
   
-  if (gd.f.navnext == false) return;
+  if (g_request.f.navnext == false) return;
   generic_cb("navigation.link.next",out,data);
 }
 
@@ -1412,7 +1412,7 @@ static void cb_navigation_link_prev(FILE *out,void *data)
 {
   assert(out != NULL);
   
-  if (gd.f.navprev == false) return;
+  if (g_request.f.navprev == false) return;
   generic_cb("navigation.link.prev",out,data);
 }
 
@@ -1480,7 +1480,7 @@ static void cb_request_url(FILE *out,void *data __attribute__((unused)))
   
   assert(out != NULL);
   
-  tum = tumbler_canonical(&gd.req.tumbler);
+  tum = tumbler_canonical(&g_request.tumbler);
   fprintf(out,"%s%s",c_config->url,tum);
   free(tum);
 }

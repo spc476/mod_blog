@@ -55,9 +55,9 @@ int main_cgi_get(Cgi cgi)
   if (cgi_init(cgi) != 0)
     return cgi_error(HTTP_ISERVERERR,"cgi_init() failed");
     
-  gd.req.reqtumbler = getenv("PATH_INFO");
+  g_request.reqtumbler = getenv("PATH_INFO");
   CgiListMake(cgi);
-  return (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,&gd.req);
+  return (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,&g_request);
 }
 
 /************************************************************************/
@@ -92,7 +92,7 @@ static int cmd_cgi_get_new(Cgi cgi,Request *req)
   (void)cgi;
   (void)req;
   
-  gd.f.edit   = true;
+  g_request.f.edit   = true;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
   generic_cb("main",stdout,callback_init(&cbd));
   return 0;
@@ -178,7 +178,7 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
       {
         struct callback_data cbd;
         
-        gd.f.htmldump = true;
+        g_request.f.htmldump = true;
         fprintf(stdout,"Status: %s\r\nContent-type: text/html\r\n\r\n",status);
         generic_cb("main",stdout,callback_init(&cbd));
         rc = 0;
@@ -267,36 +267,36 @@ int main_cgi_post(Cgi cgi)
   CgiListMake(cgi);
   
   set_cf_emailupdate    (CgiListGetValue(cgi,"email"));
-  set_m_author          (CgiListGetValue(cgi,"author"),&gd.req);
+  set_m_author          (CgiListGetValue(cgi,"author"),&g_request);
   
-  gd.req.title    = strdup(CgiListGetValue(cgi,"title"));
-  gd.req.class    = strdup(CgiListGetValue(cgi,"class"));
-  gd.req.status   = strdup(CgiListGetValue(cgi,"status"));
-  gd.req.date     = strdup(CgiListGetValue(cgi,"date"));
-  gd.req.adtag    = strdup(CgiListGetValue(cgi,"adtag"));
-  gd.req.origbody = strdup(CgiListGetValue(cgi,"body"));
-  gd.req.body     = strdup(gd.req.origbody);
-  gd.req.conversion = TO_conversion(CgiListGetValue(cgi,"filter"));
+  g_request.title    = strdup(CgiListGetValue(cgi,"title"));
+  g_request.class    = strdup(CgiListGetValue(cgi,"class"));
+  g_request.status   = strdup(CgiListGetValue(cgi,"status"));
+  g_request.date     = strdup(CgiListGetValue(cgi,"date"));
+  g_request.adtag    = strdup(CgiListGetValue(cgi,"adtag"));
+  g_request.origbody = strdup(CgiListGetValue(cgi,"body"));
+  g_request.body     = strdup(g_request.origbody);
+  g_request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"));
   
   if (
-       (emptynull_string(gd.req.author))
-       || (emptynull_string(gd.req.title))
-       || (emptynull_string(gd.req.body))
+       (emptynull_string(g_request.author))
+       || (emptynull_string(g_request.title))
+       || (emptynull_string(g_request.body))
      )
   {
     return cgi_error(HTTP_BADREQ,"errors-missing");
   }
   
-  if (gd.req.class == NULL)
-    gd.req.class = strdup("");
+  if (g_request.class == NULL)
+    g_request.class = strdup("");
     
-  if (authenticate_author(&gd.req) == false)
+  if (authenticate_author(&g_request) == false)
   {
-    syslog(LOG_ERR,"'%s' not authorized to post",gd.req.author);
-    return cgi_error(HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",gd.req.author,CgiListGetValue(cgi,"author"));
+    syslog(LOG_ERR,"'%s' not authorized to post",g_request.author);
+    return cgi_error(HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",g_request.author,CgiListGetValue(cgi,"author"));
   }
   
-  return (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,&gd.req);
+  return (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,&g_request);
 }
 
 /************************************************************************/
@@ -405,7 +405,7 @@ static int cmd_cgi_post_show(Cgi cgi,Request *req)
   entry->body      = req->body;
   
   ListAddTail(&cbd.list,&entry->node);
-  gd.f.edit = true;
+  g_request.f.edit = true;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
   generic_cb("main",stdout,&cbd);
   
@@ -458,7 +458,7 @@ static int cgi_error(int level,char const *msg, ... )
   {
     struct callback_data cbd;
     
-    gd.f.htmldump = true;
+    g_request.f.htmldump = true;
 
     fprintf(
         stdout,
@@ -485,7 +485,7 @@ static int cgi_init(Cgi cgi)
   assert(cgi != NULL);
   (void)cgi;
   
-  gd.f.cgi = true;
+  g_request.f.cgi = true;
   
   return GlobalsInit(NULL);
 }

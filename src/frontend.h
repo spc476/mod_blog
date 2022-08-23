@@ -46,25 +46,18 @@ typedef struct request
   struct btm   when;
   tumbler__s   tumbler;
   void       (*conversion)(FILE *restrict,FILE *restrict);
+  struct
+  {
+    unsigned int fullurl    : 1;
+    unsigned int reverse    : 1;
+    unsigned int navigation : 1;
+    unsigned int navprev    : 1;
+    unsigned int navnext    : 1;
+    unsigned int edit       : 1;
+    unsigned int cgi        : 1;
+    unsigned int htmldump   : 1;
+  } f;  
 } Request;
-
-typedef struct dflags
-{
-  unsigned int fullurl    : 1; /* work on this */
-  unsigned int reverse    : 1; /* work on this */
-  unsigned int navigation : 1;
-  unsigned int navprev    : 1;
-  unsigned int navnext    : 1;
-  unsigned int edit       : 1;
-  unsigned int cgi        : 1;
-  unsigned int htmldump   : 1;
-} DFlags;
-
-typedef struct display
-{
-  DFlags         f;
-  struct request req;
-} Display;
 
 /************************************************/
 

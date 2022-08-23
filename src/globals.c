@@ -33,9 +33,9 @@
 
 /************************************************************/
 
-config__s      *c_config;
-Blog           *g_blog;
-struct display  gd;
+config__s *c_config;
+Blog      *g_blog;
+Request    g_request;
 
 /****************************************************/
 
@@ -61,16 +61,16 @@ static void globals_free(void)
   if (g_blog   != NULL) BlogFree(g_blog);
   if (c_config != NULL) config_free(c_config);
   
-  free(gd.req.update);
-  free(gd.req.origauthor);
-  free(gd.req.author);
-  free(gd.req.title);
-  free(gd.req.class);
-  free(gd.req.status);
-  free(gd.req.date);
-  free(gd.req.adtag);
-  free(gd.req.origbody);
-  free(gd.req.body);
+  free(g_request.update);
+  free(g_request.origauthor);
+  free(g_request.author);
+  free(g_request.title);
+  free(g_request.class);
+  free(g_request.status);
+  free(g_request.date);
+  free(g_request.adtag);
+  free(g_request.origbody);
+  free(g_request.body);
 }
 
 /***********************************************************************/
@@ -100,8 +100,8 @@ int GlobalsInit(char const *conf)
   if (g_blog == NULL)
     return ENOMEM;
     
-  gd.f.navprev = true;
-  gd.f.navnext = true;
+  g_request.f.navprev = true;
+  g_request.f.navnext = true;
   
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting

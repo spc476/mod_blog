@@ -118,7 +118,7 @@ int main_cli(int argc,char *argv[])
            options.emailin = true;
            break;
       case OPT_ENTRY:
-           gd.req.reqtumbler = optarg;
+           g_request.reqtumbler = optarg;
            break;
       case OPT_REGENERATE:
            options.regenerate = true;
@@ -131,7 +131,7 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_THISDAY:
            options.thisday  = true;
-           gd.req.reqtumbler = optarg;
+           g_request.reqtumbler = optarg;
            break;
       case OPT_CMD:
            command = get_cli_command(optarg);
@@ -182,11 +182,11 @@ int main_cli(int argc,char *argv[])
     
     if (entry != NULL)
     {
-      gd.req.title  = strdup(entry->title);
-      gd.req.author = strdup(entry->author);
-      gd.req.status = strdup(entry->status);
-      gd.req.when   = entry->when;
-      notify_emaillist(&gd.req);
+      g_request.title  = strdup(entry->title);
+      g_request.author = strdup(entry->author);
+      g_request.status = strdup(entry->status);
+      g_request.when   = entry->when;
+      notify_emaillist(&g_request);
       BlogEntryFree(entry);
       return EXIT_SUCCESS;
     }
@@ -197,7 +197,7 @@ int main_cli(int argc,char *argv[])
     }
   }
   
-  return (command)(&gd.req,&options);
+  return (command)(&g_request,&options);
 }
 
 /************************************************************************/

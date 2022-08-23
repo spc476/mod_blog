@@ -164,8 +164,8 @@ int pagegen_items(
   assert(out      != NULL);
   assert(blog     != NULL);
   
-  gd.f.fullurl = template->fullurl;
-  gd.f.reverse = template->reverse;
+  g_request.f.fullurl = template->fullurl;
+  g_request.f.reverse = template->reverse;
   thisday      = blog->now;
   
   callback_init(&cbd);
@@ -204,8 +204,8 @@ int pagegen_days(
   assert(out      != NULL);
   assert(blog     != NULL);
   
-  gd.f.fullurl = false;
-  gd.f.reverse = true;
+  g_request.f.fullurl = false;
+  g_request.f.reverse = true;
   thisday      = blog->now;
   
   callback_init(&cbd);
@@ -356,7 +356,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   assert(spec != NULL);
   assert(errorf);
   
-  gd.f.fullurl = false; /* XXX why? */
+  g_request.f.fullurl = false; /* XXX why? */
   
   if (spec->redirect)
     return HTTP_NOTIMP;
@@ -368,7 +368,6 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   }
   
   callback_init(&cbd);
-  assert(cbd.template->fullurl);
   
   /*----------------------------------------------------------------------
   ; from here to the comment about sanity checking replaced around 100 very
@@ -393,7 +392,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   
   if (!spec->range)
   {
-    gd.f.navigation  = true;
+    g_request.f.navigation  = true;
     cbd.navunit      = spec->ustart > spec->ustop
                      ? spec->ustart
                      : spec->ustop
@@ -409,7 +408,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
       swap_endpoints(&newtum);
       start        = newtum.start;
       end          = newtum.stop;
-      gd.f.reverse = true; /* XXX */
+      g_request.f.reverse = true; /* XXX */
     }
   }
   
@@ -470,7 +469,7 @@ static struct btm calculate_previous(struct btm const start,unit__e navunit)
   {
     case UNIT_YEAR:
          if (start.year == g_blog->first.year)
-           gd.f.navprev = false;
+           g_request.f.navprev = false;
          else
            previous.year = start.year - 1;
          break;
@@ -480,7 +479,7 @@ static struct btm calculate_previous(struct btm const start,unit__e navunit)
               (start.year == g_blog->first.year)
               && (start.month == g_blog->first.month)
             )
-           gd.f.navprev = false;
+           g_request.f.navprev = false;
          else
          {
            btm_dec_month(&previous);
@@ -501,13 +500,13 @@ static struct btm calculate_previous(struct btm const start,unit__e navunit)
              return previous;
            }
            
-           gd.f.navprev = false;
+           g_request.f.navprev = false;
          }
          break;
          
     case UNIT_DAY:
          if (btm_cmp_date(&start,&g_blog->first) == 0)
-           gd.f.navprev = false;
+           g_request.f.navprev = false;
          else
          {
            btm_dec_day(&previous);
@@ -527,13 +526,13 @@ static struct btm calculate_previous(struct btm const start,unit__e navunit)
              return previous;
            }
            
-           gd.f.navprev = false;
+           g_request.f.navprev = false;
          }
          break;
          
     case UNIT_PART:
          if (btm_cmp(&start,&g_blog->first) == 0)
-           gd.f.navprev = false;
+           g_request.f.navprev = false;
          else
          {
            btm_dec_part(&previous);
@@ -552,7 +551,7 @@ static struct btm calculate_previous(struct btm const start,unit__e navunit)
              return previous;
            }
            
-           gd.f.navprev = false;
+           g_request.f.navprev = false;
          }
          break;
          
@@ -573,7 +572,7 @@ static struct btm calculate_next(struct btm const end,unit__e navunit)
   {
     case UNIT_YEAR:
          if (end.year == g_blog->now.year)
-           gd.f.navnext = false;
+           g_request.f.navnext = false;
          else
            next.year  = end.year + 1;
          break;
@@ -583,7 +582,7 @@ static struct btm calculate_next(struct btm const end,unit__e navunit)
               (end.year == g_blog->now.year)
               && (end.month == g_blog->now.month)
             )
-           gd.f.navnext = false;
+           g_request.f.navnext = false;
          else
          {
            btm_inc_month(&next);
@@ -604,13 +603,13 @@ static struct btm calculate_next(struct btm const end,unit__e navunit)
              return next;
            }
            
-           gd.f.navnext = false;
+           g_request.f.navnext = false;
          }
          break;
          
     case UNIT_DAY:
          if (btm_cmp_date(&end,&g_blog->now) == 0)
-           gd.f.navnext = false;
+           g_request.f.navnext = false;
          else
          {
            btm_inc_day(&next);
@@ -630,13 +629,13 @@ static struct btm calculate_next(struct btm const end,unit__e navunit)
              return next;
            }
            
-           gd.f.navnext = false;
+           g_request.f.navnext = false;
          }
          break;
          
     case UNIT_PART:
          if (btm_cmp(&end,&g_blog->now) == 0)
-           gd.f.navnext = false;
+           g_request.f.navnext = false;
          else
          {
            next.part++;
@@ -655,7 +654,7 @@ static struct btm calculate_next(struct btm const end,unit__e navunit)
              BlogEntryFree(entry);
              return next;
            }
-           gd.f.navnext = false;
+           g_request.f.navnext = false;
          }
          break;
          
@@ -882,7 +881,7 @@ static int display_file(tumbler__s const *spec,int (*errorf)(int,char const *,..
       spec->filename
   );
   
-  if (gd.f.cgi)
+  if (g_request.f.cgi)
   {
     struct stat  status;
     char const  *type;
@@ -912,7 +911,7 @@ static int display_file(tumbler__s const *spec,int (*errorf)(int,char const *,..
     {
       struct callback_data cbd;
       
-      gd.f.htmldump = true;
+      g_request.f.htmldump = true;
       fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
       generic_cb("main",stdout,callback_init(&cbd));
     }
