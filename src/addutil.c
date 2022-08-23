@@ -149,7 +149,7 @@ bool entry_add(Request *req)
       url,
       sizeof(url),
       "%s/%04d/%02d/%02d.%d",
-      gd.fullbaseurl,
+      c_config->url,
       entry->when.year,
       entry->when.month,
       entry->when.day,
@@ -521,7 +521,7 @@ static void cb_email_url(FILE *out,void *data)
   fprintf(
            out,
            "%s/%04d/%02d/%02d.%d",
-           gd.fullbaseurl,
+           c_config->url,
            req->when.year,
            req->when.month,
            req->when.day,

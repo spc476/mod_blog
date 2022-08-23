@@ -87,6 +87,7 @@ typedef struct
   aflink__t     *affiliates;
   size_t         affiliatenum;
   void          *user;
+  char const    *baseurl; /* derived from URL */
 } config__s;
 
 extern config__s *config_lua (char const *);

@@ -75,22 +75,6 @@ static void globals_free(void)
 
 /***********************************************************************/
 
-static char const *baseurl(char const *turl)
-{
-  assert(turl != NULL);
-  
-  /*---------------------------------------------------
-  ; XXX - need to think about a messed up URL here ...
-  ;----------------------------------------------------*/
-  
-  char const *s = strchr(turl,'/'); /* first slash in authority section  */
-  s = strchr(++s,'/');        /* second slash in authority section */
-  s = strchr(++s,'/');        /* start of path component */
-  return s;
-}
-
-/***************************************************************************/
-
 void set_cf_emailupdate(char const *value)
 {
   if (!emptynull_string(value))
@@ -119,8 +103,6 @@ int GlobalsInit(char const *conf)
   gd.template       = c_config->templates[0].template; /* XXX hack fix */
   gd.f.navprev      = true;
   gd.f.navnext      = true;
-  gd.fullbaseurl    = c_config->url;
-  gd.baseurl        = baseurl(c_config->url);
   
   /*-------------------------------------------------------
   ; for most sorting routines, I just assume C sorting

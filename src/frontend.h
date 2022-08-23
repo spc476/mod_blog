@@ -65,8 +65,6 @@ typedef struct display
   DFlags          f;
   char const     *template;
   struct request  req;
-  char const     *baseurl;
-  char const     *fullbaseurl;
 } Display;
 
 /************************************************/

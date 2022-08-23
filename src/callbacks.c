@@ -87,7 +87,7 @@ static void print_nav_url(FILE *out,struct btm const *date,unit__e unit)
   assert(out  != NULL);
   assert(date != NULL);
   
-  fprintf(out,"%s",gd.baseurl);
+  fprintf(out,"%s",c_config->baseurl);
   print_nav_name(out,date,unit,'/');
 }
 
@@ -226,9 +226,9 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
     ;-----------------------------------------------------*/
     
     if (gd.f.fullurl)
-      baseurl = gd.fullbaseurl;
+      baseurl = c_config->url;
     else
-      baseurl = gd.baseurl;
+      baseurl = c_config->baseurl;
       
     /*---------------------------------------------------------
     ; all this to reassign the value, without ``knowing'' how the pair stuff
@@ -519,7 +519,7 @@ static void cb_blog_url(FILE *out,void *data)
 static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(gd.fullbaseurl,out);
+  fputs(c_config->url,out);
 }
 
 /**********************************************************************/
@@ -1478,7 +1478,7 @@ static void cb_request_url(FILE *out,void *data __attribute__((unused)))
   assert(out != NULL);
   
   tum = tumbler_canonical(&gd.req.tumbler);
-  fprintf(out,"%s%s",gd.fullbaseurl,tum);
+  fprintf(out,"%s%s",c_config->url,tum);
   free(tum);
 }
 
@@ -1534,7 +1534,7 @@ static void cb_rss_item_url(FILE *out,void *data)
   assert(data != NULL);
   
   assert(cbd->entry->valid);
-  fprintf(out,"%s",gd.fullbaseurl);
+  fprintf(out,"%s",c_config->url);
   print_nav_url(out,&cbd->entry->when,UNIT_PART);
 }
 
@@ -1557,7 +1557,7 @@ static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
 static void cb_rss_url(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fprintf(out,"%s",gd.fullbaseurl);
+  fprintf(out,"%s",c_config->url);
 }
 
 /*******************************************************************/

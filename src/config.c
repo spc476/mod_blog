@@ -21,6 +21,7 @@
 ****************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 #include <syslog.h>
@@ -345,6 +346,14 @@ static int confL_config(lua_State *L)
     config->url = lua_tostring(L,-1);
   }
   
+  /*---------------------------------------------------
+  ; XXX - need to think about a messed up URL here ...
+  ;----------------------------------------------------*/
+  
+  char const *s = strchr(config->url,'/'); /* first slash in authority section  */
+  s = strchr(++s,'/'); /* second slash in authority section */
+  s = strchr(++s,'/'); /* start of path component */
+  config->baseurl = s;
   return 0;
 }
 

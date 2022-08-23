@@ -125,8 +125,8 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
         "  <BODY><A HREF='%s'>Go here<A></BODY>\n"
         "</HTML>\n",
         HTTP_MOVEPERM,
-        gd.fullbaseurl,
-        gd.fullbaseurl
+        c_config->url,
+        c_config->url
       );
     rc = 0;
   }
@@ -149,9 +149,9 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
                 "<body><p>Redirect to <a href='%s/%s'>%s/%s</a></p></body>"
                 "</html>\n",
                 HTTP_MOVEPERM,
-                gd.fullbaseurl, tum,
-                gd.fullbaseurl, tum,
-                gd.fullbaseurl, tum
+                c_config->url, tum,
+                c_config->url, tum,
+                c_config->url, tum
         );
         free(tum);
         free(status);
@@ -223,8 +223,8 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
       "  <BODY><A HREF='%s/%s'>Go here</A></BODY>\n"
       "</HTML>\n",
       HTTP_MOVEPERM,
-      gd.fullbaseurl,tpath,
-      gd.fullbaseurl,tpath
+      c_config->url,tpath,
+      c_config->url,tpath
     );
     return 0;
   }
@@ -245,8 +245,8 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
       "  <BODY><A HREF='%s/%s/%02d/%02d'>Go here</A></BODY>\n"
       "</HTML>\n",
       HTTP_MOVEPERM,
-      gd.fullbaseurl,tpath,req->tumbler.start.month,req->tumbler.start.day,
-      gd.fullbaseurl,tpath,req->tumbler.start.month,req->tumbler.start.day
+      c_config->url,tpath,req->tumbler.start.month,req->tumbler.start.day,
+      c_config->url,tpath,req->tumbler.start.month,req->tumbler.start.day
     );
     return 0;
   }
@@ -355,8 +355,8 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
         "  <BODY><A HREF='%s'>Go here</A></BODY>\n"
         "</HTML>\n",
         HTTP_MOVETEMP,
-        gd.fullbaseurl,
-        gd.fullbaseurl
+        c_config->url,
+        c_config->url
         
     );
     return 0;
