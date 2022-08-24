@@ -32,7 +32,6 @@
 
 typedef struct request
 {
-  char        *update;
   char        *origauthor;
   char        *author;
   char        *title;

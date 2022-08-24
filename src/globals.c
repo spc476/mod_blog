@@ -61,7 +61,6 @@ static void globals_free(void)
   if (g_blog   != NULL) BlogFree(g_blog);
   if (c_config != NULL) config_free(c_config);
   
-  free(g_request.update);
   free(g_request.origauthor);
   free(g_request.author);
   free(g_request.title);
