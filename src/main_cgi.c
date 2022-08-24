@@ -274,7 +274,7 @@ int main_cgi_post(Cgi cgi)
   g_request.adtag      = strdup(CgiListGetValue(cgi,"adtag"));
   g_request.origbody   = strdup(CgiListGetValue(cgi,"body"));
   g_request.body       = strdup(g_request.origbody);
-  g_request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"));
+  g_request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),c_config->conversion);
   g_request.f.email    = TO_email(CgiListGetValue(cgi,"email"));
   
   if (

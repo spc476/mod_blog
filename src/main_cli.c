@@ -385,7 +385,7 @@ static int mailfile_readdata(Request *req)
   req->status     = PairListGetValue(&headers,"STATUS");
   req->date       = PairListGetValue(&headers,"DATE");
   req->adtag      = PairListGetValue(&headers,"ADTAG");
-  req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"));
+  req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"),c_config->conversion);
   req->f.email    = TO_email(PairListGetValue(&headers,"EMAIL"));
   
   if (req->author != NULL)

@@ -27,7 +27,7 @@
 
 typedef void (*conversion__f)(FILE *restrict,FILE *restrict);
 
-extern conversion__f  TO_conversion        (char const *);
+extern conversion__f  TO_conversion        (char const *,char const *);
 extern void           no_conversion        (FILE *restrict,FILE *restrict);
 extern void           text_conversion      (FILE *restrict,FILE *restrict);
 extern void           mixed_conversion     (FILE *restrict,FILE *restrict);
