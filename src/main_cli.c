@@ -186,7 +186,7 @@ int main_cli(int argc,char *argv[])
       g_request.author = strdup(entry->author);
       g_request.status = strdup(entry->status);
       g_request.when   = entry->when;
-      notify_emaillist(&g_request);
+      notify_emaillist(&g_request,c_config);
       BlogEntryFree(entry);
       return EXIT_SUCCESS;
     }
@@ -220,9 +220,9 @@ static int cmd_cli_new(Request *req,struct options const *options)
     return EXIT_FAILURE;
   }
   
-  if (entry_add(req))
+  if (entry_add(req,c_config,g_blog))
   {
-    if (req->f.email) notify_emaillist(req);
+    if (req->f.email) notify_emaillist(req,c_config);
     generate_pages();
     return 0;
   }

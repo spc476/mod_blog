@@ -42,7 +42,7 @@
 
 /*********************************************************************/
 
-bool entry_add(Request *req)
+bool entry_add(Request *req,config__s const *config,Blog *blog)
 {
   BlogEntry *entry;
   char      *p;
@@ -52,7 +52,7 @@ bool entry_add(Request *req)
   
   fix_entry(req);
   
-  if (c_config->prehook != NULL)
+  if (config->prehook != NULL)
   {
     FILE *fp;
     char  fnbody[L_tmpnam];
@@ -79,7 +79,7 @@ bool entry_add(Request *req)
       char ts[12];
       
       if (req->date == NULL)
-        snprintf(ts,sizeof(ts),"%04d/%02d/%02d",g_blog->now.year,g_blog->now.month,g_blog->now.day);
+        snprintf(ts,sizeof(ts),"%04d/%02d/%02d",blog->now.year,blog->now.month,blog->now.day);
       else
         snprintf(ts,sizeof(ts),"%s",req->date);
         
@@ -108,7 +108,7 @@ bool entry_add(Request *req)
       return false;
     }
     
-    rc = run_hook("entry-pre-hook",(char const *[]){ c_config->prehook , fnbody , fnmeta , NULL });
+    rc = run_hook("entry-pre-hook",(char const *[]){ config->prehook , fnbody , fnmeta , NULL });
     
     remove(fnmeta);
     remove(fnbody);
@@ -117,10 +117,10 @@ bool entry_add(Request *req)
       return rc;
   }
   
-  entry = BlogEntryNew(g_blog);
+  entry = BlogEntryNew(blog);
   
   if ((req->date == NULL) || (empty_string(req->date)))
-    entry->when = g_blog->now;
+    entry->when = blog->now;
   else
   {
     entry->when.year  = strtoul(req->date,&p,10); p++;
@@ -129,7 +129,7 @@ bool entry_add(Request *req)
   }
   
   entry->when.part = 0;
-  entry->timestamp = g_blog->tnow;
+  entry->timestamp = blog->tnow;
   entry->title     = req->title;
   entry->class     = req->class;
   entry->status    = req->status;
@@ -141,7 +141,7 @@ bool entry_add(Request *req)
     
   req->when = entry->when;
   
-  if (c_config->posthook != NULL)
+  if (config->posthook != NULL)
   {
     char url[1024];
     
@@ -149,14 +149,14 @@ bool entry_add(Request *req)
       url,
       sizeof(url),
       "%s/%04d/%02d/%02d.%d",
-      c_config->url,
+      config->url,
       entry->when.year,
       entry->when.month,
       entry->when.day,
       entry->when.part
     );
     
-    rc = run_hook("entry-post-hook",(char const *[]){ c_config->posthook , url , NULL });
+    rc = run_hook("entry-post-hook",(char const *[]){ config->posthook , url , NULL });
   }
   
   free(entry);
@@ -437,7 +437,7 @@ static void cb_email_author(FILE *out,void *data)
 
 /*************************************************************************/
 
-void notify_emaillist(Request *req)
+void notify_emaillist(Request *req,config__s const *config)
 {
   static struct chunk_callback const emcallbacks[] =
   {
@@ -459,13 +459,13 @@ void notify_emaillist(Request *req)
   
   assert(req != NULL);
   
-  list = gdbm_open((char *)c_config->email.list,DB_BLOCK,GDBM_READER,0,dbcritical);
+  list = gdbm_open((char *)config->email.list,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
     return;
     
   email          = EmailNew();
-  email->from    = strdup(c_config->author.email);
-  email->subject = strdup(c_config->email.subject);
+  email->from    = strdup(config->author.email);
+  email->subject = strdup(config->email.subject);
   
   PairListCreate(&email->headers,"MIME-Version","1.0");
   PairListCreate(&email->headers,"Content-Type","text/plain; charset=UTF-8; format=flowed");
@@ -473,7 +473,7 @@ void notify_emaillist(Request *req)
   
   templates = ChunkNew("",emcallbacks,sizeof(emcallbacks) / sizeof(emcallbacks[0]));
   out       = open_memstream(&tmp,&size);
-  ChunkProcess(templates,c_config->email.message,out,req);
+  ChunkProcess(templates,config->email.message,out,req);
   ChunkFree(templates);
   fclose(out);
   

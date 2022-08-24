@@ -339,9 +339,9 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
   assert(cgi != NULL);
   (void)cgi;
   
-  if (entry_add(req))
+  if (entry_add(req,c_config,g_blog))
   {
-    if (req->f.email) notify_emaillist(req);
+    if (req->f.email) notify_emaillist(req,c_config);
     generate_pages();
     fprintf(
         stdout,
