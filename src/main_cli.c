@@ -418,7 +418,7 @@ static int mailfile_readdata(Request *req)
     
   PairListFree(&headers);       /* got everything we need, dump this */
   
-  if (authenticate_author(req) == false)
+  if (authenticate_author(req,c_config) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",req->author);
     return EPERM;

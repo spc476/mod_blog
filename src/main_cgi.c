@@ -289,7 +289,7 @@ int main_cgi_post(Cgi cgi)
   if (g_request.class == NULL)
     g_request.class = strdup("");
     
-  if (authenticate_author(&g_request) == false)
+  if (authenticate_author(&g_request,c_config) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",g_request.author);
     return cgi_error(HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",g_request.author,CgiListGetValue(cgi,"author"));

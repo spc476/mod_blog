@@ -77,7 +77,7 @@ src/addutil.o: src/blog.h src/timeutil.h src/conversion.h src/backend.h
 src/addutil.o: src/frontend.h src/wbtum.h src/config.h src/globals.h
 src/addutil.o: src/blogutil.h
 src/authenticate.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
-src/authenticate.o: src/config.h src/globals.h
+src/authenticate.o: src/config.h
 src/backend.o: src/blogutil.h src/frontend.h src/wbtum.h src/timeutil.h
 src/backend.o: src/blog.h src/config.h src/backend.h src/globals.h
 src/blog.o: src/blog.h src/timeutil.h src/wbtum.h

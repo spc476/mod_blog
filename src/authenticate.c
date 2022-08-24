@@ -28,7 +28,6 @@
 #include <cgilib6/util.h>
 
 #include "frontend.h"
-#include "globals.h"
 
 /*************************************************************************/
 
@@ -102,7 +101,7 @@ static size_t breakline(char **dest,size_t dsize,FILE *in)
 
 /************************************************************************/
 
-bool authenticate_author(Request *req)
+bool authenticate_author(Request *req,config__s const *config)
 {
   FILE   *in;
   char   *lines[10];
@@ -110,25 +109,26 @@ bool authenticate_author(Request *req)
   
   assert(req         != NULL);
   assert(req->author != NULL);
+  assert(config      != NULL);
   
-  if (c_config->author.file == NULL)
-    return strcmp(req->author,c_config->author.name) == 0;
+  if (config->author.file == NULL)
+    return strcmp(req->author,config->author.name) == 0;
     
-  in = fopen(c_config->author.file,"r");
+  in = fopen(config->author.file,"r");
   if (in == NULL)
   {
-    syslog(LOG_ERR,"%s: %s",c_config->author.file,strerror(errno));
+    syslog(LOG_ERR,"%s: %s",config->author.file,strerror(errno));
     return false;
   }
   
   while((cnt = breakline(lines,10,in)))
   {
-    if ((c_config->author.fields.uid < cnt) && (strcmp(req->author,lines[c_config->author.fields.uid]) == 0))
+    if ((config->author.fields.uid < cnt) && (strcmp(req->author,lines[config->author.fields.uid]) == 0))
     {
-      if (c_config->author.fields.name < cnt)
+      if (config->author.fields.name < cnt)
       {
         free(req->author);
-        req->author = strdup(lines[c_config->author.fields.name]);
+        req->author = strdup(lines[config->author.fields.name]);
         fclose(in);
         free(lines[0]); /* see comment below */
         return true;
