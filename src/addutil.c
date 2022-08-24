@@ -441,9 +441,9 @@ void notify_emaillist(Request *req,config__s const *config)
 {
   static struct chunk_callback const emcallbacks[] =
   {
-    { "email.title"       , cb_email_title        } ,
-    { "email.url"         , cb_email_url          } ,
-    { "email.author"      , cb_email_author       } ,
+    { "email.title"  , cb_email_title  } ,
+    { "email.url"    , cb_email_url    } ,
+    { "email.author" , cb_email_author } ,
   };
   
   GDBM_FILE  list;
