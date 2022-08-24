@@ -35,7 +35,6 @@
 #include "conversion.h"
 #include "backend.h"
 #include "frontend.h"
-#include "globals.h"
 #include "blogutil.h"
 
 #define DB_BLOCK 1024
@@ -391,24 +390,30 @@ static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
 
 /************************************************************************/
 
+struct ecb
+{
+  Request   const *req;
+  config__s const *config;
+};
+
 static void cb_email_title(FILE *out,void *data)
 {
-  Request *req = data;
+  struct ecb *cb = data;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (!empty_string(req->status))
-    fprintf(out,"%s",req->status);
+  if (!empty_string(cb->req->status))
+    fprintf(out,"%s",cb->req->status);
   else
-    fprintf(out,"%s",req->title);
+    fprintf(out,"%s",cb->req->title);
 }
 
 /*************************************************************************/
 
 static void cb_email_url(FILE *out,void *data)
 {
-  Request *req = data;
+  struct ecb *cb = data;
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -416,11 +421,11 @@ static void cb_email_url(FILE *out,void *data)
   fprintf(
            out,
            "%s/%04d/%02d/%02d.%d",
-           c_config->url,
-           req->when.year,
-           req->when.month,
-           req->when.day,
-           req->when.part
+           cb->config->url,
+           cb->req->when.year,
+           cb->req->when.month,
+           cb->req->when.day,
+           cb->req->when.part
          );
 }
 
@@ -428,11 +433,11 @@ static void cb_email_url(FILE *out,void *data)
 
 static void cb_email_author(FILE *out,void *data)
 {
-  Request *req = data;
+  struct ecb *cb = data;
   
   assert(out  != NULL);
   assert(data != NULL);
-  fprintf(out,"%s",req->author);
+  fprintf(out,"%s",cb->req->author);
 }
 
 /*************************************************************************/
@@ -473,7 +478,7 @@ void notify_emaillist(Request *req,config__s const *config)
   
   templates = ChunkNew("",emcallbacks,sizeof(emcallbacks) / sizeof(emcallbacks[0]));
   out       = open_memstream(&tmp,&size);
-  ChunkProcess(templates,config->email.message,out,req);
+  ChunkProcess(templates,config->email.message,out,&(struct ecb){ .req = req , .config = config });
   ChunkFree(templates);
   fclose(out);
   
