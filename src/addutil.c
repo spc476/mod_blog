@@ -241,21 +241,6 @@ static void dbcritical(char const *msg)
 
 /************************************************************************/
 
-static void cb_email_title  (FILE *,void *);
-static void cb_email_url    (FILE *,void *);
-static void cb_email_author (FILE *,void *);
-
-static struct chunk_callback const m_emcallbacks[] =
-{
-  { "email.title"       , cb_email_title        } ,
-  { "email.url"         , cb_email_url          } ,
-  { "email.author"      , cb_email_author       } ,
-};
-
-static size_t const m_emcbnum = sizeof(m_emcallbacks) / sizeof(struct chunk_callback);
-
-/************************************************************************/
-
 static ssize_t utf8_read(void *cookie,char *buffer,size_t bytes)
 {
   FILE *realin = cookie;
@@ -406,8 +391,61 @@ static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
 
 /************************************************************************/
 
+static void cb_email_title(FILE *out,void *data)
+{
+  Request *req = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (!empty_string(req->status))
+    fprintf(out,"%s",req->status);
+  else
+    fprintf(out,"%s",req->title);
+}
+
+/*************************************************************************/
+
+static void cb_email_url(FILE *out,void *data)
+{
+  Request *req = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fprintf(
+           out,
+           "%s/%04d/%02d/%02d.%d",
+           c_config->url,
+           req->when.year,
+           req->when.month,
+           req->when.day,
+           req->when.part
+         );
+}
+
+/*************************************************************************/
+
+static void cb_email_author(FILE *out,void *data)
+{
+  Request *req = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  fprintf(out,"%s",req->author);
+}
+
+/*************************************************************************/
+
 void notify_emaillist(Request *req)
 {
+  static struct chunk_callback const emcallbacks[] =
+  {
+    { "email.title"       , cb_email_title        } ,
+    { "email.url"         , cb_email_url          } ,
+    { "email.author"      , cb_email_author       } ,
+  };
+  
   GDBM_FILE  list;
   Chunk      templates;
   datum      nextkey;
@@ -433,7 +471,7 @@ void notify_emaillist(Request *req)
   PairListCreate(&email->headers,"Content-Type","text/plain; charset=UTF-8; format=flowed");
   PairListCreate(&email->headers,"Content-Transfer-Encoding","quoted-printable");
   
-  templates = ChunkNew("",m_emcallbacks,m_emcbnum);
+  templates = ChunkNew("",emcallbacks,sizeof(emcallbacks) / sizeof(emcallbacks[0]));
   out       = open_memstream(&tmp,&size);
   ChunkProcess(templates,c_config->email.message,out,req);
   ChunkFree(templates);
@@ -492,52 +530,6 @@ void notify_emaillist(Request *req)
   EmailFree(email);
   gdbm_close(list);
   free(tmp);
-}
-
-/*************************************************************************/
-
-static void cb_email_title(FILE *out,void *data)
-{
-  Request *req = data;
-  
-  assert(out  != NULL);
-  assert(data != NULL);
-  
-  if (!empty_string(req->status))
-    fprintf(out,"%s",req->status);
-  else
-    fprintf(out,"%s",req->title);
-}
-
-/*************************************************************************/
-
-static void cb_email_url(FILE *out,void *data)
-{
-  Request *req = data;
-  
-  assert(out  != NULL);
-  assert(data != NULL);
-  
-  fprintf(
-           out,
-           "%s/%04d/%02d/%02d.%d",
-           c_config->url,
-           req->when.year,
-           req->when.month,
-           req->when.day,
-           req->when.part
-         );
-}
-
-/*************************************************************************/
-
-static void cb_email_author(FILE *out,void *data)
-{
-  Request *req = data;
-  
-  assert(out  != NULL);
-  assert(data != NULL);
-  fprintf(out,"%s",req->author);
 }
 
 /*************************************************************************/
