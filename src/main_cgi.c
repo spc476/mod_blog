@@ -56,7 +56,6 @@ int main_cgi_get(Cgi cgi)
     return cgi_error(HTTP_ISERVERERR,"cgi_init() failed");
     
   g_request.reqtumbler = getenv("PATH_INFO");
-  CgiListMake(cgi);
   return (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,&g_request);
 }
 
@@ -263,7 +262,6 @@ int main_cgi_post(Cgi cgi)
   if (cgi_init(cgi) != 0)
     return cgi_error(HTTP_ISERVERERR,"cgi_init() failed");
     
-  CgiListMake(cgi);
   set_m_author(CgiListGetValue(cgi,"author"),&g_request);
   
   g_request.title      = strdup(CgiListGetValue(cgi,"title"));
@@ -481,10 +479,9 @@ static int cgi_error(int level,char const *msg, ... )
 static bool cgi_init(Cgi cgi)
 {
   assert(cgi != NULL);
-  (void)cgi;
   
   g_request.f.cgi = true;
-  
+  CgiListMake(cgi);
   return GlobalsInit(NULL);
 }
 
