@@ -40,7 +40,7 @@ extern config__s const *c_config;
 extern Blog            *g_blog;
 extern Request          g_request;
 
-extern int  GlobalsInit   (char const *);
+extern bool GlobalsInit   (char const *);
 extern bool TO_email      (char const *);
 extern int  main_cgi_get  (Cgi);
 extern int  main_cgi_post (Cgi);

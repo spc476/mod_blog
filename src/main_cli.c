@@ -167,8 +167,8 @@ int main_cli(int argc,char *argv[])
     }
   }
   
-  if (GlobalsInit(config) != 0)
-    return cli_error(HTTP_ISERVERERR,"could not open cofiguration file %s or could not initialize dates",config);
+  if (!GlobalsInit(config))
+    return cli_error(HTTP_ISERVERERR,"%s: failed to initialize",config);
     
   if (forcenotify)
   {

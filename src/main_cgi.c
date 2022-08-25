@@ -35,7 +35,7 @@ typedef int (*cgicmd__f)(Cgi,struct request *);
 
 /**************************************************************************/
 
-static int       cgi_init               (Cgi);
+static bool      cgi_init               (Cgi);
 static cgicmd__f set_m_cgi_get_command  (char const *);
 static int       cmd_cgi_get_new        (Cgi,Request *);
 static int       cmd_cgi_get_show       (Cgi,Request *);
@@ -52,7 +52,7 @@ int main_cgi_get(Cgi cgi)
 {
   assert(cgi != NULL);
   
-  if (cgi_init(cgi) != 0)
+  if (!cgi_init(cgi))
     return cgi_error(HTTP_ISERVERERR,"cgi_init() failed");
     
   g_request.reqtumbler = getenv("PATH_INFO");
@@ -478,7 +478,7 @@ static int cgi_error(int level,char const *msg, ... )
 
 /**********************************************************************/
 
-static int cgi_init(Cgi cgi)
+static bool cgi_init(Cgi cgi)
 {
   assert(cgi != NULL);
   (void)cgi;

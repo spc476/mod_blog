@@ -23,7 +23,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <locale.h>
-#include <errno.h>
 
 #include <syslog.h>
 #include <cgilib6/util.h>
@@ -89,17 +88,18 @@ bool TO_email(char const *value)
 
 /***************************************************************************/
 
-int GlobalsInit(char const *conf)
+bool GlobalsInit(char const *conf)
 {
   atexit(globals_free);
   seed_rng();
+
   c_config = config_lua(conf);
   if (c_config == NULL)
-    return ENOMEM;
+    return false;
     
   g_blog = BlogNew(c_config->basedir,c_config->lockfile);
   if (g_blog == NULL)
-    return ENOMEM;
+    return false;
     
   g_request.f.navprev = true;
   g_request.f.navnext = true;
@@ -111,7 +111,7 @@ int GlobalsInit(char const *conf)
   ;--------------------------------------------------------*/
   
   setlocale(LC_COLLATE,"C");
-  return 0;
+  return true;
 }
 
 /********************************************************************/
