@@ -40,10 +40,10 @@
 
 struct options
 {
-  bool  emailin;
-  bool  regenerate;
-  bool  today;
-  bool  thisday;
+  bool emailin;
+  bool regenerate;
+  bool today;
+  bool thisday;
 };
 
 typedef int (*clicmd__f)(Request *,struct options const *);
