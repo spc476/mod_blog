@@ -87,7 +87,7 @@ static void print_nav_url(FILE *out,struct btm const *date,unit__e unit)
   assert(out  != NULL);
   assert(date != NULL);
   
-  fprintf(out,"%s",c_config->baseurl);
+  fprintf(out,"%s",g_blog->config.baseurl);
   print_nav_name(out,date,unit,'/');
 }
 
@@ -151,9 +151,9 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
   src = HtmlParseGetPair(token,attrib);
   if (src != NULL)
   {
-    for (size_t i = 0 ; i < c_config->affiliatenum ; i++)
+    for (size_t i = 0 ; i < g_blog->config.affiliatenum ; i++)
     {
-      if (strncmp(src->value,c_config->affiliates[i].proto,c_config->affiliates[i].psize) == 0)
+      if (strncmp(src->value,g_blog->config.affiliates[i].proto,g_blog->config.affiliates[i].psize) == 0)
       {
         char buffer[BUFSIZ];
         struct pair *np;
@@ -161,8 +161,8 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
         snprintf(
                 buffer,
                 sizeof(buffer),
-                c_config->affiliates[i].format,
-                &src->value[c_config->affiliates[i].psize + 1]
+                g_blog->config.affiliates[i].format,
+                &src->value[g_blog->config.affiliates[i].psize + 1]
         );
         np = PairCreate(attrib,buffer);
         NodeInsert(&src->node,&np->node);
@@ -226,9 +226,9 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
     ;-----------------------------------------------------*/
     
     if (g_request.f.fullurl)
-      baseurl = c_config->url;
+      baseurl = g_blog->config.url;
     else
-      baseurl = c_config->baseurl;
+      baseurl = g_blog->config.baseurl;
       
     /*---------------------------------------------------------
     ; all this to reassign the value, without ``knowing'' how the pair stuff
@@ -403,7 +403,7 @@ static void cb_blog_adtag(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->adtag == NULL)
-    tag = UrlEncodeString(c_config->adtag);
+    tag = UrlEncodeString(g_blog->config.adtag);
   else
     tag = UrlEncodeString(cbd->adtag);
   fputs(tag,out);
@@ -422,7 +422,7 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->adtag == NULL)
-    tag = c_config->adtag;
+    tag = g_blog->config.adtag;
   else
     tag = cbd->adtag;
 
@@ -437,7 +437,7 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
 static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_config->author.name,out);
+  fputs(g_blog->config.author.name,out);
 }
 
 /********************************************************************/
@@ -445,7 +445,7 @@ static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_config->author.email,out);
+  fputs(g_blog->config.author.email,out);
 }
 
 /**********************************************************************/
@@ -453,7 +453,7 @@ static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_class(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_config->class,out);
+  fputs(g_blog->config.class,out);
 }
 
 /**********************************************************************/
@@ -461,7 +461,7 @@ static void cb_blog_class(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_description(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_config->description,out);
+  fputs(g_blog->config.description,out);
 }
 
 /*********************************************************************/
@@ -469,7 +469,7 @@ static void cb_blog_description(FILE *out,void *data __attribute__((unused)))
 static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_config->name,out);
+  fputs(g_blog->config.name,out);
 }
 
 /*********************************************************************/
@@ -502,7 +502,7 @@ static void cb_blog_title(FILE *out,void *data)
     }
   }
   
-  fputs(c_config->name,out);
+  fputs(g_blog->config.name,out);
 }
 
 /*********************************************************************/
@@ -522,7 +522,7 @@ static void cb_blog_url(FILE *out,void *data)
 static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fputs(c_config->url,out);
+  fputs(g_blog->config.url,out);
 }
 
 /**********************************************************************/
@@ -958,7 +958,7 @@ static void cb_entry_body_jsonified(FILE *out,void *data)
 
 static void cb_entry_class(FILE *out,void *data)
 {
-  char const *msg = c_config->class;
+  char const *msg = g_blog->config.class;
   
   assert(out  != NULL);
   
@@ -1023,7 +1023,7 @@ static void cb_entry_cond_author(FILE *out,void *data)
   
   assert(cbd->entry->valid);
   
-  if (strcmp(c_config->author.name,cbd->entry->author) != 0)
+  if (strcmp(g_blog->config.author.name,cbd->entry->author) != 0)
     generic_cb("entry.cond.author",out,data);
 }
 
@@ -1059,7 +1059,7 @@ static void cb_entry_date(FILE *out,void *data)
 
 static void cb_entry_description(FILE *out,void *data)
 {
-  char const *msg = c_config->description;
+  char const *msg = g_blog->config.description;
   
   assert(out != NULL);
   
@@ -1481,7 +1481,7 @@ static void cb_request_url(FILE *out,void *data __attribute__((unused)))
   assert(out != NULL);
   
   tum = tumbler_canonical(&g_request.tumbler);
-  fprintf(out,"%s%s",c_config->url,tum);
+  fprintf(out,"%s%s",g_blog->config.url,tum);
   free(tum);
 }
 
@@ -1537,7 +1537,7 @@ static void cb_rss_item_url(FILE *out,void *data)
   assert(data != NULL);
   
   assert(cbd->entry->valid);
-  fprintf(out,"%s",c_config->url);
+  fprintf(out,"%s",g_blog->config.url);
   print_nav_url(out,&cbd->entry->when,UNIT_PART);
 }
 
@@ -1560,7 +1560,7 @@ static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
 static void cb_rss_url(FILE *out,void *data __attribute__((unused)))
 {
   assert(out != NULL);
-  fprintf(out,"%s",c_config->url);
+  fprintf(out,"%s",g_blog->config.url);
 }
 
 /*******************************************************************/

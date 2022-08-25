@@ -172,7 +172,7 @@ int main_cli(int argc,char *argv[])
     
   if (forcenotify)
   {
-    if (!c_config->email.notify)
+    if (!g_blog->config.email.notify)
     {
       fprintf(stderr,"No email notifiation list\n");
       return EXIT_FAILURE;
@@ -186,7 +186,7 @@ int main_cli(int argc,char *argv[])
       g_request.author = strdup(entry->author);
       g_request.status = strdup(entry->status);
       g_request.when   = entry->when;
-      notify_emaillist(&g_request,c_config);
+      notify_emaillist(&g_request,g_blog);
       BlogEntryFree(entry);
       return EXIT_SUCCESS;
     }
@@ -220,9 +220,9 @@ static int cmd_cli_new(Request *req,struct options const *options)
     return EXIT_FAILURE;
   }
   
-  if (entry_add(req,c_config,g_blog))
+  if (entry_add(req,g_blog))
   {
-    if (req->f.email) notify_emaillist(req,c_config);
+    if (req->f.email) notify_emaillist(req,g_blog);
     generate_pages();
     return 0;
   }
@@ -261,8 +261,8 @@ static int cmd_cli_show(Request *req,struct options const *options)
     {
       template__t template;
       
-      template.template = c_config->templates[0].template;
-      template.items    = c_config->templates[0].items;
+      template.template = g_blog->config.templates[0].template;
+      template.items    = g_blog->config.templates[0].items;
       template.pagegen  = "days";
       template.reverse  = true;
       template.fullurl  = false;
@@ -385,7 +385,7 @@ static int mailfile_readdata(Request *req)
   req->status     = PairListGetValue(&headers,"STATUS");
   req->date       = PairListGetValue(&headers,"DATE");
   req->adtag      = PairListGetValue(&headers,"ADTAG");
-  req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"),c_config->conversion);
+  req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"),g_blog->config.conversion);
   req->f.email    = TO_email(PairListGetValue(&headers,"EMAIL"));
   
   if (req->author != NULL)
@@ -418,7 +418,7 @@ static int mailfile_readdata(Request *req)
     
   PairListFree(&headers);       /* got everything we need, dump this */
   
-  if (authenticate_author(req,c_config) == false)
+  if (authenticate_author(req,g_blog) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",req->author);
     return EPERM;

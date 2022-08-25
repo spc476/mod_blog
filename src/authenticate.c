@@ -101,7 +101,7 @@ static size_t breakline(char **dest,size_t dsize,FILE *in)
 
 /************************************************************************/
 
-bool authenticate_author(Request *req,config__s const *config)
+bool authenticate_author(Request *req,Blog *blog)
 {
   FILE   *in;
   char   *lines[10];
@@ -109,26 +109,26 @@ bool authenticate_author(Request *req,config__s const *config)
   
   assert(req         != NULL);
   assert(req->author != NULL);
-  assert(config      != NULL);
+  assert(blog        != NULL);
   
-  if (config->author.file == NULL)
-    return strcmp(req->author,config->author.name) == 0;
+  if (blog->config.author.file == NULL)
+    return strcmp(req->author,blog->config.author.name) == 0;
     
-  in = fopen(config->author.file,"r");
+  in = fopen(blog->config.author.file,"r");
   if (in == NULL)
   {
-    syslog(LOG_ERR,"%s: %s",config->author.file,strerror(errno));
+    syslog(LOG_ERR,"%s: %s",blog->config.author.file,strerror(errno));
     return false;
   }
   
   while((cnt = breakline(lines,10,in)))
   {
-    if ((config->author.fields.uid < cnt) && (strcmp(req->author,lines[config->author.fields.uid]) == 0))
+    if ((blog->config.author.fields.uid < cnt) && (strcmp(req->author,lines[blog->config.author.fields.uid]) == 0))
     {
-      if (config->author.fields.name < cnt)
+      if (blog->config.author.fields.name < cnt)
       {
         free(req->author);
-        req->author = strdup(lines[config->author.fields.name]);
+        req->author = strdup(lines[blog->config.author.fields.name]);
         fclose(in);
         free(lines[0]); /* see comment below */
         return true;

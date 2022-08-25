@@ -28,7 +28,6 @@
 #include "wbtum.h"
 #include "timeutil.h"
 #include "blog.h"
-#include "config.h"
 
 typedef struct request
 {
@@ -62,9 +61,9 @@ typedef struct request
 /************************************************/
 
 extern char *get_remote_user        (void);
-extern bool  authenticate_author    (Request *,config__s const *);
-extern void  notify_emaillist       (Request *,config__s const *);
-extern bool  entry_add              (Request *,config__s const *,Blog *);
+extern bool  authenticate_author    (Request *,Blog *);
+extern void  notify_emaillist       (Request *,Blog *);
+extern bool  entry_add              (Request *,Blog *);
 extern void  fix_entry              (Request *);
 extern char *entity_conversion      (char const *);
 extern char *entity_encode          (char const *);

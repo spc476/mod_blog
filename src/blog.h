@@ -25,19 +25,85 @@
 
 #include <stdbool.h>
 #include <time.h>
+
+#include <lua.h>
 #include <cgilib6/nodelist.h>
 
 #include "timeutil.h"
 
 /*******************************************************************/
 
+struct fields
+{
+  size_t uid;
+  size_t name;
+  size_t email;
+};
+
+struct author
+{
+  char const    *name;
+  char const    *email;
+  char const    *file;
+  struct fields  fields;
+};
+
+struct bemail
+{
+  char const *list;
+  char const *message;
+  char const *subject;
+  bool        notify; /* derived */
+};
+
+typedef struct template
+{
+  char const *template;
+  char const *file;
+  char const *posthook;
+  char const *pagegen;
+  size_t      items;
+  bool        reverse;
+  bool        fullurl;
+} template__t;
+
+typedef struct aflink
+{
+  char const *proto;
+  size_t      psize;
+  char const *format;
+} aflink__t;
+
+struct config
+{
+  char const    *name;
+  char const    *description;
+  char const    *class;
+  char const    *basedir;
+  char const    *lockfile;
+  char const    *webdir;
+  char const    *url;
+  char const    *prehook;
+  char const    *posthook;
+  char const    *adtag;
+  char const    *conversion;
+  struct author  author;
+  template__t   *templates;
+  size_t         templatenum;
+  struct bemail  email;
+  aflink__t     *affiliates;
+  size_t         affiliatenum;
+  char const    *baseurl; /* derived from URL */
+  lua_State     *L;
+};
+
 typedef struct blog
 {
-  char const *lockfile;
-  struct btm  first;
-  struct btm  last;
-  struct btm  now;
-  time_t      tnow;
+  struct config config;
+  struct btm    first;
+  struct btm    last;
+  struct btm    now;
+  time_t        tnow;
 } Blog;
 
 typedef struct blogentry
@@ -57,7 +123,7 @@ typedef struct blogentry
 
 /*********************************************************************/
 
-extern Blog      *BlogNew               (char const *restrict,char const *restrict);
+extern Blog      *BlogNew               (char const *);
 extern void       BlogFree              (Blog *);
 
 extern BlogEntry *BlogEntryNew          (Blog *);

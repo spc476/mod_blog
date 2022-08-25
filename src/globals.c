@@ -32,9 +32,8 @@
 
 /************************************************************/
 
-config__s *c_config;
-Blog      *g_blog;
-Request    g_request;
+Blog    *g_blog;
+Request  g_request;
 
 /****************************************************/
 
@@ -58,7 +57,6 @@ static void seed_rng(void)
 static void globals_free(void)
 {
   if (g_blog   != NULL) BlogFree(g_blog);
-  if (c_config != NULL) config_free(c_config);
   
   free(g_request.origauthor);
   free(g_request.author);
@@ -83,7 +81,7 @@ bool TO_email(char const *value)
       return true;
   }
 
-  return c_config->email.notify;
+  return g_blog->config.email.notify;
 }
 
 /***************************************************************************/
@@ -93,11 +91,7 @@ bool GlobalsInit(char const *conf)
   atexit(globals_free);
   seed_rng();
 
-  c_config = config_lua(conf);
-  if (c_config == NULL)
-    return false;
-    
-  g_blog = BlogNew(c_config->basedir,c_config->lockfile);
+  g_blog = BlogNew(conf);
   if (g_blog == NULL)
     return false;
     

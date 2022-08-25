@@ -32,13 +32,11 @@
 
 #include "frontend.h"
 #include "blog.h"
-#include "config.h"
 
 #define GENERATOR       "mod_blog" " " PROG_VERSION
 
-extern config__s const *c_config;
-extern Blog            *g_blog;
-extern Request          g_request;
+extern Blog    *g_blog;
+extern Request  g_request;
 
 extern bool GlobalsInit   (char const *);
 extern bool TO_email      (char const *);

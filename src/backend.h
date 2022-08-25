@@ -29,7 +29,6 @@
 #include "blog.h"
 #include "timeutil.h"
 #include "wbtum.h"
-#include "config.h"
 
 typedef int (*pagegen__f)(struct template const *,FILE *,Blog *);
 

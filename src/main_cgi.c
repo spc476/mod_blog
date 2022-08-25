@@ -123,8 +123,8 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
         "  <BODY><A HREF='%s'>Go here<A></BODY>\n"
         "</HTML>\n",
         HTTP_MOVEPERM,
-        c_config->url,
-        c_config->url
+        g_blog->config.url,
+        g_blog->config.url
       );
     rc = 0;
   }
@@ -147,9 +147,9 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
                 "<body><p>Redirect to <a href='%s/%s'>%s/%s</a></p></body>"
                 "</html>\n",
                 HTTP_MOVEPERM,
-                c_config->url, tum,
-                c_config->url, tum,
-                c_config->url, tum
+                g_blog->config.url, tum,
+                g_blog->config.url, tum,
+                g_blog->config.url, tum
         );
         free(tum);
         free(status);
@@ -221,8 +221,8 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
       "  <BODY><A HREF='%s/%s'>Go here</A></BODY>\n"
       "</HTML>\n",
       HTTP_MOVEPERM,
-      c_config->url,tpath,
-      c_config->url,tpath
+      g_blog->config.url,tpath,
+      g_blog->config.url,tpath
     );
     return 0;
   }
@@ -243,8 +243,8 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
       "  <BODY><A HREF='%s/%s/%02d/%02d'>Go here</A></BODY>\n"
       "</HTML>\n",
       HTTP_MOVEPERM,
-      c_config->url,tpath,req->tumbler.start.month,req->tumbler.start.day,
-      c_config->url,tpath,req->tumbler.start.month,req->tumbler.start.day
+      g_blog->config.url,tpath,req->tumbler.start.month,req->tumbler.start.day,
+      g_blog->config.url,tpath,req->tumbler.start.month,req->tumbler.start.day
     );
     return 0;
   }
@@ -271,7 +271,7 @@ int main_cgi_post(Cgi cgi)
   g_request.adtag      = strdup(CgiListGetValue(cgi,"adtag"));
   g_request.origbody   = strdup(CgiListGetValue(cgi,"body"));
   g_request.body       = strdup(g_request.origbody);
-  g_request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),c_config->conversion);
+  g_request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),g_blog->config.conversion);
   g_request.f.email    = TO_email(CgiListGetValue(cgi,"email"));
   
   if (
@@ -286,7 +286,7 @@ int main_cgi_post(Cgi cgi)
   if (g_request.class == NULL)
     g_request.class = strdup("");
     
-  if (authenticate_author(&g_request,c_config) == false)
+  if (authenticate_author(&g_request,g_blog) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",g_request.author);
     return cgi_error(HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",g_request.author,CgiListGetValue(cgi,"author"));
@@ -336,9 +336,9 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
   assert(cgi != NULL);
   (void)cgi;
   
-  if (entry_add(req,c_config,g_blog))
+  if (entry_add(req,g_blog))
   {
-    if (req->f.email) notify_emaillist(req,c_config);
+    if (req->f.email) notify_emaillist(req,g_blog);
     generate_pages();
     fprintf(
         stdout,
@@ -351,8 +351,8 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
         "  <BODY><A HREF='%s'>Go here</A></BODY>\n"
         "</HTML>\n",
         HTTP_MOVETEMP,
-        c_config->url,
-        c_config->url
+        g_blog->config.url,
+        g_blog->config.url
         
     );
     return 0;

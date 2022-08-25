@@ -52,7 +52,7 @@ struct callback_data *callback_init(struct callback_data *cbd)
   
   memset(cbd,0,sizeof(struct callback_data));
   ListInit(&cbd->list);
-  cbd->template = &c_config->templates[0]; /* XXX probably document this */
+  cbd->template = &g_blog->config.templates[0]; /* XXX probably document this */
   cbd->entry    = NULL;
   cbd->ad       = NULL;
   cbd->adtag    = NULL;
@@ -118,27 +118,27 @@ int generate_thisday(FILE *out,struct btm when)
 
 int generate_pages(void)
 {
-  for (size_t i = 0 ; i < c_config->templatenum ; i++)
+  for (size_t i = 0 ; i < g_blog->config.templatenum ; i++)
   {
-    FILE  *out = fopen(c_config->templates[i].file,"w");
+    FILE  *out = fopen(g_blog->config.templates[i].file,"w");
     int  (*pagegen)(struct template const *,FILE *,Blog *);
     
     if (out == NULL)
     {
-      syslog(LOG_ERR,"%s: %s",c_config->templates[i].file,strerror(errno));
+      syslog(LOG_ERR,"%s: %s",g_blog->config.templates[i].file,strerror(errno));
       continue;
     }
     
-    pagegen = TO_pagegen(c_config->templates[i].pagegen);
-    (*pagegen)(&c_config->templates[i],out,g_blog);
+    pagegen = TO_pagegen(g_blog->config.templates[i].pagegen);
+    (*pagegen)(&g_blog->config.templates[i],out,g_blog);
     fclose(out);
     
-    if (c_config->templates[i].posthook)
+    if (g_blog->config.templates[i].posthook)
     {
       char const *argv[3];
       
-      argv[0] = c_config->templates[i].posthook;
-      argv[1] = c_config->templates[i].file;
+      argv[0] = g_blog->config.templates[i].posthook;
+      argv[1] = g_blog->config.templates[i].file;
       argv[2] = NULL;
       
       run_hook("template-post-hook",argv);
@@ -962,7 +962,7 @@ static char *tag_collect(List *list)
       return strdup(entry->class);
   }
   
-  return strdup(c_config->adtag);
+  return strdup(g_blog->config.adtag);
 }
 
 /********************************************************************/
@@ -976,7 +976,7 @@ static char *tag_pick(char const *tag)
   assert(tag != NULL);
   
   if (empty_string(tag))
-    return strdup(c_config->adtag);
+    return strdup(g_blog->config.adtag);
     
   pool = tag_split(&num,tag);
   
@@ -992,7 +992,7 @@ static char *tag_pick(char const *tag)
     pick     = fromstring(pool[r]);
   }
   else
-    pick = strdup(c_config->adtag);
+    pick = strdup(g_blog->config.adtag);
     
   free(pool);
   return pick;
