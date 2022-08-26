@@ -20,10 +20,6 @@
 *
 ************************************************/
 
-#ifndef __GNUC__
-#  define __attribute__(x)
-#endif
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -497,11 +493,12 @@ static void cb_blog_name(FILE *out,void *data)
 
 /*********************************************************************/
 
-static void cb_blog_script(FILE *out,void *data __attribute__((unused)))
+static void cb_blog_script(FILE *out,void *data)
 {
   char *script;
   
   assert(out != NULL);
+  (void)data;
   
   script = getenv("SCRIPT_NAME");
   if (script)
@@ -1277,9 +1274,10 @@ static void cb_entry_url(FILE *out,void *data)
 
 /**********************************************************************/
 
-static void cb_generator(FILE *out,void *data __attribute__((unused)))
+static void cb_generator(FILE *out,void *data)
 {
   assert(out != NULL);
+  (void)data;
   
   fprintf(
     out,
@@ -1659,9 +1657,10 @@ static void cb_update_time(FILE *out,void *data)
 
 /*******************************************************************/
 
-static void cb_xyzzy(FILE *out,void *data __attribute__((unused)))
+static void cb_xyzzy(FILE *out,void *data)
 {
   assert(out != NULL);
+  (void)data;
   fputs("Nothing happens.",out);
 }
 
