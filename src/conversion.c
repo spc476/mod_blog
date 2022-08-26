@@ -95,12 +95,10 @@ void no_conversion(FILE *restrict in,FILE *restrict out)
 
 void text_conversion(FILE *restrict in,FILE *restrict out)
 {
-  FILE *entin;
-  
   assert(in    != NULL);
   assert(out   != NULL);
   
-  entin = fentity_encode_onread(in);
+  FILE *entin = fentity_encode_onread(in);
   text_conversion_backend(entin,out);
   fclose(entin);
 }
@@ -109,20 +107,14 @@ void text_conversion(FILE *restrict in,FILE *restrict out)
 
 static void text_conversion_backend(FILE *restrict in,FILE *restrict out)
 {
-  FILE   *tmpout;
-  char   *buffer;
-  char   *line;
-  size_t  bufsize;
-  size_t  linesize;
-  
   assert(in  != NULL);
   assert(out != NULL);
   
-  line     = NULL;
-  buffer   = NULL;
-  bufsize  = 0;
-  linesize = 0;
-  tmpout   = open_memstream(&buffer,&bufsize);
+  char   *line     = NULL;
+  char   *buffer   = NULL;
+  size_t  bufsize  = 0;
+  size_t  linesize = 0;
+  FILE   *tmpout   = open_memstream(&buffer,&bufsize);
   
   while(!feof(in))
   {
@@ -359,15 +351,13 @@ static void check_for_uri(struct nested_params *local,char const *attrib)
 
 static void entify_char(char *d,size_t ds,char *s,char e,char const *entity)
 {
-  size_t se;
-  
   assert(d      != NULL);
   assert(ds     >  0);
   assert(s      != NULL);
   assert(e      != '\0');
   assert(entity != NULL);
   
-  se = strlen(entity);
+  size_t se = strlen(entity);
   
   for ( ; (*s) && (ds > 0) ; )
   {
@@ -419,7 +409,6 @@ static void html_handle_string(struct nested_params *local)
 static void html_handle_comment(struct nested_params *local)
 {
   assert(local != NULL);
-  
   fprintf(local->out,"<!%s>",HtmlParseValue(local->token));
 }
 

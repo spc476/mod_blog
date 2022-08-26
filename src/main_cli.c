@@ -316,13 +316,10 @@ static clicmd__f get_cli_command(char const *value)
 static int mail_setup_data(Request *req)
 {
   List    headers;
-  char   *line;
-  size_t  size;
+  char   *line = NULL;
+  size_t  size = 0;
   
   assert(req != NULL);
-  
-  line = NULL;
-  size = 0;
   
   ListInit(&headers);
   getline(&line,&size,stdin); /* skip Unix 'From ' line */

@@ -34,13 +34,14 @@ String *tag_split(size_t *pnum,char const *tag)
   size_t      num  = 0;
   size_t      max  = 0;
   String     *pool = NULL;
-  char const *p;
   
   assert(pnum != NULL);
   assert(tag  != NULL);
   
   while(*tag)
   {
+    char const *p;
+    
     if (num == max)
     {
       max += 1024;
@@ -72,11 +73,9 @@ String *tag_split(size_t *pnum,char const *tag)
 
 char *fromstring(String const src)
 {
-  char *s;
-  
   assert(src.d != NULL);
   
-  s = malloc(src.s + 1);
+  char *s = malloc(src.s + 1);
   if (s != NULL)
   {
     memcpy(s,src.d,src.s);
@@ -92,12 +91,10 @@ size_t fcopy(FILE *restrict out,FILE *restrict in)
 {
   char   buffer[BUFSIZ];
   size_t inbytes;
-  size_t outbytes;
+  size_t outbytes = 0;
   
   assert(out != NULL);
   assert(in  != NULL);
-  
-  outbytes = 0;
   
   do
   {

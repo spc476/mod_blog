@@ -112,10 +112,9 @@ static bool set_date(char const *file,struct btm *when,struct btm *now)
 
 Blog *BlogNew(char const *configfile)
 {
-  Blog      *blog;
   struct tm *ptm;
-
-  blog = calloc(1,sizeof(struct blog));
+  Blog      *blog = calloc(1,sizeof(struct blog));
+  
   if (blog == NULL)
   {
     syslog(LOG_ERR,"Can't allocate blog memory");
@@ -305,7 +304,6 @@ void BlogEntryReadBetweenD(
 )
 {
   List  lista;
-  Node *node;
   
   assert(blog  != NULL);
   assert(listb != NULL);
@@ -323,7 +321,7 @@ void BlogEntryReadBetweenD(
   
   for
   (
-    node = ListRemHead(&lista);
+    Node *node = ListRemHead(&lista);
     NodeValid(node);
     node = ListRemHead(&lista)
   )
@@ -341,8 +339,7 @@ void BlogEntryReadXD(
         size_t            num
 )
 {
-  BlogEntry  *entry;
-  struct btm  current;
+  struct btm current;
   
   assert(blog  != NULL);
   assert(list  != NULL);
@@ -356,7 +353,7 @@ void BlogEntryReadXD(
     if (btm_cmp_date(&current,&blog->first) < 0)
       return;
       
-    entry = BlogEntryRead(blog,&current);
+    BlogEntry *entry = BlogEntryRead(blog,&current);
     if (entry != NULL)
     {
       ListAddTail(list,&entry->node);
@@ -380,8 +377,7 @@ void BlogEntryReadXU(
         size_t            num
 )
 {
-  BlogEntry  *entry;
-  struct btm  current;
+  struct btm current;
   
   assert(blog != NULL);
   assert(list != NULL);
@@ -391,7 +387,7 @@ void BlogEntryReadXU(
   
   while((num) && (btm_cmp_date(&current,&blog->now) <= 0))
   {
-    entry = BlogEntryRead(blog,&current);
+    BlogEntry *entry = BlogEntryRead(blog,&current);
     if (entry != NULL)
     {
       ListAddTail(list,&entry->node);
@@ -814,7 +810,6 @@ static size_t blog_meta_read(
 {
   char   **lines;
   size_t   i;
-  size_t   size;
   FILE    *fp;
   
   assert(plines != NULL);
@@ -840,6 +835,7 @@ static size_t blog_meta_read(
   {
     char    *nl;
     ssize_t  bytes;
+    size_t   size;
     
     lines[i] = NULL;
     size     = 0;
@@ -862,15 +858,13 @@ static size_t blog_meta_read(
 
 static void blog_meta_adjust(char ***plines,size_t num,size_t maxnum)
 {
-  char **lines;
-  
   assert(plines  != NULL);
   assert(*plines != NULL);
   assert(num     <= maxnum);
   assert(num     <= 100);
   assert(maxnum  <= 100);
   
-  lines = *plines;
+  char **lines = *plines;
   
   while(num < maxnum)
   {
@@ -888,13 +882,11 @@ static int blog_meta_write(
         size_t             num
 )
 {
-  FILE   *fp;
-  
   assert(name != NULL);
   assert(date != NULL);
   assert(list != NULL);
   
-  fp = open_file_w(name,date);
+  FILE *fp = open_file_w(name,date);
   if (fp == NULL)
     return errno;
     

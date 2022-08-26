@@ -138,12 +138,10 @@ static void print_nav_title(FILE *out,Blog *blog,struct btm const *date,unit__e 
 
 static void handle_aflinks(HtmlToken token,char const *attrib,Blog *blog)
 {
-  struct pair *src;
-  
   assert(token  != NULL);
   assert(attrib != NULL);
   
-  src = HtmlParseGetPair(token,attrib);
+  struct pair *src = HtmlParseGetPair(token,attrib);
   if (src != NULL)
   {
     for (size_t i = 0 ; i < blog->config.affiliatenum ; i++)
@@ -270,7 +268,6 @@ static void cb_ad(FILE *out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-  
   assert(cbd->entry->valid);
   
   sprintf(
@@ -977,11 +974,10 @@ static void cb_entry_body(FILE *out,void *data)
 
 static void cb_entry_body_entified(FILE *out,void *data)
 {
-  FILE *eout;
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  assert(out != NULL);
-  
-  eout = fentity_encode_onwrite(out);
+  FILE *eout = fentity_encode_onwrite(out);
   if (eout == NULL) return;
   cb_entry_body(eout,data);
   fclose(eout);
@@ -991,11 +987,10 @@ static void cb_entry_body_entified(FILE *out,void *data)
 
 static void cb_entry_body_jsonified(FILE *out,void *data)
 {
-  FILE *jout;
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  assert(out != NULL);
-  
-  jout = fjson_encode_onwrite(out);
+  FILE *jout = fjson_encode_onwrite(out);
   if (jout == NULL) return;
   cb_entry_body(jout,data);
   fclose(jout);
@@ -1295,7 +1290,6 @@ static void cb_generator(FILE *out,void *data)
 static void cb_json_item(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry            *entry;
   char const           *sep = "";
   
   assert(out  != NULL);
@@ -1308,7 +1302,7 @@ static void cb_json_item(FILE *out,void *data)
   
   for
   (
-    entry = (BlogEntry *)ListRemHead(&cbd->list);
+    BlogEntry *entry = (BlogEntry *)ListRemHead(&cbd->list);
     NodeValid(&entry->node);
     entry = (BlogEntry *)ListRemHead(&cbd->list)
   )
@@ -1550,7 +1544,8 @@ static void cb_request_url(FILE *out,void *data)
   struct callback_data *cbd = data;
   char                 *tum;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
   tum = tumbler_canonical(&cbd->request->tumbler);
   fprintf(out,"%s%s",cbd->blog->config.url,tum);
@@ -1577,14 +1572,13 @@ static void cb_robots_index(FILE *out,void *data)
 static void cb_rss_item(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
-  BlogEntry            *entry;
   
   assert(out  != NULL);
   assert(data != NULL);
   
   for
   (
-    entry = (BlogEntry *)ListRemHead(&cbd->list);
+    BlogEntry *entry = (BlogEntry *)ListRemHead(&cbd->list);
     NodeValid(&entry->node);
     entry = (BlogEntry *)ListRemHead(&cbd->list)
   )

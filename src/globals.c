@@ -39,10 +39,9 @@ Request  g_request;
 
 static void seed_rng(void)
 {
-  FILE         *fp;
   unsigned int  seed;
+  FILE         *fp = fopen("/dev/urandom","rb");
   
-  fp = fopen("/dev/urandom","rb");
   if (fp)
   {
     fread(&seed,sizeof(seed),1,fp);

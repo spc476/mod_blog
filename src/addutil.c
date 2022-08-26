@@ -44,7 +44,6 @@
 bool entry_add(Request *req,Blog *blog)
 {
   BlogEntry *entry;
-  char      *p;
   bool       rc = true;
   
   assert(req  != NULL);
@@ -123,6 +122,8 @@ bool entry_add(Request *req,Blog *blog)
     entry->when = blog->now;
   else
   {
+    char *p;
+    
     entry->when.year  = strtoul(req->date,&p,10); p++;
     entry->when.month = strtoul(p,        &p,10); p++;
     entry->when.day   = strtoul(p,        &p,10);
@@ -454,9 +455,6 @@ void notify_emaillist(Request *req,Blog *blog)
   
   GDBM_FILE  list;
   Chunk      templates;
-  datum      nextkey;
-  datum      key;
-  datum      content;
   Email      email;
   FILE      *out;
   FILE      *in;
@@ -509,12 +507,15 @@ void notify_emaillist(Request *req,Blog *blog)
                                           });
       if (inqp != NULL)
       {
+        datum key;
+        datum nextkey;
+        
         fcopy(email->body,inqp);
         key = gdbm_firstkey(list);
         
         while(key.dptr != NULL)
         {
-          content = gdbm_fetch(list,key);
+          datum content = gdbm_fetch(list,key);
           if (content.dptr != NULL)
           {
             email->to = content.dptr;
