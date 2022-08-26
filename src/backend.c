@@ -53,6 +53,8 @@ struct callback_data *callback_init(struct callback_data *cbd)
   memset(cbd,0,sizeof(struct callback_data));
   ListInit(&cbd->list);
   cbd->template = &g_blog->config.templates[0]; /* XXX probably document this */
+  cbd->request  = &g_request;
+  cbd->blog     = g_blog;
   cbd->entry    = NULL;
   cbd->ad       = NULL;
   cbd->adtag    = NULL;

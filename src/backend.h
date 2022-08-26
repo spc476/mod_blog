@@ -44,6 +44,8 @@ struct callback_data
   struct btm         next;
   unit__e            navunit;
   template__t const *template;
+  Request           *request;
+  Blog              *blog;
 };
 
 /************************************************/

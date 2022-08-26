@@ -39,7 +39,6 @@
 #include "frontend.h"
 #include "blogutil.h"
 #include "conversion.h"
-#include "globals.h"
 
 /*****************************************************************/
 
@@ -82,18 +81,18 @@ static void print_nav_name(FILE *out,struct btm const *date,unit__e unit,char se
 
 /********************************************************************/
 
-static void print_nav_url(FILE *out,struct btm const *date,unit__e unit)
+static void print_nav_url(FILE *out,struct btm const *date,unit__e unit,char const *baseurl)
 {
   assert(out  != NULL);
   assert(date != NULL);
   
-  fprintf(out,"%s",g_blog->config.baseurl);
+  fprintf(out,"%s",baseurl);
   print_nav_name(out,date,unit,'/');
 }
 
 /*******************************************************************/
 
-static void print_nav_title(FILE *out,struct btm const *date,unit__e unit)
+static void print_nav_title(FILE *out,Blog *blog,struct btm const *date,unit__e unit)
 {
   BlogEntry *entry;
   struct tm  stm;
@@ -125,7 +124,7 @@ static void print_nav_title(FILE *out,struct btm const *date,unit__e unit)
          fputs(buffer,out);
          break;
     case UNIT_PART:
-         entry = BlogEntryRead(g_blog,date);
+         entry = BlogEntryRead(blog,date);
          if (entry)
          {
            assert(entry->valid);
@@ -141,7 +140,7 @@ static void print_nav_title(FILE *out,struct btm const *date,unit__e unit)
 
 /**********************************************************************/
 
-static void handle_aflinks(HtmlToken token,char const *attrib)
+static void handle_aflinks(HtmlToken token,char const *attrib,Blog *blog)
 {
   struct pair *src;
   
@@ -151,9 +150,9 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
   src = HtmlParseGetPair(token,attrib);
   if (src != NULL)
   {
-    for (size_t i = 0 ; i < g_blog->config.affiliatenum ; i++)
+    for (size_t i = 0 ; i < blog->config.affiliatenum ; i++)
     {
-      if (strncmp(src->value,g_blog->config.affiliates[i].proto,g_blog->config.affiliates[i].psize) == 0)
+      if (strncmp(src->value,blog->config.affiliates[i].proto,blog->config.affiliates[i].psize) == 0)
       {
         char buffer[BUFSIZ];
         struct pair *np;
@@ -161,8 +160,8 @@ static void handle_aflinks(HtmlToken token,char const *attrib)
         snprintf(
                 buffer,
                 sizeof(buffer),
-                g_blog->config.affiliates[i].format,
-                &src->value[g_blog->config.affiliates[i].psize + 1]
+                blog->config.affiliates[i].format,
+                &src->value[blog->config.affiliates[i].psize + 1]
         );
         np = PairCreate(attrib,buffer);
         NodeInsert(&src->node,&np->node);
@@ -196,7 +195,7 @@ static bool uri_scheme(char const *s)
 
 /*************************************************************************/
 
-static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
+static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib,Blog *blog,Request *request)
 {
   struct pair *src;
   struct pair *np;
@@ -206,7 +205,7 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
   assert(token  != NULL);
   assert(attrib != NULL);
   
-  handle_aflinks(token,attrib);
+  handle_aflinks(token,attrib,blog);
   
   src = HtmlParseGetPair(token,attrib);
   if ((src != NULL) && !uri_scheme(src->value))
@@ -225,10 +224,10 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib)
     ; Which URL to use?  Full or partial?
     ;-----------------------------------------------------*/
     
-    if (g_request.f.fullurl)
-      baseurl = g_blog->config.url;
+    if (request->f.fullurl)
+      baseurl = blog->config.url;
     else
-      baseurl = g_blog->config.baseurl;
+      baseurl = blog->config.baseurl;
       
     /*---------------------------------------------------------
     ; all this to reassign the value, without ``knowing'' how the pair stuff
@@ -386,10 +385,14 @@ static void cb_atom_entry(FILE *out,void *data)
 
 /************************************************************************/
 
-static void cb_begin_year(FILE *out,void *data __attribute__((unused)))
+static void cb_begin_year(FILE *out,void *data)
 {
-  assert(out != NULL);
-  fprintf(out,"%04d",g_blog->first.year);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fprintf(out,"%04d",cbd->blog->first.year);
 }
 
 /*******************************************************************/
@@ -403,7 +406,7 @@ static void cb_blog_adtag(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->adtag == NULL)
-    tag = UrlEncodeString(g_blog->config.adtag);
+    tag = UrlEncodeString(cbd->blog->config.adtag);
   else
     tag = UrlEncodeString(cbd->adtag);
   fputs(tag,out);
@@ -422,7 +425,7 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->adtag == NULL)
-    tag = g_blog->config.adtag;
+    tag = cbd->blog->config.adtag;
   else
     tag = cbd->adtag;
 
@@ -434,42 +437,62 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
 
 /********************************************************************/
 
-static void cb_blog_author(FILE *out,void *data __attribute__((unused)))
+static void cb_blog_author(FILE *out,void *data)
 {
-  assert(out != NULL);
-  fputs(g_blog->config.author.name,out);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fputs(cbd->blog->config.author.name,out);
 }
 
 /********************************************************************/
 
-static void cb_blog_author_email(FILE *out,void *data __attribute__((unused)))
+static void cb_blog_author_email(FILE *out,void *data)
 {
-  assert(out != NULL);
-  fputs(g_blog->config.author.email,out);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fputs(cbd->blog->config.author.email,out);
 }
 
 /**********************************************************************/
 
-static void cb_blog_class(FILE *out,void *data __attribute__((unused)))
+static void cb_blog_class(FILE *out,void *data)
 {
-  assert(out != NULL);
-  fputs(g_blog->config.class,out);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fputs(cbd->blog->config.class,out);
 }
 
 /**********************************************************************/
 
-static void cb_blog_description(FILE *out,void *data __attribute__((unused)))
+static void cb_blog_description(FILE *out,void *data)
 {
-  assert(out != NULL);
-  fputs(g_blog->config.description,out);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fputs(cbd->blog->config.description,out);
 }
 
 /*********************************************************************/
 
-static void cb_blog_name(FILE *out,void *data __attribute__((unused)))
+static void cb_blog_name(FILE *out,void *data)
 {
-  assert(out != NULL);
-  fputs(g_blog->config.name,out);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fputs(cbd->blog->config.name,out);
 }
 
 /*********************************************************************/
@@ -489,20 +512,19 @@ static void cb_blog_script(FILE *out,void *data __attribute__((unused)))
 
 static void cb_blog_title(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (data != NULL)
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->navunit == UNIT_PART)
   {
-    struct callback_data *cbd = data;
-    if (cbd->navunit == UNIT_PART)
-    {
-      BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
-      if (NodeValid(&entry->node) && entry->valid)
-        fprintf(out,"%s - ",entry->title);
-    }
+    BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
+    if (NodeValid(&entry->node) && entry->valid)
+      fprintf(out,"%s - ",entry->title);
   }
   
-  fputs(g_blog->config.name,out);
+  fputs(cbd->blog->config.name,out);
 }
 
 /*********************************************************************/
@@ -514,15 +536,19 @@ static void cb_blog_url(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_url(out,&cbd->entry->when,UNIT_DAY);
+  print_nav_url(out,&cbd->entry->when,UNIT_DAY,cbd->blog->config.baseurl);
 }
 
 /*************************************************************************/
 
-static void cb_blog_url_home(FILE *out,void *data __attribute__((unused)))
+static void cb_blog_url_home(FILE *out,void *data)
 {
-  assert(out != NULL);
-  fputs(g_blog->config.url,out);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fputs(cbd->blog->config.url,out);
 }
 
 /**********************************************************************/
@@ -620,7 +646,7 @@ static void cb_cond_hr(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (g_request.f.navigation && (cbd->navunit == UNIT_PART))
+  if (cbd->request->f.navigation && (cbd->navunit == UNIT_PART))
     return;
     
   entry = cbd->entry;
@@ -684,37 +710,46 @@ static void cb_date_day_url(FILE *out,void *data)
   
   entry = cbd->entry;
   assert(entry->valid);
-  print_nav_url(out,&entry->when,UNIT_DAY);
+  print_nav_url(out,&entry->when,UNIT_DAY,cbd->blog->config.baseurl);
 }
 
 /********************************************************************/
 
 static void cb_edit(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.f.edit == false) return;
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->f.edit == false) return;
   generic_cb("edit",out,data);
 }
 
 /*********************************************************************/
 
-static void cb_edit_adtag(FILE *out,void *data __attribute__((unused)))
+static void cb_edit_adtag(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.adtag != NULL)
-    fputs(g_request.adtag,out);
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->adtag != NULL)
+    fputs(cbd->request->adtag,out);
 }
 
 /*********************************************************************/
 
-static void cb_edit_author(FILE *out,void *data __attribute__((unused)))
+static void cb_edit_author(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.origauthor != NULL)
-    fputs(g_request.origauthor,out);
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->origauthor != NULL)
+    fputs(cbd->request->origauthor,out);
   else
   {
     char *name = get_remote_user();
@@ -725,32 +760,41 @@ static void cb_edit_author(FILE *out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_edit_body(FILE *out,void *data __attribute__((unused)))
+static void cb_edit_body(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.origbody)
-    fputs(g_request.origbody,out);
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->origbody)
+    fputs(cbd->request->origbody,out);
 }
 
 /********************************************************************/
 
-static void cb_edit_class(FILE *out,void *data __attribute__((unused)))
+static void cb_edit_class(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.class)
-    fputs(g_request.class,out);
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->class)
+    fputs(cbd->request->class,out);
 }
 
 /********************************************************************/
 
-static void cb_edit_date(FILE *out,void *data __attribute__((unused)))
+static void cb_edit_date(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.date != NULL)
-    fputs(g_request.date,out);
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->date != NULL)
+    fputs(cbd->request->date,out);
   else
   {
     char       buffer[BUFSIZ];
@@ -764,22 +808,28 @@ static void cb_edit_date(FILE *out,void *data __attribute__((unused)))
 
 /********************************************************************/
 
-static void cb_edit_status(FILE *out,void *data __attribute__ ((unused)))
+static void cb_edit_status(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.status != NULL)
-    fputs(g_request.status,out);
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->status != NULL)
+    fputs(cbd->request->status,out);
 }
 
 /**********************************************************************/
 
-static void cb_edit_title(FILE *out,void *data __attribute__((unused)))
+static void cb_edit_title(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.title != NULL)
-    fputs(g_request.title,out);
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->title != NULL)
+    fputs(cbd->request->title,out);
 }
 
 /********************************************************************/
@@ -792,7 +842,7 @@ static void cb_entry(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (g_request.f.htmldump)
+  if (cbd->request->f.htmldump)
   {
     fcopy(out,stdin);
     return;
@@ -863,37 +913,37 @@ static void cb_entry_body(FILE *out,void *data)
       ;----------------------------------------------*/
       
       if (strcmp(HtmlParseValue(token),"A") == 0)
-        fixup_uri(entry,token,"HREF");
+        fixup_uri(entry,token,"HREF",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"BLOCKQUOTE") == 0)
-        fixup_uri(entry,token,"CITE");
+        fixup_uri(entry,token,"CITE",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"IMG") == 0)
       {
-        fixup_uri(entry,token,"SRC");
-        fixup_uri(entry,token,"LONGDESC");
-        fixup_uri(entry,token,"USEMAP");
+        fixup_uri(entry,token,"SRC",cbd->blog,cbd->request);
+        fixup_uri(entry,token,"LONGDESC",cbd->blog,cbd->request);
+        fixup_uri(entry,token,"USEMAP",cbd->blog,cbd->request);
       }
       else if (strcmp(HtmlParseValue(token),"Q") == 0)
-        fixup_uri(entry,token,"CITE");
+        fixup_uri(entry,token,"CITE",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"INS") == 0)
-        fixup_uri(entry,token,"CITE");
+        fixup_uri(entry,token,"CITE",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"DEL") == 0)
-        fixup_uri(entry,token,"CITE");
+        fixup_uri(entry,token,"CITE",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"FORM") == 0)
-        fixup_uri(entry,token,"ACTION");
+        fixup_uri(entry,token,"ACTION",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"INPUT") == 0)
       {
-        fixup_uri(entry,token,"SRC");
-        fixup_uri(entry,token,"USEMAP");
+        fixup_uri(entry,token,"SRC",cbd->blog,cbd->request);
+        fixup_uri(entry,token,"USEMAP",cbd->blog,cbd->request);
       }
       else if (strcmp(HtmlParseValue(token),"AREA") == 0)
-        fixup_uri(entry,token,"HREF");
+        fixup_uri(entry,token,"HREF",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"OBJECT") == 0)
       {
-        fixup_uri(entry,token,"CLASSID");
-        fixup_uri(entry,token,"CODEBASE");
-        fixup_uri(entry,token,"DATA");
-        fixup_uri(entry,token,"ARCHIVE");
-        fixup_uri(entry,token,"USEMAP");
+        fixup_uri(entry,token,"CLASSID",cbd->blog,cbd->request);
+        fixup_uri(entry,token,"CODEBASE",cbd->blog,cbd->request);
+        fixup_uri(entry,token,"DATA",cbd->blog,cbd->request);
+        fixup_uri(entry,token,"ARCHIVE",cbd->blog,cbd->request);
+        fixup_uri(entry,token,"USEMAP",cbd->blog,cbd->request);
       }
       
       /*-----------------------------------------------------
@@ -903,15 +953,15 @@ static void cb_entry_body(FILE *out,void *data)
       
 #if 0
       else if (strcmp(HtmlParseValue(token),"LINK") == 0)
-        fixup_uri(entry,token,"HREF");
+        fixup_uri(entry,token,"HREF",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"BASE") == 0)
-        fixup_uri(entry,token,"HREF");
+        fixup_uri(entry,token,"HREF",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"HEAD") == 0)
-        fixup_uri(entry,token,"PROFILE");
+        fixup_uri(entry,token,"PROFILE",cbd->blog,cbd->request);
       else if (strcmp(HtmlParseValue(token),"SCRIPT") == 0)
       {
-        fixup_uri(entry,token,"SRC");
-        fixup_uri(entry,token,"FOR");
+        fixup_uri(entry,token,"SRC",cbd->blog,cbd->request);
+        fixup_uri(entry,token,"FOR",cbd->blog,cbd->request);
       }
 #endif
       HtmlParsePrintTag(token,out);
@@ -958,25 +1008,23 @@ static void cb_entry_body_jsonified(FILE *out,void *data)
 
 static void cb_entry_class(FILE *out,void *data)
 {
-  char const *msg = g_blog->config.class;
+  struct callback_data *cbd = data;
   
   assert(out  != NULL);
+  assert(data != NULL);
   
-  if (data != NULL)
+  char const *msg = cbd->blog->config.class;
+  
+  if (cbd->entry != NULL)
+    msg = cbd->entry->class;
+  else
   {
-    struct callback_data *cbd = data;
-    
-    if (cbd->entry != NULL)
-      msg = cbd->entry->class;
-    else
+    if (cbd->navunit == UNIT_PART)
     {
-      if (cbd->navunit == UNIT_PART)
-      {
-        BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
-        if (NodeValid(&entry->node) && entry->valid)
-          if (!empty_string(entry->class))
-            msg = entry->class;
-      }
+      BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
+      if (NodeValid(&entry->node) && entry->valid)
+        if (!empty_string(entry->class))
+          msg = entry->class;
     }
   }
   
@@ -1023,7 +1071,7 @@ static void cb_entry_cond_author(FILE *out,void *data)
   
   assert(cbd->entry->valid);
   
-  if (strcmp(g_blog->config.author.name,cbd->entry->author) != 0)
+  if (strcmp(cbd->blog->config.author.name,cbd->entry->author) != 0)
     generic_cb("entry.cond.author",out,data);
 }
 
@@ -1052,31 +1100,30 @@ static void cb_entry_date(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_url(out,&cbd->entry->when,UNIT_DAY);
+  print_nav_url(out,&cbd->entry->when,UNIT_DAY,cbd->blog->config.baseurl);
 }
 
 /*********************************************************************/
 
 static void cb_entry_description(FILE *out,void *data)
 {
-  char const *msg = g_blog->config.description;
+  struct callback_data *cbd = data;
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  if (data != NULL)
+  char const *msg = cbd->blog->config.description;
+  
+  if (cbd->navunit == UNIT_PART)
   {
-    struct callback_data *cbd = data;
-    if (cbd->navunit == UNIT_PART)
-    {
-      BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
+    BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
       
-      if (NodeValid(&entry->node) && entry->valid)
-      {
-        if (!empty_string(entry->status))
-          msg = entry->status;
-        else if (!empty_string(entry->title))
-          msg = entry->title;
-      }
+    if (NodeValid(&entry->node) && entry->valid)
+    {
+      if (!empty_string(entry->status))
+        msg = entry->status;
+      else if (!empty_string(entry->title))
+        msg = entry->title;
     }
   }
   
@@ -1225,7 +1272,7 @@ static void cb_entry_url(FILE *out,void *data)
   
   entry = cbd->entry;
   assert(entry->valid);
-  print_nav_url(out,&entry->when,UNIT_PART);
+  print_nav_url(out,&entry->when,UNIT_PART,cbd->blog->config.baseurl);
 }
 
 /**********************************************************************/
@@ -1284,9 +1331,12 @@ static void cb_json_item(FILE *out,void *data)
 
 static void cb_navigation_bar(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.f.navigation == false) return;
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->f.navigation == false) return;
   generic_cb("navigation.bar",out,data);
 }
 
@@ -1294,9 +1344,12 @@ static void cb_navigation_bar(FILE *out,void *data)
 
 static void cb_navigation_bar_next(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.f.navnext == false) return;
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->f.navnext == false) return;
   generic_cb("navigation.bar.next",out,data);
 }
 
@@ -1304,9 +1357,12 @@ static void cb_navigation_bar_next(FILE *out,void *data)
 
 static void cb_navigation_bar_prev(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.f.navprev == false) return;
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->f.navprev == false) return;
   generic_cb("navigation.bar.prev",out,data);
 }
 
@@ -1320,10 +1376,14 @@ static void cb_navigation_current(FILE *out,void *data)
 
 /********************************************************************/
 
-static void cb_navigation_current_url(FILE *out,void *data __attribute__((unused)))
+static void cb_navigation_current_url(FILE *out,void *data)
 {
-  assert(out != NULL);
-  print_nav_url(out,&g_blog->last,UNIT_MONTH);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  print_nav_url(out,&cbd->blog->last,UNIT_MONTH,cbd->blog->config.baseurl);
 }
 
 /*********************************************************************/
@@ -1335,10 +1395,10 @@ static void cb_navigation_first_title(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (g_request.f.navigation == false)
-    print_nav_title(out,&g_blog->first,UNIT_PART);
+  if (cbd->request->f.navigation == false)
+    print_nav_title(out,cbd->blog,&cbd->blog->first,UNIT_PART);
   else
-    print_nav_title(out,&g_blog->first,cbd->navunit);
+    print_nav_title(out,cbd->blog,&cbd->blog->first,cbd->navunit);
 }
 
 /*******************************************************************/
@@ -1350,10 +1410,10 @@ static void cb_navigation_first_url(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (g_request.f.navigation == false)
-    print_nav_url(out,&g_blog->first,UNIT_PART);
+  if (cbd->request->f.navigation == false)
+    print_nav_url(out,&cbd->blog->first,UNIT_PART,cbd->blog->config.baseurl);
   else
-    print_nav_url(out,&g_blog->first,cbd->navunit);
+    print_nav_url(out,&cbd->blog->first,cbd->navunit,cbd->blog->config.baseurl);
 }
 
 /********************************************************************/
@@ -1365,10 +1425,10 @@ static void cb_navigation_last_title(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (g_request.f.navigation == false)
-    print_nav_title(out,&g_blog->last,UNIT_PART);
+  if (cbd->request->f.navigation == false)
+    print_nav_title(out,cbd->blog,&cbd->blog->last,UNIT_PART);
   else
-    print_nav_title(out,&g_blog->last,cbd->navunit);
+    print_nav_title(out,cbd->blog,&cbd->blog->last,cbd->navunit);
 }
 
 /*****************************************************************/
@@ -1380,19 +1440,22 @@ static void cb_navigation_last_url(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (g_request.f.navigation == false)
-    print_nav_url(out,&g_blog->last,UNIT_PART);
+  if (cbd->request->f.navigation == false)
+    print_nav_url(out,&cbd->blog->last,UNIT_PART,cbd->blog->config.baseurl);
   else
-    print_nav_url(out,&g_blog->last,cbd->navunit);
+    print_nav_url(out,&cbd->blog->last,cbd->navunit,cbd->blog->config.baseurl);
 }
 
 /******************************************************************/
 
 static void cb_navigation_link(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.f.navigation == false) return;
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->f.navigation == false) return;
   generic_cb("navigation.link",out,data);
 }
 
@@ -1400,9 +1463,12 @@ static void cb_navigation_link(FILE *out,void *data)
 
 static void cb_navigation_link_next(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.f.navnext == false) return;
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->f.navnext == false) return;
   generic_cb("navigation.link.next",out,data);
 }
 
@@ -1410,9 +1476,12 @@ static void cb_navigation_link_next(FILE *out,void *data)
 
 static void cb_navigation_link_prev(FILE *out,void *data)
 {
-  assert(out != NULL);
+  struct callback_data *cbd = data;
   
-  if (g_request.f.navprev == false) return;
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->f.navprev == false) return;
   generic_cb("navigation.link.prev",out,data);
 }
 
@@ -1425,7 +1494,7 @@ static void cb_navigation_next_title(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_title(out,&cbd->next,cbd->navunit);
+  print_nav_title(out,cbd->blog,&cbd->next,cbd->navunit);
 }
 
 /********************************************************************/
@@ -1437,7 +1506,7 @@ static void cb_navigation_next_url(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_url(out,&cbd->next,cbd->navunit);
+  print_nav_url(out,&cbd->next,cbd->navunit,cbd->blog->config.baseurl);
 }
 
 /*******************************************************************/
@@ -1449,7 +1518,7 @@ static void cb_navigation_prev_title(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_title(out,&cbd->previous,cbd->navunit);
+  print_nav_title(out,cbd->blog,&cbd->previous,cbd->navunit);
 }
 
 /*******************************************************************/
@@ -1461,27 +1530,32 @@ static void cb_navigation_prev_url(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_url(out,&cbd->previous,cbd->navunit);
+  print_nav_url(out,&cbd->previous,cbd->navunit,cbd->blog->config.baseurl);
 }
 
 /********************************************************************/
 
-static void cb_now_year(FILE *out,void *data __attribute__((unused)))
+static void cb_now_year(FILE *out,void *data)
 {
-  assert(out != NULL);
-  fprintf(out,"%04d",g_blog->now.year);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fprintf(out,"%04d",cbd->blog->now.year);
 }
 
 /*******************************************************************/
 
-static void cb_request_url(FILE *out,void *data __attribute__((unused)))
+static void cb_request_url(FILE *out,void *data)
 {
-  char *tum;
+  struct callback_data *cbd = data;
+  char                 *tum;
   
   assert(out != NULL);
   
-  tum = tumbler_canonical(&g_request.tumbler);
-  fprintf(out,"%s%s",g_blog->config.url,tum);
+  tum = tumbler_canonical(&cbd->request->tumbler);
+  fprintf(out,"%s%s",cbd->blog->config.url,tum);
   free(tum);
 }
 
@@ -1537,41 +1611,49 @@ static void cb_rss_item_url(FILE *out,void *data)
   assert(data != NULL);
   
   assert(cbd->entry->valid);
-  fprintf(out,"%s",g_blog->config.url);
-  print_nav_url(out,&cbd->entry->when,UNIT_PART);
+  fprintf(out,"%s",cbd->blog->config.url);
+  print_nav_url(out,&cbd->entry->when,UNIT_PART,cbd->blog->config.baseurl);
 }
 
 /********************************************************************/
 
-static void cb_rss_pubdate(FILE *out,void *data __attribute__((unused)))
+static void cb_rss_pubdate(FILE *out,void *data)
 {
-  struct tm *ptm;
-  char       buffer[BUFSIZ];
+  struct callback_data *cbd = data;
+  struct tm            *ptm;
+  char                 buffer[BUFSIZ];
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  ptm = gmtime(&g_blog->tnow);
+  ptm = gmtime(&cbd->blog->tnow);
   strftime(buffer,sizeof(buffer),"%a, %d %b %Y %H:%M:%S GMT",ptm);
   fputs(buffer,out);
 }
 
 /********************************************************************/
 
-static void cb_rss_url(FILE *out,void *data __attribute__((unused)))
+static void cb_rss_url(FILE *out,void *data)
 {
-  assert(out != NULL);
-  fprintf(out,"%s",g_blog->config.url);
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fprintf(out,"%s",cbd->blog->config.url);
 }
 
 /*******************************************************************/
 
-static void cb_update_time(FILE *out,void *data __attribute__((unused)))
+static void cb_update_time(FILE *out,void *data)
 {
-  char tmpbuf[24];
+  struct callback_data *cbd = data;
+  char                  tmpbuf[24];
   
-  assert(out != NULL);
+  assert(out  != NULL);
+  assert(data != NULL);
   
-  strftime(tmpbuf,sizeof(tmpbuf),"%FT%TZ",gmtime(&g_blog->tnow));
+  strftime(tmpbuf,sizeof(tmpbuf),"%FT%TZ",gmtime(&cbd->blog->tnow));
   fputs(tmpbuf,out);
 }
 
