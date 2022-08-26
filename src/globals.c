@@ -56,8 +56,9 @@ static void seed_rng(void)
 
 static void globals_free(void)
 {
-  if (g_blog   != NULL) BlogFree(g_blog);
-  
+  if (g_blog != NULL)
+    BlogFree(g_blog);
+    
   free(g_request.origauthor);
   free(g_request.author);
   free(g_request.title);
