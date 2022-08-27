@@ -423,9 +423,9 @@ int tumbler_page(tumbler__s *spec,Blog const *blog,Request *request,int (*errorf
     {
       tumbler__s newtum = *spec;
       swap_endpoints(&newtum);
-      start        = newtum.start;
-      end          = newtum.stop;
-      request->f.reverse = true; /* XXX */
+      start              = newtum.start;
+      end                = newtum.stop;
+      request->f.reverse = true;
     }
   }
   
