@@ -23,11 +23,13 @@
 #ifndef I_18C80596_12AD_588C_8AC5_C30F6FDDBF24
 #define I_18C80596_12AD_588C_8AC5_C30F6FDDBF24
 
+#include <stdbool.h>
 #include <stdio.h>
 #include "frontend.h"
 
 typedef void (*conversion__f)(FILE *restrict,FILE *restrict);
 
+extern bool           TO_email             (char const *,bool);
 extern conversion__f  TO_conversion        (char const *,char const *);
 extern Request       *request_init         (Request *);
 extern void           no_conversion        (FILE *restrict,FILE *restrict);

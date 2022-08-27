@@ -47,6 +47,7 @@ void request_free(Request *request)
 
 /***********************************************************************/
 
+#if 0
 bool TO_email(char const *value,bool def)
 {
   if (!emptynull_string(value))
@@ -59,5 +60,6 @@ bool TO_email(char const *value,bool def)
 
   return def;
 }
+#endif
 
 /***************************************************************************/

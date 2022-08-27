@@ -59,6 +59,21 @@ static void handle_period           (FILE *restrict,FILE *restrict);
 
 /**********************************************************************/
 
+bool TO_email(char const *value,bool def)
+{
+  if (!emptynull_string(value))
+  {
+    if (strcmp(value,"no") == 0)
+      return false;
+    else if (strcmp(value,"yes") == 0)
+      return true;
+  }
+
+  return def;
+}
+
+/**********************************************************************/
+
 conversion__f TO_conversion(char const *name,char const *def)
 {
   assert(def != NULL);

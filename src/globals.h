@@ -35,7 +35,6 @@
 #define GENERATOR       "mod_blog" " " PROG_VERSION
 
 extern void request_free  (Request *);
-extern bool TO_email      (char const *,bool);
 extern int  main_cgi_get  (Cgi);
 extern int  main_cgi_post (Cgi);
 extern int  main_cli      (int,char *[]);
