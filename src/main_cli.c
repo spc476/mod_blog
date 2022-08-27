@@ -47,7 +47,7 @@ static int       cmd_cli_show      (Blog *,Request *);
 static int       mail_setup_data   (Blog *,Request *);
 static int       mailfile_readdata (Blog *,Request *);
 static clicmd__f get_cli_command   (char const *);
-static int       cli_error         (int,char const *, ... );
+static int       cli_error         (Blog const *,Request *,int,char const *, ... );
 
 /*************************************************************************/
 
@@ -87,6 +87,8 @@ int main_cli(int argc,char *argv[])
   char      *config      = NULL;
   bool       forcenotify = false;
   clicmd__f  command     = cmd_cli_show;
+  Blog      *blog;
+  int        rc;
   
   while(true)
   {
@@ -103,7 +105,7 @@ int main_cli(int argc,char *argv[])
            break;
       case OPT_FILE:
            if (freopen(optarg,"r",stdin) == NULL)
-             return cli_error(HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
+             return cli_error(NULL,NULL,HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
            break;
       case OPT_EMAIL:
            g_request.f.emailin = true;
@@ -158,18 +160,19 @@ int main_cli(int argc,char *argv[])
     }
   }
   
-  if (!GlobalsInit(config))
-    return cli_error(HTTP_ISERVERERR,"%s: failed to initialize",config);
+  blog = BlogNew(config);
+  if (blog == NULL)
+    return cli_error(NULL,NULL,HTTP_ISERVERERR,"%s: failed to initialize",config);
     
   if (forcenotify)
   {
-    if (!g_blog->config.email.notify)
+    if (!blog->config.email.notify)
     {
       fprintf(stderr,"No email notifiation list\n");
       return EXIT_FAILURE;
     }
     
-    BlogEntry *entry = BlogEntryRead(g_blog,&g_blog->last);
+    BlogEntry *entry = BlogEntryRead(blog,&blog->last);
     
     if (entry != NULL)
     {
@@ -184,7 +187,10 @@ int main_cli(int argc,char *argv[])
     }
   }
   
-  return (command)(g_blog,&g_request);
+  rc = (*command)(blog,&g_request);
+  BlogFree(blog);
+  globals_free();
+  return rc;
 }
 
 /************************************************************************/
@@ -235,9 +241,9 @@ static int cmd_cli_show(Blog *blog,Request *req)
   else if (req->f.thisday)
   {
     if (!thisday_new(&req->tumbler,req->reqtumbler))
-      rc = cli_error(HTTP_BADREQ,"bad request");
+      rc = cli_error(blog,req,HTTP_BADREQ,"bad request");
     else if (req->tumbler.redirect)
-      rc = cli_error(HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
+      rc = cli_error(blog,req,HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
     else
       rc = generate_thisday(stdout,req->tumbler.start,blog,req);
   }
@@ -262,14 +268,14 @@ static int cmd_cli_show(Blog *blog,Request *req)
         if (req->tumbler.redirect)
         {
           char *tum = tumbler_canonical(&req->tumbler);
-          rc = cli_error(HTTP_MOVEPERM,"Redirect: %s",tum);
+          rc = cli_error(blog,req,HTTP_MOVEPERM,"Redirect: %s",tum);
           free(tum);
           return rc;
         }
         rc = tumbler_page(&req->tumbler,blog,req,cli_error);
       }
       else
-        rc = cli_error(HTTP_NOTFOUND,"tumbler error---nothing found");
+        rc = cli_error(blog,req,HTTP_NOTFOUND,"tumbler error---nothing found");
     }
   }
   
@@ -371,7 +377,7 @@ static int mailfile_readdata(Blog *blog,Request *req)
   req->date       = PairListGetValue(&headers,"DATE");
   req->adtag      = PairListGetValue(&headers,"ADTAG");
   req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"),blog->config.conversion);
-  req->f.email    = TO_email(PairListGetValue(&headers,"EMAIL"));
+  req->f.email    = TO_email(PairListGetValue(&headers,"EMAIL"),blog->config.email.notify);
   
   if (req->author != NULL)
     req->author = strdup(req->author);
@@ -419,12 +425,14 @@ static int mailfile_readdata(Blog *blog,Request *req)
 
 /***************************************************************************/
 
-static int cli_error(int level,char const *msg, ... )
+static int cli_error(Blog const *blog,Request *request,int level,char const *msg, ... )
 {
   va_list args;
   
   assert(level >= 0);
   assert(msg   != NULL);
+  (void)blog;
+  (void)request;
   
   fprintf(stderr,"Error %d: ",level);
   

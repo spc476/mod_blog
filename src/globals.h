@@ -35,11 +35,11 @@
 
 #define GENERATOR       "mod_blog" " " PROG_VERSION
 
-extern Blog    *g_blog;
 extern Request  g_request;
 
 extern bool GlobalsInit   (char const *);
-extern bool TO_email      (char const *);
+extern void globals_free  (void);
+extern bool TO_email      (char const *,bool);
 extern int  main_cgi_get  (Cgi);
 extern int  main_cgi_post (Cgi);
 extern int  main_cli      (int,char *[]);

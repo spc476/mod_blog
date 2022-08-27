@@ -40,8 +40,7 @@ static int       cmd_cgi_get_show       (Cgi,Blog *,Request *);
 static int       cmd_cgi_get_today      (Cgi,Blog *,Request *);
 static int       cmd_cgi_post_new       (Cgi,Blog *,Request *);
 static int       cmd_cgi_post_show      (Cgi,Blog *,Request *);
-static bool      cgi_init               (Cgi);
-static int       cgi_error              (int,char const *, ... );
+static int       cgi_error              (Blog const *,Request *,int,char const *, ... );
 static cgicmd__f set_m_cgi_get_command  (char const *);
 static cgicmd__f set_m_cgi_post_command (char const *);
 static void      set_m_author           (char *,Request *);
@@ -52,11 +51,17 @@ int main_cgi_get(Cgi cgi)
 {
   assert(cgi != NULL);
   
-  if (!cgi_init(cgi))
-    return cgi_error(HTTP_ISERVERERR,"cgi_init() failed");
+  Blog *blog = BlogNew(NULL);
+  
+  if (blog == NULL)
+    return 1; /* XXX */
     
+  g_request.f.cgi      = true;
   g_request.reqtumbler = getenv("PATH_INFO");
-  return (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,g_blog,&g_request);
+  int rc = (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&g_request);
+  BlogFree(blog);
+  globals_free();
+  return rc;
 }
 
 /************************************************************************/
@@ -174,7 +179,7 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
       
       snprintf(filename,sizeof(filename),"%s%s",getenv("DOCUMENT_ROOT"),getenv("PATH_INFO"));
       if (freopen(filename,"r",stdin) == NULL)
-        rc = cgi_error(HTTP_BADREQ,"bad request");
+        rc = cgi_error(blog,req,HTTP_BADREQ,"bad request");
       else
       {
         struct callback_data cbd;
@@ -210,7 +215,7 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   }
   
   if (tpath == NULL)
-    return cgi_error(HTTP_BADREQ,"bad request");
+    return cgi_error(blog,req,HTTP_BADREQ,"bad request");
     
   if ((twhen == NULL) || (*twhen == '\0'))
   {
@@ -232,7 +237,7 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   }
   
   if (!thisday_new(&req->tumbler,twhen))
-    return cgi_error(HTTP_BADREQ,"bad request");
+    return cgi_error(blog,req,HTTP_BADREQ,"bad request");
     
   if (req->tumbler.redirect)
   {
@@ -263,8 +268,9 @@ int main_cgi_post(Cgi cgi)
 {
   assert(cgi != NULL);
   
-  if (cgi_init(cgi) != 0)
-    return cgi_error(HTTP_ISERVERERR,"cgi_init() failed");
+  Blog *blog = BlogNew(NULL);
+  if (blog == NULL)
+    return 1; /* XXX */
     
   set_m_author(CgiListGetValue(cgi,"author"),&g_request);
   
@@ -275,8 +281,9 @@ int main_cgi_post(Cgi cgi)
   g_request.adtag      = strdup(CgiListGetValue(cgi,"adtag"));
   g_request.origbody   = strdup(CgiListGetValue(cgi,"body"));
   g_request.body       = strdup(g_request.origbody);
-  g_request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),g_blog->config.conversion);
-  g_request.f.email    = TO_email(CgiListGetValue(cgi,"email"));
+  g_request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),blog->config.conversion);
+  g_request.f.email    = TO_email(CgiListGetValue(cgi,"email"),blog->config.email.notify);
+  g_request.f.cgi      = true;
   
   if (
        (emptynull_string(g_request.author))
@@ -284,19 +291,22 @@ int main_cgi_post(Cgi cgi)
        || (emptynull_string(g_request.body))
      )
   {
-    return cgi_error(HTTP_BADREQ,"errors-missing");
+    return cgi_error(blog,&g_request,HTTP_BADREQ,"errors-missing");
   }
   
   if (g_request.class == NULL)
     g_request.class = strdup("");
     
-  if (authenticate_author(&g_request,g_blog) == false)
+  if (authenticate_author(&g_request,blog) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",g_request.author);
-    return cgi_error(HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",g_request.author,CgiListGetValue(cgi,"author"));
+    return cgi_error(blog,&g_request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",g_request.author,CgiListGetValue(cgi,"author"));
   }
   
-  return (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,g_blog,&g_request);
+  int rc = (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&g_request);
+  BlogFree(blog);
+  globals_free();
+  return rc;
 }
 
 /************************************************************************/
@@ -362,7 +372,7 @@ static int cmd_cgi_post_new(Cgi cgi,Blog *blog,Request *req)
     return 0;
   }
   else
-    return cgi_error(HTTP_ISERVERERR,"couldn't add entry");
+    return cgi_error(blog,req,HTTP_ISERVERERR,"couldn't add entry");
 }
 
 /***********************************************************************/
@@ -415,7 +425,7 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
 
 /**********************************************************************/
 
-static int cgi_error(int level,char const *msg, ... )
+static int cgi_error(Blog const *blog,Request *request,int level,char const *msg, ... )
 {
   va_list  args;
   char    *file   = NULL;
@@ -423,6 +433,7 @@ static int cgi_error(int level,char const *msg, ... )
   
   assert(level >= 0);
   assert(msg   != NULL);
+  (void)request;
   
   va_start(args,msg);
   vasprintf(&errmsg,msg,args);
@@ -470,7 +481,7 @@ static int cgi_error(int level,char const *msg, ... )
         level,
         errmsg
       );
-    generic_cb("main",stdout,callback_init(&cbd,g_blog,&g_request));
+    generic_cb("main",stdout,callback_init(&cbd,blog,&g_request));
   }
   
   free(file);
@@ -480,14 +491,3 @@ static int cgi_error(int level,char const *msg, ... )
 }
 
 /**********************************************************************/
-
-static bool cgi_init(Cgi cgi)
-{
-  assert(cgi != NULL);
-  
-  g_request.f.cgi = true;
-  CgiListMake(cgi);
-  return GlobalsInit(NULL);
-}
-
-/***********************************************************************/

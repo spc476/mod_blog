@@ -39,7 +39,7 @@
 static struct btm  calculate_previous (Blog const *,Request *,struct btm const,unit__e);
 static struct btm  calculate_next     (Blog const *,Request *,struct btm const,unit__e);
 static char const *mime_type          (char const *);
-static int         display_file       (tumbler__s const *,Blog const *,Request *,int (*)(int,char const *,...));
+static int         display_file       (tumbler__s const *,Blog const *,Request *,int (*)(Blog const *,Request *,int,char const *,...));
 static char       *tag_collect        (List *,char const *);
 static char       *tag_pick           (char const *,char const *);
 static void        free_entries       (List *);
@@ -361,7 +361,7 @@ static void swap_endpoints(tumbler__s *tum)
 
 /************************************************************************/
 
-int tumbler_page(tumbler__s *spec,Blog const *blog,Request *request,int (*errorf)(int,char const *,...))
+int tumbler_page(tumbler__s *spec,Blog const *blog,Request *request,int (*errorf)(Blog const *,Request *,int,char const *,...))
 {
   struct callback_data cbd;
   struct btm           start;
@@ -883,7 +883,7 @@ static char const *mime_type(char const *filename)
 
 /******************************************************************/
 
-static int display_file(tumbler__s const *spec,Blog const *blog,Request *request,int (*errorf)(int,char const *,...))
+static int display_file(tumbler__s const *spec,Blog const *blog,Request *request,int (*errorf)(Blog const *,Request *,int,char const *,...))
 {
   char fname[FILENAME_MAX];
   
@@ -910,17 +910,17 @@ static int display_file(tumbler__s const *spec,Blog const *blog,Request *request
     if (rc == -1)
     {
       if (errno == ENOENT)
-        (*errorf)(HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
+        (*errorf)(blog,request,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
       else if (errno == EACCES)
-        (*errorf)(HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
+        (*errorf)(blog,request,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
       else
-        (*errorf)(HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
+        (*errorf)(blog,request,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
       return 1;
     }
     
     if (freopen(fname,"r",stdin) == NULL)
     {
-      (*errorf)(HTTP_NOTFOUND,"%s: some internal error",fname);
+      (*errorf)(blog,request,HTTP_NOTFOUND,"%s: some internal error",fname);
       return 1;
     }
     

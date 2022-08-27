@@ -31,16 +31,12 @@
 
 /************************************************************/
 
-Blog    *g_blog;
 Request  g_request;
 
 /****************************************************/
 
-static void globals_free(void)
+void globals_free(void)
 {
-  if (g_blog != NULL)
-    BlogFree(g_blog);
-    
   free(g_request.origauthor);
   free(g_request.author);
   free(g_request.title);
@@ -54,7 +50,7 @@ static void globals_free(void)
 
 /***********************************************************************/
 
-bool TO_email(char const *value)
+bool TO_email(char const *value,bool def)
 {
   if (!emptynull_string(value))
   {
@@ -64,19 +60,15 @@ bool TO_email(char const *value)
       return true;
   }
 
-  return g_blog->config.email.notify;
+  return def;
 }
 
 /***************************************************************************/
 
 bool GlobalsInit(char const *conf)
 {
+  (void)conf;
   atexit(globals_free);
-  
-  g_blog = BlogNew(conf);
-  if (g_blog == NULL)
-    return false;
-    
   return true;
 }
 
