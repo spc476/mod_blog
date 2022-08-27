@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <locale.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1268,6 +1269,13 @@ static bool config_read(char const *conf,Blog *blog)
     syslog(LOG_ERR,"Lua error: (%d) %s",rc,lua_tostring(blog->config.L,-1));
     return false;
   }
+  
+  /*------------------------------------------------------------------------
+  ; Ensure that searches are using the C locale, because we give the config
+  ; file the full access to Lua, including os.setlocale().
+  ;-------------------------------------------------------------------------*/
+  
+  setlocale(LC_COLLATE,"C");
   
   /*-----------------------------------------------------------------------
   ; Some items aren't optional, so let Lua do the error checking for us and

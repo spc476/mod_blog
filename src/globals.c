@@ -22,7 +22,6 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <locale.h>
 
 #include <syslog.h>
 #include <cgilib6/util.h>
@@ -97,14 +96,6 @@ bool GlobalsInit(char const *conf)
     
   g_request.f.navprev = true;
   g_request.f.navnext = true;
-  
-  /*-------------------------------------------------------
-  ; for most sorting routines, I just assume C sorting
-  ; conventions---this makes sure I have those for sorting
-  ; and searching only.
-  ;--------------------------------------------------------*/
-  
-  setlocale(LC_COLLATE,"C");
   return true;
 }
 
