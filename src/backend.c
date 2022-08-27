@@ -1008,9 +1008,21 @@ static char *tag_pick(char const *tag,char const *def)
   
   if (num)
   {
-    size_t r = (((double)rand() / (double)RAND_MAX) * (double)num);
+    unsigned int seed;
+    FILE         *fp;
+    size_t        r;
+    
+    fp = fopen("/dev/urandom","rb");
+    if (fp != NULL)
+    {
+      fread(&seed,sizeof(seed),1,fp);
+      fclose(fp);
+    }
+    srand(seed);
+    
+    r = (((double)rand() / (double)RAND_MAX) * (double)num);
     assert(r < num);
-    pick     = fromstring(pool[r]);
+    pick = fromstring(pool[r]);
   }
   else
     pick = strdup(def);
