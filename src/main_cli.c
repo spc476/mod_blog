@@ -38,15 +38,15 @@
 #include "conversion.h"
 #include "globals.h"
 
-typedef int (*clicmd__f)(Request *);
+typedef int (*clicmd__f)(Blog *,Request *);
 
 /*******************************************************************/
 
-static int       cmd_cli_new       (Request *);
-static int       cmd_cli_show      (Request *);
+static int       cmd_cli_new       (Blog *,Request *);
+static int       cmd_cli_show      (Blog *,Request *);
+static int       mail_setup_data   (Blog *,Request *);
+static int       mailfile_readdata (Blog *,Request *);
 static clicmd__f get_cli_command   (char const *);
-static int       mail_setup_data   (Request *);
-static int       mailfile_readdata (Request *);
 static int       cli_error         (int,char const *, ... );
 
 /*************************************************************************/
@@ -184,21 +184,22 @@ int main_cli(int argc,char *argv[])
     }
   }
   
-  return (command)(&g_request);
+  return (command)(g_blog,&g_request);
 }
 
 /************************************************************************/
 
-static int cmd_cli_new(Request *req)
+static int cmd_cli_new(Blog *blog,Request *req)
 {
   int rc;
   
-  assert(req != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
   
   if (req->f.emailin)
-    rc = mail_setup_data(req);
+    rc = mail_setup_data(blog,req);
   else
-    rc = mailfile_readdata(req);
+    rc = mailfile_readdata(blog,req);
     
   if (rc != 0)
   {
@@ -206,7 +207,7 @@ static int cmd_cli_new(Request *req)
     return EXIT_FAILURE;
   }
   
-  if (entry_add(req,g_blog))
+  if (entry_add(req,blog))
   {
     generate_pages();
     return 0;
@@ -220,16 +221,17 @@ static int cmd_cli_new(Request *req)
 
 /****************************************************************************/
 
-static int cmd_cli_show(Request *req)
+static int cmd_cli_show(Blog *blog,Request *req)
 {
   int rc = -1;
   
-  assert(req != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
   
   if (req->f.regenerate)
     rc = generate_pages();
   else if (req->f.today)
-    rc = generate_thisday(stdout,g_blog->now);
+    rc = generate_thisday(stdout,blog->now);
   else if (req->f.thisday)
   {
     if (!thisday_new(&req->tumbler,req->reqtumbler))
@@ -245,17 +247,17 @@ static int cmd_cli_show(Request *req)
     {
       template__t template;
       
-      template.template = g_blog->config.templates[0].template;
-      template.items    = g_blog->config.templates[0].items;
+      template.template = blog->config.templates[0].template;
+      template.items    = blog->config.templates[0].items;
       template.pagegen  = "days";
       template.reverse  = true;
       template.fullurl  = false;
       
-      rc = pagegen_days(&template,stdout,g_blog);
+      rc = pagegen_days(&template,stdout,blog);
     }
     else
     {
-      if (tumbler_new(&req->tumbler,req->reqtumbler,&g_blog->first,&g_blog->last))
+      if (tumbler_new(&req->tumbler,req->reqtumbler,&blog->first,&blog->last))
       {
         if (req->tumbler.redirect)
         {
@@ -297,13 +299,14 @@ static clicmd__f get_cli_command(char const *value)
 
 /*************************************************************************/
 
-static int mail_setup_data(Request *req)
+static int mail_setup_data(Blog *blog,Request *req)
 {
   List    headers;
   char   *line = NULL;
   size_t  size = 0;
   
-  assert(req != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
   
   ListInit(&headers);
   getline(&line,&size,stdin); /* skip Unix 'From ' line */
@@ -344,18 +347,19 @@ static int mail_setup_data(Request *req)
   
   PairListFree(&headers);
   
-  return mailfile_readdata(req);
+  return mailfile_readdata(blog,req);
 }
 
 /*******************************************************************/
 
-static int mailfile_readdata(Request *req)
+static int mailfile_readdata(Blog *blog,Request *req)
 {
   FILE   *output;
   List    headers;
   size_t  size;
   
-  assert(req != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
   
   ListInit(&headers);
   RFC822HeadersRead(stdin,&headers);
@@ -366,7 +370,7 @@ static int mailfile_readdata(Request *req)
   req->status     = PairListGetValue(&headers,"STATUS");
   req->date       = PairListGetValue(&headers,"DATE");
   req->adtag      = PairListGetValue(&headers,"ADTAG");
-  req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"),g_blog->config.conversion);
+  req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"),blog->config.conversion);
   req->f.email    = TO_email(PairListGetValue(&headers,"EMAIL"));
   
   if (req->author != NULL)
@@ -399,7 +403,7 @@ static int mailfile_readdata(Request *req)
     
   PairListFree(&headers);       /* got everything we need, dump this */
   
-  if (authenticate_author(req,g_blog) == false)
+  if (authenticate_author(req,blog) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",req->author);
     return EPERM;
