@@ -36,17 +36,17 @@
 
 /*****************************************************************/
 
-static struct btm  calculate_previous (struct btm const,unit__e);
-static struct btm  calculate_next     (struct btm const,unit__e);
+static struct btm  calculate_previous (Blog const *,Request *,struct btm const,unit__e);
+static struct btm  calculate_next     (Blog const *,Request *,struct btm const,unit__e);
 static char const *mime_type          (char const *);
-static int         display_file       (tumbler__s const *,int (*)(int,char const *,...));
-static char       *tag_collect        (List *);
-static char       *tag_pick           (char const *);
+static int         display_file       (tumbler__s const *,Blog const *,Request *,int (*)(int,char const *,...));
+static char       *tag_collect        (List *,char const *);
+static char       *tag_pick           (char const *,char const *);
 static void        free_entries       (List *);
 
 /************************************************************************/
 
-struct callback_data *callback_init(struct callback_data *cbd,Blog *blog,Request *request)
+struct callback_data *callback_init(struct callback_data *cbd,Blog const *blog,Request const *request)
 {
   assert(cbd     != NULL);
   assert(blog    != NULL);
@@ -83,7 +83,7 @@ pagegen__f TO_pagegen(char const *name)
 
 /************************************************************************/
 
-int generate_thisday(FILE *out,struct btm when,Blog *blog,Request *request)
+int generate_thisday(FILE *out,struct btm when,Blog const *blog,Request *request)
 {
   struct callback_data  cbd;
   char                 *tags;
@@ -112,8 +112,8 @@ int generate_thisday(FILE *out,struct btm when,Blog *blog,Request *request)
     }
   }
   
-  tags = tag_collect(&cbd.list);
-  cbd.adtag = tag_pick(tags);
+  tags = tag_collect(&cbd.list,blog->config.adtag);
+  cbd.adtag = tag_pick(tags,blog->config.adtag);
   free(tags);
   generic_cb("main",out,&cbd);
   free_entries(&cbd.list);
@@ -123,7 +123,7 @@ int generate_thisday(FILE *out,struct btm when,Blog *blog,Request *request)
 
 /************************************************************************/
 
-int generate_pages(Blog *blog,Request *request)
+int generate_pages(Blog const *blog,Request *request)
 {
   assert(blog    != NULL);
   assert(request != NULL);
@@ -132,7 +132,7 @@ int generate_pages(Blog *blog,Request *request)
   for (size_t i = 0 ; i < blog->config.templatenum ; i++)
   {
     FILE  *out = fopen(blog->config.templates[i].file,"w");
-    int  (*pagegen)(struct template const *,FILE *,Blog *,Request *);
+    int  (*pagegen)(struct template const *,FILE *,Blog const *,Request *);
     
     if (out == NULL)
     {
@@ -164,7 +164,7 @@ int generate_pages(Blog *blog,Request *request)
 int pagegen_items(
         template__t const *template,
         FILE              *out,
-        Blog              *blog,
+        Blog        const *blog,
         Request           *request
 )
 {
@@ -189,8 +189,8 @@ int pagegen_items(
   else
     BlogEntryReadXU(blog,&cbd.list,&thisday,template->items);
     
-  tags      = tag_collect(&cbd.list);
-  cbd.adtag = tag_pick(tags);
+  tags      = tag_collect(&cbd.list,blog->config.adtag);
+  cbd.adtag = tag_pick(tags,blog->config.adtag);
   
   free(tags);
   generic_cb("main",out,&cbd);
@@ -204,7 +204,7 @@ int pagegen_items(
 int pagegen_days(
         template__t const *template,
         FILE              *out,
-        Blog              *blog,
+        Blog        const *blog,
         Request           *request
 )
 {
@@ -230,9 +230,9 @@ int pagegen_days(
   {
     BlogEntry *entry;
     
-    if (btm_cmp(&thisday,&g_blog->first) < 0) break;
+    if (btm_cmp(&thisday,&blog->first) < 0) break;
     
-    entry = BlogEntryRead(g_blog,&thisday);
+    entry = BlogEntryRead(blog,&thisday);
     if (entry)
     {
       assert(entry->valid);
@@ -251,8 +251,8 @@ int pagegen_days(
     }
   }
   
-  tags      = tag_collect(&cbd.list);
-  cbd.adtag = tag_pick(tags);
+  tags      = tag_collect(&cbd.list,blog->config.adtag);
+  cbd.adtag = tag_pick(tags,blog->config.adtag);
   
   free(tags);
   generic_cb("main",out,&cbd);
@@ -361,7 +361,7 @@ static void swap_endpoints(tumbler__s *tum)
 
 /************************************************************************/
 
-int tumbler_page(tumbler__s *spec,Blog *blog,Request *request,int (*errorf)(int,char const *,...))
+int tumbler_page(tumbler__s *spec,Blog const *blog,Request *request,int (*errorf)(int,char const *,...))
 {
   struct callback_data cbd;
   struct btm           start;
@@ -382,7 +382,7 @@ int tumbler_page(tumbler__s *spec,Blog *blog,Request *request,int (*errorf)(int,
     
   if (spec->file)
   {
-    display_file(spec,errorf);
+    display_file(spec,blog,request,errorf);
     return 0; /* XXX hack for now */
   }
   
@@ -416,8 +416,8 @@ int tumbler_page(tumbler__s *spec,Blog *blog,Request *request,int (*errorf)(int,
                      ? spec->ustart
                      : spec->ustop
                      ;
-    cbd.previous = calculate_previous(start,cbd.navunit);
-    cbd.next     = calculate_next(end,cbd.navunit);
+    cbd.previous = calculate_previous(blog,request,start,cbd.navunit);
+    cbd.next     = calculate_next(blog,request,end,cbd.navunit);
   }
   else
   {
@@ -468,8 +468,8 @@ int tumbler_page(tumbler__s *spec,Blog *blog,Request *request,int (*errorf)(int,
   else
     BlogEntryReadBetweenU(blog,&cbd.list,&start,&end);
     
-  tags      = tag_collect(&cbd.list);
-  cbd.adtag = tag_pick(tags);
+  tags      = tag_collect(&cbd.list,blog->config.adtag);
+  cbd.adtag = tag_pick(tags,blog->config.adtag);
   
   free(tags);
   generic_cb("main",stdout,&cbd);
@@ -480,34 +480,34 @@ int tumbler_page(tumbler__s *spec,Blog *blog,Request *request,int (*errorf)(int,
 
 /******************************************************************/
 
-static struct btm calculate_previous(struct btm const start,unit__e navunit)
+static struct btm calculate_previous(Blog const *blog,Request *request,struct btm const start,unit__e navunit)
 {
   struct btm previous = start;
   
   switch(navunit)
   {
     case UNIT_YEAR:
-         if (start.year == g_blog->first.year)
-           g_request.f.navprev = false;
+         if (start.year == blog->first.year)
+           request->f.navprev = false;
          else
            previous.year = start.year - 1;
          break;
          
     case UNIT_MONTH:
          if (
-              (start.year == g_blog->first.year)
-              && (start.month == g_blog->first.month)
+              (start.year == blog->first.year)
+              && (start.month == blog->first.month)
             )
-           g_request.f.navprev = false;
+           request->f.navprev = false;
          else
          {
            btm_dec_month(&previous);
            previous.day  = max_monthday(previous.year,previous.month);
            previous.part = 1;
            
-           while(btm_cmp(&previous,&g_blog->first) >= 0)
+           while(btm_cmp(&previous,&blog->first) >= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&previous);
+             BlogEntry *entry = BlogEntryRead(blog,&previous);
              if (entry == NULL)
              {
                btm_dec_day(&previous);
@@ -519,21 +519,21 @@ static struct btm calculate_previous(struct btm const start,unit__e navunit)
              return previous;
            }
            
-           g_request.f.navprev = false;
+           request->f.navprev = false;
          }
          break;
          
     case UNIT_DAY:
-         if (btm_cmp_date(&start,&g_blog->first) == 0)
-           g_request.f.navprev = false;
+         if (btm_cmp_date(&start,&blog->first) == 0)
+           request->f.navprev = false;
          else
          {
            btm_dec_day(&previous);
            previous.part = 1;
            
-           while(btm_cmp(&previous,&g_blog->first) >= 0)
+           while(btm_cmp(&previous,&blog->first) >= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&previous);
+             BlogEntry *entry = BlogEntryRead(blog,&previous);
              if (entry == NULL)
              {
                btm_dec_day(&previous);
@@ -545,20 +545,20 @@ static struct btm calculate_previous(struct btm const start,unit__e navunit)
              return previous;
            }
            
-           g_request.f.navprev = false;
+           request->f.navprev = false;
          }
          break;
          
     case UNIT_PART:
-         if (btm_cmp(&start,&g_blog->first) == 0)
-           g_request.f.navprev = false;
+         if (btm_cmp(&start,&blog->first) == 0)
+           request->f.navprev = false;
          else
          {
            btm_dec_part(&previous);
            
-           while(btm_cmp(&previous,&g_blog->first) >= 0)
+           while(btm_cmp(&previous,&blog->first) >= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&previous);
+             BlogEntry *entry = BlogEntryRead(blog,&previous);
              if (entry == NULL)
              {
                btm_dec_part(&previous);
@@ -570,7 +570,7 @@ static struct btm calculate_previous(struct btm const start,unit__e navunit)
              return previous;
            }
            
-           g_request.f.navprev = false;
+           request->f.navprev = false;
          }
          break;
          
@@ -583,34 +583,34 @@ static struct btm calculate_previous(struct btm const start,unit__e navunit)
 
 /******************************************************************/
 
-static struct btm calculate_next(struct btm const end,unit__e navunit)
+static struct btm calculate_next(Blog const *blog,Request *request,struct btm const end,unit__e navunit)
 {
   struct btm next = end;
   
   switch(navunit)
   {
     case UNIT_YEAR:
-         if (end.year == g_blog->now.year)
-           g_request.f.navnext = false;
+         if (end.year == blog->now.year)
+           request->f.navnext = false;
          else
            next.year  = end.year + 1;
          break;
          
     case UNIT_MONTH:
          if (
-              (end.year == g_blog->now.year)
-              && (end.month == g_blog->now.month)
+              (end.year == blog->now.year)
+              && (end.month == blog->now.month)
             )
-           g_request.f.navnext = false;
+           request->f.navnext = false;
          else
          {
            btm_inc_month(&next);
            next.day  = 1;
            next.part = 1;
            
-           while(btm_cmp(&next,&g_blog->now) <= 0)
+           while(btm_cmp(&next,&blog->now) <= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&next);
+             BlogEntry *entry = BlogEntryRead(blog,&next);
              if (entry == NULL)
              {
                btm_inc_day(&next);
@@ -622,21 +622,21 @@ static struct btm calculate_next(struct btm const end,unit__e navunit)
              return next;
            }
            
-           g_request.f.navnext = false;
+           request->f.navnext = false;
          }
          break;
          
     case UNIT_DAY:
-         if (btm_cmp_date(&end,&g_blog->now) == 0)
-           g_request.f.navnext = false;
+         if (btm_cmp_date(&end,&blog->now) == 0)
+           request->f.navnext = false;
          else
          {
            btm_inc_day(&next);
            next.part = 1;
            
-           while(btm_cmp(&next,&g_blog->now) <= 0)
+           while(btm_cmp(&next,&blog->now) <= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&next);
+             BlogEntry *entry = BlogEntryRead(blog,&next);
              if (entry == NULL)
              {
                btm_inc_day(&next);
@@ -648,20 +648,20 @@ static struct btm calculate_next(struct btm const end,unit__e navunit)
              return next;
            }
            
-           g_request.f.navnext = false;
+           request->f.navnext = false;
          }
          break;
          
     case UNIT_PART:
-         if (btm_cmp(&end,&g_blog->now) == 0)
-           g_request.f.navnext = false;
+         if (btm_cmp(&end,&blog->now) == 0)
+           request->f.navnext = false;
          else
          {
            next.part++;
            
-           while(btm_cmp(&next,&g_blog->now) <= 0)
+           while(btm_cmp(&next,&blog->now) <= 0)
            {
-             BlogEntry *entry = BlogEntryRead(g_blog,&next);
+             BlogEntry *entry = BlogEntryRead(blog,&next);
              if (entry == NULL)
              {
                next.part = 1;
@@ -673,7 +673,7 @@ static struct btm calculate_next(struct btm const end,unit__e navunit)
              BlogEntryFree(entry);
              return next;
            }
-           g_request.f.navnext = false;
+           request->f.navnext = false;
          }
          break;
          
@@ -883,7 +883,7 @@ static char const *mime_type(char const *filename)
 
 /******************************************************************/
 
-static int display_file(tumbler__s const *spec,int (*errorf)(int,char const *,...))
+static int display_file(tumbler__s const *spec,Blog const *blog,Request *request,int (*errorf)(int,char const *,...))
 {
   char fname[FILENAME_MAX];
   
@@ -900,7 +900,7 @@ static int display_file(tumbler__s const *spec,int (*errorf)(int,char const *,..
       spec->filename
   );
   
-  if (g_request.f.cgi)
+  if (request->f.cgi)
   {
     struct stat  status;
     char const  *type;
@@ -930,9 +930,9 @@ static int display_file(tumbler__s const *spec,int (*errorf)(int,char const *,..
     {
       struct callback_data cbd;
       
-      g_request.f.htmldump = true;
+      request->f.htmldump = true;
       fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
-      generic_cb("main",stdout,callback_init(&cbd,g_blog,&g_request));
+      generic_cb("main",stdout,callback_init(&cbd,blog,request));
     }
     else
     {
@@ -958,7 +958,7 @@ static int display_file(tumbler__s const *spec,int (*errorf)(int,char const *,..
 
 /*****************************************************************/
 
-static char *tag_collect(List *list)
+static char *tag_collect(List *list,char const *def)
 {
   BlogEntry *entry;
   
@@ -969,6 +969,7 @@ static char *tag_collect(List *list)
   ;-----------------------------------------------------------------------*/
   
   assert(list != NULL);
+  assert(def  != NULL);
   
   entry = (BlogEntry *)ListGetHead(list);
   
@@ -981,21 +982,22 @@ static char *tag_collect(List *list)
       return strdup(entry->class);
   }
   
-  return strdup(g_blog->config.adtag);
+  return strdup(def);
 }
 
 /********************************************************************/
 
-static char *tag_pick(char const *tag)
+static char *tag_pick(char const *tag,char const *def)
 {
   String *pool;
   size_t  num;
   char   *pick;
   
   assert(tag != NULL);
+  assert(def != NULL);
   
   if (empty_string(tag))
-    return strdup(g_blog->config.adtag);
+    return strdup(def);
     
   pool = tag_split(&num,tag);
   
@@ -1011,7 +1013,7 @@ static char *tag_pick(char const *tag)
     pick     = fromstring(pool[r]);
   }
   else
-    pick = strdup(g_blog->config.adtag);
+    pick = strdup(def);
     
   free(pool);
   return pick;
