@@ -31,20 +31,20 @@
 #include "conversion.h"
 #include "globals.h"
 
-typedef int (*cgicmd__f)(Cgi,struct request *);
+typedef int (*cgicmd__f)(Cgi,Blog *,struct request *);
 
 /**************************************************************************/
 
+static int       cmd_cgi_get_new        (Cgi,Blog *,Request *);
+static int       cmd_cgi_get_show       (Cgi,Blog *,Request *);
+static int       cmd_cgi_get_today      (Cgi,Blog *,Request *);
+static int       cmd_cgi_post_new       (Cgi,Blog *,Request *);
+static int       cmd_cgi_post_show      (Cgi,Blog *,Request *);
 static bool      cgi_init               (Cgi);
+static int       cgi_error              (int,char const *, ... );
 static cgicmd__f set_m_cgi_get_command  (char const *);
-static int       cmd_cgi_get_new        (Cgi,Request *);
-static int       cmd_cgi_get_show       (Cgi,Request *);
-static int       cmd_cgi_get_today      (Cgi,Request *);
 static cgicmd__f set_m_cgi_post_command (char const *);
 static void      set_m_author           (char *,Request *);
-static int       cmd_cgi_post_new       (Cgi,Request *);
-static int       cmd_cgi_post_show      (Cgi,Request *);
-static int       cgi_error              (int,char const *, ... );
 
 /*************************************************************************/
 
@@ -56,7 +56,7 @@ int main_cgi_get(Cgi cgi)
     return cgi_error(HTTP_ISERVERERR,"cgi_init() failed");
     
   g_request.reqtumbler = getenv("PATH_INFO");
-  return (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,&g_request);
+  return (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,g_blog,&g_request);
 }
 
 /************************************************************************/
@@ -82,15 +82,17 @@ static cgicmd__f set_m_cgi_get_command(char const *value)
 
 /***********************************************************************/
 
-static int cmd_cgi_get_new(Cgi cgi,Request *req)
+static int cmd_cgi_get_new(Cgi cgi,Blog *blog,Request *req)
 {
   struct callback_data cbd;
   
-  assert(req != NULL);
-  assert(cgi != NULL);
+  assert(cgi  != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
   (void)cgi;
+  (void)blog;
   
-  req->f.edit   = true;
+  req->f.edit = true;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
   generic_cb("main",stdout,callback_init(&cbd));
   return 0;
@@ -98,13 +100,14 @@ static int cmd_cgi_get_new(Cgi cgi,Request *req)
 
 /**********************************************************************/
 
-static int cmd_cgi_get_show(Cgi cgi,Request *req)
+static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
 {
   char *status;
   int   rc = -1;
   
-  assert(req != NULL);
-  assert(cgi != NULL);
+  assert(cgi  != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
   
   status = CgiListGetValue(cgi,"status");
   if (emptynull_string(status))
@@ -123,15 +126,15 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
         "  <BODY><A HREF='%s'>Go here<A></BODY>\n"
         "</HTML>\n",
         HTTP_MOVEPERM,
-        g_blog->config.url,
-        g_blog->config.url
+        blog->config.url,
+        blog->config.url
       );
     rc = 0;
   }
   else
   {
     req->reqtumbler++;
-    if (tumbler_new(&req->tumbler,req->reqtumbler,&g_blog->first,&g_blog->last))
+    if (tumbler_new(&req->tumbler,req->reqtumbler,&blog->first,&blog->last))
     {
     
       if (req->tumbler.redirect)
@@ -147,9 +150,9 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
                 "<body><p>Redirect to <a href='%s/%s'>%s/%s</a></p></body>"
                 "</html>\n",
                 HTTP_MOVEPERM,
-                g_blog->config.url, tum,
-                g_blog->config.url, tum,
-                g_blog->config.url, tum
+                blog->config.url, tum,
+                blog->config.url, tum,
+                blog->config.url, tum
         );
         free(tum);
         free(status);
@@ -191,10 +194,11 @@ static int cmd_cgi_get_show(Cgi cgi,Request *req)
 
 /********************************************************************/
 
-static int cmd_cgi_get_today(Cgi cgi,Request *req)
+static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
 {
-  assert(req != NULL);
-  assert(cgi != NULL);
+  assert(cgi  != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
   
   char *tpath = CgiListGetValue(cgi,"path");
   char *twhen = CgiListGetValue(cgi,"day");
@@ -202,7 +206,7 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
   if ((tpath == NULL) && (twhen == NULL))
   {
     fprintf(stdout,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
-    return generate_thisday(stdout,g_blog->now);
+    return generate_thisday(stdout,blog->now);
   }
   
   if (tpath == NULL)
@@ -221,8 +225,8 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
       "  <BODY><A HREF='%s/%s'>Go here</A></BODY>\n"
       "</HTML>\n",
       HTTP_MOVEPERM,
-      g_blog->config.url,tpath,
-      g_blog->config.url,tpath
+      blog->config.url,tpath,
+      blog->config.url,tpath
     );
     return 0;
   }
@@ -243,8 +247,8 @@ static int cmd_cgi_get_today(Cgi cgi,Request *req)
       "  <BODY><A HREF='%s/%s/%02d/%02d'>Go here</A></BODY>\n"
       "</HTML>\n",
       HTTP_MOVEPERM,
-      g_blog->config.url,tpath,req->tumbler.start.month,req->tumbler.start.day,
-      g_blog->config.url,tpath,req->tumbler.start.month,req->tumbler.start.day
+      blog->config.url,tpath,req->tumbler.start.month,req->tumbler.start.day,
+      blog->config.url,tpath,req->tumbler.start.month,req->tumbler.start.day
     );
     return 0;
   }
@@ -292,7 +296,7 @@ int main_cgi_post(Cgi cgi)
     return cgi_error(HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",g_request.author,CgiListGetValue(cgi,"author"));
   }
   
-  return (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,&g_request);
+  return (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,g_blog,&g_request);
 }
 
 /************************************************************************/
@@ -330,13 +334,14 @@ static void set_m_author(char *value,Request *req)
 
 /************************************************************************/
 
-static int cmd_cgi_post_new(Cgi cgi,Request *req)
+static int cmd_cgi_post_new(Cgi cgi,Blog *blog,Request *req)
 {
-  assert(req != NULL);
-  assert(cgi != NULL);
+  assert(cgi  != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
   (void)cgi;
   
-  if (entry_add(req,g_blog))
+  if (entry_add(req,blog))
   {
     generate_pages();
     fprintf(
@@ -350,8 +355,8 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
         "  <BODY><A HREF='%s'>Go here</A></BODY>\n"
         "</HTML>\n",
         HTTP_MOVETEMP,
-        g_blog->config.url,
-        g_blog->config.url
+        blog->config.url,
+        blog->config.url
         
     );
     return 0;
@@ -362,14 +367,15 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
 
 /***********************************************************************/
 
-static int cmd_cgi_post_show(Cgi cgi,Request *req)
+static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
 {
   struct callback_data cbd;
   BlogEntry           *entry;
   char                *p;
   
-  assert(req != NULL);
-  assert(cgi != NULL);
+  assert(cgi  != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
   (void)cgi;
   
   /*----------------------------------------------------
@@ -380,10 +386,10 @@ static int cmd_cgi_post_show(Cgi cgi,Request *req)
   
   callback_init(&cbd);
   fix_entry(req);
-  entry = BlogEntryNew(g_blog);
+  entry = BlogEntryNew(blog);
   
   if (emptynull_string(req->date))
-    entry->when = g_blog->now;
+    entry->when = blog->now;
   else
   {
     entry->when.year  = strtoul(req->date,&p,10); p++;
@@ -392,7 +398,7 @@ static int cmd_cgi_post_show(Cgi cgi,Request *req)
   }
   
   entry->when.part = 1; /* doesn't matter what this is */
-  entry->timestamp = g_blog->tnow;
+  entry->timestamp = blog->tnow;
   entry->title     = req->title;
   entry->class     = req->class;
   entry->status    = req->status;
