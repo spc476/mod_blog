@@ -26,10 +26,6 @@
 #include <stdbool.h>
 #include <cgilib6/cgi.h>
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-
 #include "frontend.h"
 
 #define GENERATOR       "mod_blog" " " PROG_VERSION

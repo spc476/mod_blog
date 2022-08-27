@@ -47,6 +47,23 @@ static void      set_m_author           (char *,Request *);
 
 /*************************************************************************/
 
+void request_free(Request *request)
+{
+  assert(request != NULL);
+  
+  free(request->origauthor);
+  free(request->author);
+  free(request->title);
+  free(request->class);
+  free(request->status);
+  free(request->date);
+  free(request->adtag);
+  free(request->origbody);
+  free(request->body);
+}
+
+/*************************************************************************/
+
 int main_cgi_get(Cgi cgi)
 {
   assert(cgi != NULL);
