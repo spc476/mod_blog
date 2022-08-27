@@ -93,7 +93,7 @@ int main_cli(int argc,char *argv[])
   };
   
   char           *config      = NULL;
-  int             forcenotify = false;
+  bool            forcenotify = false;
   clicmd__f       command     = cmd_cli_show;
   struct options  options     = { .emailin = false , .regenerate = false , .today = false , .thisday = false };
   
