@@ -32,7 +32,6 @@
 #include <cgilib6/util.h>
 
 #include "backend.h"
-#include "frontend.h"
 #include "blogutil.h"
 #include "conversion.h"
 

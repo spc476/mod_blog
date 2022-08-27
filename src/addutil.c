@@ -31,10 +31,8 @@
 #include <cgilib6/util.h>
 #include <cgilib6/chunk.h>
 
-#include "blog.h"
 #include "conversion.h"
 #include "backend.h"
-#include "frontend.h"
 #include "blogutil.h"
 
 #define DB_BLOCK 1024

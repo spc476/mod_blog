@@ -28,7 +28,6 @@
 #include <cgilib6/htmltok.h>
 
 #include "conversion.h"
-#include "frontend.h"
 #include "blogutil.h"
 
 /**********************************************************************/
