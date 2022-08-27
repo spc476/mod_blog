@@ -74,6 +74,7 @@ int main_cgi_get(Cgi cgi)
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
     
+  CgiListMake(cgi);
   request_init(&request);
   request.f.cgi      = true;
   request.reqtumbler = getenv("PATH_INFO");
@@ -293,6 +294,7 @@ int main_cgi_post(Cgi cgi)
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
   
+  CgiListMake(cgi);
   request_init(&request);
   set_m_author(CgiListGetValue(cgi,"author"),&request);
   
