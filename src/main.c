@@ -26,12 +26,13 @@
 
 /************************************************************************/
 
-int main(int argc,char *argv[],char *envp[])
+int main(int argc,char *argv[])
 {
+  extern char **environ;
   Cgi cgi;
   int rc;
   
-  crashreport_with(argc,argv,envp);
+  crashreport_with(argc,argv,environ);
   crashreport_core();
   
   cgi = CgiNew(NULL);
