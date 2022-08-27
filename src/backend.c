@@ -81,14 +81,14 @@ pagegen__f TO_pagegen(char const *name)
 
 /************************************************************************/
 
-int generate_thisday(FILE *out,struct btm when,Blog const *blog,Request *request)
+int generate_thisday(Blog const *blog,Request *request,FILE *out,struct btm when)
 {
   struct callback_data  cbd;
   char                 *tags;
   
-  assert(out     != NULL);
   assert(blog    != NULL);
   assert(request != NULL);
+  assert(out     != NULL);
   
   callback_init(&cbd,blog,request);
   
@@ -130,7 +130,7 @@ int generate_pages(Blog const *blog,Request *request)
   for (size_t i = 0 ; i < blog->config.templatenum ; i++)
   {
     FILE  *out = fopen(blog->config.templates[i].file,"w");
-    int  (*pagegen)(struct template const *,FILE *,Blog const *,Request *);
+    int  (*pagegen)(Blog const *,Request *,struct template const *,FILE *);
     
     if (out == NULL)
     {
@@ -139,7 +139,7 @@ int generate_pages(Blog const *blog,Request *request)
     }
     
     pagegen = TO_pagegen(blog->config.templates[i].pagegen);
-    (*pagegen)(&blog->config.templates[i],out,blog,request);
+    (*pagegen)(blog,request,&blog->config.templates[i],out);
     fclose(out);
     
     if (blog->config.templates[i].posthook)
@@ -160,20 +160,20 @@ int generate_pages(Blog const *blog,Request *request)
 /******************************************************************/
 
 int pagegen_items(
-        template__t const *template,
-        FILE              *out,
         Blog        const *blog,
-        Request           *request
+        Request           *request,
+        template__t const *template,
+        FILE              *out
 )
 {
   struct btm            thisday;
   char                 *tags;
   struct callback_data  cbd;
   
-  assert(template != NULL);
-  assert(out      != NULL);
   assert(blog     != NULL);
   assert(request  != NULL);
+  assert(template != NULL);
+  assert(out      != NULL);
   
   request->f.fullurl = template->fullurl;
   request->f.reverse = template->reverse;
@@ -200,10 +200,10 @@ int pagegen_items(
 /************************************************************************/
 
 int pagegen_days(
-        template__t const *template,
-        FILE              *out,
         Blog        const *blog,
-        Request           *request
+        Request           *request,
+        template__t const *template,
+        FILE              *out
 )
 {
   struct btm            thisday;
@@ -212,10 +212,10 @@ int pagegen_days(
   struct callback_data  cbd;
   bool                  added;
   
-  assert(template != NULL);
-  assert(out      != NULL);
   assert(blog     != NULL);
   assert(request  != NULL);
+  assert(template != NULL);
+  assert(out      != NULL);
   
   request->f.fullurl = false;
   request->f.reverse = true;
@@ -359,16 +359,16 @@ static void swap_endpoints(tumbler__s *tum)
 
 /************************************************************************/
 
-int tumbler_page(tumbler__s *spec,Blog const *blog,Request *request,int (*errorf)(Blog const *,Request *,int,char const *,...))
+int tumbler_page(Blog const *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog const *,Request *,int,char const *,...))
 {
   struct callback_data cbd;
   struct btm           start;
   struct btm           end;
   char                *tags;
   
-  assert(spec    != NULL);
   assert(blog    != NULL);
   assert(request != NULL);
+  assert(spec    != NULL);
   assert(errorf);
   
   request->f.fullurl = false; /* XXX why? */

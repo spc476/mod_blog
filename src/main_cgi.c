@@ -199,7 +199,7 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
                 "Content-type: text/html\r\n\r\n",
                 status
         );
-      rc = tumbler_page(&req->tumbler,blog,req,cgi_error);
+      rc = tumbler_page(blog,req,&req->tumbler,cgi_error);
     }
     else
     {
@@ -239,7 +239,7 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   if ((tpath == NULL) && (twhen == NULL))
   {
     fprintf(stdout,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
-    return generate_thisday(stdout,blog->now,blog,req);
+    return generate_thisday(blog,req,stdout,blog->now);
   }
   
   if (tpath == NULL)
@@ -287,7 +287,7 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   }
   
   fprintf(stdout,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
-  return generate_thisday(stdout,req->tumbler.start,blog,req);
+  return generate_thisday(blog,req,stdout,req->tumbler.start);
 }
 
 /**********************************************************************/
@@ -329,7 +329,7 @@ int main_cgi_POST(Cgi cgi)
   if (request.class == NULL)
     request.class = strdup("");
     
-  if (authenticate_author(&request,blog) == false)
+  if (authenticate_author(blog,&request) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",request.author);
     return cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiListGetValue(cgi,"author"));
@@ -383,7 +383,7 @@ static int cmd_cgi_post_new(Cgi cgi,Blog *blog,Request *req)
   assert(req  != NULL);
   (void)cgi;
   
-  if (entry_add(req,blog))
+  if (entry_add(blog,req))
   {
     generate_pages(blog,req);
     fprintf(

@@ -216,7 +216,7 @@ static int cmd_cli_new(Blog *blog,Request *req)
     return EXIT_FAILURE;
   }
   
-  if (entry_add(req,blog))
+  if (entry_add(blog,req))
   {
     generate_pages(blog,req);
     return 0;
@@ -240,7 +240,7 @@ static int cmd_cli_show(Blog *blog,Request *req)
   if (req->f.regenerate)
     rc = generate_pages(blog,req);
   else if (req->f.today)
-    rc = generate_thisday(stdout,blog->now,blog,req);
+    rc = generate_thisday(blog,req,stdout,blog->now);
   else if (req->f.thisday)
   {
     if (!thisday_new(&req->tumbler,req->reqtumbler))
@@ -248,7 +248,7 @@ static int cmd_cli_show(Blog *blog,Request *req)
     else if (req->tumbler.redirect)
       rc = cli_error(blog,req,HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
     else
-      rc = generate_thisday(stdout,req->tumbler.start,blog,req);
+      rc = generate_thisday(blog,req,stdout,req->tumbler.start);
   }
   else
   {
@@ -262,7 +262,7 @@ static int cmd_cli_show(Blog *blog,Request *req)
       template.reverse  = true;
       template.fullurl  = false;
       
-      rc = pagegen_days(&template,stdout,blog,req);
+      rc = pagegen_days(blog,req,&template,stdout);
     }
     else
     {
@@ -275,7 +275,7 @@ static int cmd_cli_show(Blog *blog,Request *req)
           free(tum);
           return rc;
         }
-        rc = tumbler_page(&req->tumbler,blog,req,cli_error);
+        rc = tumbler_page(blog,req,&req->tumbler,cli_error);
       }
       else
         rc = cli_error(blog,req,HTTP_NOTFOUND,"tumbler error---nothing found");
@@ -412,7 +412,7 @@ static int mailfile_readdata(Blog *blog,Request *req)
     
   PairListFree(&headers);       /* got everything we need, dump this */
   
-  if (authenticate_author(req,blog) == false)
+  if (authenticate_author(blog,req) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",req->author);
     return EPERM;

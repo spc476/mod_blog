@@ -30,7 +30,7 @@
 #include "timeutil.h"
 #include "wbtum.h"
 
-typedef int (*pagegen__f)(struct template const *,FILE *,Blog const *,Request *);
+typedef int (*pagegen__f)(Blog const *,Request *,struct template const *,FILE *);
 
 struct callback_data
 {
@@ -52,11 +52,11 @@ struct callback_data
 
 extern struct callback_data *callback_init    (struct callback_data *,Blog const *,Request const *);
 extern pagegen__f            TO_pagegen       (char const *);
-extern int                   generate_thisday (FILE *,struct btm,Blog const *,Request *);
+extern int                   generate_thisday (Blog const *,Request *,FILE *,struct btm);
 extern int                   generate_pages   (Blog const *,Request *);
-extern int                   pagegen_items    (template__t const *,FILE *,Blog const *,Request *);
-extern int                   pagegen_days     (template__t const *,FILE *,Blog const *,Request *);
-extern int                   tumbler_page     (tumbler__s *,Blog const *,Request *,int (*)(Blog const *,Request *,int,char const *,...));
+extern int                   pagegen_items    (Blog const *,Request *,template__t const *,FILE *);
+extern int                   pagegen_days     (Blog const *,Request *,template__t const *,FILE *);
+extern int                   tumbler_page     (Blog const *,Request *,tumbler__s *,int (*)(Blog const *,Request *,int,char const *,...));
 extern void                  generic_cb       (char const *,FILE *,void *);
 extern bool                  run_hook         (char const *,char const **);
 

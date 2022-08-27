@@ -101,15 +101,15 @@ static size_t breakline(char **dest,size_t dsize,FILE *in)
 
 /************************************************************************/
 
-bool authenticate_author(Request *req,Blog *blog)
+bool authenticate_author(Blog const *blog,Request *req)
 {
   FILE   *in;
   char   *lines[10];
   size_t  cnt;
   
+  assert(blog        != NULL);
   assert(req         != NULL);
   assert(req->author != NULL);
-  assert(blog        != NULL);
   
   if (blog->config.author.file == NULL)
     return strcmp(req->author,blog->config.author.name) == 0;

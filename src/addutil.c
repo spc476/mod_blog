@@ -39,13 +39,13 @@
 
 /*********************************************************************/
 
-bool entry_add(Request *req,Blog *blog)
+bool entry_add(Blog *blog,Request *req)
 {
   BlogEntry *entry;
   bool       rc = true;
   
-  assert(req  != NULL);
   assert(blog != NULL);
+  assert(req  != NULL);
   
   fix_entry(req);
   
