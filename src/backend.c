@@ -46,15 +46,17 @@ static void        free_entries       (List *);
 
 /************************************************************************/
 
-struct callback_data *callback_init(struct callback_data *cbd)
+struct callback_data *callback_init(struct callback_data *cbd,Blog *blog,Request *request)
 {
-  assert(cbd != NULL);
+  assert(cbd     != NULL);
+  assert(blog    != NULL);
+  assert(request != NULL);
   
   memset(cbd,0,sizeof(struct callback_data));
   ListInit(&cbd->list);
-  cbd->template = &g_blog->config.templates[0]; /* XXX probably document this */
-  cbd->request  = &g_request;
-  cbd->blog     = g_blog;
+  cbd->template = &blog->config.templates[0]; /* XXX probably document this */
+  cbd->request  = request;
+  cbd->blog     = blog;
   cbd->entry    = NULL;
   cbd->ad       = NULL;
   cbd->adtag    = NULL;
@@ -81,22 +83,25 @@ pagegen__f TO_pagegen(char const *name)
 
 /************************************************************************/
 
-int generate_thisday(FILE *out,struct btm when)
+int generate_thisday(FILE *out,struct btm when,Blog *blog,Request *request)
 {
   struct callback_data  cbd;
   char                 *tags;
   
-  assert(out != NULL);
-  callback_init(&cbd);
+  assert(out     != NULL);
+  assert(blog    != NULL);
+  assert(request != NULL);
   
-  for(when.year = g_blog->first.year ; when.year <= g_blog->now.year ; when.year++)
+  callback_init(&cbd,blog,request);
+  
+  for(when.year = blog->first.year ; when.year <= blog->now.year ; when.year++)
   {
-    if (btm_cmp_date(&when,&g_blog->first) < 0)
+    if (btm_cmp_date(&when,&blog->first) < 0)
       continue;
       
     for (when.part = 1 ; ; when.part++)
     {
-      BlogEntry *entry = BlogEntryRead(g_blog,&when);
+      BlogEntry *entry = BlogEntryRead(blog,&when);
       if (entry)
       {
         assert(entry->valid);
@@ -118,29 +123,33 @@ int generate_thisday(FILE *out,struct btm when)
 
 /************************************************************************/
 
-int generate_pages(void)
+int generate_pages(Blog *blog,Request *request)
 {
-  for (size_t i = 0 ; i < g_blog->config.templatenum ; i++)
+  assert(blog    != NULL);
+  assert(request != NULL);
+  (void)request;
+    
+  for (size_t i = 0 ; i < blog->config.templatenum ; i++)
   {
-    FILE  *out = fopen(g_blog->config.templates[i].file,"w");
-    int  (*pagegen)(struct template const *,FILE *,Blog *);
+    FILE  *out = fopen(blog->config.templates[i].file,"w");
+    int  (*pagegen)(struct template const *,FILE *,Blog *,Request *);
     
     if (out == NULL)
     {
-      syslog(LOG_ERR,"%s: %s",g_blog->config.templates[i].file,strerror(errno));
+      syslog(LOG_ERR,"%s: %s",blog->config.templates[i].file,strerror(errno));
       continue;
     }
     
-    pagegen = TO_pagegen(g_blog->config.templates[i].pagegen);
-    (*pagegen)(&g_blog->config.templates[i],out,g_blog);
+    pagegen = TO_pagegen(blog->config.templates[i].pagegen);
+    (*pagegen)(&blog->config.templates[i],out,blog,request);
     fclose(out);
     
-    if (g_blog->config.templates[i].posthook)
+    if (blog->config.templates[i].posthook)
     {
       char const *argv[3];
       
-      argv[0] = g_blog->config.templates[i].posthook;
-      argv[1] = g_blog->config.templates[i].file;
+      argv[0] = blog->config.templates[i].posthook;
+      argv[1] = blog->config.templates[i].file;
       argv[2] = NULL;
       
       run_hook("template-post-hook",argv);
@@ -155,7 +164,8 @@ int generate_pages(void)
 int pagegen_items(
         template__t const *template,
         FILE              *out,
-        Blog              *blog
+        Blog              *blog,
+        Request           *request
 )
 {
   struct btm            thisday;
@@ -165,18 +175,19 @@ int pagegen_items(
   assert(template != NULL);
   assert(out      != NULL);
   assert(blog     != NULL);
+  assert(request  != NULL);
   
-  g_request.f.fullurl = template->fullurl;
-  g_request.f.reverse = template->reverse;
+  request->f.fullurl = template->fullurl;
+  request->f.reverse = template->reverse;
   thisday      = blog->now;
   
-  callback_init(&cbd);
+  callback_init(&cbd,blog,request);
   cbd.template = template;
   
   if (template->reverse)
-    BlogEntryReadXD(g_blog,&cbd.list,&thisday,template->items);
+    BlogEntryReadXD(blog,&cbd.list,&thisday,template->items);
   else
-    BlogEntryReadXU(g_blog,&cbd.list,&thisday,template->items);
+    BlogEntryReadXU(blog,&cbd.list,&thisday,template->items);
     
   tags      = tag_collect(&cbd.list);
   cbd.adtag = tag_pick(tags);
@@ -193,7 +204,8 @@ int pagegen_items(
 int pagegen_days(
         template__t const *template,
         FILE              *out,
-        Blog              *blog
+        Blog              *blog,
+        Request           *request
 )
 {
   struct btm            thisday;
@@ -205,12 +217,13 @@ int pagegen_days(
   assert(template != NULL);
   assert(out      != NULL);
   assert(blog     != NULL);
+  assert(request  != NULL);
   
-  g_request.f.fullurl = false;
-  g_request.f.reverse = true;
+  request->f.fullurl = false;
+  request->f.reverse = true;
   thisday      = blog->now;
   
-  callback_init(&cbd);
+  callback_init(&cbd,blog,request);
   cbd.template = template;
   
   for (days = 0 , added = false ; days < template->items ; )
@@ -348,19 +361,21 @@ static void swap_endpoints(tumbler__s *tum)
 
 /************************************************************************/
 
-int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
+int tumbler_page(tumbler__s *spec,Blog *blog,Request *request,int (*errorf)(int,char const *,...))
 {
   struct callback_data cbd;
   struct btm           start;
   struct btm           end;
   char                *tags;
   
-  assert(spec != NULL);
+  assert(spec    != NULL);
+  assert(blog    != NULL);
+  assert(request != NULL);
   assert(errorf);
   
-  g_request.f.fullurl = false; /* XXX why? */
-  g_request.f.navprev = true;
-  g_request.f.navnext = true;
+  request->f.fullurl = false; /* XXX why? */
+  request->f.navprev = true;
+  request->f.navnext = true;
   
   if (spec->redirect)
     return HTTP_NOTIMP;
@@ -371,7 +386,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
     return 0; /* XXX hack for now */
   }
   
-  callback_init(&cbd);
+  callback_init(&cbd,blog,request);
   
   /*----------------------------------------------------------------------
   ; from here to the comment about sanity checking replaced around 100 very
@@ -379,13 +394,13 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   ; than the old version, so a lot of code was removed.
   ;-----------------------------------------------------------------------*/
   
-  assert(spec->start.year  >= g_blog->first.year);
+  assert(spec->start.year  >= blog->first.year);
   assert(spec->start.month >   0);
   assert(spec->start.month <  13);
   assert(spec->start.day   >   0);
   assert(spec->start.day   <= max_monthday(spec->start.year,spec->start.month));
   
-  assert(spec->stop.year  >= g_blog->first.year);
+  assert(spec->stop.year  >= blog->first.year);
   assert(spec->stop.month >   0);
   assert(spec->stop.month <  13);
   assert(spec->stop.day   >   0);
@@ -396,7 +411,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   
   if (!spec->range)
   {
-    g_request.f.navigation  = true;
+    request->f.navigation  = true;
     cbd.navunit      = spec->ustart > spec->ustop
                      ? spec->ustart
                      : spec->ustop
@@ -412,7 +427,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
       swap_endpoints(&newtum);
       start        = newtum.start;
       end          = newtum.stop;
-      g_request.f.reverse = true; /* XXX */
+      request->f.reverse = true; /* XXX */
     }
   }
   
@@ -448,10 +463,10 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   ; these four lines replaced 65 very confused lines of code.
   ;-----------------------------------------------------------*/
   
-  if (g_request.f.reverse)
-    BlogEntryReadBetweenD(g_blog,&cbd.list,&end,&start);
+  if (request->f.reverse)
+    BlogEntryReadBetweenD(blog,&cbd.list,&end,&start);
   else
-    BlogEntryReadBetweenU(g_blog,&cbd.list,&start,&end);
+    BlogEntryReadBetweenU(blog,&cbd.list,&start,&end);
     
   tags      = tag_collect(&cbd.list);
   cbd.adtag = tag_pick(tags);
@@ -917,7 +932,7 @@ static int display_file(tumbler__s const *spec,int (*errorf)(int,char const *,..
       
       g_request.f.htmldump = true;
       fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
-      generic_cb("main",stdout,callback_init(&cbd));
+      generic_cb("main",stdout,callback_init(&cbd,g_blog,&g_request));
     }
     else
     {

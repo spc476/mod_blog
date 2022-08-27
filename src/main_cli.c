@@ -209,7 +209,7 @@ static int cmd_cli_new(Blog *blog,Request *req)
   
   if (entry_add(req,blog))
   {
-    generate_pages();
+    generate_pages(blog,req);
     return 0;
   }
   else
@@ -229,9 +229,9 @@ static int cmd_cli_show(Blog *blog,Request *req)
   assert(req  != NULL);
   
   if (req->f.regenerate)
-    rc = generate_pages();
+    rc = generate_pages(blog,req);
   else if (req->f.today)
-    rc = generate_thisday(stdout,blog->now);
+    rc = generate_thisday(stdout,blog->now,blog,req);
   else if (req->f.thisday)
   {
     if (!thisday_new(&req->tumbler,req->reqtumbler))
@@ -239,7 +239,7 @@ static int cmd_cli_show(Blog *blog,Request *req)
     else if (req->tumbler.redirect)
       rc = cli_error(HTTP_MOVEPERM,"Redirect: %02d/%02d",req->tumbler.start.month,req->tumbler.start.day);
     else
-      rc = generate_thisday(stdout,req->tumbler.start);
+      rc = generate_thisday(stdout,req->tumbler.start,blog,req);
   }
   else
   {
@@ -253,7 +253,7 @@ static int cmd_cli_show(Blog *blog,Request *req)
       template.reverse  = true;
       template.fullurl  = false;
       
-      rc = pagegen_days(&template,stdout,blog);
+      rc = pagegen_days(&template,stdout,blog,req);
     }
     else
     {
@@ -266,7 +266,7 @@ static int cmd_cli_show(Blog *blog,Request *req)
           free(tum);
           return rc;
         }
-        rc = tumbler_page(&req->tumbler,cli_error);
+        rc = tumbler_page(&req->tumbler,blog,req,cli_error);
       }
       else
         rc = cli_error(HTTP_NOTFOUND,"tumbler error---nothing found");

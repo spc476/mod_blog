@@ -94,7 +94,7 @@ static int cmd_cgi_get_new(Cgi cgi,Blog *blog,Request *req)
   
   req->f.edit = true;
   fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
-  generic_cb("main",stdout,callback_init(&cbd));
+  generic_cb("main",stdout,callback_init(&cbd,blog,req));
   return 0;
 }
 
@@ -166,7 +166,7 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
                 "Content-type: text/html\r\n\r\n",
                 status
         );
-      rc = tumbler_page(&req->tumbler,cgi_error);
+      rc = tumbler_page(&req->tumbler,blog,req,cgi_error);
     }
     else
     {
@@ -181,7 +181,7 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
         
         req->f.htmldump = true;
         fprintf(stdout,"Status: %s\r\nContent-type: text/html\r\n\r\n",status);
-        generic_cb("main",stdout,callback_init(&cbd));
+        generic_cb("main",stdout,callback_init(&cbd,blog,req));
         rc = 0;
       }
     }
@@ -206,7 +206,7 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   if ((tpath == NULL) && (twhen == NULL))
   {
     fprintf(stdout,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
-    return generate_thisday(stdout,blog->now);
+    return generate_thisday(stdout,blog->now,blog,req);
   }
   
   if (tpath == NULL)
@@ -254,7 +254,7 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   }
   
   fprintf(stdout,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
-  return generate_thisday(stdout,req->tumbler.start);
+  return generate_thisday(stdout,req->tumbler.start,blog,req);
 }
 
 /**********************************************************************/
@@ -343,7 +343,7 @@ static int cmd_cgi_post_new(Cgi cgi,Blog *blog,Request *req)
   
   if (entry_add(req,blog))
   {
-    generate_pages();
+    generate_pages(blog,req);
     fprintf(
         stdout,
         "Status: %d\r\n"
@@ -384,7 +384,7 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
   ; at some point.
   ;-------------------------------------------------------*/
   
-  callback_init(&cbd);
+  callback_init(&cbd,blog,req);
   fix_entry(req);
   entry = BlogEntryNew(blog);
   
@@ -470,7 +470,7 @@ static int cgi_error(int level,char const *msg, ... )
         level,
         errmsg
       );
-    generic_cb("main",stdout,callback_init(&cbd));
+    generic_cb("main",stdout,callback_init(&cbd,g_blog,&g_request));
   }
   
   free(file);

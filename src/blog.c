@@ -202,7 +202,7 @@ BlogEntry *BlogEntryNew(Blog *blog)
 
 /***********************************************************************/
 
-BlogEntry *BlogEntryRead(Blog *blog,struct btm const *which)
+BlogEntry *BlogEntryRead(Blog const *blog,struct btm const *which)
 {
   BlogEntry   *entry;
   char         pname[FILENAME_MAX];
@@ -263,7 +263,7 @@ BlogEntry *BlogEntryRead(Blog *blog,struct btm const *which)
 /**********************************************************************/
 
 void BlogEntryReadBetweenU(
-        Blog             *blog,
+        Blog const       *blog,
         List             *list,
         struct btm const *restrict start,
         struct btm const *restrict end
@@ -298,7 +298,7 @@ void BlogEntryReadBetweenU(
 /************************************************************************/
 
 void BlogEntryReadBetweenD(
-        Blog             *blog,
+        Blog const       *blog,
         List             *listb,
         struct btm const *restrict end,
         struct btm const *restrict start
@@ -334,7 +334,7 @@ void BlogEntryReadBetweenD(
 /*******************************************************************/
 
 void BlogEntryReadXD(
-        Blog             *blog,
+        Blog const       *blog,
         List             *list,
         struct btm const *start,
         size_t            num
@@ -372,7 +372,7 @@ void BlogEntryReadXD(
 /*******************************************************************/
 
 void BlogEntryReadXU(
-        Blog             *blog,
+        Blog const       *blog,
         List             *list,
         struct btm const *start,
         size_t            num
@@ -584,8 +584,9 @@ int BlogEntryWrite(BlogEntry *entry)
   
   if (btm_cmp(&entry->when,&entry->blog->last) > 0)
   {
-    entry->blog->last = entry->when;
-    entry->blog->now  = entry->when;
+    Blog *blog = (Blog *)entry->blog; /* XXX how to handle */
+    blog->last = entry->when;
+    blog->now  = entry->when;
     
     out = fopen(".last","w");
     

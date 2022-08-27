@@ -88,7 +88,7 @@ static void print_nav_url(FILE *out,struct btm const *date,unit__e unit,char con
 
 /*******************************************************************/
 
-static void print_nav_title(FILE *out,Blog *blog,struct btm const *date,unit__e unit)
+static void print_nav_title(FILE *out,Blog const *blog,struct btm const *date,unit__e unit)
 {
   BlogEntry *entry;
   struct tm  stm;
@@ -136,7 +136,7 @@ static void print_nav_title(FILE *out,Blog *blog,struct btm const *date,unit__e 
 
 /**********************************************************************/
 
-static void handle_aflinks(HtmlToken token,char const *attrib,Blog *blog)
+static void handle_aflinks(HtmlToken token,char const *attrib,Blog const *blog)
 {
   assert(token  != NULL);
   assert(attrib != NULL);
@@ -189,7 +189,7 @@ static bool uri_scheme(char const *s)
 
 /*************************************************************************/
 
-static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib,Blog *blog,Request *request)
+static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib,Blog const *blog,Request const *request)
 {
   struct pair *src;
   struct pair *np;
