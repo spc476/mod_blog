@@ -64,6 +64,14 @@ void request_free(Request *request)
 
 /*************************************************************************/
 
+int main_cgi_BAD(Cgi cgi)
+{
+  (void)cgi;
+  return cgi_error(NULL,NULL,HTTP_METHODNOTALLOWED,"Nope, now allowed.");
+}
+
+/*************************************************************************/
+
 int main_cgi_get(Cgi cgi)
 {
   assert(cgi != NULL);

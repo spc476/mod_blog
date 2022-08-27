@@ -20,7 +20,6 @@
 *
 *************************************************************************/
 
-#include <stdlib.h>
 #include <cgilib6/crashreport.h>
 #include "main.h"
 
@@ -44,7 +43,7 @@ int main(int argc,char *argv[])
       case HEAD:
       case GET:  rc = main_cgi_get (cgi); break;
       case POST: rc = main_cgi_post(cgi); break;
-      default:   rc = EXIT_FAILURE;       break;
+      default:   rc = main_cgi_BAD (cgi); break;
     }
     CgiFree(cgi);
   }
