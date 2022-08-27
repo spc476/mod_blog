@@ -72,7 +72,7 @@ int main_cgi_get(Cgi cgi)
   Blog    *blog = BlogNew(NULL);
   
   if (blog == NULL)
-    return 1; /* XXX */
+    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
     
   request_init(&request);
   request.f.cgi      = true;
@@ -291,7 +291,7 @@ int main_cgi_post(Cgi cgi)
   Blog    *blog = BlogNew(NULL);
   
   if (blog == NULL)
-    return 1; /* XXX */
+    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
   
   request_init(&request);
   set_m_author(CgiListGetValue(cgi,"author"),&request);
@@ -455,7 +455,6 @@ static int cgi_error(Blog const *blog,Request *request,int level,char const *msg
   
   assert(level >= 0);
   assert(msg   != NULL);
-  (void)request;
   
   va_start(args,msg);
   vasprintf(&errmsg,msg,args);
@@ -463,7 +462,7 @@ static int cgi_error(Blog const *blog,Request *request,int level,char const *msg
   
   asprintf(&file,"%s/errors/%d.html",getenv("DOCUMENT_ROOT"),level);
   
-  if (freopen(file,"r",stdin) == NULL)
+  if ((blog == NULL) || (freopen(file,"r",stdin) == NULL))
   {
     fprintf(
         stdout,
@@ -491,6 +490,9 @@ static int cgi_error(Blog const *blog,Request *request,int level,char const *msg
   else
   {
     struct callback_data cbd;
+    
+    assert(blog    != NULL);
+    assert(request != NULL);
     
     request->f.htmldump = true;
 
