@@ -77,8 +77,6 @@ bool GlobalsInit(char const *conf)
   if (g_blog == NULL)
     return false;
     
-  g_request.f.navprev = true;
-  g_request.f.navnext = true;
   return true;
 }
 

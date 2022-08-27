@@ -359,6 +359,8 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   assert(errorf);
   
   g_request.f.fullurl = false; /* XXX why? */
+  g_request.f.navprev = true;
+  g_request.f.navnext = true;
   
   if (spec->redirect)
     return HTTP_NOTIMP;
