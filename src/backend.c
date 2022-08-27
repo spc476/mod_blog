@@ -446,7 +446,7 @@ int tumbler_page(tumbler__s *spec,int (*errorf)(int,char const *,...))
   ; these four lines replaced 65 very confused lines of code.
   ;-----------------------------------------------------------*/
   
-  if (cbd.template->reverse)
+  if (g_request.f.reverse)
     BlogEntryReadBetweenD(g_blog,&cbd.list,&end,&start);
   else
     BlogEntryReadBetweenU(g_blog,&cbd.list,&start,&end);
