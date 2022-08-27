@@ -40,9 +40,9 @@ int main(int argc,char *argv[],char *envp[])
   {
     switch(CgiMethod(cgi))
     {
+      case HEAD:
       case GET:  rc = main_cgi_get (cgi); break;
       case POST: rc = main_cgi_post(cgi); break;
-      case HEAD: rc = main_cgi_get (cgi); break;
       default:   rc = EXIT_FAILURE;       break;
     }
     CgiFree(cgi);
