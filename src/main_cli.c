@@ -182,11 +182,7 @@ int main_cli(int argc,char *argv[])
     
     if (entry != NULL)
     {
-      g_request.title  = strdup(entry->title);
-      g_request.author = strdup(entry->author);
-      g_request.status = strdup(entry->status);
-      g_request.when   = entry->when;
-      notify_emaillist(&g_request,g_blog);
+      notify_emaillist(entry);
       BlogEntryFree(entry);
       return EXIT_SUCCESS;
     }
@@ -222,7 +218,6 @@ static int cmd_cli_new(Request *req,struct options const *options)
   
   if (entry_add(req,g_blog))
   {
-    if (req->f.email) notify_emaillist(req,g_blog);
     generate_pages();
     return 0;
   }

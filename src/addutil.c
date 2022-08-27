@@ -144,6 +144,10 @@ bool entry_add(Request *req,Blog *blog)
   
   if (blog->config.posthook != NULL)
   {
+    /*---------------------------------------------------------------
+    ; XXX maybe in the future move email notifications to this hook?
+    ;----------------------------------------------------------------*/
+    
     char url[1024];
     
     snprintf(
@@ -159,6 +163,9 @@ bool entry_add(Request *req,Blog *blog)
     
     rc = run_hook("entry-post-hook",(char const *[]){ blog->config.posthook , url , NULL });
   }
+  
+  if (req->f.email)
+    notify_emaillist(entry);
   
   free(entry);
   return rc;
@@ -392,30 +399,24 @@ static ssize_t qp_read(void *cookie,char *buffer,size_t bytes)
 
 /************************************************************************/
 
-struct ecb
-{
-  Request const *req;
-  Blog    const *blog;
-};
-
 static void cb_email_title(FILE *out,void *data)
 {
-  struct ecb *cb = data;
+  BlogEntry *entry = data;
   
   assert(out  != NULL);
   assert(data != NULL);
   
-  if (!empty_string(cb->req->status))
-    fprintf(out,"%s",cb->req->status);
+  if (!empty_string(entry->status))
+    fprintf(out,"%s",entry->status);
   else
-    fprintf(out,"%s",cb->req->title);
+    fprintf(out,"%s",entry->title);
 }
 
 /*************************************************************************/
 
 static void cb_email_url(FILE *out,void *data)
 {
-  struct ecb *cb = data;
+  BlogEntry *entry = data;
   
   assert(out  != NULL);
   assert(data != NULL);
@@ -423,11 +424,11 @@ static void cb_email_url(FILE *out,void *data)
   fprintf(
            out,
            "%s/%04d/%02d/%02d.%d",
-           cb->blog->config.url,
-           cb->req->when.year,
-           cb->req->when.month,
-           cb->req->when.day,
-           cb->req->when.part
+           entry->blog->config.url,
+           entry->when.year,
+           entry->when.month,
+           entry->when.day,
+           entry->when.part
          );
 }
 
@@ -435,16 +436,16 @@ static void cb_email_url(FILE *out,void *data)
 
 static void cb_email_author(FILE *out,void *data)
 {
-  struct ecb *cb = data;
+  BlogEntry *entry = data;
   
   assert(out  != NULL);
   assert(data != NULL);
-  fprintf(out,"%s",cb->req->author);
+  fprintf(out,"%s",entry->author);
 }
 
 /*************************************************************************/
 
-void notify_emaillist(Request *req,Blog *blog)
+void notify_emaillist(BlogEntry *entry)
 {
   static struct chunk_callback const emcallbacks[] =
   {
@@ -461,16 +462,16 @@ void notify_emaillist(Request *req,Blog *blog)
   char      *tmp  = NULL;
   size_t     size = 0;
   
-  assert(req  != NULL);
-  assert(blog != NULL);
+  assert(entry != NULL);
+  assert(entry->valid);
   
-  list = gdbm_open((char *)blog->config.email.list,DB_BLOCK,GDBM_READER,0,dbcritical);
+  list = gdbm_open((char *)entry->blog->config.email.list,DB_BLOCK,GDBM_READER,0,dbcritical);
   if (list == NULL)
     return;
     
   email          = EmailNew();
-  email->from    = strdup(blog->config.author.email);
-  email->subject = strdup(blog->config.email.subject);
+  email->from    = strdup(entry->blog->config.author.email);
+  email->subject = strdup(entry->blog->config.email.subject);
   
   PairListCreate(&email->headers,"MIME-Version","1.0");
   PairListCreate(&email->headers,"Content-Type","text/plain; charset=UTF-8; format=flowed");
@@ -478,7 +479,7 @@ void notify_emaillist(Request *req,Blog *blog)
   
   templates = ChunkNew("",emcallbacks,sizeof(emcallbacks) / sizeof(emcallbacks[0]));
   out       = open_memstream(&tmp,&size);
-  ChunkProcess(templates,blog->config.email.message,out,&(struct ecb){ .req = req , .blog = blog });
+  ChunkProcess(templates,entry->blog->config.email.message,out,entry);
   ChunkFree(templates);
   fclose(out);
   

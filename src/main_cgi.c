@@ -338,7 +338,6 @@ static int cmd_cgi_post_new(Cgi cgi,Request *req)
   
   if (entry_add(req,g_blog))
   {
-    if (req->f.email) notify_emaillist(req,g_blog);
     generate_pages();
     fprintf(
         stdout,
