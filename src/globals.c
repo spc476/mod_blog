@@ -36,22 +36,6 @@ Request  g_request;
 
 /****************************************************/
 
-static void seed_rng(void)
-{
-  unsigned int  seed;
-  FILE         *fp = fopen("/dev/urandom","rb");
-  
-  if (fp)
-  {
-    fread(&seed,sizeof(seed),1,fp);
-    fclose(fp);
-  }
-  
-  srand(seed);
-}
-
-/**************************************************************************/
-
 static void globals_free(void)
 {
   if (g_blog != NULL)
@@ -88,8 +72,7 @@ bool TO_email(char const *value)
 bool GlobalsInit(char const *conf)
 {
   atexit(globals_free);
-  seed_rng();
-
+  
   g_blog = BlogNew(conf);
   if (g_blog == NULL)
     return false;

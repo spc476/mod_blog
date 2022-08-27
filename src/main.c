@@ -28,12 +28,22 @@
 
 int main(int argc,char *argv[])
 {
-  extern char **environ;
-  Cgi cgi;
-  int rc;
+  extern char  **environ;
+  unsigned int   seed;
+  FILE          *fp;
+  Cgi            cgi;
+  int            rc;
   
   crashreport_with(argc,argv,environ);
   crashreport_core();
+  
+  fp = fopen("/dev/urandom","rb");
+  if (fp != NULL)
+  {
+    fread(&seed,sizeof(seed),1,fp);
+    fclose(fp);
+  }
+  srand(seed);
   
   cgi = CgiNew(NULL);
   
