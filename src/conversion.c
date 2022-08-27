@@ -83,6 +83,27 @@ conversion__f TO_conversion(char const *name,char const *def)
 
 /**********************************************************************/
 
+Request *request_init(Request *request)
+{
+  assert(request != NULL);
+
+  memset(request,0,sizeof(Request));
+  request->origauthor = NULL;
+  request->author     = NULL;
+  request->title      = NULL;
+  request->class      = NULL;
+  request->status     = NULL;
+  request->date       = NULL;
+  request->adtag      = NULL;
+  request->origbody   = NULL;
+  request->body       = NULL;
+  request->reqtumbler = NULL;
+  request->conversion = no_conversion;
+  return request;
+}
+
+/**********************************************************************/
+
 void no_conversion(FILE *restrict in,FILE *restrict out)
 {
   assert(in  != NULL);

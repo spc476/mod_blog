@@ -88,7 +88,10 @@ int main_cli(int argc,char *argv[])
   bool       forcenotify = false;
   clicmd__f  command     = cmd_cli_show;
   Blog      *blog;
+  Request    request;
   int        rc;
+
+  request_init(&request);
   
   while(true)
   {
@@ -108,23 +111,23 @@ int main_cli(int argc,char *argv[])
              return cli_error(NULL,NULL,HTTP_ISERVERERR,"%s: %s",optarg,strerror(errno));
            break;
       case OPT_EMAIL:
-           g_request.f.emailin = true;
+           request.f.emailin = true;
            break;
       case OPT_ENTRY:
-           g_request.reqtumbler = optarg;
+           request.reqtumbler = optarg;
            break;
       case OPT_REGENERATE:
-           g_request.f.regenerate = true;
+           request.f.regenerate = true;
            break;
       case OPT_FORCENOTIFY:
            forcenotify = true;
            break;
       case OPT_TODAY:
-           g_request.f.today = true;
+           request.f.today = true;
            break;
       case OPT_THISDAY:
-           g_request.f.thisday  = true;
-           g_request.reqtumbler = optarg;
+           request.f.thisday  = true;
+           request.reqtumbler = optarg;
            break;
       case OPT_CMD:
            command = get_cli_command(optarg);
@@ -187,9 +190,9 @@ int main_cli(int argc,char *argv[])
     }
   }
   
-  rc = (*command)(blog,&g_request);
+  rc = (*command)(blog,&request);
   BlogFree(blog);
-  globals_free();
+  request_free(&request);
   return rc;
 }
 

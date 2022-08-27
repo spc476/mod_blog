@@ -23,29 +23,26 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <syslog.h>
 #include <cgilib6/util.h>
 
 #include "conversion.h"
 #include "frontend.h"
 
-/************************************************************/
-
-Request  g_request;
-
 /****************************************************/
 
-void globals_free(void)
+void request_free(Request *request)
 {
-  free(g_request.origauthor);
-  free(g_request.author);
-  free(g_request.title);
-  free(g_request.class);
-  free(g_request.status);
-  free(g_request.date);
-  free(g_request.adtag);
-  free(g_request.origbody);
-  free(g_request.body);
+  assert(request != NULL);
+  
+  free(request->origauthor);
+  free(request->author);
+  free(request->title);
+  free(request->class);
+  free(request->status);
+  free(request->date);
+  free(request->adtag);
+  free(request->origbody);
+  free(request->body);
 }
 
 /***********************************************************************/
@@ -64,12 +61,3 @@ bool TO_email(char const *value,bool def)
 }
 
 /***************************************************************************/
-
-bool GlobalsInit(char const *conf)
-{
-  (void)conf;
-  atexit(globals_free);
-  return true;
-}
-
-/********************************************************************/

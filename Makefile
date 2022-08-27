@@ -73,8 +73,8 @@ depend:
 
 # DO NOT DELETE
 
-src/addutil.o: src/blog.h src/timeutil.h src/conversion.h src/backend.h
-src/addutil.o: src/frontend.h src/wbtum.h src/blogutil.h
+src/addutil.o: src/blog.h src/timeutil.h src/conversion.h src/frontend.h
+src/addutil.o: src/wbtum.h src/backend.h src/blogutil.h
 src/authenticate.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
 src/backend.o: src/blogutil.h src/frontend.h src/wbtum.h src/timeutil.h
 src/backend.o: src/blog.h src/backend.h src/globals.h

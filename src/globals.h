@@ -31,14 +31,10 @@
 #include <lauxlib.h>
 
 #include "frontend.h"
-#include "blog.h"
 
 #define GENERATOR       "mod_blog" " " PROG_VERSION
 
-extern Request  g_request;
-
-extern bool GlobalsInit   (char const *);
-extern void globals_free  (void);
+extern void request_free  (Request *);
 extern bool TO_email      (char const *,bool);
 extern int  main_cgi_get  (Cgi);
 extern int  main_cgi_post (Cgi);

@@ -51,16 +51,18 @@ int main_cgi_get(Cgi cgi)
 {
   assert(cgi != NULL);
   
-  Blog *blog = BlogNew(NULL);
+  Request  request;
+  Blog    *blog = BlogNew(NULL);
   
   if (blog == NULL)
     return 1; /* XXX */
     
-  g_request.f.cgi      = true;
-  g_request.reqtumbler = getenv("PATH_INFO");
-  int rc = (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&g_request);
+  request_init(&request);
+  request.f.cgi      = true;
+  request.reqtumbler = getenv("PATH_INFO");
+  int rc = (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&request);
   BlogFree(blog);
-  globals_free();
+  request_free(&request);
   return rc;
 }
 
@@ -268,44 +270,47 @@ int main_cgi_post(Cgi cgi)
 {
   assert(cgi != NULL);
   
-  Blog *blog = BlogNew(NULL);
+  Request  request;
+  Blog    *blog = BlogNew(NULL);
+  
   if (blog == NULL)
     return 1; /* XXX */
-    
-  set_m_author(CgiListGetValue(cgi,"author"),&g_request);
   
-  g_request.title      = strdup(CgiListGetValue(cgi,"title"));
-  g_request.class      = strdup(CgiListGetValue(cgi,"class"));
-  g_request.status     = strdup(CgiListGetValue(cgi,"status"));
-  g_request.date       = strdup(CgiListGetValue(cgi,"date"));
-  g_request.adtag      = strdup(CgiListGetValue(cgi,"adtag"));
-  g_request.origbody   = strdup(CgiListGetValue(cgi,"body"));
-  g_request.body       = strdup(g_request.origbody);
-  g_request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),blog->config.conversion);
-  g_request.f.email    = TO_email(CgiListGetValue(cgi,"email"),blog->config.email.notify);
-  g_request.f.cgi      = true;
+  request_init(&request);
+  set_m_author(CgiListGetValue(cgi,"author"),&request);
+  
+  request.title      = strdup(CgiListGetValue(cgi,"title"));
+  request.class      = strdup(CgiListGetValue(cgi,"class"));
+  request.status     = strdup(CgiListGetValue(cgi,"status"));
+  request.date       = strdup(CgiListGetValue(cgi,"date"));
+  request.adtag      = strdup(CgiListGetValue(cgi,"adtag"));
+  request.origbody   = strdup(CgiListGetValue(cgi,"body"));
+  request.body       = strdup(request.origbody);
+  request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),blog->config.conversion);
+  request.f.email    = TO_email(CgiListGetValue(cgi,"email"),blog->config.email.notify);
+  request.f.cgi      = true;
   
   if (
-       (emptynull_string(g_request.author))
-       || (emptynull_string(g_request.title))
-       || (emptynull_string(g_request.body))
+       (emptynull_string(request.author))
+       || (emptynull_string(request.title))
+       || (emptynull_string(request.body))
      )
   {
-    return cgi_error(blog,&g_request,HTTP_BADREQ,"errors-missing");
+    return cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
   }
   
-  if (g_request.class == NULL)
-    g_request.class = strdup("");
+  if (request.class == NULL)
+    request.class = strdup("");
     
-  if (authenticate_author(&g_request,blog) == false)
+  if (authenticate_author(&request,blog) == false)
   {
-    syslog(LOG_ERR,"'%s' not authorized to post",g_request.author);
-    return cgi_error(blog,&g_request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",g_request.author,CgiListGetValue(cgi,"author"));
+    syslog(LOG_ERR,"'%s' not authorized to post",request.author);
+    return cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiListGetValue(cgi,"author"));
   }
   
-  int rc = (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&g_request);
+  int rc = (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&request);
   BlogFree(blog);
-  globals_free();
+  request_free(&request);
   return rc;
 }
 
@@ -470,7 +475,7 @@ static int cgi_error(Blog const *blog,Request *request,int level,char const *msg
   {
     struct callback_data cbd;
     
-    g_request.f.htmldump = true;
+    request->f.htmldump = true;
 
     fprintf(
         stdout,
@@ -481,7 +486,7 @@ static int cgi_error(Blog const *blog,Request *request,int level,char const *msg
         level,
         errmsg
       );
-    generic_cb("main",stdout,callback_init(&cbd,blog,&g_request));
+    generic_cb("main",stdout,callback_init(&cbd,blog,request));
   }
   
   free(file);
