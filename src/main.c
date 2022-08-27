@@ -41,9 +41,9 @@ int main(int argc,char *argv[])
     switch(CgiMethod(cgi))
     {
       case HEAD:
-      case GET:  rc = main_cgi_get (cgi); break;
-      case POST: rc = main_cgi_post(cgi); break;
-      default:   rc = main_cgi_BAD (cgi); break;
+      case GET:  rc = main_cgi_GET (cgi); break;
+      case POST: rc = main_cgi_POST(cgi); break;
+      default:   rc = main_cgi_bad (cgi); break;
     }
     CgiFree(cgi);
   }
