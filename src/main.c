@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include <cgilib6/crashreport.h>
-#include "globals.h"
+#include "main.h"
 
 /************************************************************************/
 

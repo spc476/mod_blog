@@ -29,7 +29,7 @@
 #include "backend.h"
 #include "frontend.h"
 #include "conversion.h"
-#include "globals.h"
+#include "main.h"
 
 typedef int (*cgicmd__f)(Cgi,Blog *,struct request *);
 

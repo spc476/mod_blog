@@ -36,7 +36,7 @@
 #include "frontend.h"
 #include "blogutil.h"
 #include "conversion.h"
-#include "globals.h"
+#include "main.h"
 
 typedef int (*clicmd__f)(Blog *,Request *);
 
