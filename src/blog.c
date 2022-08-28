@@ -37,21 +37,6 @@
 #include "blog.h"
 #include "wbtum.h"
 
-/**********************************************************************/
-
-static void    date_to_dir      (char *,struct btm const *);
-static void    date_to_filename (char *,struct btm const *,char const *);
-static void    date_to_part     (char *,struct btm const *,int);
-static FILE   *open_file_r      (char const *,struct btm const *);
-static FILE   *open_file_w      (char const *,struct btm const *);
-static bool    date_check       (struct btm const *);
-static int     date_checkcreate (struct btm const *);
-static char   *blog_meta_entry  (char const *,struct btm const *);
-static size_t  blog_meta_read   (char ***,char const *,struct btm const *);
-static void    blog_meta_adjust (char ***,size_t,size_t);
-static int     blog_meta_write  (char const *,struct btm const *,char **,size_t);
-static bool    config_read      (char const *,Blog *);
-
 /***********************************************************************/
 
 static inline size_t max(size_t a,size_t b)
@@ -110,300 +95,6 @@ static bool set_date(char const *file,struct btm *when,struct btm *now)
 }
 
 /***********************************************************************/
-
-Blog *BlogNew(char const *configfile)
-{
-  struct tm *ptm;
-  Blog      *blog = calloc(1,sizeof(struct blog));
-  
-  if (blog == NULL)
-  {
-    syslog(LOG_ERR,"Can't allocate blog memory");
-    return NULL;
-  }
-  
-  if (!config_read(configfile,blog))
-  {
-    BlogFree(blog);
-    return NULL;
-  }
-  
-  umask(022);
-  if (chdir(blog->config.basedir) != 0)
-  {
-    syslog(LOG_ERR,"%s: %s",blog->config.basedir,strerror(errno));
-    BlogFree(blog);
-    return NULL;
-  }
-  
-  blog->tnow      = time(NULL);
-  ptm             = localtime(&blog->tnow);
-  blog->now.year  = ptm->tm_year + 1900;
-  blog->now.month = ptm->tm_mon  + 1;
-  blog->now.day   = ptm->tm_mday;
-  blog->now.part  = 1;
-  
-  if (!set_date(".first",&blog->first,&blog->now) || !set_date(".last",&blog->last,&blog->now))
-  {
-    BlogFree(blog);
-    return NULL;
-  }
-  
-  if (
-          (blog->last.year  == blog->now.year)
-       && (blog->last.month == blog->now.month)
-       && (blog->last.day   == blog->now.day)
-     )
-  {
-    blog->now.part = blog->last.part;
-  }
-  
-  return blog;
-}
-
-/***********************************************************************/
-
-void BlogFree(Blog *blog)
-{
-  assert(blog           != NULL);
-  assert(blog->config.L != NULL);
-  lua_close(blog->config.L);
-  free(blog);
-}
-
-/************************************************************************/
-
-BlogEntry *BlogEntryNew(Blog *blog)
-{
-  assert(blog != NULL);
-  
-  BlogEntry *pbe = malloc(sizeof(struct blogentry));
-  if (pbe != NULL)
-  {
-    pbe->node.ln_Succ = NULL;
-    pbe->node.ln_Pred = NULL;
-    pbe->blog         = blog;
-    pbe->valid        = true;
-    pbe->timestamp    = time(NULL);
-    pbe->when.year    = blog->now.year;
-    pbe->when.month   = blog->now.month;
-    pbe->when.day     = blog->now.day;
-    pbe->when.part    = 0;
-    pbe->title        = NULL;
-    pbe->class        = NULL;
-    pbe->author       = NULL;
-    pbe->status       = NULL;
-    pbe->adtag        = NULL;
-    pbe->body         = NULL;
-  }
-  
-  return pbe;
-}
-
-/***********************************************************************/
-
-BlogEntry *BlogEntryRead(Blog const *blog,struct btm const *which)
-{
-  BlogEntry   *entry;
-  char         pname[FILENAME_MAX];
-  FILE        *sinbody;
-  struct stat  status;
-  
-  assert(blog                             != NULL);
-  assert(which                            != NULL);
-  assert(which->part                      >  0);
-  assert(btm_cmp_date(which,&blog->first) >= 0);
-  
-  if (!date_check(which))
-    return NULL;
-    
-  date_to_part(pname,which,which->part);
-  if (access(pname,R_OK) != 0)
-    return NULL;
-    
-  entry = malloc(sizeof(struct blogentry));
-  if (entry == NULL)
-    return NULL;
-    
-  entry->node.ln_Succ = NULL;
-  entry->node.ln_Pred = NULL;
-  entry->valid        = true;
-  entry->blog         = blog;
-  entry->when.year    = which->year;
-  entry->when.month   = which->month;
-  entry->when.day     = which->day;
-  entry->when.part    = which->part;
-  entry->title        = blog_meta_entry("titles",which);
-  entry->class        = blog_meta_entry("class",which);
-  entry->author       = blog_meta_entry("authors",which);
-  entry->status       = blog_meta_entry("status",which);
-  entry->adtag        = blog_meta_entry("adtag",which);
-  
-  date_to_part(pname,which,which->part);
-  
-  if (stat(pname,&status) == 0)
-    entry->timestamp = status.st_mtime;
-  else
-    entry->timestamp = blog->tnow;
-    
-  sinbody = fopen(pname,"r");
-  if (sinbody == NULL)
-    entry->body = strdup("");
-  else
-  {
-    entry->body = malloc(status.st_size + 1);
-    fread(entry->body,1,status.st_size,sinbody);
-    fclose(sinbody);
-    entry->body[status.st_size] = '\0';
-  }
-  
-  return entry;
-}
-
-/**********************************************************************/
-
-void BlogEntryReadBetweenU(
-        Blog const       *blog,
-        List             *list,
-        struct btm const *restrict start,
-        struct btm const *restrict end
-)
-{
-  BlogEntry  *entry;
-  struct btm  current;
-  
-  assert(blog  != NULL);
-  assert(list  != NULL);
-  assert(start != NULL);
-  assert(end   != NULL);
-  
-  current = *start;
-  
-  while(btm_cmp(&current,end) <= 0)
-  {
-    entry = BlogEntryRead(blog,&current);
-    if (entry != NULL)
-    {
-      ListAddTail(list,&entry->node);
-      current.part++;
-    }
-    else
-    {
-      current.part = 1;
-      btm_inc_day(&current);
-    }
-  }
-}
-
-/************************************************************************/
-
-void BlogEntryReadBetweenD(
-        Blog const       *blog,
-        List             *listb,
-        struct btm const *restrict end,
-        struct btm const *restrict start
-)
-{
-  List  lista;
-  
-  assert(blog  != NULL);
-  assert(listb != NULL);
-  assert(start != NULL);
-  assert(end   != NULL);
-  
-  ListInit(&lista);
-  
-  /*----------------------------------------------
-  ; we read in the entries from earlier to later,
-  ; then just reverse the list.
-  ;----------------------------------------------*/
-  
-  BlogEntryReadBetweenU(blog,&lista,start,end);
-  
-  for
-  (
-    Node *node = ListRemHead(&lista);
-    NodeValid(node);
-    node = ListRemHead(&lista)
-  )
-  {
-    ListAddHead(listb,node);
-  }
-}
-
-/*******************************************************************/
-
-void BlogEntryReadXD(
-        Blog const       *blog,
-        List             *list,
-        struct btm const *start,
-        size_t            num
-)
-{
-  struct btm current;
-  
-  assert(blog  != NULL);
-  assert(list  != NULL);
-  assert(start != NULL);
-  assert(num   >  0);
-  
-  current = *start;
-  
-  while(num)
-  {
-    if (btm_cmp_date(&current,&blog->first) < 0)
-      return;
-      
-    BlogEntry *entry = BlogEntryRead(blog,&current);
-    if (entry != NULL)
-    {
-      ListAddTail(list,&entry->node);
-      num--;
-    }
-    current.part--;
-    if (current.part == 0)
-    {
-      current.part = ENTRY_MAX;
-      btm_dec_day(&current);
-    }
-  }
-}
-
-/*******************************************************************/
-
-void BlogEntryReadXU(
-        Blog const       *blog,
-        List             *list,
-        struct btm const *start,
-        size_t            num
-)
-{
-  struct btm current;
-  
-  assert(blog != NULL);
-  assert(list != NULL);
-  assert(num  >  0);
-  
-  current = *start;
-  
-  while((num) && (btm_cmp_date(&current,&blog->now) <= 0))
-  {
-    BlogEntry *entry = BlogEntryRead(blog,&current);
-    if (entry != NULL)
-    {
-      ListAddTail(list,&entry->node);
-      num--;
-      current.part++;
-    }
-    else
-    {
-      current.part = 1;
-      btm_inc_day(&current);
-    }
-  }
-}
-
-/**************************************************************************/
 
 static int blog_lock(char const *lockfile)
 {
@@ -465,169 +156,6 @@ static void blog_unlock(char const *lockfile,int lock)
     else
       syslog(LOG_ERR,"fcntl('%s',F_UNLCK) = %s",lockfile,strerror(errno));
   }
-}
-
-/***********************************************************************/
-
-int BlogEntryWrite(BlogEntry *entry)
-{
-  char   **authors;
-  char   **class;
-  char   **status;
-  char   **titles;
-  char   **adtag;
-  size_t   numa;
-  size_t   numc;
-  size_t   nums;
-  size_t   numt;
-  size_t   numad;
-  size_t   maxnum;
-  char     filename[FILENAME_MAX];
-  FILE    *out;
-  int      rc;
-  int      lock;
-  
-  assert(entry != NULL);
-  assert(entry->valid);
-  
-  rc = date_checkcreate(&entry->when);
-  if (rc != 0)
-    return rc;
-    
-  /*---------------------------------------------------------------------
-  ; The meta-data for the entries are stored in separate files.  When
-  ; updating an entry (or adding an entry), we need to rewrite these
-  ; metafiles.  So, we read them all in, make the adjustments required and
-  ; write them out.
-  ;------------------------------------------------------------------------*/
-  
-  numa   = blog_meta_read(&authors,"authors",&entry->when);
-  numc   = blog_meta_read(&class,  "class",  &entry->when);
-  nums   = blog_meta_read(&status, "status", &entry->when);
-  numt   = blog_meta_read(&titles, "titles", &entry->when);
-  numad  = blog_meta_read(&adtag,  "adtag",  &entry->when);
-  maxnum = max(numa,max(numc,max(nums,numt)));
-  
-  blog_meta_adjust(&authors,numa, maxnum);
-  blog_meta_adjust(&class,  numc, maxnum);
-  blog_meta_adjust(&status, nums, maxnum);
-  blog_meta_adjust(&titles, numt, maxnum);
-  blog_meta_adjust(&adtag,  numad,maxnum);
-  
-  if (entry->when.part == 0)
-  {
-    if (maxnum == 99)
-      return ENOMEM;
-      
-    authors[maxnum]  = strdup(entry->author);
-    class  [maxnum]  = strdup(entry->class);
-    status [maxnum]  = strdup(entry->status);
-    titles [maxnum]  = strdup(entry->title);
-    adtag  [maxnum]  = strdup(entry->adtag);
-    entry->when.part = ++maxnum;
-  }
-  else
-  {
-    free(authors[entry->when.part]);
-    free(class  [entry->when.part]);
-    free(status [entry->when.part]);
-    free(titles [entry->when.part]);
-    free(adtag  [entry->when.part]);
-    
-    authors[entry->when.part] = strdup(entry->author);
-    class  [entry->when.part] = strdup(entry->class);
-    status [entry->when.part] = strdup(entry->status);
-    titles [entry->when.part] = strdup(entry->title);
-    adtag  [entry->when.part] = strdup(entry->adtag);
-  }
-  
-  blog_meta_write("authors",&entry->when,authors,maxnum);
-  blog_meta_write("class"  ,&entry->when,class,  maxnum);
-  blog_meta_write("status" ,&entry->when,status, maxnum);
-  blog_meta_write("titles" ,&entry->when,titles, maxnum);
-  blog_meta_write("adtag"  ,&entry->when,adtag,  maxnum);
-  
-  lock = blog_lock(entry->blog->config.lockfile);
-  
-  /*-------------------------------
-  ; update the actual entry body
-  ;---------------------------------*/
-  
-  date_to_part(filename,&entry->when,entry->when.part);
-  out = fopen(filename,"w");
-  fputs(entry->body,out);
-  fclose(out);
-  
-  /*-----------------
-  ; clean up
-  ;------------------*/
-  
-  for(size_t i = 0 ; i < maxnum ; i++)
-  {
-    free(authors[i]);
-    free(class[i]);
-    free(status[i]);
-    free(titles[i]);
-    free(adtag[i]);
-  }
-  
-  free(authors);
-  free(class);
-  free(status);
-  free(titles);
-  free(adtag);
-  
-  /*------------------------------------------------------------------------
-  ; Oh, and if this is the latest entry to be added, update the .last file
-  ; to reflect that.
-  ;------------------------------------------------------------------------*/
-  
-  if (btm_cmp(&entry->when,&entry->blog->last) > 0)
-  {
-    Blog *blog = (Blog *)entry->blog; /* XXX how to handle */
-    blog->last = entry->when;
-    blog->now  = entry->when;
-    
-    out = fopen(".last","w");
-    
-    if (out)
-    {
-      fprintf(
-                out,
-                "%d/%02d/%02d.%d\n",
-                entry->when.year,
-                entry->when.month,
-                entry->when.day,
-                entry->when.part
-        );
-      fclose(out);
-    }
-  }
-  
-  blog_unlock(entry->blog->config.lockfile,lock);
-  return 0;
-}
-
-/***********************************************************************/
-
-int BlogEntryFree(BlogEntry *entry)
-{
-  assert(entry != NULL);
-  
-  if (!entry->valid)
-  {
-    syslog(LOG_ERR,"invalid entry being freed");
-    return 0;
-  }
-  
-  free(entry->body);
-  free(entry->adtag);
-  free(entry->status);
-  free(entry->author);
-  free(entry->class);
-  free(entry->title);
-  free(entry);
-  return 0;
 }
 
 /***********************************************************************/
@@ -1297,3 +825,460 @@ static bool config_read(char const *conf,Blog *blog)
 }
 
 /***************************************************************************/
+
+Blog *BlogNew(char const *configfile)
+{
+  struct tm *ptm;
+  Blog      *blog = calloc(1,sizeof(struct blog));
+  
+  if (blog == NULL)
+  {
+    syslog(LOG_ERR,"Can't allocate blog memory");
+    return NULL;
+  }
+  
+  if (!config_read(configfile,blog))
+  {
+    BlogFree(blog);
+    return NULL;
+  }
+  
+  umask(022);
+  if (chdir(blog->config.basedir) != 0)
+  {
+    syslog(LOG_ERR,"%s: %s",blog->config.basedir,strerror(errno));
+    BlogFree(blog);
+    return NULL;
+  }
+  
+  blog->tnow      = time(NULL);
+  ptm             = localtime(&blog->tnow);
+  blog->now.year  = ptm->tm_year + 1900;
+  blog->now.month = ptm->tm_mon  + 1;
+  blog->now.day   = ptm->tm_mday;
+  blog->now.part  = 1;
+  
+  if (!set_date(".first",&blog->first,&blog->now) || !set_date(".last",&blog->last,&blog->now))
+  {
+    BlogFree(blog);
+    return NULL;
+  }
+  
+  if (
+          (blog->last.year  == blog->now.year)
+       && (blog->last.month == blog->now.month)
+       && (blog->last.day   == blog->now.day)
+     )
+  {
+    blog->now.part = blog->last.part;
+  }
+  
+  return blog;
+}
+
+/***********************************************************************/
+
+void BlogFree(Blog *blog)
+{
+  assert(blog           != NULL);
+  assert(blog->config.L != NULL);
+  lua_close(blog->config.L);
+  free(blog);
+}
+
+/************************************************************************/
+
+BlogEntry *BlogEntryNew(Blog *blog)
+{
+  assert(blog != NULL);
+  
+  BlogEntry *pbe = malloc(sizeof(struct blogentry));
+  if (pbe != NULL)
+  {
+    pbe->node.ln_Succ = NULL;
+    pbe->node.ln_Pred = NULL;
+    pbe->blog         = blog;
+    pbe->valid        = true;
+    pbe->timestamp    = time(NULL);
+    pbe->when.year    = blog->now.year;
+    pbe->when.month   = blog->now.month;
+    pbe->when.day     = blog->now.day;
+    pbe->when.part    = 0;
+    pbe->title        = NULL;
+    pbe->class        = NULL;
+    pbe->author       = NULL;
+    pbe->status       = NULL;
+    pbe->adtag        = NULL;
+    pbe->body         = NULL;
+  }
+  
+  return pbe;
+}
+
+/***********************************************************************/
+
+BlogEntry *BlogEntryRead(Blog const *blog,struct btm const *which)
+{
+  BlogEntry   *entry;
+  char         pname[FILENAME_MAX];
+  FILE        *sinbody;
+  struct stat  status;
+  
+  assert(blog                             != NULL);
+  assert(which                            != NULL);
+  assert(which->part                      >  0);
+  assert(btm_cmp_date(which,&blog->first) >= 0);
+  
+  if (!date_check(which))
+    return NULL;
+    
+  date_to_part(pname,which,which->part);
+  if (access(pname,R_OK) != 0)
+    return NULL;
+    
+  entry = malloc(sizeof(struct blogentry));
+  if (entry == NULL)
+    return NULL;
+    
+  entry->node.ln_Succ = NULL;
+  entry->node.ln_Pred = NULL;
+  entry->valid        = true;
+  entry->blog         = blog;
+  entry->when.year    = which->year;
+  entry->when.month   = which->month;
+  entry->when.day     = which->day;
+  entry->when.part    = which->part;
+  entry->title        = blog_meta_entry("titles",which);
+  entry->class        = blog_meta_entry("class",which);
+  entry->author       = blog_meta_entry("authors",which);
+  entry->status       = blog_meta_entry("status",which);
+  entry->adtag        = blog_meta_entry("adtag",which);
+  
+  date_to_part(pname,which,which->part);
+  
+  if (stat(pname,&status) == 0)
+    entry->timestamp = status.st_mtime;
+  else
+    entry->timestamp = blog->tnow;
+    
+  sinbody = fopen(pname,"r");
+  if (sinbody == NULL)
+    entry->body = strdup("");
+  else
+  {
+    entry->body = malloc(status.st_size + 1);
+    fread(entry->body,1,status.st_size,sinbody);
+    fclose(sinbody);
+    entry->body[status.st_size] = '\0';
+  }
+  
+  return entry;
+}
+
+/**********************************************************************/
+
+void BlogEntryReadBetweenU(
+        Blog const       *blog,
+        List             *list,
+        struct btm const *restrict start,
+        struct btm const *restrict end
+)
+{
+  BlogEntry  *entry;
+  struct btm  current;
+  
+  assert(blog  != NULL);
+  assert(list  != NULL);
+  assert(start != NULL);
+  assert(end   != NULL);
+  
+  current = *start;
+  
+  while(btm_cmp(&current,end) <= 0)
+  {
+    entry = BlogEntryRead(blog,&current);
+    if (entry != NULL)
+    {
+      ListAddTail(list,&entry->node);
+      current.part++;
+    }
+    else
+    {
+      current.part = 1;
+      btm_inc_day(&current);
+    }
+  }
+}
+
+/************************************************************************/
+
+void BlogEntryReadBetweenD(
+        Blog const       *blog,
+        List             *listb,
+        struct btm const *restrict end,
+        struct btm const *restrict start
+)
+{
+  List  lista;
+  
+  assert(blog  != NULL);
+  assert(listb != NULL);
+  assert(start != NULL);
+  assert(end   != NULL);
+  
+  ListInit(&lista);
+  
+  /*----------------------------------------------
+  ; we read in the entries from earlier to later,
+  ; then just reverse the list.
+  ;----------------------------------------------*/
+  
+  BlogEntryReadBetweenU(blog,&lista,start,end);
+  
+  for
+  (
+    Node *node = ListRemHead(&lista);
+    NodeValid(node);
+    node = ListRemHead(&lista)
+  )
+  {
+    ListAddHead(listb,node);
+  }
+}
+
+/*******************************************************************/
+
+void BlogEntryReadXD(
+        Blog const       *blog,
+        List             *list,
+        struct btm const *start,
+        size_t            num
+)
+{
+  struct btm current;
+  
+  assert(blog  != NULL);
+  assert(list  != NULL);
+  assert(start != NULL);
+  assert(num   >  0);
+  
+  current = *start;
+  
+  while(num)
+  {
+    if (btm_cmp_date(&current,&blog->first) < 0)
+      return;
+      
+    BlogEntry *entry = BlogEntryRead(blog,&current);
+    if (entry != NULL)
+    {
+      ListAddTail(list,&entry->node);
+      num--;
+    }
+    current.part--;
+    if (current.part == 0)
+    {
+      current.part = ENTRY_MAX;
+      btm_dec_day(&current);
+    }
+  }
+}
+
+/*******************************************************************/
+
+void BlogEntryReadXU(
+        Blog const       *blog,
+        List             *list,
+        struct btm const *start,
+        size_t            num
+)
+{
+  struct btm current;
+  
+  assert(blog != NULL);
+  assert(list != NULL);
+  assert(num  >  0);
+  
+  current = *start;
+  
+  while((num) && (btm_cmp_date(&current,&blog->now) <= 0))
+  {
+    BlogEntry *entry = BlogEntryRead(blog,&current);
+    if (entry != NULL)
+    {
+      ListAddTail(list,&entry->node);
+      num--;
+      current.part++;
+    }
+    else
+    {
+      current.part = 1;
+      btm_inc_day(&current);
+    }
+  }
+}
+
+/**************************************************************************/
+
+int BlogEntryWrite(BlogEntry *entry)
+{
+  char   **authors;
+  char   **class;
+  char   **status;
+  char   **titles;
+  char   **adtag;
+  size_t   numa;
+  size_t   numc;
+  size_t   nums;
+  size_t   numt;
+  size_t   numad;
+  size_t   maxnum;
+  char     filename[FILENAME_MAX];
+  FILE    *out;
+  int      rc;
+  int      lock;
+  
+  assert(entry != NULL);
+  assert(entry->valid);
+  
+  rc = date_checkcreate(&entry->when);
+  if (rc != 0)
+    return rc;
+    
+  /*---------------------------------------------------------------------
+  ; The meta-data for the entries are stored in separate files.  When
+  ; updating an entry (or adding an entry), we need to rewrite these
+  ; metafiles.  So, we read them all in, make the adjustments required and
+  ; write them out.
+  ;------------------------------------------------------------------------*/
+  
+  numa   = blog_meta_read(&authors,"authors",&entry->when);
+  numc   = blog_meta_read(&class,  "class",  &entry->when);
+  nums   = blog_meta_read(&status, "status", &entry->when);
+  numt   = blog_meta_read(&titles, "titles", &entry->when);
+  numad  = blog_meta_read(&adtag,  "adtag",  &entry->when);
+  maxnum = max(numa,max(numc,max(nums,numt)));
+  
+  blog_meta_adjust(&authors,numa, maxnum);
+  blog_meta_adjust(&class,  numc, maxnum);
+  blog_meta_adjust(&status, nums, maxnum);
+  blog_meta_adjust(&titles, numt, maxnum);
+  blog_meta_adjust(&adtag,  numad,maxnum);
+  
+  if (entry->when.part == 0)
+  {
+    if (maxnum == 99)
+      return ENOMEM;
+      
+    authors[maxnum]  = strdup(entry->author);
+    class  [maxnum]  = strdup(entry->class);
+    status [maxnum]  = strdup(entry->status);
+    titles [maxnum]  = strdup(entry->title);
+    adtag  [maxnum]  = strdup(entry->adtag);
+    entry->when.part = ++maxnum;
+  }
+  else
+  {
+    free(authors[entry->when.part]);
+    free(class  [entry->when.part]);
+    free(status [entry->when.part]);
+    free(titles [entry->when.part]);
+    free(adtag  [entry->when.part]);
+    
+    authors[entry->when.part] = strdup(entry->author);
+    class  [entry->when.part] = strdup(entry->class);
+    status [entry->when.part] = strdup(entry->status);
+    titles [entry->when.part] = strdup(entry->title);
+    adtag  [entry->when.part] = strdup(entry->adtag);
+  }
+  
+  blog_meta_write("authors",&entry->when,authors,maxnum);
+  blog_meta_write("class"  ,&entry->when,class,  maxnum);
+  blog_meta_write("status" ,&entry->when,status, maxnum);
+  blog_meta_write("titles" ,&entry->when,titles, maxnum);
+  blog_meta_write("adtag"  ,&entry->when,adtag,  maxnum);
+  
+  lock = blog_lock(entry->blog->config.lockfile);
+  
+  /*-------------------------------
+  ; update the actual entry body
+  ;---------------------------------*/
+  
+  date_to_part(filename,&entry->when,entry->when.part);
+  out = fopen(filename,"w");
+  fputs(entry->body,out);
+  fclose(out);
+  
+  /*-----------------
+  ; clean up
+  ;------------------*/
+  
+  for(size_t i = 0 ; i < maxnum ; i++)
+  {
+    free(authors[i]);
+    free(class[i]);
+    free(status[i]);
+    free(titles[i]);
+    free(adtag[i]);
+  }
+  
+  free(authors);
+  free(class);
+  free(status);
+  free(titles);
+  free(adtag);
+  
+  /*------------------------------------------------------------------------
+  ; Oh, and if this is the latest entry to be added, update the .last file
+  ; to reflect that.
+  ;------------------------------------------------------------------------*/
+  
+  if (btm_cmp(&entry->when,&entry->blog->last) > 0)
+  {
+    Blog *blog = (Blog *)entry->blog; /* XXX how to handle */
+    blog->last = entry->when;
+    blog->now  = entry->when;
+    
+    out = fopen(".last","w");
+    
+    if (out)
+    {
+      fprintf(
+                out,
+                "%d/%02d/%02d.%d\n",
+                entry->when.year,
+                entry->when.month,
+                entry->when.day,
+                entry->when.part
+        );
+      fclose(out);
+    }
+  }
+  
+  blog_unlock(entry->blog->config.lockfile,lock);
+  return 0;
+}
+
+/***********************************************************************/
+
+int BlogEntryFree(BlogEntry *entry)
+{
+  assert(entry != NULL);
+  
+  if (!entry->valid)
+  {
+    syslog(LOG_ERR,"invalid entry being freed");
+    return 0;
+  }
+  
+  free(entry->body);
+  free(entry->adtag);
+  free(entry->status);
+  free(entry->author);
+  free(entry->class);
+  free(entry->title);
+  free(entry);
+  return 0;
+}
+
+/***********************************************************************/

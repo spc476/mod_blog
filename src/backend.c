@@ -34,233 +34,6 @@
 
 /*****************************************************************/
 
-static struct btm  calculate_previous (Blog const *,Request *,struct btm const,unit__e);
-static struct btm  calculate_next     (Blog const *,Request *,struct btm const,unit__e);
-static char const *mime_type          (char const *);
-static int         display_file       (tumbler__s const *,Blog const *,Request *,int (*)(Blog const *,Request *,int,char const *,...));
-static char       *tag_collect        (List *,char const *);
-static char       *tag_pick           (char const *,char const *);
-static void        free_entries       (List *);
-
-/************************************************************************/
-
-struct callback_data *callback_init(struct callback_data *cbd,Blog const *blog,Request const *request)
-{
-  assert(cbd     != NULL);
-  assert(blog    != NULL);
-  assert(request != NULL);
-  
-  memset(cbd,0,sizeof(struct callback_data));
-  ListInit(&cbd->list);
-  cbd->template = &blog->config.templates[0]; /* XXX probably document this */
-  cbd->request  = request;
-  cbd->blog     = blog;
-  cbd->entry    = NULL;
-  cbd->ad       = NULL;
-  cbd->adtag    = NULL;
-  cbd->adcat    = NULL;
-  cbd->navunit  = UNIT_PART;
-  return cbd;
-}
-
-/************************************************************************/
-
-pagegen__f TO_pagegen(char const *name)
-{
-  assert(name != NULL);
-  if (strcmp(name,"items") == 0)
-    return pagegen_items;
-  else if (strcmp(name,"days") == 0)
-    return pagegen_days;
-  else
-  {
-    assert(0);
-    return pagegen_items;
-  }
-}
-
-/************************************************************************/
-
-int generate_thisday(Blog const *blog,Request *request,FILE *out,struct btm when)
-{
-  struct callback_data  cbd;
-  char                 *tags;
-  
-  assert(blog    != NULL);
-  assert(request != NULL);
-  assert(out     != NULL);
-  
-  callback_init(&cbd,blog,request);
-  
-  for(when.year = blog->first.year ; when.year <= blog->now.year ; when.year++)
-  {
-    if (btm_cmp_date(&when,&blog->first) < 0)
-      continue;
-      
-    for (when.part = 1 ; ; when.part++)
-    {
-      BlogEntry *entry = BlogEntryRead(blog,&when);
-      if (entry)
-      {
-        assert(entry->valid);
-        ListAddTail(&cbd.list,&entry->node);
-      }
-      else
-        break;
-    }
-  }
-  
-  tags = tag_collect(&cbd.list,blog->config.adtag);
-  cbd.adtag = tag_pick(tags,blog->config.adtag);
-  free(tags);
-  generic_cb("main",out,&cbd);
-  free_entries(&cbd.list);
-  free(cbd.adtag);
-  return 0;
-}
-
-/************************************************************************/
-
-int generate_pages(Blog const *blog,Request *request)
-{
-  assert(blog    != NULL);
-  assert(request != NULL);
-  (void)request;
-  
-  for (size_t i = 0 ; i < blog->config.templatenum ; i++)
-  {
-    FILE  *out = fopen(blog->config.templates[i].file,"w");
-    int  (*pagegen)(Blog const *,Request *,struct template const *,FILE *);
-    
-    if (out == NULL)
-    {
-      syslog(LOG_ERR,"%s: %s",blog->config.templates[i].file,strerror(errno));
-      continue;
-    }
-    
-    pagegen = TO_pagegen(blog->config.templates[i].pagegen);
-    (*pagegen)(blog,request,&blog->config.templates[i],out);
-    fclose(out);
-    
-    if (blog->config.templates[i].posthook)
-    {
-      char const *argv[3];
-      
-      argv[0] = blog->config.templates[i].posthook;
-      argv[1] = blog->config.templates[i].file;
-      argv[2] = NULL;
-      
-      run_hook("template-post-hook",argv);
-    }
-  }
-  
-  return 0;
-}
-
-/******************************************************************/
-
-int pagegen_items(
-        Blog        const *blog,
-        Request           *request,
-        template__t const *template,
-        FILE              *out
-)
-{
-  struct btm            thisday;
-  char                 *tags;
-  struct callback_data  cbd;
-  
-  assert(blog     != NULL);
-  assert(request  != NULL);
-  assert(template != NULL);
-  assert(out      != NULL);
-  
-  request->f.fullurl = template->fullurl;
-  request->f.reverse = template->reverse;
-  thisday      = blog->now;
-  
-  callback_init(&cbd,blog,request);
-  cbd.template = template;
-  
-  if (template->reverse)
-    BlogEntryReadXD(blog,&cbd.list,&thisday,template->items);
-  else
-    BlogEntryReadXU(blog,&cbd.list,&thisday,template->items);
-    
-  tags      = tag_collect(&cbd.list,blog->config.adtag);
-  cbd.adtag = tag_pick(tags,blog->config.adtag);
-  
-  free(tags);
-  generic_cb("main",out,&cbd);
-  free_entries(&cbd.list);
-  free(cbd.adtag);
-  return 0;
-}
-
-/************************************************************************/
-
-int pagegen_days(
-        Blog        const *blog,
-        Request           *request,
-        template__t const *template,
-        FILE              *out
-)
-{
-  struct btm            thisday;
-  size_t                days;
-  char                 *tags;
-  struct callback_data  cbd;
-  bool                  added;
-  
-  assert(blog     != NULL);
-  assert(request  != NULL);
-  assert(template != NULL);
-  assert(out      != NULL);
-  
-  request->f.fullurl = false;
-  request->f.reverse = true;
-  thisday      = blog->now;
-  
-  callback_init(&cbd,blog,request);
-  cbd.template = template;
-  
-  for (days = 0 , added = false ; days < template->items ; )
-  {
-    BlogEntry *entry;
-    
-    if (btm_cmp(&thisday,&blog->first) < 0) break;
-    
-    entry = BlogEntryRead(blog,&thisday);
-    if (entry)
-    {
-      assert(entry->valid);
-      ListAddTail(&cbd.list,&entry->node);
-      added = true;
-    }
-    
-    thisday.part--;
-    if (thisday.part == 0)
-    {
-      thisday.part = ENTRY_MAX;
-      btm_dec_day(&thisday);
-      if (added)
-        days++;
-      added = false;
-    }
-  }
-  
-  tags      = tag_collect(&cbd.list,blog->config.adtag);
-  cbd.adtag = tag_pick(tags,blog->config.adtag);
-  
-  free(tags);
-  generic_cb("main",out,&cbd);
-  free_entries(&cbd.list);
-  free(cbd.adtag);
-  return 0;
-}
-
-/************************************************************************/
-
 static void swap_endpoints(tumbler__s *tum)
 {
   struct btm start;
@@ -358,125 +131,6 @@ static void swap_endpoints(tumbler__s *tum)
 }
 
 /************************************************************************/
-
-int tumbler_page(Blog const *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog const *,Request *,int,char const *,...))
-{
-  struct callback_data cbd;
-  struct btm           start;
-  struct btm           end;
-  char                *tags;
-  
-  assert(blog    != NULL);
-  assert(request != NULL);
-  assert(spec    != NULL);
-  assert(errorf);
-  
-  request->f.fullurl = false; /* XXX why? */
-  request->f.navprev = true;
-  request->f.navnext = true;
-  
-  if (spec->redirect)
-    return HTTP_NOTIMP;
-    
-  if (spec->file)
-  {
-    display_file(spec,blog,request,errorf);
-    return 0; /* XXX hack for now */
-  }
-  
-  callback_init(&cbd,blog,request);
-  
-  /*----------------------------------------------------------------------
-  ; from here to the comment about sanity checking replaced around 100 very
-  ; confused lines of code.  The tumbler code now does more checking of data
-  ; than the old version, so a lot of code was removed.
-  ;-----------------------------------------------------------------------*/
-  
-  assert(spec->start.year  >= blog->first.year);
-  assert(spec->start.month >   0);
-  assert(spec->start.month <  13);
-  assert(spec->start.day   >   0);
-  assert(spec->start.day   <= max_monthday(spec->start.year,spec->start.month));
-  
-  assert(spec->stop.year  >= blog->first.year);
-  assert(spec->stop.month >   0);
-  assert(spec->stop.month <  13);
-  assert(spec->stop.day   >   0);
-  assert(spec->stop.day   <= max_monthday(spec->stop.year,spec->stop.month));
-  
-  start = spec->start;
-  end   = spec->stop;
-  
-  if (!spec->range)
-  {
-    request->f.navigation  = true;
-    cbd.navunit      = spec->ustart > spec->ustop
-                     ? spec->ustart
-                     : spec->ustop
-                     ;
-    cbd.previous = calculate_previous(blog,request,start,cbd.navunit);
-    cbd.next     = calculate_next(blog,request,end,cbd.navunit);
-  }
-  else
-  {
-    if (btm_cmp(&spec->start,&spec->stop) > 0)
-    {
-      tumbler__s newtum = *spec;
-      swap_endpoints(&newtum);
-      start              = newtum.start;
-      end                = newtum.stop;
-      request->f.reverse = true;
-    }
-  }
-  
-  assert(end.day <= max_monthday(end.year,end.month));
-  
-  /*---------------------------------------------------------------------
-  ; Okay, sanity checking here ...  These should be true once we hit this
-  ; spot of the code.
-  ;---------------------------------------------------------------------*/
-  
-  assert(start.year  >= 1);
-  assert(start.month >= 1);
-  assert(start.month <= 12);
-  assert(start.day   >= 1);
-  assert(start.day   <= max_monthday(start.year,start.month));
-  
-  assert(end.year  >= 1);
-  assert(end.month >= 1);
-  assert(end.month <= 12);
-  assert(end.day   >= 1);
-  assert(end.day   <= max_monthday(end.year,end.month));
-  
-  assert(btm_cmp(&start,&end) <= 0);
-  
-  /*-------------------------------------------------------------------------
-  ; okay, resume processing ...  bound against the starting time of the
-  ; blog, and the current time.
-  ;
-  ; From here on out, it's pretty straight forward.  read a day, if it has
-  ; entries, add it to the list, otherwise, continue on, advancing (or
-  ; retreading) the days as we go ...
-  ;
-  ; these four lines replaced 65 very confused lines of code.
-  ;-----------------------------------------------------------*/
-  
-  if (request->f.reverse)
-    BlogEntryReadBetweenD(blog,&cbd.list,&end,&start);
-  else
-    BlogEntryReadBetweenU(blog,&cbd.list,&start,&end);
-    
-  tags      = tag_collect(&cbd.list,blog->config.adtag);
-  cbd.adtag = tag_pick(tags,blog->config.adtag);
-  
-  free(tags);
-  generic_cb("main",stdout,&cbd);
-  free_entries(&cbd.list);
-  free(cbd.adtag);
-  return 0;
-}
-
-/******************************************************************/
 
 static struct btm calculate_previous(Blog const *blog,Request *request,struct btm const start,unit__e navunit)
 {
@@ -1045,6 +699,342 @@ static void free_entries(List *list)
     assert(entry->valid);
     BlogEntryFree(entry);
   }
+}
+
+/******************************************************************/
+
+struct callback_data *callback_init(struct callback_data *cbd,Blog const *blog,Request const *request)
+{
+  assert(cbd     != NULL);
+  assert(blog    != NULL);
+  assert(request != NULL);
+  
+  memset(cbd,0,sizeof(struct callback_data));
+  ListInit(&cbd->list);
+  cbd->template = &blog->config.templates[0]; /* XXX probably document this */
+  cbd->request  = request;
+  cbd->blog     = blog;
+  cbd->entry    = NULL;
+  cbd->ad       = NULL;
+  cbd->adtag    = NULL;
+  cbd->adcat    = NULL;
+  cbd->navunit  = UNIT_PART;
+  return cbd;
+}
+
+/************************************************************************/
+
+pagegen__f TO_pagegen(char const *name)
+{
+  assert(name != NULL);
+  if (strcmp(name,"items") == 0)
+    return pagegen_items;
+  else if (strcmp(name,"days") == 0)
+    return pagegen_days;
+  else
+  {
+    assert(0);
+    return pagegen_items;
+  }
+}
+
+/************************************************************************/
+
+int generate_thisday(Blog const *blog,Request *request,FILE *out,struct btm when)
+{
+  struct callback_data  cbd;
+  char                 *tags;
+  
+  assert(blog    != NULL);
+  assert(request != NULL);
+  assert(out     != NULL);
+  
+  callback_init(&cbd,blog,request);
+  
+  for(when.year = blog->first.year ; when.year <= blog->now.year ; when.year++)
+  {
+    if (btm_cmp_date(&when,&blog->first) < 0)
+      continue;
+      
+    for (when.part = 1 ; ; when.part++)
+    {
+      BlogEntry *entry = BlogEntryRead(blog,&when);
+      if (entry)
+      {
+        assert(entry->valid);
+        ListAddTail(&cbd.list,&entry->node);
+      }
+      else
+        break;
+    }
+  }
+  
+  tags = tag_collect(&cbd.list,blog->config.adtag);
+  cbd.adtag = tag_pick(tags,blog->config.adtag);
+  free(tags);
+  generic_cb("main",out,&cbd);
+  free_entries(&cbd.list);
+  free(cbd.adtag);
+  return 0;
+}
+
+/************************************************************************/
+
+int generate_pages(Blog const *blog,Request *request)
+{
+  assert(blog    != NULL);
+  assert(request != NULL);
+  (void)request;
+  
+  for (size_t i = 0 ; i < blog->config.templatenum ; i++)
+  {
+    FILE  *out = fopen(blog->config.templates[i].file,"w");
+    int  (*pagegen)(Blog const *,Request *,struct template const *,FILE *);
+    
+    if (out == NULL)
+    {
+      syslog(LOG_ERR,"%s: %s",blog->config.templates[i].file,strerror(errno));
+      continue;
+    }
+    
+    pagegen = TO_pagegen(blog->config.templates[i].pagegen);
+    (*pagegen)(blog,request,&blog->config.templates[i],out);
+    fclose(out);
+    
+    if (blog->config.templates[i].posthook)
+    {
+      char const *argv[3];
+      
+      argv[0] = blog->config.templates[i].posthook;
+      argv[1] = blog->config.templates[i].file;
+      argv[2] = NULL;
+      
+      run_hook("template-post-hook",argv);
+    }
+  }
+  
+  return 0;
+}
+
+/******************************************************************/
+
+int pagegen_items(
+        Blog        const *blog,
+        Request           *request,
+        template__t const *template,
+        FILE              *out
+)
+{
+  struct btm            thisday;
+  char                 *tags;
+  struct callback_data  cbd;
+  
+  assert(blog     != NULL);
+  assert(request  != NULL);
+  assert(template != NULL);
+  assert(out      != NULL);
+  
+  request->f.fullurl = template->fullurl;
+  request->f.reverse = template->reverse;
+  thisday      = blog->now;
+  
+  callback_init(&cbd,blog,request);
+  cbd.template = template;
+  
+  if (template->reverse)
+    BlogEntryReadXD(blog,&cbd.list,&thisday,template->items);
+  else
+    BlogEntryReadXU(blog,&cbd.list,&thisday,template->items);
+    
+  tags      = tag_collect(&cbd.list,blog->config.adtag);
+  cbd.adtag = tag_pick(tags,blog->config.adtag);
+  
+  free(tags);
+  generic_cb("main",out,&cbd);
+  free_entries(&cbd.list);
+  free(cbd.adtag);
+  return 0;
+}
+
+/************************************************************************/
+
+int pagegen_days(
+        Blog        const *blog,
+        Request           *request,
+        template__t const *template,
+        FILE              *out
+)
+{
+  struct btm            thisday;
+  size_t                days;
+  char                 *tags;
+  struct callback_data  cbd;
+  bool                  added;
+  
+  assert(blog     != NULL);
+  assert(request  != NULL);
+  assert(template != NULL);
+  assert(out      != NULL);
+  
+  request->f.fullurl = false;
+  request->f.reverse = true;
+  thisday      = blog->now;
+  
+  callback_init(&cbd,blog,request);
+  cbd.template = template;
+  
+  for (days = 0 , added = false ; days < template->items ; )
+  {
+    BlogEntry *entry;
+    
+    if (btm_cmp(&thisday,&blog->first) < 0) break;
+    
+    entry = BlogEntryRead(blog,&thisday);
+    if (entry)
+    {
+      assert(entry->valid);
+      ListAddTail(&cbd.list,&entry->node);
+      added = true;
+    }
+    
+    thisday.part--;
+    if (thisday.part == 0)
+    {
+      thisday.part = ENTRY_MAX;
+      btm_dec_day(&thisday);
+      if (added)
+        days++;
+      added = false;
+    }
+  }
+  
+  tags      = tag_collect(&cbd.list,blog->config.adtag);
+  cbd.adtag = tag_pick(tags,blog->config.adtag);
+  
+  free(tags);
+  generic_cb("main",out,&cbd);
+  free_entries(&cbd.list);
+  free(cbd.adtag);
+  return 0;
+}
+
+/************************************************************************/
+
+int tumbler_page(Blog const *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog const *,Request *,int,char const *,...))
+{
+  struct callback_data cbd;
+  struct btm           start;
+  struct btm           end;
+  char                *tags;
+  
+  assert(blog    != NULL);
+  assert(request != NULL);
+  assert(spec    != NULL);
+  assert(errorf);
+  
+  request->f.fullurl = false; /* XXX why? */
+  request->f.navprev = true;
+  request->f.navnext = true;
+  
+  if (spec->redirect)
+    return HTTP_NOTIMP;
+    
+  if (spec->file)
+  {
+    display_file(spec,blog,request,errorf);
+    return 0; /* XXX hack for now */
+  }
+  
+  callback_init(&cbd,blog,request);
+  
+  /*----------------------------------------------------------------------
+  ; from here to the comment about sanity checking replaced around 100 very
+  ; confused lines of code.  The tumbler code now does more checking of data
+  ; than the old version, so a lot of code was removed.
+  ;-----------------------------------------------------------------------*/
+  
+  assert(spec->start.year  >= blog->first.year);
+  assert(spec->start.month >   0);
+  assert(spec->start.month <  13);
+  assert(spec->start.day   >   0);
+  assert(spec->start.day   <= max_monthday(spec->start.year,spec->start.month));
+  
+  assert(spec->stop.year  >= blog->first.year);
+  assert(spec->stop.month >   0);
+  assert(spec->stop.month <  13);
+  assert(spec->stop.day   >   0);
+  assert(spec->stop.day   <= max_monthday(spec->stop.year,spec->stop.month));
+  
+  start = spec->start;
+  end   = spec->stop;
+  
+  if (!spec->range)
+  {
+    request->f.navigation  = true;
+    cbd.navunit      = spec->ustart > spec->ustop
+                     ? spec->ustart
+                     : spec->ustop
+                     ;
+    cbd.previous = calculate_previous(blog,request,start,cbd.navunit);
+    cbd.next     = calculate_next(blog,request,end,cbd.navunit);
+  }
+  else
+  {
+    if (btm_cmp(&spec->start,&spec->stop) > 0)
+    {
+      tumbler__s newtum = *spec;
+      swap_endpoints(&newtum);
+      start              = newtum.start;
+      end                = newtum.stop;
+      request->f.reverse = true;
+    }
+  }
+  
+  assert(end.day <= max_monthday(end.year,end.month));
+  
+  /*---------------------------------------------------------------------
+  ; Okay, sanity checking here ...  These should be true once we hit this
+  ; spot of the code.
+  ;---------------------------------------------------------------------*/
+  
+  assert(start.year  >= 1);
+  assert(start.month >= 1);
+  assert(start.month <= 12);
+  assert(start.day   >= 1);
+  assert(start.day   <= max_monthday(start.year,start.month));
+  
+  assert(end.year  >= 1);
+  assert(end.month >= 1);
+  assert(end.month <= 12);
+  assert(end.day   >= 1);
+  assert(end.day   <= max_monthday(end.year,end.month));
+  
+  assert(btm_cmp(&start,&end) <= 0);
+  
+  /*-------------------------------------------------------------------------
+  ; okay, resume processing ...  bound against the starting time of the
+  ; blog, and the current time.
+  ;
+  ; From here on out, it's pretty straight forward.  read a day, if it has
+  ; entries, add it to the list, otherwise, continue on, advancing (or
+  ; retreading) the days as we go ...
+  ;
+  ; these four lines replaced 65 very confused lines of code.
+  ;-----------------------------------------------------------*/
+  
+  if (request->f.reverse)
+    BlogEntryReadBetweenD(blog,&cbd.list,&end,&start);
+  else
+    BlogEntryReadBetweenU(blog,&cbd.list,&start,&end);
+    
+  tags      = tag_collect(&cbd.list,blog->config.adtag);
+  cbd.adtag = tag_pick(tags,blog->config.adtag);
+  
+  free(tags);
+  generic_cb("main",stdout,&cbd);
+  free_entries(&cbd.list);
+  free(cbd.adtag);
+  return 0;
 }
 
 /******************************************************************/

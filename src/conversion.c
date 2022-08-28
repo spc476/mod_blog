@@ -45,101 +45,6 @@ struct nested_params
 
 /**********************************************************************/
 
-static void text_conversion_backend (FILE *restrict,FILE *restrict);
-static void html_handle_tag         (struct nested_params *);
-static void check_for_uri           (struct nested_params *,char const *);
-static void entify_char             (char *,size_t,char *,char,char const *);
-static void html_handle_string      (struct nested_params *);
-static void html_handle_comment     (struct nested_params *);
-static void handle_backquote        (FILE *restrict,FILE *restrict);
-static void handle_quote            (FILE *restrict,FILE *restrict);
-static void handle_dash             (FILE *restrict,FILE *restrict);
-static void handle_period           (FILE *restrict,FILE *restrict);
-
-/**********************************************************************/
-
-bool TO_email(char const *value,bool def)
-{
-  if (!emptynull_string(value))
-  {
-    if (strcmp(value,"no") == 0)
-      return false;
-    else if (strcmp(value,"yes") == 0)
-      return true;
-  }
-  
-  return def;
-}
-
-/**********************************************************************/
-
-conversion__f TO_conversion(char const *name,char const *def)
-{
-  assert(def != NULL);
-  
-  if (name == NULL)
-    name = def;
-    
-  if (strcmp(name,"text") == 0)
-    return text_conversion;
-  else if (strcmp(name,"mixed") == 0)
-    return mixed_conversion;
-  else if (strcmp(name,"html") == 0)
-    return html_conversion;
-  else if (strcmp(name,"none") == 0)
-    return no_conversion;
-  else
-  {
-    syslog(LOG_WARNING,"conversion '%s' unsupported",name);
-    return no_conversion;
-  }
-}
-
-/**********************************************************************/
-
-Request *request_init(Request *request)
-{
-  assert(request != NULL);
-  
-  memset(request,0,sizeof(Request));
-  request->origauthor = NULL;
-  request->author     = NULL;
-  request->title      = NULL;
-  request->class      = NULL;
-  request->status     = NULL;
-  request->date       = NULL;
-  request->adtag      = NULL;
-  request->origbody   = NULL;
-  request->body       = NULL;
-  request->reqtumbler = NULL;
-  request->conversion = no_conversion;
-  return request;
-}
-
-/**********************************************************************/
-
-void no_conversion(FILE *restrict in,FILE *restrict out)
-{
-  assert(in  != NULL);
-  assert(out != NULL);
-  
-  fcopy(out,in);
-}
-
-/**********************************************************************/
-
-void text_conversion(FILE *restrict in,FILE *restrict out)
-{
-  assert(in    != NULL);
-  assert(out   != NULL);
-  
-  FILE *entin = fentity_encode_onread(in);
-  text_conversion_backend(entin,out);
-  fclose(entin);
-}
-
-/**********************************************************************/
-
 static void text_conversion_backend(FILE *restrict in,FILE *restrict out)
 {
   assert(in  != NULL);
@@ -193,59 +98,63 @@ static void text_conversion_backend(FILE *restrict in,FILE *restrict out)
 
 /***********************************************************************/
 
-void mixed_conversion(FILE *restrict in,FILE *restrict out)
+static void entify_char(char *d,size_t ds,char *s,char e,char const *entity)
 {
-  FILE *tmpfp;
-  char *text;
-  size_t size;
+  assert(d      != NULL);
+  assert(ds     >  0);
+  assert(s      != NULL);
+  assert(e      != '\0');
+  assert(entity != NULL);
   
-  assert(in  != NULL);
-  assert(out != NULL);
+  size_t se = strlen(entity);
   
-  tmpfp = open_memstream(&text,&size);
-  text_conversion_backend(in,tmpfp);
-  fclose(tmpfp);
+  for ( ; (*s) && (ds > 0) ; )
+  {
+    if (*s == e)
+    {
+      if (ds < se)
+      {
+        *d = '\0';
+        return;
+      }
+      memcpy(d,entity,se);
+      d  += se;
+      ds -= se;
+      s++;
+    }
+    else
+    {
+      *d++ = *s++;
+      ds--;
+    }
+  }
   
-  tmpfp = fmemopen(text,size,"r");
-  html_conversion(tmpfp,out);
-  fclose(tmpfp);
+  *d = '\0';
+}
+
+/**************************************************************************/
+
+static void check_for_uri(struct nested_params *local,char const *attrib)
+{
+  char         newuri[BUFSIZ];
+  struct pair *src;
+  struct pair *np;
   
-  free(text);
+  assert(local  != NULL);
+  assert(attrib != NULL);
+  
+  src = HtmlParseGetPair(local->token,attrib);
+  if (src == NULL) return;
+  
+  entify_char(newuri,sizeof(newuri),src->value,'&',"&amp;");
+  
+  np = PairCreate(attrib,newuri);
+  NodeInsert(&src->node,&np->node);
+  NodeRemove(&src->node);
+  PairFree(src);
 }
 
 /*************************************************************************/
-
-void html_conversion(FILE *restrict in,FILE *restrict out)
-{
-  struct nested_params local;
-  int                  t;
-  
-  assert(in  != NULL);
-  assert(out != NULL);
-  
-  local.in         = in;
-  local.out        = out;
-  local.p          = false;
-  local.pre        = false;
-  local.blockquote = false;
-  local.list       = false;
-  
-  local.token = HtmlParseNew(local.in);
-  
-  while((t = HtmlParseNext(local.token)) != T_EOF)
-  {
-    if (t == T_TAG)
-      html_handle_tag(&local);
-    else if (t == T_COMMENT)
-      html_handle_comment(&local);
-    else if (t == T_STRING)
-      html_handle_string(&local);
-  }
-  
-  HtmlParseFree(local.token);
-}
-
-/**********************************************************************/
 
 static void html_handle_tag(struct nested_params *local)
 {
@@ -362,64 +271,6 @@ static void html_handle_tag(struct nested_params *local)
 
 /************************************************************************/
 
-static void check_for_uri(struct nested_params *local,char const *attrib)
-{
-  char         newuri[BUFSIZ];
-  struct pair *src;
-  struct pair *np;
-  
-  assert(local  != NULL);
-  assert(attrib != NULL);
-  
-  src = HtmlParseGetPair(local->token,attrib);
-  if (src == NULL) return;
-  
-  entify_char(newuri,sizeof(newuri),src->value,'&',"&amp;");
-  
-  np = PairCreate(attrib,newuri);
-  NodeInsert(&src->node,&np->node);
-  NodeRemove(&src->node);
-  PairFree(src);
-}
-
-/*************************************************************************/
-
-static void entify_char(char *d,size_t ds,char *s,char e,char const *entity)
-{
-  assert(d      != NULL);
-  assert(ds     >  0);
-  assert(s      != NULL);
-  assert(e      != '\0');
-  assert(entity != NULL);
-  
-  size_t se = strlen(entity);
-  
-  for ( ; (*s) && (ds > 0) ; )
-  {
-    if (*s == e)
-    {
-      if (ds < se)
-      {
-        *d = '\0';
-        return;
-      }
-      memcpy(d,entity,se);
-      d  += se;
-      ds -= se;
-      s++;
-    }
-    else
-    {
-      *d++ = *s++;
-      ds--;
-    }
-  }
-  
-  *d = '\0';
-}
-
-/**************************************************************************/
-
 static void html_handle_string(struct nested_params *local)
 {
   assert(local != NULL);
@@ -448,41 +299,6 @@ static void html_handle_comment(struct nested_params *local)
 }
 
 /**************************************************************************/
-
-void buff_conversion(FILE *restrict in,FILE *restrict out)
-{
-  /*----------------------------------------------------
-  ; this is basically the macro substitution module.
-  ;-----------------------------------------------------*/
-  
-  assert(in  != NULL);
-  assert(out != NULL);
-  
-  /*------------------------------------------------------------------------
-  ; XXX how to handle using '"' for smart quotes, or regular quotes.  I'd
-  ; rather not have to do logic, but anything else might require more
-  ; coupling than I want.  Have to think on this.  Also, add in some logic
-  ; to handle '&' in strings.  look for something like &[^\s]+; and if so,
-  ; then pass it through unchanged; if not, then convert '&' to "&amp;".
-  ;------------------------------------------------------------------------*/
-  
-  while(!feof(in))
-  {
-    int c = fgetc(in);
-    switch(c)
-    {
-      case EOF:  break;
-      case '`':  handle_backquote(in,out); break;
-      case '\'': handle_quote(in,out); break;
-      case '-':  handle_dash(in,out); break;
-      case '.':  handle_period(in,out); break;
-      case '\0': assert(0);
-      default:   fputc(c,out); break;
-    }
-  }
-}
-
-/*****************************************************************/
 
 static void handle_backquote(FILE *restrict input,FILE *restrict output)
 {
@@ -632,6 +448,177 @@ static ssize_t fj_write(void *cookie,char const *buffer,size_t bytes)
 
 /*********************************************************************/
 
+bool TO_email(char const *value,bool def)
+{
+  if (!emptynull_string(value))
+  {
+    if (strcmp(value,"no") == 0)
+      return false;
+    else if (strcmp(value,"yes") == 0)
+      return true;
+  }
+  
+  return def;
+}
+
+/**********************************************************************/
+
+conversion__f TO_conversion(char const *name,char const *def)
+{
+  assert(def != NULL);
+  
+  if (name == NULL)
+    name = def;
+    
+  if (strcmp(name,"text") == 0)
+    return text_conversion;
+  else if (strcmp(name,"mixed") == 0)
+    return mixed_conversion;
+  else if (strcmp(name,"html") == 0)
+    return html_conversion;
+  else if (strcmp(name,"none") == 0)
+    return no_conversion;
+  else
+  {
+    syslog(LOG_WARNING,"conversion '%s' unsupported",name);
+    return no_conversion;
+  }
+}
+
+/**********************************************************************/
+
+Request *request_init(Request *request)
+{
+  assert(request != NULL);
+  
+  memset(request,0,sizeof(Request));
+  request->origauthor = NULL;
+  request->author     = NULL;
+  request->title      = NULL;
+  request->class      = NULL;
+  request->status     = NULL;
+  request->date       = NULL;
+  request->adtag      = NULL;
+  request->origbody   = NULL;
+  request->body       = NULL;
+  request->reqtumbler = NULL;
+  request->conversion = no_conversion;
+  return request;
+}
+
+/**********************************************************************/
+
+void no_conversion(FILE *restrict in,FILE *restrict out)
+{
+  assert(in  != NULL);
+  assert(out != NULL);
+  
+  fcopy(out,in);
+}
+
+/**********************************************************************/
+
+void text_conversion(FILE *restrict in,FILE *restrict out)
+{
+  assert(in    != NULL);
+  assert(out   != NULL);
+  
+  FILE *entin = fentity_encode_onread(in);
+  text_conversion_backend(entin,out);
+  fclose(entin);
+}
+
+/**********************************************************************/
+
+void mixed_conversion(FILE *restrict in,FILE *restrict out)
+{
+  FILE *tmpfp;
+  char *text;
+  size_t size;
+  
+  assert(in  != NULL);
+  assert(out != NULL);
+  
+  tmpfp = open_memstream(&text,&size);
+  text_conversion_backend(in,tmpfp);
+  fclose(tmpfp);
+  
+  tmpfp = fmemopen(text,size,"r");
+  html_conversion(tmpfp,out);
+  fclose(tmpfp);
+  
+  free(text);
+}
+
+/*************************************************************************/
+
+void html_conversion(FILE *restrict in,FILE *restrict out)
+{
+  struct nested_params local;
+  int                  t;
+  
+  assert(in  != NULL);
+  assert(out != NULL);
+  
+  local.in         = in;
+  local.out        = out;
+  local.p          = false;
+  local.pre        = false;
+  local.blockquote = false;
+  local.list       = false;
+  
+  local.token = HtmlParseNew(local.in);
+  
+  while((t = HtmlParseNext(local.token)) != T_EOF)
+  {
+    if (t == T_TAG)
+      html_handle_tag(&local);
+    else if (t == T_COMMENT)
+      html_handle_comment(&local);
+    else if (t == T_STRING)
+      html_handle_string(&local);
+  }
+  
+  HtmlParseFree(local.token);
+}
+
+/**********************************************************************/
+
+void buff_conversion(FILE *restrict in,FILE *restrict out)
+{
+  /*----------------------------------------------------
+  ; this is basically the macro substitution module.
+  ;-----------------------------------------------------*/
+  
+  assert(in  != NULL);
+  assert(out != NULL);
+  
+  /*------------------------------------------------------------------------
+  ; XXX how to handle using '"' for smart quotes, or regular quotes.  I'd
+  ; rather not have to do logic, but anything else might require more
+  ; coupling than I want.  Have to think on this.  Also, add in some logic
+  ; to handle '&' in strings.  look for something like &[^\s]+; and if so,
+  ; then pass it through unchanged; if not, then convert '&' to "&amp;".
+  ;------------------------------------------------------------------------*/
+  
+  while(!feof(in))
+  {
+    int c = fgetc(in);
+    switch(c)
+    {
+      case EOF:  break;
+      case '`':  handle_backquote(in,out); break;
+      case '\'': handle_quote(in,out); break;
+      case '-':  handle_dash(in,out); break;
+      case '.':  handle_period(in,out); break;
+      case '\0': assert(0);
+      default:   fputc(c,out); break;
+    }
+  }
+}
+
+/*****************************************************************/
+
 FILE *fjson_encode_onwrite(FILE *out)
 {
   assert(out != NULL);
@@ -642,3 +629,5 @@ FILE *fjson_encode_onwrite(FILE *out)
                                NULL
                              });
 }
+
+/*********************************************************************/

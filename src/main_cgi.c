@@ -35,85 +35,74 @@ typedef int (*cgicmd__f)(Cgi,Blog *,struct request *);
 
 /**************************************************************************/
 
-static int       cmd_cgi_get_new        (Cgi,Blog *,Request *);
-static int       cmd_cgi_get_show       (Cgi,Blog *,Request *);
-static int       cmd_cgi_get_today      (Cgi,Blog *,Request *);
-static int       cmd_cgi_post_new       (Cgi,Blog *,Request *);
-static int       cmd_cgi_post_show      (Cgi,Blog *,Request *);
-static int       cgi_error              (Blog const *,Request *,int,char const *, ... );
-static cgicmd__f set_m_cgi_get_command  (char const *);
-static cgicmd__f set_m_cgi_post_command (char const *);
-static void      set_m_author           (char *,Request *);
-
-/*************************************************************************/
-
-void request_free(Request *request)
+static int cgi_error(Blog const *blog,Request *request,int level,char const *msg, ... )
 {
-  assert(request != NULL);
+  va_list  args;
+  char    *file   = NULL;
+  char    *errmsg = NULL;
   
-  free(request->origauthor);
-  free(request->author);
-  free(request->title);
-  free(request->class);
-  free(request->status);
-  free(request->date);
-  free(request->adtag);
-  free(request->origbody);
-  free(request->body);
-}
-
-/*************************************************************************/
-
-int main_cgi_bad(Cgi cgi)
-{
-  (void)cgi;
-  return cgi_error(NULL,NULL,HTTP_METHODNOTALLOWED,"Nope, now allowed.");
-}
-
-/*************************************************************************/
-
-int main_cgi_GET(Cgi cgi)
-{
-  assert(cgi != NULL);
+  assert(level >= 0);
+  assert(msg   != NULL);
   
-  Request  request;
-  Blog    *blog = BlogNew(NULL);
+  va_start(args,msg);
+  vasprintf(&errmsg,msg,args);
+  va_end(args);
   
-  if (blog == NULL)
-    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
-    
-  CgiListMake(cgi);
-  request_init(&request);
-  request.f.cgi      = true;
-  request.reqtumbler = getenv("PATH_INFO");
-  int rc = (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&request);
-  BlogFree(blog);
-  request_free(&request);
-  return rc;
-}
-
-/************************************************************************/
-
-static cgicmd__f set_m_cgi_get_command(char const *value)
-{
-  if (emptynull_string(value))
-    return cmd_cgi_get_show;
-  else if (strcmp(value,"new") == 0)
-    return cmd_cgi_get_new;
-  else if (strcmp(value,"show") == 0)
-    return cmd_cgi_get_show;
-  else if (strcmp(value,"preview") == 0)
-    return cmd_cgi_get_show;
-  else if (strcmp(value,"today") == 0)
-    return cmd_cgi_get_today;
+  asprintf(&file,"%s/errors/%d.html",getenv("DOCUMENT_ROOT"),level);
+  
+  if ((blog == NULL) || (freopen(file,"r",stdin) == NULL))
+  {
+    fprintf(
+        stdout,
+        "Status: %d\r\n"
+        "X-Error: %s\r\n"
+        "Content-type: text/html\r\n"
+        "\r\n"
+        "<html>\n"
+        "<head>\n"
+        "<title>Error %d</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "<h1>Error %d</h1>\n"
+        "<p>%s</p>\n"
+        "</body>\n"
+        "</html>\n"
+        "\n",
+        level,
+        errmsg,
+        level,
+        level,
+        errmsg
+    );
+  }
   else
   {
-    syslog(LOG_WARNING,"'%s' not supported, using 'show'",value);
-    return cmd_cgi_get_show;
+    struct callback_data cbd;
+    
+    assert(blog    != NULL);
+    assert(request != NULL);
+    
+    request->f.htmldump = true;
+    
+    fprintf(
+        stdout,
+        "Status: %d\r\n"
+        "X-Error: %s\r\n"
+        "Content-type: text/html\r\n"
+        "\r\n",
+        level,
+        errmsg
+      );
+    generic_cb("main",stdout,callback_init(&cbd,blog,request));
   }
+  
+  free(file);
+  free(errmsg);
+  
+  return 0;
 }
 
-/***********************************************************************/
+/**********************************************************************/
 
 static int cmd_cgi_get_new(Cgi cgi,Blog *blog,Request *req)
 {
@@ -292,75 +281,26 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
 
 /**********************************************************************/
 
-int main_cgi_POST(Cgi cgi)
+static cgicmd__f set_m_cgi_get_command(char const *value)
 {
-  assert(cgi != NULL);
-  
-  Request  request;
-  Blog    *blog = BlogNew(NULL);
-  
-  if (blog == NULL)
-    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
-    
-  CgiListMake(cgi);
-  request_init(&request);
-  set_m_author(CgiListGetValue(cgi,"author"),&request);
-  
-  request.title      = strdup(CgiListGetValue(cgi,"title"));
-  request.class      = strdup(CgiListGetValue(cgi,"class"));
-  request.status     = strdup(CgiListGetValue(cgi,"status"));
-  request.date       = strdup(CgiListGetValue(cgi,"date"));
-  request.adtag      = strdup(CgiListGetValue(cgi,"adtag"));
-  request.origbody   = strdup(CgiListGetValue(cgi,"body"));
-  request.body       = strdup(request.origbody);
-  request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),blog->config.conversion);
-  request.f.email    = TO_email(CgiListGetValue(cgi,"email"),blog->config.email.notify);
-  request.f.cgi      = true;
-  
-  if (
-       (emptynull_string(request.author))
-       || (emptynull_string(request.title))
-       || (emptynull_string(request.body))
-     )
-  {
-    return cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
-  }
-  
-  if (request.class == NULL)
-    request.class = strdup("");
-    
-  if (authenticate_author(blog,&request) == false)
-  {
-    syslog(LOG_ERR,"'%s' not authorized to post",request.author);
-    return cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiListGetValue(cgi,"author"));
-  }
-  
-  int rc = (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&request);
-  BlogFree(blog);
-  request_free(&request);
-  return rc;
-}
-
-/************************************************************************/
-
-static cgicmd__f set_m_cgi_post_command(char const *value)
-{
-  assert(value != NULL);
-  
   if (emptynull_string(value))
-    return cmd_cgi_post_show;
+    return cmd_cgi_get_show;
   else if (strcmp(value,"new") == 0)
-    return cmd_cgi_post_new;
+    return cmd_cgi_get_new;
   else if (strcmp(value,"show") == 0)
-    return cmd_cgi_post_show;
+    return cmd_cgi_get_show;
+  else if (strcmp(value,"preview") == 0)
+    return cmd_cgi_get_show;
+  else if (strcmp(value,"today") == 0)
+    return cmd_cgi_get_today;
   else
   {
     syslog(LOG_WARNING,"'%s' not supported, using 'show'",value);
-    return cmd_cgi_post_show;
+    return cmd_cgi_get_show;
   }
 }
 
-/************************************************************************/
+/***********************************************************************/
 
 static void set_m_author(char *value,Request *req)
 {
@@ -456,71 +396,119 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
 
 /**********************************************************************/
 
-static int cgi_error(Blog const *blog,Request *request,int level,char const *msg, ... )
+static cgicmd__f set_m_cgi_post_command(char const *value)
 {
-  va_list  args;
-  char    *file   = NULL;
-  char    *errmsg = NULL;
+  assert(value != NULL);
   
-  assert(level >= 0);
-  assert(msg   != NULL);
-  
-  va_start(args,msg);
-  vasprintf(&errmsg,msg,args);
-  va_end(args);
-  
-  asprintf(&file,"%s/errors/%d.html",getenv("DOCUMENT_ROOT"),level);
-  
-  if ((blog == NULL) || (freopen(file,"r",stdin) == NULL))
-  {
-    fprintf(
-        stdout,
-        "Status: %d\r\n"
-        "X-Error: %s\r\n"
-        "Content-type: text/html\r\n"
-        "\r\n"
-        "<html>\n"
-        "<head>\n"
-        "<title>Error %d</title>\n"
-        "</head>\n"
-        "<body>\n"
-        "<h1>Error %d</h1>\n"
-        "<p>%s</p>\n"
-        "</body>\n"
-        "</html>\n"
-        "\n",
-        level,
-        errmsg,
-        level,
-        level,
-        errmsg
-    );
-  }
+  if (emptynull_string(value))
+    return cmd_cgi_post_show;
+  else if (strcmp(value,"new") == 0)
+    return cmd_cgi_post_new;
+  else if (strcmp(value,"show") == 0)
+    return cmd_cgi_post_show;
   else
   {
-    struct callback_data cbd;
-    
-    assert(blog    != NULL);
-    assert(request != NULL);
-    
-    request->f.htmldump = true;
-    
-    fprintf(
-        stdout,
-        "Status: %d\r\n"
-        "X-Error: %s\r\n"
-        "Content-type: text/html\r\n"
-        "\r\n",
-        level,
-        errmsg
-      );
-    generic_cb("main",stdout,callback_init(&cbd,blog,request));
+    syslog(LOG_WARNING,"'%s' not supported, using 'show'",value);
+    return cmd_cgi_post_show;
   }
-  
-  free(file);
-  free(errmsg);
-  
-  return 0;
 }
 
-/**********************************************************************/
+/************************************************************************/
+
+void request_free(Request *request)
+{
+  assert(request != NULL);
+  
+  free(request->origauthor);
+  free(request->author);
+  free(request->title);
+  free(request->class);
+  free(request->status);
+  free(request->date);
+  free(request->adtag);
+  free(request->origbody);
+  free(request->body);
+}
+
+/*************************************************************************/
+
+int main_cgi_bad(Cgi cgi)
+{
+  (void)cgi;
+  return cgi_error(NULL,NULL,HTTP_METHODNOTALLOWED,"Nope, now allowed.");
+}
+
+/*************************************************************************/
+
+int main_cgi_GET(Cgi cgi)
+{
+  assert(cgi != NULL);
+  
+  Request  request;
+  Blog    *blog = BlogNew(NULL);
+  
+  if (blog == NULL)
+    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
+    
+  CgiListMake(cgi);
+  request_init(&request);
+  request.f.cgi      = true;
+  request.reqtumbler = getenv("PATH_INFO");
+  int rc = (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&request);
+  BlogFree(blog);
+  request_free(&request);
+  return rc;
+}
+
+/************************************************************************/
+
+int main_cgi_POST(Cgi cgi)
+{
+  assert(cgi != NULL);
+  
+  Request  request;
+  Blog    *blog = BlogNew(NULL);
+  
+  if (blog == NULL)
+    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
+    
+  CgiListMake(cgi);
+  request_init(&request);
+  set_m_author(CgiListGetValue(cgi,"author"),&request);
+  
+  request.title      = strdup(CgiListGetValue(cgi,"title"));
+  request.class      = strdup(CgiListGetValue(cgi,"class"));
+  request.status     = strdup(CgiListGetValue(cgi,"status"));
+  request.date       = strdup(CgiListGetValue(cgi,"date"));
+  request.adtag      = strdup(CgiListGetValue(cgi,"adtag"));
+  request.origbody   = strdup(CgiListGetValue(cgi,"body"));
+  request.body       = strdup(request.origbody);
+  request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),blog->config.conversion);
+  request.f.email    = TO_email(CgiListGetValue(cgi,"email"),blog->config.email.notify);
+  request.f.cgi      = true;
+  
+  if (
+       (emptynull_string(request.author))
+       || (emptynull_string(request.title))
+       || (emptynull_string(request.body))
+     )
+  {
+    return cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
+  }
+  
+  if (request.class == NULL)
+    request.class = strdup("");
+    
+  if (authenticate_author(blog,&request) == false)
+  {
+    syslog(LOG_ERR,"'%s' not authorized to post",request.author);
+    return cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiListGetValue(cgi,"author"));
+  }
+  
+  int rc = (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&request);
+  BlogFree(blog);
+  request_free(&request);
+  return rc;
+}
+
+/************************************************************************/
