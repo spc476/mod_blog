@@ -324,12 +324,12 @@ tumbler_new_file:
   
   return false;
   
-  /*--------------------------------------
+  /*------------------------------------------------------------------------
   ; parse the range portion of the tumbler.  Since the number of segments in
   ; this portion is variable, we parse first without reguard to the actual
   ; ranges, keep track of the number of segments found, then after we're
   ; done with the parsing, we figure everything out.
-  ;---------------------------------------*/
+  ;-------------------------------------------------------------------------*/
   
 tumbler_new_range:
 

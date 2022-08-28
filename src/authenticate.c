@@ -36,12 +36,12 @@ char *get_remote_user(void)
   /*-------------------------------------------------------
   ; A change in Apache 2.0.48:
   ;     Remember an authenticated user during internal redirects if the
-  ;     redirection target is not access protected and pass it
-  ;     to scripts using the REDIRECT_REMOTE_USER environment variable.
-  ;     PR 10678, 11602
+  ;     redirection target is not access protected and pass it to scripts
+  ;     using the REDIRECT_REMOTE_USER environment variable.  PR 10678,
+  ;     11602
   ;
-  ; Because of the way I'm doing this, this is affecting me, so I need
-  ; to check both REMOTE_USER and REDIRECT_REMOTE_USER.
+  ; Because of the way I'm doing this, this is affecting me, so I need to
+  ; check both REMOTE_USER and REDIRECT_REMOTE_USER.
   ;------------------------------------------------------*/
   
   char const *name = getenv("REMOTE_USER");

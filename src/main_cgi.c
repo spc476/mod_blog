@@ -420,11 +420,10 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
   assert(req  != NULL);
   (void)cgi;
   
-  /*----------------------------------------------------
-  ; this routine is a mixture between entry_add() and
-  ; tumbler_page().  Perhaps some refactoring is in order
-  ; at some point.
-  ;-------------------------------------------------------*/
+  /*-----------------------------------------------------------------
+  ; this routine is a mixture between entry_add() and tumbler_page().
+  ; Perhaps some refactoring is in order at some point.
+  ;------------------------------------------------------------------*/
   
   callback_init(&cbd,blog,req);
   fix_entry(req);

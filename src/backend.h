@@ -36,10 +36,10 @@ struct callback_data
 {
   List               list;
   BlogEntry         *entry;    /* current entry being processed */
-  FILE              *ad;       /* file containing ad */
+  FILE              *ad;       /* file containing ad            */
   char              *adtag;
   char              *adcat;
-  struct btm         last;     /* timestamp of previous entry */
+  struct btm         last;     /* timestamp of previous entry   */
   struct btm         previous;
   struct btm         next;
   unit__e            navunit;

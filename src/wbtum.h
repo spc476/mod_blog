@@ -41,17 +41,16 @@ typedef enum unit__e
 
 typedef struct tumbler__s
 {
-  struct btm start;     /* starting date                        */
-  struct btm stop;      /* ending date                          */
-  unit__e    ustart;    /* ending segment of initial part       */
-  unit__e    ustop;     /* ending segment of range part         */
-  int        segments;  /* used for range part                  */
-  bool       file;      /* a file was specified                 */
-  bool       redirect;  /* we need to redirect                  */
-  bool       range;     /* a range was specified                */
+  struct btm start;     /* starting date                  */
+  struct btm stop;      /* ending date                    */
+  unit__e    ustart;    /* ending segment of initial part */
+  unit__e    ustop;     /* ending segment of range part   */
+  int        segments;  /* used for range part            */
+  bool       file;      /* a file was specified           */
+  bool       redirect;  /* we need to redirect            */
+  bool       range;     /* a range was specified          */
   char       filename[FILENAME_MAX];
 } tumbler__s;
-
 
 /***********************************************************************/
 

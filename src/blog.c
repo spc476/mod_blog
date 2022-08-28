@@ -677,12 +677,11 @@ static FILE *open_file_r(char const *name,struct btm const *date)
   if (in == NULL)
     in = fopen("/dev/null","r");
     
-  /*--------------------------------------------------
-  ; because the code was written using a different IO
-  ; model (that is, if there's no data in the file to
-  ; begin with, we automatically end up in EOF mode,
-  ; let's trigger EOF.  Sigh.
-  ;-------------------------------------------------*/
+  /*----------------------------------------------------------------------
+  ; because the code was written using a different IO model (that is, if
+  ; there's no data in the file to begin with, we automatically end up in
+  ; EOF mode, let's trigger EOF.  Sigh.
+  ;-----------------------------------------------------------------------*/
   
   ungetc(fgetc(in),in);
   return in;

@@ -432,7 +432,7 @@ int tumbler_page(Blog const *blog,Request *request,tumbler__s *spec,int (*errorf
   assert(end.day <= max_monthday(end.year,end.month));
   
   /*---------------------------------------------------------------------
-  ; Okay, sanity checking here ... These should be true once we hit this
+  ; Okay, sanity checking here ...  These should be true once we hit this
   ; spot of the code.
   ;---------------------------------------------------------------------*/
   
@@ -451,8 +451,8 @@ int tumbler_page(Blog const *blog,Request *request,tumbler__s *spec,int (*errorf
   assert(btm_cmp(&start,&end) <= 0);
   
   /*-------------------------------------------------------------------------
-  ; okay, resume processing ... bound against the starting time of the blog,
-  ; and the current time.
+  ; okay, resume processing ...  bound against the starting time of the
+  ; blog, and the current time.
   ;
   ; From here on out, it's pretty straight forward.  read a day, if it has
   ; entries, add it to the list, otherwise, continue on, advancing (or

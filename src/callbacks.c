@@ -222,7 +222,7 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib,Blog c
     else
       baseurl = blog->config.baseurl;
       
-    /*---------------------------------------------------------
+    /*-----------------------------------------------------------------------
     ; all this to reassign the value, without ``knowing'' how the pair stuff
     ; actually works.  Perhaps add a PairReValue() call or something?
     ;
@@ -232,7 +232,7 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib,Blog c
     ; If baseurl ends in a '/', and src->value does not start with a '/', we
     ; end up with a double '//'.  We need to make sure we canonicalize all
     ; partial urls to either end in a '/', or not end in a '/'.
-    ;----------------------------------------------------------*/
+    ;------------------------------------------------------------------------*/
     
     if (src->value[0] == '/')
       sprintf(buffer,"%s%s",baseurl,&src->value[1]);
@@ -294,11 +294,10 @@ static void cb_ad_content(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  /*------------------------------------------
-  ; we might also do a generic_cb() here, but
-  ; I would need one that takes a FILE *
-  ; object ... just an idea ...
-  ;-------------------------------------------*/
+  /*------------------------------------------------------------------------
+  ; we might also do a generic_cb() here, but I would need one that takes a
+  ; FILE * object ...  just an idea ...
+  ;-------------------------------------------------------------------------*/
   
   fcopy(out,cbd->ad);
 }
