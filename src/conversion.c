@@ -67,7 +67,7 @@ bool TO_email(char const *value,bool def)
     else if (strcmp(value,"yes") == 0)
       return true;
   }
-
+  
   return def;
 }
 
@@ -100,7 +100,7 @@ conversion__f TO_conversion(char const *name,char const *def)
 Request *request_init(Request *request)
 {
   assert(request != NULL);
-
+  
   memset(request,0,sizeof(Request));
   request->origauthor = NULL;
   request->author     = NULL;

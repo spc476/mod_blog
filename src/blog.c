@@ -196,7 +196,7 @@ BlogEntry *BlogEntryNew(Blog *blog)
     pbe->adtag        = NULL;
     pbe->body         = NULL;
   }
-    
+  
   return pbe;
 }
 
@@ -1286,7 +1286,7 @@ static bool config_read(char const *conf,Blog *blog)
   
   lua_pushcfunction(blog->config.L,confL_config);
   lua_pushlightuserdata(blog->config.L,&blog->config);
-
+  
   rc = lua_pcall(blog->config.L,1,0,0);
   if (rc != LUA_OK)
   {

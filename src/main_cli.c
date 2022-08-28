@@ -90,7 +90,7 @@ int main_cli(int argc,char *argv[])
   Blog      *blog;
   Request    request;
   int        rc;
-
+  
   request_init(&request);
   
   while(true)

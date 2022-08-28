@@ -301,7 +301,7 @@ int main_cgi_POST(Cgi cgi)
   
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
-  
+    
   CgiListMake(cgi);
   request_init(&request);
   set_m_author(CgiListGetValue(cgi,"author"),&request);
@@ -505,7 +505,7 @@ static int cgi_error(Blog const *blog,Request *request,int level,char const *msg
     assert(request != NULL);
     
     request->f.htmldump = true;
-
+    
     fprintf(
         stdout,
         "Status: %d\r\n"

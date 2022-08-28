@@ -233,7 +233,7 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib,Blog c
     ; end up with a double '//'.  We need to make sure we canonicalize all
     ; partial urls to either end in a '/', or not end in a '/'.
     ;----------------------------------------------------------*/
-
+    
     if (src->value[0] == '/')
       sprintf(buffer,"%s%s",baseurl,&src->value[1]);
     else if (isdigit(src->value[0]))
@@ -420,7 +420,7 @@ static void cb_blog_adtag_entity(FILE *out,void *data)
     tag = cbd->blog->config.adtag;
   else
     tag = cbd->adtag;
-
+    
   entityout = fentity_encode_onwrite(out);
   if (entityout == NULL) return;
   fputs(tag,entityout);
@@ -1108,7 +1108,7 @@ static void cb_entry_description(FILE *out,void *data)
   if (cbd->navunit == UNIT_PART)
   {
     BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
-      
+    
     if (NodeValid(&entry->node) && entry->valid)
     {
       if (!empty_string(entry->status))

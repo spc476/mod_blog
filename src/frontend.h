@@ -59,7 +59,7 @@ typedef struct request
     unsigned int regenerate : 1;
     unsigned int today      : 1;
     unsigned int thisday    : 1;
-  } f;  
+  } f;
 } Request;
 
 /************************************************/

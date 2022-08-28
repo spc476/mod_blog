@@ -126,7 +126,7 @@ int generate_pages(Blog const *blog,Request *request)
   assert(blog    != NULL);
   assert(request != NULL);
   (void)request;
-    
+  
   for (size_t i = 0 ; i < blog->config.templatenum ; i++)
   {
     FILE  *out = fopen(blog->config.templates[i].file,"w");

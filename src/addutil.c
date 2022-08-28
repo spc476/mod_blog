@@ -137,7 +137,7 @@ bool entry_add(Blog *blog,Request *req)
   entry->body      = req->body;
   
   BlogEntryWrite(entry);
-    
+  
   req->when = entry->when;
   
   if (blog->config.posthook != NULL)
@@ -164,7 +164,7 @@ bool entry_add(Blog *blog,Request *req)
   
   if (req->f.email)
     notify_emaillist(entry);
-  
+    
   free(entry);
   return rc;
 }
