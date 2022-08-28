@@ -353,7 +353,6 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
 {
   struct callback_data cbd;
   BlogEntry           *entry;
-  char                *p;
   
   assert(cgi  != NULL);
   assert(blog != NULL);
@@ -373,6 +372,8 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
     entry->when = blog->now;
   else
   {
+    char *p;
+    
     entry->when.year  = strtoul(req->date,&p,10); p++;
     entry->when.month = strtoul(p,        &p,10); p++;
     entry->when.day   = strtoul(p,        &p,10);

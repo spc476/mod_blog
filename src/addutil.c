@@ -116,7 +116,7 @@ bool entry_add(Blog *blog,Request *req)
   
   entry = BlogEntryNew(blog);
   
-  if ((req->date == NULL) || (empty_string(req->date)))
+  if (emptynull_string(req->date))
     entry->when = blog->now;
   else
   {
