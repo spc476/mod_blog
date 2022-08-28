@@ -40,7 +40,7 @@ typedef struct request
   char        *adtag;
   char        *origbody;
   char        *body;
-  char        *reqtumbler;
+  char const  *reqtumbler;
   struct btm   when;
   tumbler__s   tumbler;
   void       (*conversion)(FILE *restrict,FILE *restrict);
