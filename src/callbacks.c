@@ -1293,11 +1293,6 @@ static void cb_json_item(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  /*----------------------------------------------------------------------
-  ; XXX---this code is identical to cb_rss_item(), except for which template
-  ; is being used.  Could possibly use some refactoring here ...
-  ;-----------------------------------------------------------------------*/
-  
   for
   (
     BlogEntry *entry = (BlogEntry *)ListRemHead(&cbd->list);
