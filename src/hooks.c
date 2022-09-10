@@ -81,7 +81,7 @@ bool run_hook(char const *tag,char const **argv)
     {
       if (WEXITSTATUS(status) != 0)
       {
-        syslog(LOG_ERR,"%s='%s' rc=%d",tag,argv[0],WEXITSTATUS(status));
+        syslog(LOG_ERR,"%s='%s' status=%d",tag,argv[0],WEXITSTATUS(status));
         return false;
       }
     }
