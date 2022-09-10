@@ -1661,11 +1661,11 @@ void generic_cb(char const *which,FILE *out,void *data)
   
   static struct chunk_callback const callbacks[] =
   {
-    { "ad"                     , cb_ad                     } ,
-    { "ad.content"             , cb_ad_content             } ,
+    { "ad"                     , cb_ad                     } , /* template "ad" */
+    { "ad.content"             , cb_ad_content             } , /* template "categories" */
     { "atom.categories"        , cb_atom_categories        } ,
     { "atom.category"          , cb_atom_category          } ,
-    { "atom.entry"             , cb_atom_entry             } ,
+    { "atom.entry"             , cb_atom_entry             } , /* template "entry" */
     { "begin.year"             , cb_begin_year             } ,
     { "blog.adtag"             , cb_blog_adtag             } ,
     { "blog.adtag.entity"      , cb_blog_adtag_entity      } ,
@@ -1678,15 +1678,15 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "blog.title"             , cb_blog_title             } ,
     { "blog.url"               , cb_blog_url               } ,
     { "blog.url.home"          , cb_blog_url_home          } ,
-    { "comments"               , cb_comments               } ,
+    { "comments"               , cb_comments               } , /* template "comments" */
     { "comments.body"          , cb_comments_body          } ,
     { "comments.check"         , cb_comments_check         } ,
     { "comments.filename"      , cb_comments_filename      } ,
-    { "cond.hr"                , cb_cond_hr                } ,
+    { "cond.hr"                , cb_cond_hr                } , /* template "cond.hr" */
     { "date.day"               , cb_date_day               } ,
     { "date.day.normal"        , cb_date_day_normal        } ,
     { "date.day.url"           , cb_date_day_url           } ,
-    { "edit"                   , cb_edit                   } ,
+    { "edit"                   , cb_edit                   } , /* template "edit" */
     { "edit.adtag"             , cb_edit_adtag             } ,
     { "edit.author"            , cb_edit_author            } ,
     { "edit.body"              , cb_edit_body              } ,
@@ -1694,15 +1694,15 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "edit.date"              , cb_edit_date              } ,
     { "edit.status"            , cb_edit_status            } ,
     { "edit.title"             , cb_edit_title             } ,
-    { "entry"                  , cb_entry                  } ,
+    { "entry"                  , cb_entry                  } , /* template "entry" */
     { "entry.author"           , cb_entry_author           } ,
     { "entry.body"             , cb_entry_body             } ,
     { "entry.body.entified"    , cb_entry_body_entified    } ,
     { "entry.body.jsonified"   , cb_entry_body_jsonified   } ,
     { "entry.class"            , cb_entry_class            } ,
     { "entry.class.jsonified"  , cb_entry_class_jsonified  } ,
-    { "entry.cond.author"      , cb_entry_cond_author      } ,
-    { "entry.cond.date"        , cb_entry_cond_date        } ,
+    { "entry.cond.author"      , cb_entry_cond_author      } , /* template "entry.cond.author" */
+    { "entry.cond.date"        , cb_entry_cond_date        } , /* template "entry.cond.date" */
     { "entry.date"             , cb_entry_date             } ,
     { "entry.description"      , cb_entry_description      } ,
     { "entry.id"               , cb_entry_id               } ,
@@ -1716,19 +1716,19 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "entry.title"            , cb_entry_title            } ,
     { "entry.url"              , cb_entry_url              } ,
     { "generator"              , cb_generator              } ,
-    { "json.item"              , cb_json_item              } ,
-    { "navigation.bar"         , cb_navigation_bar         } ,
-    { "navigation.bar.next"    , cb_navigation_bar_next    } ,
-    { "navigation.bar.prev"    , cb_navigation_bar_prev    } ,
-    { "navigation.current"     , cb_navigation_current     } ,
+    { "json.item"              , cb_json_item              } , /* template "item" */
+    { "navigation.bar"         , cb_navigation_bar         } , /* template "navigation.bar" */
+    { "navigation.bar.next"    , cb_navigation_bar_next    } , /* template "navigation.bar.next" */
+    { "navigation.bar.prev"    , cb_navigation_bar_prev    } , /* template "navigation.bar.prev" */
+    { "navigation.current"     , cb_navigation_current     } , /* template "navigation.current" */
     { "navigation.current.url" , cb_navigation_current_url } ,
     { "navigation.first.title" , cb_navigation_first_title } ,
     { "navigation.first.url"   , cb_navigation_first_url   } ,
     { "navigation.last.title"  , cb_navigation_last_title  } ,
     { "navigation.last.url"    , cb_navigation_last_url    } ,
-    { "navigation.link"        , cb_navigation_link        } ,
-    { "navigation.link.next"   , cb_navigation_link_next   } ,
-    { "navigation.link.prev"   , cb_navigation_link_prev   } ,
+    { "navigation.link"        , cb_navigation_link        } , /* template "navigation.link" */
+    { "navigation.link.next"   , cb_navigation_link_next   } , /* template "navigation.link.next" */
+    { "navigation.link.prev"   , cb_navigation_link_prev   } , /* template "navigation.link.prev" */
     { "navigation.next.title"  , cb_navigation_next_title  } ,
     { "navigation.next.url"    , cb_navigation_next_url    } ,
     { "navigation.prev.title"  , cb_navigation_prev_title  } ,
@@ -1736,7 +1736,7 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "now.year"               , cb_now_year               } ,
     { "request.url"            , cb_request_url            } ,
     { "robots.index"           , cb_robots_index           } ,
-    { "rss.item"               , cb_rss_item               } ,
+    { "rss.item"               , cb_rss_item               } , /* template "item" */
     { "rss.item.url"           , cb_rss_item_url           } ,
     { "rss.pubdate"            , cb_rss_pubdate            } ,
     { "rss.url"                , cb_rss_url                } ,
