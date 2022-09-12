@@ -64,8 +64,8 @@ bool run_hook(char const *tag,char const **argv)
     for (int fh = STDERR_FILENO + 1 ; fh <= devnull ; fh++)
       if (close(fh) == -1)
         _Exit(EX_OSERR);
-    if (execve((char *)argv[0],(char **)argv,environ) == -1)
-      _Exit(EX_UNAVAILABLE);
+    execve((char *)argv[0],(char **)argv,environ);
+    _Exit(EX_UNAVAILABLE);
   }
   else
   {
