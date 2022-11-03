@@ -28,7 +28,6 @@ local uchar   = require "org.conman.parsers.ascii.char"
               + require "org.conman.parsers.utf8.char"
 local allchar = require "org.conman.parsers.ascii"
               + require "org.conman.parsers.utf8.char"
-local ascii   = require "org.conman.parsers.ascii"
 local lpeg    = require "lpeg"
 
 local Carg = lpeg.Carg
@@ -299,23 +298,23 @@ local para  = paras + parae
 
         -- ------------------------------------------------------------
         -- HTML links.  Formats:
-        --              [[href][linktext]]
-        --              [[href]]
-        --              [[href][]]
+        --              {^href linktext}
+        --              {href}
         --
         -- NOTE:  relative links get a CLASS attribute of 'local',
         --        URIs to 'conman.org' get a CLASS attribute of 'site'
         --        All others get a CLASS attribute of 'external'
         -- ------------------------------------------------------------
 
+local SPACE    = S" \t\r\n"
 local urlchar  = P"&" / "&amp;"
-               + ascii - P']'
+               + R"!~" - P'}'
 local urltext  = Cs(urlchar^1)
 local totext   = abbr + tex + entity + style
                + (abnf.HTAB + abnf.CRLF) / " "
-               + (uchar - P"]")
+               + (uchar - P"}")
 local linktext = Cs(totext^1)
-local link     = P"[[" * urltext * P"][" * linktext * P"]]"
+local link     = P"{^" * urltext * SPACE^1 * linktext * P"}"
                / function(href,text)
                    return string.format(
                         [[<a class="%s" href="%s">%s</a>]],
@@ -324,7 +323,7 @@ local link     = P"[[" * urltext * P"][" * linktext * P"]]"
                         text
                    )
                  end
-               + P"[[" * urltext * (P"]]" + P"][]]")
+               + P"{^" * urltext * P"}"
                / function(href)
                    return string.format(
                      [[<code><a class="%s" href="%s">%s</a></code>]],
@@ -340,7 +339,6 @@ local link     = P"[[" * urltext * P"][" * linktext * P"]]"
         
 local tag       = abnf.ALPHA * (abnf.ALPHA + abnf.DIGIT)^0
 local aname     = abnf.ALPHA * (abnf.ALPHA + P"-")^0
-local SPACE     = S" \t\r\n"
 local EQ        = SPACE^0 * P"=" * SPACE^0
 local htmltext  = tex + entity + (-SPACE * uchar)
 local htmlchard = tex + entity + (-P'"'  * uchar)

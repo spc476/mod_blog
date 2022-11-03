@@ -18,10 +18,10 @@ non *proident,* sunt **in culpa qui** officia deserunt mollit anim id est
 laborum. <!-- text from https://lipsum.com/ --> 
 
 Fusce ante ex, congue efficitur ligula a, tincidunt placerat dolor.  Vivamus
-sed [[http://www.example.com/?one=1&two=2][dui sit amet est sagittis]]
+sed {^http://www.example.com/?one=1&two=2 dui sit amet est sagittis}
 rutrum quis eu neque.  In non risus lectus.  Nunc et lorem vitae erat
-[[gopher://gopher.example.com/][molestie aliquet]].  Praesent id
-pellentesque diam.  Duis maximus ipsum [[locallink.html][in urna pulvinar]],
+{^gopher://gopher.example.com/ molestie aliquet}.  Praesent id
+pellentesque diam.  Duis maximus ipsum {^locallink.html in urna pulvinar},
 eu imperdiet risus HTML.  Curabitur quis nibh vel ligula maximus commodo
 ut ac felis.  Nam efficitur erat in ante aliquet, non semper magna aliquam.
 Nunc fermentum turpis HTTP scelerisque mollis.  Phasellus feugiat ligula
@@ -104,20 +104,20 @@ current trainwreck of the modern web happened when browsers gained the
 ability to run code within the browser, turning the browser from a content
 delivery platform and into an application delivery platform (althought that
 transformation didn't happen overnight).  And no, it wasn't the fault of
-[[https://en.wikipedia.org/wiki/Netscape][Netscape]] and their introduction
-of [[https://en.wikipedia.org/wiki/JavaScript][Javascript]] that brought
+{^https://en.wikipedia.org/wiki/Netscape Netscape} and their introduction
+of {^https://en.wikipedia.org/wiki/JavaScript Javascript} that brought
 about the current apocalypse of bloated webpages and constant surveillance.
 Nope, the fault lies directly at the feet of
-[[https://en.wikipedia.org/wiki/Sun_Microsystems][Sun Microsystems]] (whose
+{^https://en.wikipedia.org/wiki/Sun_Microsystems Sun Microsystems} (whose
 zombie corpse is following the command of
-[[https://www.oracle.com/sun/][Oracle]] but I digress) and the introduction
-of [[https://en.wikipedia.org/wiki/Java_(software_platform)#History][Java in
-early 1996]].  Javascript was Netscape's reaction to Java.
+{^https://www.oracle.com/sun/ Oracle} but I digress) and the introduction
+of {^https://en.wikipedia.org/wiki/Java_(software_platform)#History Java in
+early 1996}.  Javascript was Netscape's reaction to Java.
 
 #-quote
 
-Maecenas mollis [[http://www.example.net/]] venenatis
-[[http://www.example.org/][]] odio id vulputate.  Nunc malesuada odio vitae
+Maecenas mollis {^http://www.example.net/} venenatis
+{^http://www.example.org/} odio id vulputate.  Nunc malesuada odio vitae
 nisi cursus, sit amet sodales velit egestas.  Mauris at odio lobortis,
 viverra orci vel, pretium diam.
 
