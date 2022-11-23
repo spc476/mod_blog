@@ -165,11 +165,11 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
         fprintf(
                 stdout,
                 "Status: %d\r\n"
-                "Location: %s/%s\r\n"
+                "Location: %s%s\r\n"
                 "Content-Type: text/html\r\n\r\n"
                 "<html>"
                 "<head><title>Redirect</title></head>"
-                "<body><p>Redirect to <a href='%s/%s'>%s/%s</a></p></body>"
+                "<body><p>Redirect to <a href='%s%s'>%s%s</a></p></body>"
                 "</html>\n",
                 HTTP_MOVEPERM,
                 blog->config.url, tum,
@@ -240,11 +240,11 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
       stdout,
       "Status: %d\r\n"
       "Content-Type: text/html\r\n"
-      "Location: %s/%s\r\n"
+      "Location: %s%s\r\n"
       "\r\n"
       "<HTML>\n"
       "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
-      "  <BODY><A HREF='%s/%s'>Go here</A></BODY>\n"
+      "  <BODY><A HREF='%s%s'>Go here</A></BODY>\n"
       "</HTML>\n",
       HTTP_MOVEPERM,
       blog->config.url,tpath,
@@ -262,11 +262,11 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
       stdout,
       "Status: %d\r\n"
       "Content-Type: text/html\r\n"
-      "Location: %s/%s/%02d/%02d\r\n"
+      "Location: %s%s/%02d/%02d\r\n"
       "\r\n"
       "<HTML>\n"
       "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
-      "  <BODY><A HREF='%s/%s/%02d/%02d'>Go here</A></BODY>\n"
+      "  <BODY><A HREF='%s%s/%02d/%02d'>Go here</A></BODY>\n"
       "</HTML>\n",
       HTTP_MOVEPERM,
       blog->config.url,tpath,req->tumbler.start.month,req->tumbler.start.day,
