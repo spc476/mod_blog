@@ -22,9 +22,12 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include <unistd.h>
+#include <fcntl.h>
 #include <gdbm.h>
+#include <syslog.h>
 
 #include <cgilib6/conf.h>
 #include <cgilib6/htmltok.h>
@@ -1644,6 +1647,118 @@ static void cb_update_time(FILE *out,void *data)
 
 /*******************************************************************/
 
+static void cb_webmention(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  char                  fname[FILENAME_MAX];
+  int                   rc;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  snprintf(
+         fname,
+         sizeof(fname),
+         "%04d/%02d/%02d/%d.webmention",
+         cbd->entry->when.year,
+         cbd->entry->when.month,
+         cbd->entry->when.day,
+         cbd->entry->when.part
+  );
+  
+  cbd->wm = fopen(fname,"r");
+  if (cbd->wm == NULL) return;
+  rc = fcntl(
+              fileno(cbd->wm),
+              F_SETLKW,
+              &(struct flock){
+                .l_type   = F_RDLCK,
+                .l_start  = 0,
+                .l_whence = SEEK_SET,
+                .l_len    = 0,
+              }
+            );
+  if (rc < 0)
+  {
+    syslog(LOG_DEBUG,"fileno('%s') = %d",fname,fileno(cbd->wm));
+    syslog(LOG_ERR,"fcntl('%s',F_SETLKW) = %s",fname,strerror(errno));
+    fclose(cbd->wm);
+    return;
+  }
+  
+  generic_cb("webmention",out,data);
+
+  rc = fcntl(
+              fileno(cbd->wm),
+              F_SETLKW,
+              &(struct flock){
+                .l_type   = F_UNLCK,
+                .l_start  = 0,
+                .l_whence = SEEK_SET,
+                .l_len    = 0,
+              }
+            );
+  if (rc < 0)
+    syslog(LOG_ERR,"fcntl('%s',F_UNLCK) = %s",fname,strerror(errno));
+  fclose(cbd->wm);
+  cbd->wm = NULL;
+}
+
+/*******************************************************************/
+
+static void cb_webmention_item(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  size_t                 buflen = 0;
+  ssize_t                len;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  while((len = getline(&cbd->wmurl,&buflen,cbd->wm)) != -1)
+  {
+    char *p = strchr(cbd->wmurl,'\t');
+    if (p == NULL)
+      cbd->wmtitle = cbd->wmurl;
+    else
+    {
+      *p++ = '\0';
+      cbd->wmtitle = p;
+    }
+    cbd->wmurl[len - 1] = '\0'; /* remove trailing '\n' */
+    generic_cb("webmention.item",out,data);
+    free(cbd->wmurl);
+    cbd->wmurl   = NULL;
+    cbd->wmtitle = NULL;
+    buflen       = 0;
+  }
+  
+  free(cbd->wmurl);
+}
+
+/*******************************************************************/
+static void cb_webmention_title(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  fputs(cbd->wmtitle,out);
+}
+
+/*******************************************************************/
+
+static void cb_webmention_url(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  fputs(cbd->wmurl,out);
+}
+
+/*******************************************************************/
+
 static void cb_xyzzy(FILE *out,void *data)
 {
   assert(out != NULL);
@@ -1662,8 +1777,8 @@ void generic_cb(char const *which,FILE *out,void *data)
   static struct chunk_callback const callbacks[] =
   {
     { "ad"                     , cb_ad                     } , /* template "ad" */
-    { "ad.content"             , cb_ad_content             } , /* template "categories" */
-    { "atom.categories"        , cb_atom_categories        } ,
+    { "ad.content"             , cb_ad_content             } ,
+    { "atom.categories"        , cb_atom_categories        } , /* template "categories" */
     { "atom.category"          , cb_atom_category          } ,
     { "atom.entry"             , cb_atom_entry             } , /* template "entry" */
     { "begin.year"             , cb_begin_year             } ,
@@ -1741,6 +1856,10 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "rss.pubdate"            , cb_rss_pubdate            } ,
     { "rss.url"                , cb_rss_url                } ,
     { "update.time"            , cb_update_time            } ,
+    { "webmention"             , cb_webmention             } , /* template "webmention" */
+    { "webmention.item"        , cb_webmention_item        } , /* template "webmention.item" */
+    { "webmention.title"       , cb_webmention_title       } ,
+    { "webmention.url"         , cb_webmention_url         } ,
     { "xyzzy"                  , cb_xyzzy                  } ,
   };
   

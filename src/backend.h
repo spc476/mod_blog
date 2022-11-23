@@ -39,6 +39,9 @@ struct callback_data
   FILE              *ad;       /* file containing ad            */
   char              *adtag;
   char              *adcat;
+  FILE              *wm;       /* file containing webmentions   */
+  char              *wmtitle;  /* webmention title              */
+  char              *wmurl;    /* webmention url                */
   struct btm         last;     /* timestamp of previous entry   */
   struct btm         previous;
   struct btm         next;

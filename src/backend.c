@@ -718,6 +718,9 @@ struct callback_data *callback_init(struct callback_data *cbd,Blog const *blog,R
   cbd->ad       = NULL;
   cbd->adtag    = NULL;
   cbd->adcat    = NULL;
+  cbd->wm       = NULL;
+  cbd->wmtitle  = NULL;
+  cbd->wmurl    = NULL;
   cbd->navunit  = UNIT_PART;
   return cbd;
 }
