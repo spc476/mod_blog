@@ -235,12 +235,13 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib,Blog c
     ;------------------------------------------------------------------------*/
     
     if (src->value[0] == '/')
-      sprintf(buffer,"%s%s",baseurl,&src->value[1]);
+      snprintf(buffer,sizeof(buffer),"%s%s",baseurl,&src->value[1]);
     else if (isdigit(src->value[0]))
-      sprintf(buffer,"%s%s",baseurl,src->value);
+      snprintf(buffer,sizeof(buffer),"%s%s",baseurl,src->value);
     else
-      sprintf(
+      snprintf(
         buffer,
+        sizeof(buffer),
         "%s%04d/%02d/%02d/%s",
         baseurl,
         entry->when.year,
@@ -269,8 +270,9 @@ static void cb_ad(FILE *out,void *data)
   assert(data != NULL);
   assert(cbd->entry->valid);
   
-  sprintf(
+  snprintf(
         fname,
+        sizeof(fname),
         "%04d/%02d/%02d/%d.ad",
         cbd->entry->when.year,
         cbd->entry->when.month,
@@ -569,8 +571,9 @@ static void cb_comments_body(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  sprintf(
+  snprintf(
         fname,
+        sizeof(fname),
         "%04d/%02d/%02d/%d.comments",
         cbd->entry->when.year,
         cbd->entry->when.month,
@@ -594,8 +597,9 @@ static void cb_comments_check(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  sprintf(
+  snprintf(
         fname,
+        sizeof(fname),
         "%04d/%02d/%02d/%d.comments",
         cbd->entry->when.year,
         cbd->entry->when.month,
