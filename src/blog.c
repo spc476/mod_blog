@@ -165,7 +165,7 @@ static void date_to_dir(char *tname,struct btm const *date)
   assert(tname != NULL);
   assert(date  != NULL);
   
-  sprintf(tname,"%04d/%02d/%02d",date->year,date->month,date->day);
+  snprintf(tname,FILENAME_MAX,"%04d/%02d/%02d",date->year,date->month,date->day);
 }
 
 /***********************************************************************/
@@ -176,7 +176,7 @@ static void date_to_filename(char *tname,struct btm const *date,char const *file
   assert(date  != NULL);
   assert(file  != NULL);
   
-  sprintf(tname,"%04d/%02d/%02d/%s",date->year,date->month,date->day,file);
+  snprintf(tname,FILENAME_MAX,"%04d/%02d/%02d/%s",date->year,date->month,date->day,file);
 }
 
 /**********************************************************************/
@@ -187,7 +187,7 @@ static void date_to_part(char *tname,struct btm const *date,int p)
   assert(date  != NULL);
   assert(p     >  0);
   
-  sprintf(tname,"%04d/%02d/%02d/%d",date->year,date->month,date->day,p);
+  snprintf(tname,FILENAME_MAX,"%04d/%02d/%02d/%d",date->year,date->month,date->day,p);
 }
 
 /*********************************************************************/
@@ -252,7 +252,7 @@ static int date_checkcreate(struct btm const *date)
   
   assert(date != NULL);
   
-  sprintf(tname,"%04d",date->year);
+  snprintf(tname,sizeof(tname),"%04d",date->year);
   rc = stat(tname,&status);
   if (rc != 0)
   {
@@ -263,7 +263,7 @@ static int date_checkcreate(struct btm const *date)
       return errno;
   }
   
-  sprintf(tname,"%04d/%02d",date->year,date->month);
+  snprintf(tname,sizeof(tname),"%04d/%02d",date->year,date->month);
   rc = stat(tname,&status);
   if (rc != 0)
   {
@@ -274,7 +274,7 @@ static int date_checkcreate(struct btm const *date)
       return errno;
   }
   
-  sprintf(tname,"%04d/%02d/%02d",date->year,date->month,date->day);
+  snprintf(tname,sizeof(tname),"%04d/%02d/%02d",date->year,date->month,date->day);
   rc = stat(tname,&status);
   if (rc != 0)
   {
