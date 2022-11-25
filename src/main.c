@@ -27,7 +27,7 @@
 
 int main(int argc,char *argv[])
 {
-  extern char  **environ;
+  extern char **environ;
   Cgi cgi;
   int rc;
   
