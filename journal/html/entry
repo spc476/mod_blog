@@ -14,3 +14,13 @@
 <!-- uncomment below and remove the spaces between the '%'      -->
 <!-- and the braces                                             -->
 <!-- % {comments} % -->
+
+<!-- If you want webmentions and add the approripate code   -->
+<!-- to generate them, uncomment below and remove the space -->
+<!-- between the '%' and the braces                         -->
+<!-- The file for webmentions is stored alongside the post  -->
+<!-- and whould be called "<post#>.webmention", so for the  -->
+<!-- third entry in a day, it would be "3.webmention".  The -->
+<!-- format is one line per mention, url, tab character,    -->
+<!-- then text.                                             -->
+<!-- % {webmention}%

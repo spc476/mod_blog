@@ -1,0 +1,4 @@
+<h4>Webmention</h4>
+<ul>
+%{webmention.item}%
+</ul>
