@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# An example hook script that is run after an entry is successfully added to 
+# the blog.  This could be used to notify some other service that the blog
+# has a new entry.
+#
+# $1 will be the URL of the newly added entry
+
+# For example, let's send ourselves an email when a new entry is added.
+
+sendmail <<EOF
+From: myself@example.com
+To: myself@example.com
+Subject: New post: $1
+
+New post: $1
+EOF
+
+exit 0

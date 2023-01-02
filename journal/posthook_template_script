@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# An example hook script that is run after a template is run.  This could be
+# used to notify some other service that the blog had updated the given page.
+#
+# $1 will the filename of the generated file
+# $2 the reason why this hook is running
+#	'new'		- a new entry is being added
+#	'regenerate'	- the file is being regenerated (no new content)
+#
+
+exit 0

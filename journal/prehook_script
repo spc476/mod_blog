@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# An example hook script that is run before an entry is added to the blog. 
+# You can use this to perhaps verify the HTML is proper, or that there
+# exists a title or class fields.  The hook should return a non-zero if
+# further processing of the entry should stop and not be added.
+#
+# $1 will be the name of a file that contains the entry itself.
+# $2 will be the name of a file that contain metadata about the entry, one
+#    piece of data per line, starting in column 1:
+#
+#-------+-------[ meta file contents ]------------
+#	Author:
+#	Title:
+#	Class:
+#	Status:
+#	Date:
+#	Adtag:
+#
+#-------+------[ end of file ]---------------
+#       ^ column 1
+#
+# For example, to check if we have a given the entry a title
+
+if ! grep ^Title: $2 >/dev/null 2>/dev/null
+then
+	exit 1
+fi
+
+# Now check that the entry contains valid UTF-8 characters.  A more
+# ambitious script might validate the contents in some way.  But as an
+# example, this is fine.
+
+if ! iconv -f UTF-8 -t UTF-8 $1 -o /dev/null >/dev/null 2>/dev/null
+then
+	exit 1
+fi
+
+# Everything seems okay
+
+exit 0
