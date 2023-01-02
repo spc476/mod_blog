@@ -763,7 +763,7 @@ static bool config_read(char const *conf,Blog *blog)
   
   if (conf == NULL)
   {
-    conf = getenv("REDIRECT_BlOG_CONFIG");
+    conf = getenv("REDIRECT_BLOG_CONFIG");
     if (conf == NULL)
     {
       conf = getenv("BLOG_CONFIG");
