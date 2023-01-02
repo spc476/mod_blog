@@ -787,7 +787,6 @@ int generate_pages(Blog const *blog,Request *request)
 {
   assert(blog    != NULL);
   assert(request != NULL);
-  (void)request;
   
   for (size_t i = 0 ; i < blog->config.templatenum ; i++)
   {
@@ -810,7 +809,8 @@ int generate_pages(Blog const *blog,Request *request)
       
       argv[0] = blog->config.templates[i].posthook;
       argv[1] = blog->config.templates[i].file;
-      argv[2] = NULL;
+      argv[2] = request->f.regenerate ? "regenerate" : "new";
+      argv[3] = NULL;
       
       run_hook("template-post-hook",argv);
     }
