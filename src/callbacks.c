@@ -1604,7 +1604,7 @@ static void cb_rss_item_url(FILE *out,void *data)
   
   assert(cbd->entry->valid);
   fprintf(out,"%s",cbd->blog->config.url);
-  print_nav_url(out,&cbd->entry->when,UNIT_PART,cbd->blog->config.baseurl);
+  print_nav_name(out,&cbd->entry->when,UNIT_PART,'/');
 }
 
 /********************************************************************/
