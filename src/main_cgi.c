@@ -496,7 +496,7 @@ int main_cgi_POST(Cgi cgi)
   request.f.cgi      = true;
   
   if (
-       (emptynull_string(request.author))
+          (emptynull_string(request.author))
        || (emptynull_string(request.title))
        || (emptynull_string(request.body))
      )
