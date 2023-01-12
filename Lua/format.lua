@@ -186,10 +186,12 @@ local abbrex = C("IPv4")
              + C("MHz")
              + C("POP3")
              + C("D&amp;D")
+             + C("K&amp;R")
              + C("NaNoWriMo")
              + C("NaNoGenMo")
              + P"D&D5" / "D&amp;D5"
-             + P"D&D" / "D&amp;D"
+             + P"D&D"  / "D&amp;D"
+             + P"K&R"  / "K&amp;R"
              + C(R"AZ" * ((R"ax" * #R"AZ") + R"AZ")^1)
 local abbr   = Cmt(
                   abbrex * Carg(1),
