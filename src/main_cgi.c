@@ -463,6 +463,13 @@ int main_cgi_GET(Cgi cgi)
 
 /************************************************************************/
 
+static char *safe_strdup(char const *orig)
+{
+  return orig != NULL ? strdup(orig) : NULL;
+}
+
+/************************************************************************/
+
 int main_cgi_POST(Cgi cgi)
 {
   assert(cgi != NULL);
@@ -477,13 +484,13 @@ int main_cgi_POST(Cgi cgi)
   request_init(&request);
   set_m_author(CgiListGetValue(cgi,"author"),&request);
   
-  request.title      = strdup(CgiListGetValue(cgi,"title"));
-  request.class      = strdup(CgiListGetValue(cgi,"class"));
-  request.status     = strdup(CgiListGetValue(cgi,"status"));
-  request.date       = strdup(CgiListGetValue(cgi,"date"));
-  request.adtag      = strdup(CgiListGetValue(cgi,"adtag"));
-  request.origbody   = strdup(CgiListGetValue(cgi,"body"));
-  request.body       = strdup(request.origbody);
+  request.title      = safe_strdup(CgiListGetValue(cgi,"title"));
+  request.class      = safe_strdup(CgiListGetValue(cgi,"class"));
+  request.status     = safe_strdup(CgiListGetValue(cgi,"status"));
+  request.date       = safe_strdup(CgiListGetValue(cgi,"date"));
+  request.adtag      = safe_strdup(CgiListGetValue(cgi,"adtag"));
+  request.origbody   = safe_strdup(CgiListGetValue(cgi,"body"));
+  request.body       = safe_strdup(request.origbody);
   request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),blog->config.conversion);
   request.f.email    = TO_email(CgiListGetValue(cgi,"email"),blog->config.email.notify);
   request.f.cgi      = true;
