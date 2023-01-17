@@ -408,7 +408,7 @@ int main_cli(int argc,char *argv[])
   
   blog = BlogNew(config);
   if (blog == NULL)
-    return cli_error(NULL,NULL,HTTP_ISERVERERR,"%s: failed to initialize",config);
+    return cli_error(NULL,NULL,HTTP_ISERVERERR,"%s: failed to initialize",config ? config : "missing config file");
     
   if (forcenotify)
   {

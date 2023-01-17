@@ -880,9 +880,10 @@ Blog *BlogNew(char const *configfile)
 
 void BlogFree(Blog *blog)
 {
-  assert(blog           != NULL);
-  assert(blog->config.L != NULL);
-  lua_close(blog->config.L);
+  assert(blog != NULL);
+  
+  if (blog->config.L != NULL)
+    lua_close(blog->config.L);
   free(blog);
 }
 
