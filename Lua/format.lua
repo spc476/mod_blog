@@ -192,6 +192,7 @@ local abbrex = C("IPv4")
              + P"D&D5" / "D&amp;D5"
              + P"D&D"  / "D&amp;D"
              + P"K&R"  / "K&amp;R"
+             + C("mDNS")
              + C(R"AZ" * ((R"ax" * #R"AZ") + R"AZ")^1)
 local abbr   = Cmt(
                   abbrex * Carg(1),
