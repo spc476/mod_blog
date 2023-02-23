@@ -36,7 +36,7 @@
 
 /************************************************************************/
 
-bool run_hook(char const *tag,char const **argv)
+bool run_hook(char const *tag,char const *argv[])
 {
   assert(tag     != NULL);
   assert(argv    != NULL);

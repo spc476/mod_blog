@@ -61,6 +61,6 @@ extern int                   pagegen_items    (Blog const *,Request *,template__
 extern int                   pagegen_days     (Blog const *,Request *,template__t const *,FILE *);
 extern int                   tumbler_page     (Blog const *,Request *,tumbler__s *,int (*)(Blog const *,Request *,int,char const *,...));
 extern void                  generic_cb       (char const *,FILE *,void *);
-extern bool                  run_hook         (char const *,char const **);
+extern bool                  run_hook         (char const *,char const *[]);
 
 #endif

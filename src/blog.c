@@ -332,9 +332,9 @@ static char *blog_meta_entry(char const *name,struct btm const *date)
 /********************************************************************/
 
 static size_t blog_meta_read(
-        char             ***plines,
-        char       const   *name,
-        struct btm const   *date
+        char             **plines[],
+        char       const  *name,
+        struct btm const  *date
 )
 {
   char   **lines;
@@ -385,7 +385,7 @@ static size_t blog_meta_read(
 
 /************************************************************************/
 
-static void blog_meta_adjust(char ***plines,size_t num,size_t maxnum)
+static void blog_meta_adjust(char **plines[],size_t num,size_t maxnum)
 {
   assert(plines  != NULL);
   assert(*plines != NULL);
@@ -407,7 +407,7 @@ static void blog_meta_adjust(char ***plines,size_t num,size_t maxnum)
 static int blog_meta_write(
         char       const *name,
         struct btm const *date,
-        char             **list,
+        char             *list[],
         size_t             num
 )
 {
@@ -595,7 +595,7 @@ static void confL_toitems(lua_State *L,int idx,template__t *temp)
 
 /***************************************************************************/
 
-static size_t confL_totemplates(lua_State *L,int idx,template__t **ptemps)
+static size_t confL_totemplates(lua_State *L,int idx,template__t *ptemps[])
 {
   size_t       max;
   template__t *temps;
@@ -645,7 +645,7 @@ static size_t confL_totemplates(lua_State *L,int idx,template__t **ptemps)
 
 /***************************************************************************/
 
-static size_t confL_toaffiliates(lua_State *L,int idx,aflink__t **paffs)
+static size_t confL_toaffiliates(lua_State *L,int idx,aflink__t *paffs[])
 {
   size_t     max;
   aflink__t *affs;

@@ -58,7 +58,7 @@ char *get_remote_user(void)
 
 /************************************************************************/
 
-static size_t breakline(char **dest,size_t dsize,FILE *in)
+static size_t breakline(char *dest[],size_t dsize,FILE *in)
 {
   char   *line = NULL;
   char   *p;
