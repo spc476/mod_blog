@@ -185,10 +185,13 @@ local abbrex = C("IPv4")
              + C("GHz")
              + C("MHz")
              + C("POP3")
+             + C("D&amp;D5")
              + C("D&amp;D")
              + C("K&amp;R")
+             + C("AT&amp;T")
              + C("NaNoWriMo")
              + C("NaNoGenMo")
+             + C("I/O")
              + P"D&D5" / "D&amp;D5"
              + P"D&D"  / "D&amp;D"
              + P"K&R"  / "K&amp;R"
