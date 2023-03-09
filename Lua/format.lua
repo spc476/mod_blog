@@ -229,10 +229,10 @@ local tex = P"``"    / ENTITY.ldquo
           + P"(TM)"  / ENTITY.trade
           + P"(C)"   / ENTITY.copy
           + P"(R)"   / ENTITY.reg
-          + P"..."   / "\226\128\166"
+          + P"..."   / ENTITY.hellip
           + P".."    / "\226\128\165"
-          + P"<-"    / "\226\134\144"
-          + P"->"    / "\226\134\146"
+          + P"<-"    / ENTITY.LeftArrow
+          + P"->"    / ENTITY.RightArrow
           + P"^st"   / "<sup>st</sup>"
           + P"^nd"   / "<sup>nd</sup>"
           + P"^rd"   / "<sup>rd</sup>"
