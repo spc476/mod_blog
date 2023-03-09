@@ -580,7 +580,7 @@ local begin_quote = Cmt(
 -- ********************************************************************
 -- #+comment
 --
---      <sol> #-comment <eol>
+--      <sol> #+comment <eol>
 --      text
 --      <sol> #-comment <eol>
 --
