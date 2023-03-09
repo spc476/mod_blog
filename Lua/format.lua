@@ -608,6 +608,7 @@ local pf_char  = tex
                + entity
                + P'"' / '&quot;'
                + P"&" / '&amp;'
+               + P"<" / '&lt;'
                + uchar
                
 local pf_image = P"\n" * #-P"#-photo"
