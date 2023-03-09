@@ -578,20 +578,6 @@ local begin_quote = Cmt(
                     )
                     
 -- ********************************************************************
--- #+comment
---
---      <sol> #+comment <eol>
---      text
---      <sol> #-comment <eol>
---
--- NOTE:        These blocks cannot nest.  Bad things will happen.
--- XXX:         does not display for some reason
--- ********************************************************************
-
-local begin_comment = (P(1) - P"\n#-comment")^0 / "<!-- comment -->"
-                    * (P"\n#-comment" * #P"\n") / ""
-                    
--- ********************************************************************
 -- #+photo
 --
 --      <sol> #+photo <eol>
@@ -680,7 +666,6 @@ local begin  = P"source"  / "" * begin_src
              + P"email"   / "" * begin_email
              + P"quote"   / "" * begin_quote
              + P"photo"   / "" * begin_pf
-             + P"comment" / "" * begin_comment
              
 local battr  = P"_QUOTE:"   / "" * attr_quote
 
