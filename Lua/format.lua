@@ -615,8 +615,8 @@ local pf_image = P"\n" * #-P"#-photo"
                * P"\n" * S" \t"^1 * P"alt="   * Cs(pf_char^1)
                * P"\n" * S" \t"^1 * P"title=" * Cs(pf_char^1)
                / function(display,target,alt,title)
-                   local width,height = image_size(display)
                    if target == '-' then
+                     local width,height = image_size(display)
                      return string.format(
                         '  <img src="%s" width="%d" height="%d" alt="[%s] %s" title="%s">\n',
                         display,
@@ -626,12 +626,13 @@ local pf_image = P"\n" * #-P"#-photo"
                         title
                       )
                    else
-                     local mime = image_type(target)
+                     local mime         = image_type(target)
+                     local width,height = image_size(target)
                      return string.format(
                         '  <a type="%s" class="notype" href="%s"><img src="%s" width="%d" height="%d" alt="[%s] %s" title="%s"></a>\n', -- luacheck: ignore
                         mime,
-                        target,
                         display,
+                        target,
                         width,
                         height,
                         alt,title,
