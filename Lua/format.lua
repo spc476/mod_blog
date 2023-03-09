@@ -612,11 +612,11 @@ local pf_char  = tex
                + uchar
                
 local pf_image = P"\n" * #-P"#-photo"
-               * C(uchar^1) * ((S" \t^1" * C(uchar^1)) + Cc'-')
+               * C(uchar^1) * ((S" \t^1" * C(uchar^1)) + Cc(nil))
                * P"\n" * S" \t"^1 * P"alt="   * Cs(pf_char^1)
                * P"\n" * S" \t"^1 * P"title=" * Cs(pf_char^1)
                / function(display,target,alt,title)
-                   if target == '-' then
+                   if not target then
                      local width,height = image_size(display)
                      return string.format(
                         '  <img src="%s" width="%d" height="%d" alt="[%s] %s" title="%s">\n',
