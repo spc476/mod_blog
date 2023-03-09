@@ -142,8 +142,12 @@ cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
 est laborum.
 
 #+photo
-test.jpg	-	This is a test [] of the ``image'' stuff
-test.png	test.gif	This is yet another &rarr; test of the stuff
+test.jpg
+	alt=A small picture of ... something
+	title=This is a test [] of the ``image'' stuff with a really long text message to see if I can deal with this stuff.
+test.png	test.gif
+	alt=Another small picture of ... something
+	title=This is yet another &rarr; test of the stuff
 #-photo
 
 #+comment

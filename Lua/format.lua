@@ -101,10 +101,10 @@ local function image_size(filename)
 end
 
 -- ********************************************************************
--- usage:	mime = image_type(filename)
--- desc:	Return the image type
--- input:	filename (string) filename of image
--- return:	mime (string) MIME type of image
+-- usage:       mime = image_type(filename)
+-- desc:        Return the image type
+-- input:       filename (string) filename of image
+-- return:      mime (string) MIME type of image
 -- ********************************************************************
 
 local function image_type(filename)
@@ -179,7 +179,7 @@ end
         -- acronym expansion into
         --    <abbr title="expansion">ABBR</abbr>
         -- ----------------------------------------
-
+        
 local abbrex = C("IPv4")
              + C("IPv6")
              + C("GHz")
@@ -312,7 +312,7 @@ local para  = paras + parae
         --        URIs to 'conman.org' get a CLASS attribute of 'site'
         --        All others get a CLASS attribute of 'external'
         -- ------------------------------------------------------------
-
+        
 local SPACE    = S" \t\r\n"
 local urlchar  = P"&" / "&amp;"
                + R"!~" - P'}'
@@ -585,7 +585,7 @@ local begin_quote = Cmt(
 --      <sol> #-comment <eol>
 --
 -- NOTE:        These blocks cannot nest.  Bad things will happen.
--- XXX:		does not display for some reason
+-- XXX:         does not display for some reason
 -- ********************************************************************
 
 local begin_comment = (P(1) - P"\n#-comment")^0 / "<!-- comment -->"
@@ -595,10 +595,13 @@ local begin_comment = (P(1) - P"\n#-comment")^0 / "<!-- comment -->"
 -- #+photo
 --
 --      <sol> #+photo <eol>
---      <sol> displayfile <sp> linkfile <sp> <text>
---      <sol> #-photo
+--      <sol> displayfile [<sp> linkfile] <eol>
+--      <sol> <sp> alt=<text> <eol>
+--      <sol> <sp> title=<text> <eol>
+--      <sol> #-photo <eol>
 --
--- NOTE:        If linkfile is "-" then no link is generated.
+-- NOTE:        If linkfile is not specified, then no link is generated.
+--              There can be more than one display file.
 -- ********************************************************************
 
 local pf_char  = tex
@@ -607,36 +610,36 @@ local pf_char  = tex
                + P"&" / '&amp;'
                + uchar
                
-local pf_image = (P"\n" - P"#-photo") / ""
-                 * C(uchar^1) * (S" \t"^1 / "")
-                 * C(uchar^1) * (S" \t"^1 / "")
-                 * Cs(pf_char^1)
-                 / function(_,display,_,target,_,title)
-                     local width,height = image_size(display)
-                     if target == '-' then
-                       return string.format(
-                          '  <img src="%s" width="%d" height="%d" alt="[%s]" title="%s">\n',
-                          display,
-                          width,
-                          height,
-                          title,
-                          title
-                       )
-                     else
-                       local mime = image_type(target)
-                       return string.format(
-                         '  <a type="%s" class="notype" href="%s"><img src="%s" width="%d" height="%d" alt="[%s]" title="%s"></a>\n', -- luacheck: ignore
-                         mime,
-                         target,
-                         display,
-                         width,
-                         height,
-                         title,
-                         title
-                       )
-                     end
+local pf_image = P"\n" * #-P"#-photo"
+               * C(uchar^1) * ((S" \t^1" * C(uchar^1)) + Cc'-')
+               * P"\n" * S" \t"^1 * P"alt="   * Cs(pf_char^1)
+               * P"\n" * S" \t"^1 * P"title=" * Cs(pf_char^1)
+               / function(display,target,alt,title)
+                   local width,height = image_size(display)
+                   if target == '-' then
+                     return string.format(
+                        '  <img src="%s" width="%d" height="%d" alt="[%s] %s" title="%s">\n',
+                        display,
+                        width,
+                        height,
+                        alt,title,
+                        title
+                      )
+                   else
+                     local mime = image_type(target)
+                     return string.format(
+                        '  <a type="%s" class="notype" href="%s"><img src="%s" width="%d" height="%d" alt="[%s] %s" title="%s"></a>\n', -- luacheck: ignore
+                        mime,
+                        target,
+                        display,
+                        width,
+                        height,
+                        alt,title,
+                        title
+                     )
                    end
-                   
+                 end
+                 
 local begin_pf = #P"\n" * Cc'\n<div class="pf">\n'
                * pf_image^1
                * (P"\n#-photo" * #P"\n" / "</div>")
