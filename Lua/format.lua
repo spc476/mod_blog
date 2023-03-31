@@ -230,7 +230,7 @@ local tex = P"``"    / ENTITY.ldquo
           + P"(C)"   / ENTITY.copy
           + P"(R)"   / ENTITY.reg
           + P"..."   / ENTITY.hellip
-          + P".."    / "\226\128\165"
+          + P".."    / ENTITY.nldr
           + P"<-"    / ENTITY.LeftArrow
           + P"->"    / ENTITY.RightArrow
           + P"^st"   / "<sup>st</sup>"
