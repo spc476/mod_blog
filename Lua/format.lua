@@ -405,6 +405,8 @@ local begin_src = C(S" \t"^0) * C(R("AZ","az")^1) * C(P"\n")
 --      1(<sol> <text>      0(<ht> <text>) <eol> ) -- data row
 --      <sol> '#-table' <eol>
 --
+-- Note:	If <text> starts with '\f' then it represents a header
+--		field within a data row.
 -- ********************************************************************
 
 local int           = P"0" + (R"19" * R"09"^0)
@@ -425,8 +427,10 @@ local table_footer  = P"**" / ""
                     * th^1
                     * Cc'</tr>\n  </tfoot>'
                     * P'\n'
-local td            = Cc'<td class="num">' * number      * Cc'</td>' * (P"\t" / " ")^-1
-                    + Cc'<td>'             * Cs(hchar^1) * Cc'</td>' * (P"\t" / " ")^-1
+local td            = P"\\f" * C(number)   / '<th class="num">%1</th>' * (P"\t" / " ")^-1
+                    + P"\\f" * Cs(hchar^1) / '<th>%1</th>'             * (P"\t" / " ")^-1
+                    + C(number)            / '<td class="num">%1</td>' * (P"\t" / " ")^-1
+                    + Cs(hchar^1)          / '<td>%1</td>'             * (P"\t" / " ")^-1
 local tr            = -P"#-table" * Cc'    <tr>' * td^1 * Cc'</tr>' * P"\n"
 local table_body    = Cc'  <tbody>\n'
                     * tr^1

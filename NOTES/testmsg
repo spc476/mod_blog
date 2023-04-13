@@ -64,6 +64,8 @@ sagittis venenatis.  Praesent rutrum egestas dictum.
 1	2	3	4	bing
 5	6	7	8	bang
 9	10	11	12	bongo
+15	18	21	24	\ftotals
+0	0	0	\f1	\fboom
 #-table
 
 Lorem ipsum dolor sit amet.
