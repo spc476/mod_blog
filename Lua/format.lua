@@ -665,16 +665,14 @@ local attr_quote  = S" \t"^1 / ""
 -- Top level #+BEGIN blocks definition
 -- ********************************************************************
 
-local begin  = P"source"  / "" * begin_src
-             + P"table"   / "" * begin_table
-             + P"email"   / "" * begin_email
-             + P"quote"   / "" * begin_quote
-             + P"photo"   / "" * begin_pf
-             
-local battr  = P"_QUOTE:"   / "" * attr_quote
-
-local blocks = P"\n#+"      / "" * begin
-             + P"\n#+ATTR"  / "" * battr
+local begin  = P"source"   / "" * begin_src
+             + P"table"    / "" * begin_table
+             + P"email"    / "" * begin_email
+             + P"quote"    / "" * begin_quote
+             + P"photo"    / "" * begin_pf
+local battr  = P"_QUOTE:"  / "" * attr_quote
+local blocks = P"\n#+"     / "" * begin
+             + P"\n#+ATTR" / "" * battr
              
 -- ********************************************************************
 -- Entry header
