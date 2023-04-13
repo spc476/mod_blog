@@ -306,7 +306,7 @@ local para  = paras + parae
         -- ------------------------------------------------------------
         -- HTML links.  Formats:
         --              {^href linktext}
-        --              {href}
+        --              {^href}
         --
         -- NOTE:  relative links get a CLASS attribute of 'local',
         --        URIs to 'conman.org' get a CLASS attribute of 'site'
