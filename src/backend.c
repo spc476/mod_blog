@@ -805,7 +805,7 @@ int generate_pages(Blog const *blog,Request *request)
     
     if (blog->config.templates[i].posthook)
     {
-      char const *argv[3];
+      char const *argv[4];
       
       argv[0] = blog->config.templates[i].posthook;
       argv[1] = blog->config.templates[i].file;
