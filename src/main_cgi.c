@@ -451,6 +451,9 @@ int main_cgi_GET(Cgi cgi)
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
     
+  if (cgi->status != HTTP_OKAY)
+    return cgi_error(blog,&request,cgi->status,"");
+    
   CgiListMake(cgi);
   request_init(&request);
   request.f.cgi      = true;
@@ -479,6 +482,9 @@ int main_cgi_POST(Cgi cgi)
   
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
+
+  if (cgi->status != HTTP_OKAY)
+    return cgi_error(blog,&request,cgi->status,"");
     
   CgiListMake(cgi);
   request_init(&request);
