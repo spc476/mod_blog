@@ -1703,7 +1703,7 @@ static void cb_webmention(FILE *out,void *data)
   }
   
   generic_cb("webmention",out,data);
-
+  
   rc = fcntl(
               fileno(cbd->wm),
               F_SETLKW,
