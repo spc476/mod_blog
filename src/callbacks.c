@@ -538,6 +538,18 @@ static void cb_blog_url(FILE *out,void *data)
 
 /*************************************************************************/
 
+static void cb_blog_url_base(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  fputs(cbd->blog->config.baseurl,out);
+}
+
+/*********************************************************************/
+
 static void cb_blog_url_home(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
@@ -1796,6 +1808,7 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "blog.script"            , cb_blog_script            } ,
     { "blog.title"             , cb_blog_title             } ,
     { "blog.url"               , cb_blog_url               } ,
+    { "blog.url.base"          , cb_blog_url_base          } ,
     { "blog.url.home"          , cb_blog_url_home          } ,
     { "comments"               , cb_comments               } , /* template "comments" */
     { "comments.body"          , cb_comments_body          } ,
