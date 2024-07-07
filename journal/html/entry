@@ -23,4 +23,4 @@
 <!-- third entry in a day, it would be "3.webmention".  The -->
 <!-- format is one line per mention, url, tab character,    -->
 <!-- then text.                                             -->
-<!-- % {webmention}%
+<!-- % {webmention} % -->
