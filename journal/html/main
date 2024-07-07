@@ -4,7 +4,7 @@
 <html lang="en-US">
 <head>
   <meta name="robots"                content="%{robots.index}%,follow">
-  <meta name="generator"             content="%{generator}% (%{blog.url.home}%/about/)">
+  <meta name="generator"             content="%{generator}% (%{blog.url.home}%about/)">
   <meta name="description"           content="%{entry.description}%">
   <meta name="keywords"              content="%{entry.class}%">
   
@@ -14,11 +14,11 @@
   %{navigation.link}%
   <link rel="First"         href="%{navigation.first.url}%" title="%{navigation.first.title}%">
   <link rel="Last"          href="%{navigation.last.url}%" title="%{navigation.last.title}%">
-  <link rel="Up"            href="http://www.example.com/">
-  <link rel="Top"           href="http://www.example.com/">
-  <link rel="Home"          href="%{blog.url.home}%">
-  <link rel="alternate"     href="/index.atom"           type="application/atom+xml"    title="Atom 1.0">
-  <link rel="alternate"     href="/index.rss"            type="application/rss+xml"     title="RSS 0.91">
+  <link rel="Up"            href="/">
+  <link rel="Top"           href="/">
+  <link rel="Home"          href="%{blog.url.base}%">
+  <link rel="alternate"     href="%{blog.url.base}%index.atom" type="application/atom+xml"    title="Atom 1.0">
+  <link rel="alternate"     href="%{blog.url.base}%index.rss"  type="application/rss+xml"     title="RSS 0.91">
   <link rev="Made"          href="%{blog.author.email}%" title="%{blog.author}%">
   
   <title>%{blog.title}%%{blog.name}%</title>
@@ -47,8 +47,8 @@
     %{navigation.bar}%
     <li><a href="%{navigation.first.url}%" title="%{navigation.first.title}%">First</a></li>
     <li><a href="%{navigation.last.url}%"  title="%{navigation.last.title}%">Last</a></li>
-    <li><a href="http://www.example.com/">Top</a></li>
-    <li><a href="%{blog.url.home}%">Home</a></li>
+    <li><a href="/">Top</a></li>
+    <li><a href="%{blog.url.base}%">Home</a></li>
   </ul>
 </div>
 
