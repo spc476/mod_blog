@@ -158,7 +158,6 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
     req->reqtumbler++;
     if (tumbler_new(&req->tumbler,req->reqtumbler,&blog->first,&blog->last))
     {
-    
       if (req->tumbler.redirect)
       {
         char *tum = tumbler_canonical(&req->tumbler);
