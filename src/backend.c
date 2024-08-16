@@ -538,6 +538,7 @@ static char const *mime_type(char const *filename)
 static int display_file(tumbler__s const *spec,Blog *blog,Request *request,int (*errorf)(Blog *,Request *,int,char const *,...))
 {
   char fname[FILENAME_MAX];
+  char lastmod[64];
   
   assert(spec != NULL);
   assert(errorf);
@@ -570,6 +571,11 @@ static int display_file(tumbler__s const *spec,Blog *blog,Request *request,int (
       return 1;
     }
     
+    if (HttpNotModified(status.st_mtime))
+    {
+      syslog(LOG_DEBUG,"nomod='%s'",fname);
+    }
+    
     if (freopen(fname,"r",stdin) == NULL)
     {
       (*errorf)(blog,request,HTTP_NOTFOUND,"%s: some internal error",fname);
@@ -583,7 +589,16 @@ static int display_file(tumbler__s const *spec,Blog *blog,Request *request,int (
       struct callback_data cbd;
       
       request->f.htmldump = true;
-      fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
+      fprintf(
+        stdout,
+        "Status: 200\r\n"
+        "Content-Type: text/html\r\n"
+        "Content-Length: %lu\r\n"
+        "Last-Modified: %s\r\n"
+        "\r\n",
+        (unsigned long)status.st_size,
+        HttpTimeStamp(lastmod,sizeof(lastmod),status.st_mtime)
+      );
       generic_cb("main",stdout,callback_init(&cbd,blog,request));
     }
     else
@@ -593,9 +608,11 @@ static int display_file(tumbler__s const *spec,Blog *blog,Request *request,int (
         "Status: 200\r\n"
         "Content-Type: %s\r\n"
         "Content-Length: %lu\r\n"
+        "Last-Modified: %s\r\n"
         "\r\n",
         type,
-        (unsigned long)status.st_size
+        (unsigned long)status.st_size,
+        HttpTimeStamp(lastmod,sizeof(lastmod),status.st_mtime)
       );
       
       fcopy(stdout,stdin);
