@@ -35,7 +35,7 @@ typedef int (*cgicmd__f)(Cgi,Blog *,struct request *);
 
 /**************************************************************************/
 
-static int cgi_error(Blog const *blog,Request *request,int level,char const *msg, ... )
+static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... )
 {
   va_list  args;
   char    *file   = NULL;

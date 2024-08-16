@@ -162,7 +162,7 @@ static int mail_setup_data(Blog *blog,Request *req)
 
 /*******************************************************************/
 
-static int cli_error(Blog const *blog,Request *request,int level,char const *msg, ... )
+static int cli_error(Blog *blog,Request *request,int level,char const *msg, ... )
 {
   va_list args;
   

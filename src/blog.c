@@ -918,7 +918,7 @@ BlogEntry *BlogEntryNew(Blog *blog)
 
 /***********************************************************************/
 
-BlogEntry *BlogEntryRead(Blog const *blog,struct btm const *which)
+BlogEntry *BlogEntryRead(Blog *blog,struct btm const *which)
 {
   BlogEntry   *entry;
   char         pname[FILENAME_MAX];
@@ -961,6 +961,9 @@ BlogEntry *BlogEntryRead(Blog const *blog,struct btm const *which)
     entry->timestamp = status.st_mtime;
   else
     entry->timestamp = blog->tnow;
+  
+  if (entry->timestamp > blog->lastmod)
+    blog->lastmod = entry->timestamp;
     
   sinbody = fopen(pname,"r");
   if (sinbody == NULL)
@@ -979,7 +982,7 @@ BlogEntry *BlogEntryRead(Blog const *blog,struct btm const *which)
 /**********************************************************************/
 
 void BlogEntryReadBetweenU(
-        Blog const       *blog,
+        Blog             *blog,
         List             *list,
         struct btm const *restrict start,
         struct btm const *restrict end
@@ -1014,7 +1017,7 @@ void BlogEntryReadBetweenU(
 /************************************************************************/
 
 void BlogEntryReadBetweenD(
-        Blog const       *blog,
+        Blog             *blog,
         List             *listb,
         struct btm const *restrict end,
         struct btm const *restrict start
@@ -1050,7 +1053,7 @@ void BlogEntryReadBetweenD(
 /*******************************************************************/
 
 void BlogEntryReadXD(
-        Blog const       *blog,
+        Blog             *blog,
         List             *list,
         struct btm const *start,
         size_t            num
@@ -1088,7 +1091,7 @@ void BlogEntryReadXD(
 /*******************************************************************/
 
 void BlogEntryReadXU(
-        Blog const       *blog,
+        Blog             *blog,
         List             *list,
         struct btm const *start,
         size_t            num
@@ -1256,6 +1259,7 @@ int BlogEntryWrite(BlogEntry *entry)
     }
   }
   
+  entry->blog->lastmod = entry->timestamp;
   blog_unlock(entry->blog->config.lockfile,lock);
   return 0;
 }

@@ -30,7 +30,7 @@
 #include "timeutil.h"
 #include "wbtum.h"
 
-typedef int (*pagegen__f)(Blog const *,Request *,struct template const *,FILE *);
+typedef int (*pagegen__f)(Blog *,Request *,struct template const *,FILE *);
 
 struct callback_data
 {
@@ -48,18 +48,18 @@ struct callback_data
   unit__e            navunit;
   template__t const *template;
   Request     const *request;
-  Blog        const *blog;
+  Blog              *blog;
 };
 
 /************************************************/
 
-extern struct callback_data *callback_init    (struct callback_data *,Blog const *,Request const *);
+extern struct callback_data *callback_init    (struct callback_data *,Blog *,Request const *);
 extern pagegen__f            TO_pagegen       (char const *);
-extern int                   generate_thisday (Blog const *,Request *,FILE *,struct btm);
-extern int                   generate_pages   (Blog const *,Request *);
-extern int                   pagegen_items    (Blog const *,Request *,template__t const *,FILE *);
-extern int                   pagegen_days     (Blog const *,Request *,template__t const *,FILE *);
-extern int                   tumbler_page     (Blog const *,Request *,tumbler__s *,int (*)(Blog const *,Request *,int,char const *,...));
+extern int                   generate_thisday (Blog *,Request *,FILE *,struct btm);
+extern int                   generate_pages   (Blog *,Request *);
+extern int                   pagegen_items    (Blog *,Request *,template__t const *,FILE *);
+extern int                   pagegen_days     (Blog *,Request *,template__t const *,FILE *);
+extern int                   tumbler_page     (Blog *,Request *,tumbler__s *,int (*)(Blog *,Request *,int,char const *,...));
 extern void                  generic_cb       (char const *,FILE *,void *);
 extern bool                  run_hook         (char const *,char const *[]);
 

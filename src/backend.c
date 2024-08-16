@@ -132,7 +132,7 @@ static void swap_endpoints(tumbler__s *tum)
 
 /************************************************************************/
 
-static struct btm calculate_previous(Blog const *blog,Request *request,struct btm const start,unit__e navunit)
+static struct btm calculate_previous(Blog *blog,Request *request,struct btm const start,unit__e navunit)
 {
   struct btm previous = start;
   
@@ -235,7 +235,7 @@ static struct btm calculate_previous(Blog const *blog,Request *request,struct bt
 
 /******************************************************************/
 
-static struct btm calculate_next(Blog const *blog,Request *request,struct btm const end,unit__e navunit)
+static struct btm calculate_next(Blog *blog,Request *request,struct btm const end,unit__e navunit)
 {
   struct btm next = end;
   
@@ -535,7 +535,7 @@ static char const *mime_type(char const *filename)
 
 /******************************************************************/
 
-static int display_file(tumbler__s const *spec,Blog const *blog,Request *request,int (*errorf)(Blog const *,Request *,int,char const *,...))
+static int display_file(tumbler__s const *spec,Blog *blog,Request *request,int (*errorf)(Blog *,Request *,int,char const *,...))
 {
   char fname[FILENAME_MAX];
   
@@ -703,7 +703,7 @@ static void free_entries(List *list)
 
 /******************************************************************/
 
-struct callback_data *callback_init(struct callback_data *cbd,Blog const *blog,Request const *request)
+struct callback_data *callback_init(struct callback_data *cbd,Blog *blog,Request const *request)
 {
   assert(cbd     != NULL);
   assert(blog    != NULL);
@@ -743,7 +743,7 @@ pagegen__f TO_pagegen(char const *name)
 
 /************************************************************************/
 
-int generate_thisday(Blog const *blog,Request *request,FILE *out,struct btm when)
+int generate_thisday(Blog *blog,Request *request,FILE *out,struct btm when)
 {
   struct callback_data  cbd;
   char                 *tags;
@@ -783,7 +783,7 @@ int generate_thisday(Blog const *blog,Request *request,FILE *out,struct btm when
 
 /************************************************************************/
 
-int generate_pages(Blog const *blog,Request *request)
+int generate_pages(Blog *blog,Request *request)
 {
   assert(blog    != NULL);
   assert(request != NULL);
@@ -791,7 +791,7 @@ int generate_pages(Blog const *blog,Request *request)
   for (size_t i = 0 ; i < blog->config.templatenum ; i++)
   {
     FILE  *out = fopen(blog->config.templates[i].file,"w");
-    int  (*pagegen)(Blog const *,Request *,struct template const *,FILE *);
+    int  (*pagegen)(Blog *,Request *,struct template const *,FILE *);
     
     if (out == NULL)
     {
@@ -822,7 +822,7 @@ int generate_pages(Blog const *blog,Request *request)
 /******************************************************************/
 
 int pagegen_items(
-        Blog        const *blog,
+        Blog              *blog,
         Request           *request,
         template__t const *template,
         FILE              *out
@@ -862,7 +862,7 @@ int pagegen_items(
 /************************************************************************/
 
 int pagegen_days(
-        Blog        const *blog,
+        Blog              *blog,
         Request           *request,
         template__t const *template,
         FILE              *out
@@ -923,7 +923,7 @@ int pagegen_days(
 
 /************************************************************************/
 
-int tumbler_page(Blog const *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog const *,Request *,int,char const *,...))
+int tumbler_page(Blog *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog *,Request *,int,char const *,...))
 {
   struct callback_data cbd;
   struct btm           start;

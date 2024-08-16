@@ -104,13 +104,14 @@ typedef struct blog
   struct btm    last;
   struct btm    now;
   time_t        tnow;
+  time_t        lastmod;
 } Blog;
 
 typedef struct blogentry
 {
   Node        node;
   bool        valid;
-  Blog const *blog;
+  Blog       *blog;
   time_t      timestamp;
   struct btm  when;
   char       *title;
@@ -127,11 +128,11 @@ extern Blog      *BlogNew               (char const *);
 extern void       BlogFree              (Blog *);
 
 extern BlogEntry *BlogEntryNew          (Blog *);
-extern BlogEntry *BlogEntryRead         (Blog const *,struct btm const *);
-extern void       BlogEntryReadBetweenU (Blog const *,List *,struct btm const *restrict,struct btm const *restrict);
-extern void       BlogEntryReadBetweenD (Blog const *,List *,struct btm const *restrict,struct btm const *restrict);
-extern void       BlogEntryReadXD       (Blog const *,List *,struct btm const *,size_t);
-extern void       BlogEntryReadXU       (Blog const *,List *,struct btm const *,size_t);
+extern BlogEntry *BlogEntryRead         (Blog *,struct btm const *);
+extern void       BlogEntryReadBetweenU (Blog *,List *,struct btm const *restrict,struct btm const *restrict);
+extern void       BlogEntryReadBetweenD (Blog *,List *,struct btm const *restrict,struct btm const *restrict);
+extern void       BlogEntryReadXD       (Blog *,List *,struct btm const *,size_t);
+extern void       BlogEntryReadXU       (Blog *,List *,struct btm const *,size_t);
 extern int        BlogEntryWrite        (BlogEntry *);
 extern int        BlogEntryFree         (BlogEntry *);
 
