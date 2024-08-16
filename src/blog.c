@@ -852,6 +852,7 @@ Blog *BlogNew(char const *configfile)
   }
   
   blog->tnow      = time(NULL);
+  blog->lastmod   = 0;
   ptm             = localtime(&blog->tnow);
   blog->now.year  = ptm->tm_year + 1900;
   blog->now.month = ptm->tm_mon  + 1;
