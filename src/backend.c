@@ -593,10 +593,8 @@ static int display_file(tumbler__s const *spec,Blog *blog,Request *request,int (
         stdout,
         "Status: 200\r\n"
         "Content-Type: text/html\r\n"
-        "Content-Length: %lu\r\n"
         "Last-Modified: %s\r\n"
         "\r\n",
-        (unsigned long)status.st_size,
         HttpTimeStamp(lastmod,sizeof(lastmod),status.st_mtime)
       );
       generic_cb("main",stdout,callback_init(&cbd,blog,request));
