@@ -573,7 +573,14 @@ static int display_file(tumbler__s const *spec,Blog *blog,Request *request,int (
     
     if (HttpNotModified(status.st_mtime))
     {
-      syslog(LOG_DEBUG,"nomod='%s'",fname);
+      fprintf(
+        stdout,
+        "Status: %d\r\n"
+        "Content-Length: 0\r\n"
+        "\r\n",
+        HTTP_NOTMODIFIED
+      );
+      return 0;
     }
     
     if (freopen(fname,"r",stdin) == NULL)
