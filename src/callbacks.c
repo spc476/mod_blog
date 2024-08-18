@@ -1901,30 +1901,32 @@ void generic_main(FILE *out,struct callback_data *cbd)
   assert(out != NULL);
   assert(cbd != NULL);
   
-  if ((cbd->status == HTTP_OKAY) && HttpNotModified(cbd->blog->lastmod))
+  if (cbd->request->f.cgi)
   {
+    if ((cbd->status == HTTP_OKAY) && HttpNotModified(cbd->blog->lastmod))
+    {
+      fprintf(
+        out,
+        "Status: %d\r\n"
+        "Content-Length: 0\r\n"
+        "Last-Modified: %s\r\n"
+        "\r\n",
+        HTTP_NOTMODIFIED,
+        HttpTimeStamp(buf,64,cbd->blog->lastmod)
+      );
+      return;
+    }
+    
     fprintf(
-      out,
-      "Status: %d\r\n"
-      "Content-Length: 0\r\n"
-      "Last-Modified: %s\r\n"
-      "\r\n",
-      HTTP_NOTMODIFIED,
-      HttpTimeStamp(buf,64,cbd->blog->lastmod)
+        out,
+        "Status: %d\r\n"
+        "Content-Type: text/html\r\n"
+        "Last-Modified: %s\r\n"
+        "\r\n",
+        cbd->status,
+        HttpTimeStamp(buf,64,cbd->blog->lastmod)
     );
-    return;
   }
-  
-  fprintf(
-      out,
-      "Status: %d\r\n"
-      "Content-Type: text/html\r\n"
-      "Last-Modified: %s\r\n"
-      "\r\n",
-      cbd->status,
-      HttpTimeStamp(buf,64,cbd->blog->lastmod)
-  );
-
   generic_cb("main",out,cbd);
 }
 
