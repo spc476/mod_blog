@@ -88,7 +88,7 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
     request->f.htmldump = true;
     callback_init(&cbd,blog,request);
     cbd.status = level;
-    generic_cb("main",stdout,&cbd);
+    generic_main(stdout,&cbd);
   }
   
   free(file);
@@ -110,7 +110,7 @@ static int cmd_cgi_get_new(Cgi cgi,Blog *blog,Request *req)
   (void)blog;
   
   req->f.edit = true;
-  generic_cb("main",stdout,callback_init(&cbd,blog,req));
+  generic_main(stdout,callback_init(&cbd,blog,req));
   return 0;
 }
 
@@ -188,7 +188,7 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
         struct callback_data cbd;
         
         req->f.htmldump = true;
-        generic_cb("main",stdout,callback_init(&cbd,blog,req));
+        generic_main(stdout,callback_init(&cbd,blog,req));
         rc = 0;
       }
     }
@@ -372,7 +372,7 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
   
   ListAddTail(&cbd.list,&entry->node);
   req->f.edit = true;
-  generic_cb("main",stdout,&cbd);
+  generic_main(stdout,&cbd);
   
   return 0;
 }

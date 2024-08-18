@@ -1886,39 +1886,46 @@ void generic_cb(char const *which,FILE *out,void *data)
   
   struct callback_data *cbd = data;
   
-  if (strcmp(which,"main") == 0)
-  {
-    char buf[64];
-    
-    if ((cbd->status == HTTP_OKAY) && HttpNotModified(cbd->blog->lastmod))
-    {
-      fprintf(
-        out,
-        "Status: %d\r\n"
-        "Content-Length: 0\r\n"
-        "Last-Modified: %s\r\n"
-        "\r\n",
-        HTTP_NOTMODIFIED,
-        HttpTimeStamp(buf,64,cbd->blog->lastmod)
-      );
-      return;
-    }
-    
-    fprintf(
-        out,
-        "Status: %d\r\n"
-        "Content-Type: text/html\r\n"
-        "Last-Modified: %s\r\n"
-        "\r\n",
-        cbd->status,
-        HttpTimeStamp(buf,64,cbd->blog->lastmod)
-    );
-  }
-  
   Chunk templates = ChunkNew(cbd->template->template,callbacks,sizeof(callbacks) / sizeof(callbacks[0]));
   ChunkProcess(templates,which,out,data);
   ChunkFree(templates);
   fflush(out);
+}
+
+/*********************************************************************/
+
+void generic_main(FILE *out,struct callback_data *cbd)
+{
+  char buf[64];
+  
+  assert(out != NULL);
+  assert(cbd != NULL);
+  
+  if ((cbd->status == HTTP_OKAY) && HttpNotModified(cbd->blog->lastmod))
+  {
+    fprintf(
+      out,
+      "Status: %d\r\n"
+      "Content-Length: 0\r\n"
+      "Last-Modified: %s\r\n"
+      "\r\n",
+      HTTP_NOTMODIFIED,
+      HttpTimeStamp(buf,64,cbd->blog->lastmod)
+    );
+    return;
+  }
+  
+  fprintf(
+      out,
+      "Status: %d\r\n"
+      "Content-Type: text/html\r\n"
+      "Last-Modified: %s\r\n"
+      "\r\n",
+      cbd->status,
+      HttpTimeStamp(buf,64,cbd->blog->lastmod)
+  );
+
+  generic_cb("main",out,cbd);
 }
 
 /*********************************************************************/

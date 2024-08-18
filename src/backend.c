@@ -596,7 +596,7 @@ static int display_file(tumbler__s const *spec,Blog *blog,Request *request,int (
       struct callback_data cbd;
       
       request->f.htmldump = true;
-      generic_cb("main",stdout,callback_init(&cbd,blog,request));
+      generic_main(stdout,callback_init(&cbd,blog,request));
     }
     else
     {
@@ -791,7 +791,7 @@ int generate_thisday(Blog *blog,Request *request,FILE *out,struct btm when)
   tags = tag_collect(&cbd.list,blog->config.adtag);
   cbd.adtag = tag_pick(tags,blog->config.adtag);
   free(tags);
-  generic_cb("main",out,&cbd);
+  generic_main(out,&cbd);
   free_entries(&cbd.list);
   free(cbd.adtag);
   return 0;
@@ -869,7 +869,7 @@ int pagegen_items(
   cbd.adtag = tag_pick(tags,blog->config.adtag);
   
   free(tags);
-  generic_cb("main",out,&cbd);
+  generic_main(out,&cbd);
   free_entries(&cbd.list);
   free(cbd.adtag);
   return 0;
@@ -931,7 +931,7 @@ int pagegen_days(
   cbd.adtag = tag_pick(tags,blog->config.adtag);
   
   free(tags);
-  generic_cb("main",out,&cbd);
+  generic_main(out,&cbd);
   free_entries(&cbd.list);
   free(cbd.adtag);
   return 0;
@@ -1050,7 +1050,7 @@ int tumbler_page(Blog *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog
   cbd.adtag = tag_pick(tags,blog->config.adtag);
   
   free(tags);
-  generic_cb("main",stdout,&cbd);
+  generic_main(stdout,&cbd);
   free_entries(&cbd.list);
   free(cbd.adtag);
   return 0;
