@@ -596,25 +596,18 @@ static int display_file(tumbler__s const *spec,Blog *blog,Request *request,int (
       struct callback_data cbd;
       
       request->f.htmldump = true;
-      fprintf(
-        stdout,
-        "Status: 200\r\n"
-        "Content-Type: text/html\r\n"
-        "Last-Modified: %s\r\n"
-        "\r\n",
-        HttpTimeStamp(lastmod,sizeof(lastmod),status.st_mtime)
-      );
       generic_cb("main",stdout,callback_init(&cbd,blog,request));
     }
     else
     {
       fprintf(
         stdout,
-        "Status: 200\r\n"
+        "Status: %d\r\n"
         "Content-Type: %s\r\n"
         "Content-Length: %lu\r\n"
         "Last-Modified: %s\r\n"
         "\r\n",
+        HTTP_OKAY,
         type,
         (unsigned long)status.st_size,
         HttpTimeStamp(lastmod,sizeof(lastmod),status.st_mtime)
@@ -744,6 +737,7 @@ struct callback_data *callback_init(struct callback_data *cbd,Blog *blog,Request
   cbd->wmtitle  = NULL;
   cbd->wmurl    = NULL;
   cbd->navunit  = UNIT_PART;
+  cbd->status   = HTTP_OKAY;
   return cbd;
 }
 

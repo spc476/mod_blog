@@ -48,6 +48,9 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
   vasprintf(&errmsg,msg,args);
   va_end(args);
   
+  if (level >= HTTP_ISERVERERR)
+    syslog(LOG_ERR,"%d: %s",level,errmsg);
+  
   asprintf(&file,"%s/errors/%d.html",getenv("DOCUMENT_ROOT"),level);
   
   if ((blog == NULL) || (freopen(file,"r",stdin) == NULL))
@@ -83,17 +86,9 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
     assert(request != NULL);
     
     request->f.htmldump = true;
-    
-    fprintf(
-        stdout,
-        "Status: %d\r\n"
-        "X-Error: %s\r\n"
-        "Content-type: text/html\r\n"
-        "\r\n",
-        level,
-        errmsg
-      );
-    generic_cb("main",stdout,callback_init(&cbd,blog,request));
+    callback_init(&cbd,blog,request);
+    cbd.status = level;
+    generic_cb("main",stdout,&cbd);
   }
   
   free(file);
@@ -115,7 +110,6 @@ static int cmd_cgi_get_new(Cgi cgi,Blog *blog,Request *req)
   (void)blog;
   
   req->f.edit = true;
-  fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
   generic_cb("main",stdout,callback_init(&cbd,blog,req));
   return 0;
 }
@@ -180,13 +174,6 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
         return 0;
       }
       
-      if (req->tumbler.file == false)
-        fprintf(
-                stdout,
-                "Status: %s\r\n"
-                "Content-type: text/html\r\n\r\n",
-                status
-        );
       rc = tumbler_page(blog,req,&req->tumbler,cgi_error);
     }
     else
@@ -195,13 +182,12 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
       
       snprintf(filename,sizeof(filename),"%s%s",getenv("DOCUMENT_ROOT"),getenv("PATH_INFO"));
       if (freopen(filename,"r",stdin) == NULL)
-        rc = cgi_error(blog,req,HTTP_BADREQ,"bad request");
+        rc = cgi_error(blog,req,HTTP_NOTFOUND,"bad request");
       else
       {
         struct callback_data cbd;
         
         req->f.htmldump = true;
-        fprintf(stdout,"Status: %s\r\nContent-type: text/html\r\n\r\n",status);
         generic_cb("main",stdout,callback_init(&cbd,blog,req));
         rc = 0;
       }
@@ -226,7 +212,6 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   
   if ((tpath == NULL) && (twhen == NULL))
   {
-    fprintf(stdout,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
     return generate_thisday(blog,req,stdout,blog->now);
   }
   
@@ -274,7 +259,6 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
     return 0;
   }
   
-  fprintf(stdout,"Status: %d\r\nContent-type: text/html\r\n\r\n",HTTP_OKAY);
   return generate_thisday(blog,req,stdout,req->tumbler.start);
 }
 
@@ -388,7 +372,6 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
   
   ListAddTail(&cbd.list,&entry->node);
   req->f.edit = true;
-  fputs("Status: 200\r\nContent-type: text/html\r\n\r\n",stdout);
   generic_cb("main",stdout,&cbd);
   
   return 0;
@@ -448,7 +431,7 @@ int main_cgi_GET(Cgi cgi)
   Blog    *blog = BlogNew(NULL);
   
   if (blog == NULL)
-    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
+    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
     
   if (cgi->status != HTTP_OKAY)
     return cgi_error(blog,&request,cgi->status,"");
@@ -480,7 +463,7 @@ int main_cgi_POST(Cgi cgi)
   Blog    *blog = BlogNew(NULL);
   
   if (blog == NULL)
-    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Internal Error");
+    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
     
   if (cgi->status != HTTP_OKAY)
     return cgi_error(blog,&request,cgi->status,"");

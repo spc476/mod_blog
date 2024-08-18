@@ -46,6 +46,7 @@ struct callback_data
   struct btm         previous;
   struct btm         next;
   unit__e            navunit;
+  http__e            status;
   template__t const *template;
   Request     const *request;
   Blog              *blog;
