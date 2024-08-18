@@ -99,6 +99,39 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
 
 /**********************************************************************/
 
+static void redirect(http__e status,char const *base,char const *path)
+{
+  assert((status == HTTP_MOVEPERM) || (status == HTTP_MOVETEMP));
+  assert(base != NULL);
+  assert(path != NULL);
+  
+  char doc[BUFSIZ];
+  int  len = snprintf(
+               doc,
+               sizeof(doc),
+                "<HTML>\n"
+                "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
+                "  <BODY><A HREF='%s%s'>%s%s</A></BODY>\n"
+                "</HTML>\n",
+                base,path,
+                base,path
+              );
+  printf(
+    "Status: %d\r\n"
+    "Location: %s%s\r\n"
+    "Content-Type: text/html\r\n"
+    "Content-Length: %d\r\n"
+    "\r\n"
+    "%s",
+    status,
+    base, path,
+    len,
+    doc
+  );
+}
+
+/**********************************************************************/
+
 static int cmd_cgi_get_new(Cgi cgi,Blog *blog,Request *req)
 {
   struct callback_data cbd;
@@ -131,20 +164,7 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
     
   if ((emptynull_string(req->reqtumbler)) || (strcmp(req->reqtumbler,"/") == 0))
   {
-    fprintf(
-        stdout,
-        "Status: %d\r\n"
-        "Location: %s\r\n"
-        "Content-type: text/html\r\n"
-        "\r\n"
-        "<HTML>\n"
-        "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
-        "  <BODY><A HREF='%s'>Go here<A></BODY>\n"
-        "</HTML>\n",
-        HTTP_MOVEPERM,
-        blog->config.url,
-        blog->config.url
-      );
+    redirect(HTTP_MOVEPERM,blog->config.url,"");
     rc = 0;
   }
   else
@@ -155,20 +175,7 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
       if (req->tumbler.redirect)
       {
         char *tum = tumbler_canonical(&req->tumbler);
-        fprintf(
-                stdout,
-                "Status: %d\r\n"
-                "Location: %s%s\r\n"
-                "Content-Type: text/html\r\n\r\n"
-                "<html>"
-                "<head><title>Redirect</title></head>"
-                "<body><p>Redirect to <a href='%s%s'>%s%s</a></p></body>"
-                "</html>\n",
-                HTTP_MOVEPERM,
-                blog->config.url, tum,
-                blog->config.url, tum,
-                blog->config.url, tum
-        );
+        redirect(HTTP_MOVEPERM,blog->config.url,tum);
         free(tum);
         free(status);
         return 0;
@@ -220,20 +227,7 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
     
   if ((twhen == NULL) || (*twhen == '\0'))
   {
-    fprintf(
-      stdout,
-      "Status: %d\r\n"
-      "Content-Type: text/html\r\n"
-      "Location: %s%s\r\n"
-      "\r\n"
-      "<HTML>\n"
-      "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
-      "  <BODY><A HREF='%s%s'>Go here</A></BODY>\n"
-      "</HTML>\n",
-      HTTP_MOVEPERM,
-      blog->config.url,tpath,
-      blog->config.url,tpath
-    );
+    redirect(HTTP_MOVEPERM,blog->config.url,tpath);
     return 0;
   }
   
@@ -242,20 +236,14 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
     
   if (req->tumbler.redirect)
   {
-    fprintf(
-      stdout,
-      "Status: %d\r\n"
-      "Content-Type: text/html\r\n"
-      "Location: %s%s/%02d/%02d\r\n"
-      "\r\n"
-      "<HTML>\n"
-      "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
-      "  <BODY><A HREF='%s%s/%02d/%02d'>Go here</A></BODY>\n"
-      "</HTML>\n",
-      HTTP_MOVEPERM,
-      blog->config.url,tpath,req->tumbler.start.month,req->tumbler.start.day,
-      blog->config.url,tpath,req->tumbler.start.month,req->tumbler.start.day
+    char buf[BUFSIZ];
+    snprintf(
+      buf,
+      sizeof(buf),
+      "%s/%02d/%02d",
+      tpath,req->tumbler.start.month,req->tumbler.start.day
     );
+    redirect(HTTP_MOVEPERM,blog->config.url,buf);
     return 0;
   }
   
@@ -309,21 +297,7 @@ static int cmd_cgi_post_new(Cgi cgi,Blog *blog,Request *req)
   if (entry_add(blog,req))
   {
     generate_pages(blog,req);
-    fprintf(
-        stdout,
-        "Status: %d\r\n"
-        "Location: %s\r\n"
-        "Content-type: text/html\r\n"
-        "\r\n"
-        "<HTML>\n"
-        "  <HEAD><TITLE>Go here</TITLE></HEAD>\n"
-        "  <BODY><A HREF='%s'>Go here</A></BODY>\n"
-        "</HTML>\n",
-        HTTP_MOVETEMP,
-        blog->config.url,
-        blog->config.url
-        
-    );
+    redirect(HTTP_MOVETEMP,blog->config.url,"");
     return 0;
   }
   else
