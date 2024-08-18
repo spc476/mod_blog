@@ -956,8 +956,6 @@ BlogEntry *BlogEntryRead(Blog *blog,struct btm const *which)
   entry->status       = blog_meta_entry("status",which);
   entry->adtag        = blog_meta_entry("adtag",which);
   
-  date_to_part(pname,which,which->part);
-  
   if (stat(pname,&status) == 0)
     entry->timestamp = status.st_mtime;
   else
