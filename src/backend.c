@@ -956,7 +956,7 @@ int tumbler_page(Blog *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog
   request->f.navnext = true;
   
   if (spec->redirect)
-    return HTTP_NOTIMP;
+    return (*errorf)(blog,request,HTTP_NOTIMP,"redirect on this request not implemented");
     
   if (spec->file)
   {

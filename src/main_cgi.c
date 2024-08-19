@@ -41,7 +41,7 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
   char    *file   = NULL;
   char    *errmsg = NULL;
   
-  assert(level >= 0);
+  assert(level >= 400);
   assert(msg   != NULL);
   
   va_start(args,msg);
@@ -159,9 +159,13 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
   assert(req  != NULL);
   
   status = CgiListGetValue(cgi,"status");
-  if (emptynull_string(status))
-    status = strdup("200");
-    
+  if (!emptynull_string(status))
+  {
+    int level = strtoul(status,NULL,10);
+    if (level >= 400)
+      return cgi_error(blog,req,level,"Error from Apache");
+  }
+  
   if ((emptynull_string(req->reqtumbler)) || (strcmp(req->reqtumbler,"/") == 0))
   {
     redirect(HTTP_MOVEPERM,blog->config.url,"");
@@ -177,7 +181,6 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
         char *tum = tumbler_canonical(&req->tumbler);
         redirect(HTTP_MOVEPERM,blog->config.url,tum);
         free(tum);
-        free(status);
         return 0;
       }
       
@@ -201,7 +204,6 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
     }
   }
   
-  free(status);
   assert(rc != -1);
   return rc;
 }
@@ -408,7 +410,7 @@ int main_cgi_GET(Cgi cgi)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
     
   if (cgi->status != HTTP_OKAY)
-    return cgi_error(blog,&request,cgi->status,"");
+    return cgi_error(blog,&request,cgi->status,"processing error");
     
   CgiListMake(cgi);
   request_init(&request);
@@ -440,7 +442,7 @@ int main_cgi_POST(Cgi cgi)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
     
   if (cgi->status != HTTP_OKAY)
-    return cgi_error(blog,&request,cgi->status,"");
+    return cgi_error(blog,&request,cgi->status,"processing error");
     
   CgiListMake(cgi);
   request_init(&request);
