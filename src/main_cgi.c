@@ -394,7 +394,7 @@ void request_free(Request *request)
 int main_cgi_bad(Cgi cgi)
 {
   (void)cgi;
-  return cgi_error(NULL,NULL,HTTP_METHODNOTALLOWED,"Nope, now allowed.");
+  return cgi_error(NULL,NULL,HTTP_METHODNOTALLOWED,"Nope, not allowed.");
 }
 
 /*************************************************************************/
