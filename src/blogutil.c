@@ -31,9 +31,9 @@
 
 String *tag_split(size_t *pnum,char const *tag)
 {
-  size_t      num  = 0;
-  size_t      max  = 0;
-  String     *pool = NULL;
+  size_t  num  = 0;
+  size_t  max  = 0;
+  String *pool = NULL;
   
   assert(pnum != NULL);
   assert(tag  != NULL);

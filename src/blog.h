@@ -126,7 +126,6 @@ typedef struct blogentry
 
 extern Blog      *BlogNew               (char const *);
 extern void       BlogFree              (Blog *);
-
 extern BlogEntry *BlogEntryNew          (Blog *);
 extern BlogEntry *BlogEntryRead         (Blog *,struct btm const *);
 extern void       BlogEntryReadBetweenU (Blog *,List *,struct btm const *restrict,struct btm const *restrict);
