@@ -971,12 +971,6 @@ int tumbler_page(Blog *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog
   
   callback_init(&cbd,blog,request);
   
-  /*----------------------------------------------------------------------
-  ; from here to the comment about sanity checking replaced around 100 very
-  ; confused lines of code.  The tumbler code now does more checking of data
-  ; than the old version, so a lot of code was removed.
-  ;-----------------------------------------------------------------------*/
-  
   assert(spec->start.year  >= blog->first.year);
   assert(spec->start.month >   0);
   assert(spec->start.month <  13);

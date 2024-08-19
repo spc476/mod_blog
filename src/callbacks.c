@@ -299,10 +299,9 @@ static void cb_ad_content(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  /*------------------------------------------------------------------------
-  ; we might also do a generic_cb() here, but I would need one that takes a
-  ; FILE * object ...  just an idea ...
-  ;-------------------------------------------------------------------------*/
+  /*-------------------------------------
+  ; we might also do a generic_cb() here
+  ;--------------------------------------*/
   
   fcopy(out,cbd->ad);
 }
