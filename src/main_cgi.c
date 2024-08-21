@@ -55,27 +55,34 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
   
   if ((blog == NULL) || (freopen(file,"r",stdin) == NULL))
   {
-    fprintf(
-        stdout,
-        "Status: %d\r\n"
-        "X-Error: %s\r\n"
-        "Content-type: text/html\r\n"
-        "\r\n"
-        "<html>\n"
-        "<head>\n"
-        "<title>Error %d</title>\n"
-        "</head>\n"
-        "<body>\n"
-        "<h1>Error %d</h1>\n"
-        "<p>%s</p>\n"
-        "</body>\n"
-        "</html>\n"
-        "\n",
-        level,
-        errmsg,
-        level,
-        level,
-        errmsg
+    char buf[BUFSIZ];
+    int  len = snprintf(
+                 buf,
+                 sizeof(buf),
+                 "<html lang='en'>\n"
+                 "<head>\n"
+                 "<title>Error %d</title>\n"
+                 "</head>\n"
+                 "<body>\n"
+                 "<h1>Error %d</h1>\n"
+                 "<p>%s</p>\n"
+                 "</body>\n"
+                 "</html>\n"
+                 "",
+                 level,
+                 level,
+                 errmsg
+               );
+    printf(
+      "Status: %d\r\n"
+      "Content-Type: text/html\r\n"
+      "Content-Length: %d\r\n"
+      "\r\n"
+      "%s"
+      "",
+      level,
+      len,
+      buf
     );
   }
   else
