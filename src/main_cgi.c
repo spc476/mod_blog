@@ -261,6 +261,78 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
 
 /**********************************************************************/
 
+static int cmd_cgi_get_last(Cgi cgi,Blog *blog,Request *req)
+{
+  char buf[BUFSIZ];
+  int  len;
+  
+  assert(cgi  != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
+  
+  syslog(LOG_DEBUG,"cmd_cgi_get_last");
+  char *date = CgiListGetValue(cgi,"date");
+  if (date == NULL)
+  {
+    len = snprintf(
+                 buf,
+                 sizeof(buf),
+                 "%s%04d/%02d/%02d.%d",
+                 blog->config.url,
+                 blog->last.year,
+                 blog->last.month,
+                 blog->last.day,
+                 blog->last.part
+               );
+  }
+  else
+  {
+    struct btm  when;
+    char       *p;
+    size_t      last;
+    
+    syslog(LOG_DEBUG,"date='%s'",date);
+    when.year  = strtoul(date,&p,10); p++;
+    when.month = strtoul(p,   &p,10); p++;
+    when.day   = strtoul(p,   &p,10);
+    when.part  = 1;
+    syslog(LOG_DEBUG,"year=%d month=%d day=%d",when.year,when.month,when.day);
+    
+    if (btm_cmp(&when,&blog->first) < 0)
+      return cgi_error(blog,req,HTTP_BADREQ,"date out of range");
+    if (btm_cmp(&when,&blog->last) <= 0)
+      last = BlogLastEntry(blog,&when);
+    else
+      last = 0;
+      
+    len  = snprintf(
+                  buf,
+                  sizeof(buf),
+                  "%s%04d/%02d/%02d.%zu",
+                  blog->config.url,
+                  when.year,
+                  when.month,
+                  when.day,
+                  last
+            );
+  }
+  
+  printf(
+      "Status: %d\r\n"
+      "Content-Type: text/plain\r\n"
+      "Content-Length: %d\r\n"
+      "\r\n"
+      "%s",
+      HTTP_OKAY,
+      len,
+      buf
+  );
+      
+  return 0;
+}
+
+/**********************************************************************/
+
 static cgicmd__f set_m_cgi_get_command(char const *value)
 {
   if (emptynull_string(value))
@@ -273,6 +345,8 @@ static cgicmd__f set_m_cgi_get_command(char const *value)
     return cmd_cgi_get_show;
   else if (strcmp(value,"today") == 0)
     return cmd_cgi_get_today;
+  else if (strcmp(value,"last") == 0)
+    return cmd_cgi_get_last;
   else
   {
     syslog(LOG_WARNING,"'%s' not supported, using 'show'",value);
