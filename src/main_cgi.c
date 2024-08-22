@@ -507,7 +507,7 @@ int main_cgi_GET(Cgi cgi)
 
 static char *safe_strdup(char const *orig)
 {
-  return orig != NULL ? strdup(orig) : NULL;
+  return orig != NULL ? strdup(orig) : strdup("");
 }
 
 /************************************************************************/
