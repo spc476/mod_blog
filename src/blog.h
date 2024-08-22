@@ -133,6 +133,7 @@ extern void       BlogEntryReadBetweenD (Blog *,List *,struct btm const *restric
 extern void       BlogEntryReadXD       (Blog *,List *,struct btm const *,size_t);
 extern void       BlogEntryReadXU       (Blog *,List *,struct btm const *,size_t);
 extern int        BlogEntryWrite        (BlogEntry *);
+extern size_t     BlogLastEntry         (Blog *,struct btm const *);
 extern int        BlogEntryFree         (BlogEntry *);
 
 /**********************************************************************/

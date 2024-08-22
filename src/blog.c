@@ -1265,6 +1265,24 @@ int BlogEntryWrite(BlogEntry *entry)
 
 /***********************************************************************/
 
+size_t BlogLastEntry(Blog *blog,struct btm const *when)
+{
+  assert(blog != NULL);
+  assert(when != NULL);
+
+  char name[FILENAME_MAX];
+
+  for (int i = 1 ; i < ENTRY_MAX ; i++)
+  {
+    date_to_part(name,when,i);
+    if (access(name,R_OK) == -1)
+      return (size_t)i-1;
+  }
+  return 0;
+}
+
+/***********************************************************************/
+
 int BlogEntryFree(BlogEntry *entry)
 {
   assert(entry != NULL);
