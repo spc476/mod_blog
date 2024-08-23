@@ -166,10 +166,10 @@ static int cli_error(Blog *blog,Request *request,int level,char const *msg, ... 
 {
   va_list args;
   
-  assert(level >= 0);
-  assert(msg   != NULL);
   (void)blog;
   (void)request;
+  assert(level >= 0);
+  assert(msg   != NULL);
   
   fprintf(stderr,"Error %d: ",level);
   

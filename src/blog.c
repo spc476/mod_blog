@@ -1267,7 +1267,7 @@ int BlogEntryWrite(BlogEntry *entry)
 
 size_t BlogLastEntry(Blog *blog,struct btm const *when)
 {
-  assert(blog != NULL);
+  (void)blog;
   assert(when != NULL);
 
   char name[FILENAME_MAX];

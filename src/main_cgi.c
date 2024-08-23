@@ -144,11 +144,9 @@ static int cmd_cgi_get_new(Cgi cgi,Blog *blog,Request *req)
 {
   struct callback_data cbd;
   
-  assert(cgi  != NULL);
-  assert(blog != NULL);
-  assert(req  != NULL);
   (void)cgi;
   (void)blog;
+  assert(req  != NULL);
   
   req->f.edit = true;
   generic_main(stdout,callback_init(&cbd,blog,req));
@@ -370,10 +368,9 @@ static void set_m_author(char *value,Request *req)
 
 static int cmd_cgi_post_new(Cgi cgi,Blog *blog,Request *req)
 {
-  assert(cgi  != NULL);
+  (void)cgi;
   assert(blog != NULL);
   assert(req  != NULL);
-  (void)cgi;
   
   if (entry_add(blog,req))
   {
@@ -392,10 +389,9 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
   struct callback_data cbd;
   BlogEntry           *entry;
   
-  assert(cgi  != NULL);
+  (void)cgi;
   assert(blog != NULL);
   assert(req  != NULL);
-  (void)cgi;
   
   /*-----------------------------------------------------------------
   ; this routine is a mixture between entry_add() and tumbler_page().
