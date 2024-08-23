@@ -547,9 +547,6 @@ int main_cgi_POST(Cgi cgi)
     return cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
   }
   
-  if (request.class == NULL) // XXX
-    request.class = strdup("");
-    
   if (authenticate_author(blog,&request) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",request.author);
