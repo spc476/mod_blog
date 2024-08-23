@@ -16,9 +16,6 @@ local status  = require "org.conman.const.http-response"
 local zlib    = require "zlib"
 
 local headers = ih.headers(ih.generic)
-
-local BASEURL = os.getenv("BLOG_URL")
-local USER
 local gf_debug
 
 magic:flags('mime')
@@ -187,8 +184,7 @@ end
 local function usage()
   io.stderr:write(string.format([[
 usage: %s [options] entryfile [files...]
-        -u | --user user:pw
-        -b | --url  base-url
+        -b | --blog blogref
         -d | --debug
         -h | --help
 ]],arg[0]))
@@ -197,22 +193,47 @@ end
 
 -- ************************************************************************
 
+local CONF = "/home/spc/.config/mod-blog-put.config"
+local BLOG = 'default'
+local BASEURL
+local USER
+
 local opts =
 {
-  { "u" , "user"  , true  , function(u) USER = "Basic " .. base64:encode(u) end },
-  { "b" , "url"   , true  , function(b) BASEURL  = b    end },
+  { "b" , "blog"  , true  , function(b) BLOG = b        end },
   { "d" , "debug" , false , function()  gf_debug = true end },
   { "h" , "help"  , false , function()  usage()         end },
 }
 
 local fi = getopt(arg,opts)
 
-if not BASEURL then
-  os.exit(errmsg("missing base URL"),true)
-end
-
 if not arg[fi] then
   os.exit(errmsg("missing entry file"),true)
+end
+
+do
+  local confenv = {}
+  local conf,err = loadfile(CONF,"t",confenv)
+  if not conf then
+    os.exit(errmsg("%s: %s",CONF,err),true)
+  end
+  
+  conf()
+  
+  if not confenv[BLOG] then
+    os.exit(errmsg("%s: missing %q config block",CONF,BLOG))
+  end
+  
+  BASEURL = confenv[BLOG].url
+  
+  if not BASEURL then
+    os.exit(errmsg("%s: missing %s.url directive",CONF,BLOG))
+  end
+  
+  USER = confenv[BLOG].user
+  if USER then
+    USER = "Basic " .. base64:encode(USER)
+  end
 end
 
 if gf_debug then
