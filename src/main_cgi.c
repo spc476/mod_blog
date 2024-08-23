@@ -583,6 +583,7 @@ int main_cgi_PUT(Cgi cgi)
     request.body       = malloc(cgi->bufsize + 1);
     
     fread(request.body,1,cgi->bufsize,stdin);
+    request.body[cgi->bufsize] = '\0';
     
     if (
             (emptynull_string(request.author))
