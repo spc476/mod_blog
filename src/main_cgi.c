@@ -566,6 +566,9 @@ int main_cgi_PUT(Cgi cgi)
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
     
+  if (cgi->status != HTTP_OKAY)
+    return cgi_error(NULL,NULL,cgi->status,"processing error");
+    
   if (getenv("HTTP_BLOG_FILE") == NULL)
   {
     Request request;
