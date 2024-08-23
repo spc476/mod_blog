@@ -33,6 +33,7 @@
 extern void request_free  (Request *);
 extern int  main_cgi_GET  (Cgi);
 extern int  main_cgi_POST (Cgi);
+extern int  main_cgi_PUT  (Cgi);
 extern int  main_cgi_bad  (Cgi);
 extern int  main_cli      (int,char *[]);
 

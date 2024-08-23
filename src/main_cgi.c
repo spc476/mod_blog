@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include <syslog.h>
 #include <cgilib6/util.h>
@@ -50,7 +51,7 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
   
   if (level >= HTTP_ISERVERERR)
     syslog(LOG_ERR,"%d: %s",level,errmsg);
-  
+    
   asprintf(&file,"%s/errors/%d.html",getenv("DOCUMENT_ROOT"),level);
   
   if ((blog == NULL) || (freopen(file,"r",stdin) == NULL))
@@ -270,7 +271,6 @@ static int cmd_cgi_get_last(Cgi cgi,Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
-  syslog(LOG_DEBUG,"cmd_cgi_get_last");
   char *date = CgiListGetValue(cgi,"date");
   if (date == NULL)
   {
@@ -291,12 +291,10 @@ static int cmd_cgi_get_last(Cgi cgi,Blog *blog,Request *req)
     char       *p;
     size_t      last;
     
-    syslog(LOG_DEBUG,"date='%s'",date);
     when.year  = strtoul(date,&p,10); p++;
     when.month = strtoul(p,   &p,10); p++;
     when.day   = strtoul(p,   &p,10);
     when.part  = 1;
-    syslog(LOG_DEBUG,"year=%d month=%d day=%d",when.year,when.month,when.day);
     
     if (btm_cmp(&when,&blog->first) < 0)
       return cgi_error(blog,req,HTTP_BADREQ,"date out of range");
@@ -327,7 +325,7 @@ static int cmd_cgi_get_last(Cgi cgi,Blog *blog,Request *req)
       len,
       buf
   );
-      
+  
   return 0;
 }
 
@@ -549,7 +547,7 @@ int main_cgi_POST(Cgi cgi)
     return cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
   }
   
-  if (request.class == NULL)
+  if (request.class == NULL) // XXX
     request.class = strdup("");
     
   if (authenticate_author(blog,&request) == false)
@@ -562,6 +560,94 @@ int main_cgi_POST(Cgi cgi)
   BlogFree(blog);
   request_free(&request);
   return rc;
+}
+
+/************************************************************************/
+
+int main_cgi_PUT(Cgi cgi)
+{
+  assert(cgi != NULL);
+  
+  Blog *blog = BlogNew(NULL);
+  
+  if (blog == NULL)
+    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
+    
+  if (getenv("HTTP_BLOG_FILE") == NULL)
+  {
+    Request request;
+    
+    request_init(&request);
+    set_m_author(safe_strdup(getenv("HTTP_BLOG_AUTHOR")),&request);
+    
+    request.title      = safe_strdup(getenv("HTTP_BLOG_TITLE"));
+    request.class      = safe_strdup(getenv("HTTP_BLOG_CLASS"));
+    request.status     = safe_strdup(getenv("HTTP_BLOG_STATUS"));
+    request.date       = safe_strdup(getenv("HTTP_BLOG_DATE"));
+    request.adtag      = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
+    request.conversion = TO_conversion(getenv("HTTP_BLOG_FILTER"),blog->config.conversion);
+    request.f.email    = TO_email(getenv("HTTP_BLOG_EMAIL"),blog->config.email.notify);
+    request.body       = malloc(cgi->bufsize + 1);
+    
+    fread(request.body,1,cgi->bufsize,stdin);
+    
+    if (
+            (emptynull_string(request.author))
+         || (emptynull_string(request.title))
+         || (emptynull_string(request.body))
+      )
+    {
+      cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
+      request_free(&request);
+      BlogFree(blog);
+      return 0;
+    }
+    
+    if (!authenticate_author(blog,&request))
+    {
+      syslog(LOG_ERR,"'%s' not authorized to post",request.author);
+      cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticatged got [%s] wanted [%s]",request.author,getenv("HTTP_BLOG_AUTHOR"));
+      request_free(&request);
+      BlogFree(blog);
+      return 0;
+    }
+    
+    if (entry_add(blog,&request))
+    {
+      generate_pages(blog,&request);
+      printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
+    }
+    else
+      cgi_error(blog,&request,HTTP_ISERVERERR,"couldn't add entry");
+      
+    request_free(&request);
+    BlogFree(blog);
+    return 0;
+  }
+  else
+  {
+    char        buffer[BUFSIZ];
+    size_t      bytes;
+    FILE       *fp;
+    char const *path = getenv("PATH_TRANSLATED");
+    
+    if (path == NULL)
+      return cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add file");
+      
+    fp = fopen(path,"wb");
+    if (fp == NULL)
+      return cgi_error(NULL,NULL,HTTP_ISERVERERR,"%s: %s",path,strerror(errno));
+      
+    do
+    {
+      bytes = fread(buffer,1,sizeof(buffer),stdin);
+      fwrite(buffer,1,bytes,fp);
+    } while (bytes > 0);
+    
+    fclose(fp);
+    printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
+    return 0;
+  }
 }
 
 /************************************************************************/

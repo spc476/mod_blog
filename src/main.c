@@ -43,6 +43,7 @@ int main(int argc,char *argv[])
       case HEAD:
       case GET:  rc = main_cgi_GET (cgi); break;
       case POST: rc = main_cgi_POST(cgi); break;
+      case PUT:  rc = main_cgi_PUT (cgi); break;
       default:   rc = main_cgi_bad (cgi); break;
     }
     CgiFree(cgi);
