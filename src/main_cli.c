@@ -435,6 +435,9 @@ int main_cli(int argc,char *argv[])
   
   rc = (*command)(blog,&request);
   BlogFree(blog);
+  free(request.author); // XXX
+  free(request.status); // XXX
+  free(request.class);  // XXX
   request_free(&request);
   return rc;
 }

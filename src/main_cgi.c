@@ -36,6 +36,23 @@ typedef int (*cgicmd__f)(Cgi,Blog *,struct request *);
 
 /**************************************************************************/
 
+static char *safe_strdup(char const *orig)
+{
+  return orig != NULL ? strdup(orig) : strdup("");
+}
+
+/************************************************************************/
+
+static char *safe_getenv(char const *env)
+{
+  char *e = getenv(env);
+  if (e == NULL)
+    e = (char *)"";
+  return e;
+}
+
+/************************************************************************/
+
 static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... )
 {
   va_list  args;
@@ -360,7 +377,7 @@ static void set_m_author(char *value,Request *req)
   if (emptynull_string(value))
     req->author = get_remote_user();
   else
-    req->author = value;
+    req->author = safe_strdup(value);
     
   req->origauthor = strdup(req->author);
 }
@@ -454,15 +471,15 @@ void request_free(Request *request)
 {
   assert(request != NULL);
   
+  /*-----------------------------------------------------------------------
+  ; Not all fields need to be freed.  I need to figure out why.  Is my code
+  ; now legacy?  That's ...  scary.
+  ;------------------------------------------------------------------------*/
+  
   free(request->origauthor);
-  free(request->author);
-  free(request->title);
-  free(request->class);
-  free(request->status);
   free(request->date);
   free(request->adtag);
   free(request->origbody);
-  free(request->body);
 }
 
 /*************************************************************************/
@@ -496,13 +513,6 @@ int main_cgi_GET(Cgi cgi)
   BlogFree(blog);
   request_free(&request);
   return rc;
-}
-
-/************************************************************************/
-
-static char *safe_strdup(char const *orig)
-{
-  return orig != NULL ? strdup(orig) : strdup("");
 }
 
 /************************************************************************/
@@ -575,11 +585,11 @@ int main_cgi_PUT(Cgi cgi)
     Request request;
     
     request_init(&request);
-    set_m_author(safe_strdup(getenv("HTTP_BLOG_AUTHOR")),&request);
+    set_m_author(getenv("HTTP_BLOG_AUTHOR"),&request);
     
     request.title      = safe_strdup(getenv("HTTP_BLOG_TITLE"));
-    request.class      = safe_strdup(getenv("HTTP_BLOG_CLASS"));
-    request.status     = safe_strdup(getenv("HTTP_BLOG_STATUS"));
+    request.class      = safe_getenv("HTTP_BLOG_CLASS");  // XXX why does this not need freeing?
+    request.status     = safe_getenv("HTTP_BLOG_STATUS"); // XXX why does this not need freeing?
     request.date       = safe_strdup(getenv("HTTP_BLOG_DATE"));
     request.adtag      = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
     request.conversion = TO_conversion(getenv("HTTP_BLOG_FILTER"),blog->config.conversion);
@@ -618,6 +628,7 @@ int main_cgi_PUT(Cgi cgi)
     else
       cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add entry");
       
+    free(request.author); // XXX needs it here, but not for POST or GET.
     request_free(&request);
     BlogFree(blog);
     return 0;
