@@ -584,7 +584,6 @@ int main_cgi_PUT(Cgi cgi)
     request.adtag      = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
     request.conversion = TO_conversion(getenv("HTTP_BLOG_FILTER"),blog->config.conversion);
     request.f.email    = TO_email(getenv("HTTP_BLOG_EMAIL"),blog->config.email.notify);
-    request.f.cgi      = true;
     request.body       = malloc(cgi->bufsize + 1);
     
     fread(request.body,1,cgi->bufsize,stdin);
@@ -596,7 +595,7 @@ int main_cgi_PUT(Cgi cgi)
          || (emptynull_string(request.body))
       )
     {
-      cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
+      cgi_error(NULL,NULL,HTTP_BADREQ,"errors-missing");
       request_free(&request);
       BlogFree(blog);
       return 0;
@@ -605,7 +604,7 @@ int main_cgi_PUT(Cgi cgi)
     if (!authenticate_author(blog,&request))
     {
       syslog(LOG_ERR,"'%s' not authorized to post",request.author);
-      cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticatged got [%s] wanted [%s]",request.author,getenv("HTTP_BLOG_AUTHOR"));
+      cgi_error(NULL,NULL,HTTP_UNAUTHORIZED,"errors-author not authenticatged got [%s] wanted [%s]",request.author,getenv("HTTP_BLOG_AUTHOR"));
       request_free(&request);
       BlogFree(blog);
       return 0;
@@ -617,7 +616,7 @@ int main_cgi_PUT(Cgi cgi)
       printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
     }
     else
-      cgi_error(blog,&request,HTTP_ISERVERERR,"couldn't add entry");
+      cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add entry");
       
     request_free(&request);
     BlogFree(blog);
