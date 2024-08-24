@@ -92,6 +92,7 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
     
     assert(blog    != NULL);
     assert(request != NULL);
+    assert(request->f.cgi);
     
     request->f.htmldump = true;
     callback_init(&cbd,blog,request);
@@ -583,6 +584,7 @@ int main_cgi_PUT(Cgi cgi)
     request.adtag      = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
     request.conversion = TO_conversion(getenv("HTTP_BLOG_FILTER"),blog->config.conversion);
     request.f.email    = TO_email(getenv("HTTP_BLOG_EMAIL"),blog->config.email.notify);
+    request.f.cgi      = true;
     request.body       = malloc(cgi->bufsize + 1);
     
     fread(request.body,1,cgi->bufsize,stdin);
