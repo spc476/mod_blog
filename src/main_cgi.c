@@ -182,7 +182,7 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
-  status = CgiGetValue(cgi,"status");
+  status = CgiGetQValue(cgi,"status");
   if (!emptynull_string(status))
   {
     int level = strtoul(status,NULL,10);
@@ -240,8 +240,8 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
-  char *tpath = CgiGetValue(cgi,"path");
-  char *twhen = CgiGetValue(cgi,"day");
+  char *tpath = CgiGetQValue(cgi,"path");
+  char *twhen = CgiGetQValue(cgi,"day");
   
   if ((tpath == NULL) && (twhen == NULL))
   {
@@ -287,7 +287,7 @@ static int cmd_cgi_get_last(Cgi cgi,Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
-  char *date = CgiGetValue(cgi,"date");
+  char *date = CgiGetQValue(cgi,"date");
   if (date == NULL)
   {
     len = snprintf(
@@ -508,7 +508,7 @@ int main_cgi_GET(Cgi cgi)
   request_init(&request);
   request.f.cgi      = true;
   request.reqtumbler = getenv("PATH_INFO");
-  int rc = (*set_m_cgi_get_command(CgiGetValue(cgi,"cmd")))(cgi,blog,&request);
+  int rc = (*set_m_cgi_get_command(CgiGetQValue(cgi,"cmd")))(cgi,blog,&request);
   BlogFree(blog);
   request_free(&request);
   return rc;
