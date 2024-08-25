@@ -25,7 +25,7 @@
 #include <stdlib.h>
 
 #include <syslog.h>
-#include <cgilib6/util.h>
+#include <cgilib7/util.h>
 
 #include "frontend.h"
 

@@ -27,9 +27,9 @@
 #include <syslog.h>
 #include <gdbm.h>
 
-#include <cgilib6/mail.h>
-#include <cgilib6/util.h>
-#include <cgilib6/chunk.h>
+#include <cgilib7/mail.h>
+#include <cgilib7/util.h>
+#include <cgilib7/chunk.h>
 
 #include "conversion.h"
 #include "backend.h"

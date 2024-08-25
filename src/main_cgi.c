@@ -25,7 +25,7 @@
 #include <errno.h>
 
 #include <syslog.h>
-#include <cgilib6/util.h>
+#include <cgilib7/util.h>
 
 #include "backend.h"
 #include "frontend.h"
@@ -182,7 +182,7 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
-  status = CgiListGetValue(cgi,"status");
+  status = CgiGetValue(cgi,"status");
   if (!emptynull_string(status))
   {
     int level = strtoul(status,NULL,10);
@@ -240,8 +240,8 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
-  char *tpath = CgiListGetValue(cgi,"path");
-  char *twhen = CgiListGetValue(cgi,"day");
+  char *tpath = CgiGetValue(cgi,"path");
+  char *twhen = CgiGetValue(cgi,"day");
   
   if ((tpath == NULL) && (twhen == NULL))
   {
@@ -287,7 +287,7 @@ static int cmd_cgi_get_last(Cgi cgi,Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
-  char *date = CgiListGetValue(cgi,"date");
+  char *date = CgiGetValue(cgi,"date");
   if (date == NULL)
   {
     len = snprintf(
@@ -505,11 +505,10 @@ int main_cgi_GET(Cgi cgi)
   if (cgi->status != HTTP_OKAY)
     return cgi_error(blog,&request,cgi->status,"processing error");
     
-  CgiListMake(cgi);
   request_init(&request);
   request.f.cgi      = true;
   request.reqtumbler = getenv("PATH_INFO");
-  int rc = (*set_m_cgi_get_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&request);
+  int rc = (*set_m_cgi_get_command(CgiGetValue(cgi,"cmd")))(cgi,blog,&request);
   BlogFree(blog);
   request_free(&request);
   return rc;
@@ -530,19 +529,18 @@ int main_cgi_POST(Cgi cgi)
   if (cgi->status != HTTP_OKAY)
     return cgi_error(blog,&request,cgi->status,"processing error");
     
-  CgiListMake(cgi);
   request_init(&request);
-  set_m_author(CgiListGetValue(cgi,"author"),&request);
+  set_m_author(CgiGetValue(cgi,"author"),&request);
   
-  request.title      = safe_strdup(CgiListGetValue(cgi,"title"));
-  request.class      = safe_strdup(CgiListGetValue(cgi,"class"));
-  request.status     = safe_strdup(CgiListGetValue(cgi,"status"));
-  request.date       = safe_strdup(CgiListGetValue(cgi,"date"));
-  request.adtag      = safe_strdup(CgiListGetValue(cgi,"adtag"));
-  request.origbody   = safe_strdup(CgiListGetValue(cgi,"body"));
+  request.title      = safe_strdup(CgiGetValue(cgi,"title"));
+  request.class      = safe_strdup(CgiGetValue(cgi,"class"));
+  request.status     = safe_strdup(CgiGetValue(cgi,"status"));
+  request.date       = safe_strdup(CgiGetValue(cgi,"date"));
+  request.adtag      = safe_strdup(CgiGetValue(cgi,"adtag"));
+  request.origbody   = safe_strdup(CgiGetValue(cgi,"body"));
   request.body       = safe_strdup(request.origbody);
-  request.conversion = TO_conversion(CgiListGetValue(cgi,"filter"),blog->config.conversion);
-  request.f.email    = TO_email(CgiListGetValue(cgi,"email"),blog->config.email.notify);
+  request.conversion = TO_conversion(CgiGetValue(cgi,"filter"),blog->config.conversion);
+  request.f.email    = TO_email(CgiGetValue(cgi,"email"),blog->config.email.notify);
   request.f.cgi      = true;
   
   if (
@@ -557,10 +555,10 @@ int main_cgi_POST(Cgi cgi)
   if (authenticate_author(blog,&request) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",request.author);
-    return cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiListGetValue(cgi,"author"));
+    return cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiGetValue(cgi,"author"));
   }
   
-  int rc = (*set_m_cgi_post_command(CgiListGetValue(cgi,"cmd")))(cgi,blog,&request);
+  int rc = (*set_m_cgi_post_command(CgiGetValue(cgi,"cmd")))(cgi,blog,&request);
   BlogFree(blog);
   request_free(&request);
   return rc;

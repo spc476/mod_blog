@@ -20,7 +20,7 @@
 *
 *************************************************************************/
 
-#include <cgilib6/crashreport.h>
+#include <cgilib7/crashreport.h>
 #include "main.h"
 
 /************************************************************************/
@@ -34,7 +34,7 @@ int main(int argc,char *argv[])
   crashreport_with(argc,argv,environ);
   crashreport_core();
   
-  cgi = CgiNew(NULL);
+  cgi = CgiNew();
   
   if (cgi != NULL)
   {

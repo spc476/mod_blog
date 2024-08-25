@@ -24,7 +24,7 @@
 #define I_82F50023_10E0_5FB8_A706_318F243A6012
 
 #include <stdbool.h>
-#include <cgilib6/cgi.h>
+#include <cgilib7/cgi.h>
 
 #include "frontend.h"
 

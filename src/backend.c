@@ -27,7 +27,7 @@
 #include <sys/stat.h>
 #include <syslog.h>
 
-#include <cgilib6/util.h>
+#include <cgilib7/util.h>
 
 #include "blogutil.h"
 #include "backend.h"

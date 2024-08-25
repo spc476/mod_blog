@@ -24,8 +24,8 @@
 #include <string.h>
 
 #include <syslog.h>
-#include <cgilib6/util.h>
-#include <cgilib6/htmltok.h>
+#include <cgilib7/util.h>
+#include <cgilib7/htmltok.h>
 
 #include "conversion.h"
 #include "blogutil.h"
