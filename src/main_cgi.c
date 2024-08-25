@@ -501,13 +501,14 @@ int main_cgi_GET(Cgi cgi)
   
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
-    
-  if (cgi->status != HTTP_OKAY)
-    return cgi_error(blog,&request,cgi->status,"processing error");
-    
+
   request_init(&request);
   request.f.cgi      = true;
   request.reqtumbler = getenv("PATH_INFO");
+  
+  if (CgiStatus(cgi) != HTTP_OKAY)
+    return cgi_error(blog,&request,CgiStatus(cgi),"processing error");
+    
   int rc = (*set_m_cgi_get_command(CgiGetQValue(cgi,"cmd")))(cgi,blog,&request);
   BlogFree(blog);
   request_free(&request);
@@ -525,11 +526,13 @@ int main_cgi_POST(Cgi cgi)
   
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
-    
-  if (cgi->status != HTTP_OKAY)
-    return cgi_error(blog,&request,cgi->status,"processing error");
-    
+
   request_init(&request);
+  request.f.cgi = true;
+      
+  if (CgiStatus(cgi) != HTTP_OKAY)
+    return cgi_error(blog,&request,CgiStatus(cgi),"processing error");
+    
   set_m_author(CgiGetValue(cgi,"author"),&request);
   
   request.title      = safe_strdup(CgiGetValue(cgi,"title"));
@@ -541,7 +544,6 @@ int main_cgi_POST(Cgi cgi)
   request.body       = safe_strdup(request.origbody);
   request.conversion = TO_conversion(CgiGetValue(cgi,"filter"),blog->config.conversion);
   request.f.email    = TO_email(CgiGetValue(cgi,"email"),blog->config.email.notify);
-  request.f.cgi      = true;
   
   if (
           (emptynull_string(request.author))
@@ -575,8 +577,8 @@ int main_cgi_PUT(Cgi cgi)
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
     
-  if (cgi->status != HTTP_OKAY)
-    return cgi_error(NULL,NULL,cgi->status,"processing error");
+  if (CgiStatus(cgi) != HTTP_OKAY)
+    return cgi_error(NULL,NULL,CgiStatus(cgi),"processing error");
     
   if (getenv("HTTP_BLOG_FILE") == NULL)
   {
@@ -592,10 +594,10 @@ int main_cgi_PUT(Cgi cgi)
     request.adtag      = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
     request.conversion = TO_conversion(getenv("HTTP_BLOG_FILTER"),blog->config.conversion);
     request.f.email    = TO_email(getenv("HTTP_BLOG_EMAIL"),blog->config.email.notify);
-    request.body       = malloc(cgi->bufsize + 1);
+    request.body       = malloc(CgiContentLength(cgi) + 1);
     
-    fread(request.body,1,cgi->bufsize,stdin);
-    request.body[cgi->bufsize] = '\0';
+    fread(request.body,1,CgiContentLength(cgi),stdin);
+    request.body[CgiContentLength(cgi)] = '\0';
     
     if (
             (emptynull_string(request.author))
