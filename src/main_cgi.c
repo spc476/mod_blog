@@ -629,6 +629,8 @@ int main_cgi_PUT(Cgi cgi)
       cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add entry");
       
     free(request.author); // XXX needs it here, but not for POST or GET.
+    free(request.title);  // XXX needs it here, entry_add()/fix_entry():198
+    free(request.body);   // XXX
     request_free(&request);
     BlogFree(blog);
     return 0;
