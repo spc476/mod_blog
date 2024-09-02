@@ -75,5 +75,7 @@ extern FILE    *fentity_encode_onread  (FILE *);
 extern FILE    *fentity_encode_onwrite (FILE *);
 extern Request *request_init           (Request *);
 extern void     request_free           (Request *);
+extern char    *safe_strdup            (char const *);
+extern char    *safe_getenv            (char const *);
 
 #endif

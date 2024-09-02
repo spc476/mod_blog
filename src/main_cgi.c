@@ -34,23 +34,6 @@
 
 typedef int (*cgicmd__f)(Cgi,Blog *,struct request *);
 
-/**************************************************************************/
-
-static char *safe_strdup(char const *orig)
-{
-  return orig != NULL ? strdup(orig) : strdup("");
-}
-
-/************************************************************************/
-
-static char *safe_getenv(char const *env)
-{
-  char *e = getenv(env);
-  if (e == NULL)
-    e = (char *)"";
-  return e;
-}
-
 /************************************************************************/
 
 static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... )
@@ -466,23 +449,6 @@ static cgicmd__f set_m_cgi_post_command(char const *value)
 }
 
 /************************************************************************/
-
-void request_free(Request *request)
-{
-  assert(request != NULL);
-  
-  /*-----------------------------------------------------------------------
-  ; Not all fields need to be freed.  I need to figure out why.  Is my code
-  ; now legacy?  That's ...  scary.
-  ;------------------------------------------------------------------------*/
-  
-  free(request->origauthor);
-  free(request->date);
-  free(request->adtag);
-  free(request->origbody);
-}
-
-/*************************************************************************/
 
 int main_cgi_bad(Cgi cgi)
 {
