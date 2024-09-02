@@ -729,11 +729,7 @@ struct callback_data *callback_init(struct callback_data *cbd,Blog *blog,Request
   assert(blog    != NULL);
   assert(request != NULL);
   
-  memset(cbd,0,sizeof(struct callback_data));
   ListInit(&cbd->list);
-  cbd->template = &blog->config.templates[0]; /* XXX probably document this */
-  cbd->request  = request;
-  cbd->blog     = blog;
   cbd->entry    = NULL;
   cbd->ad       = NULL;
   cbd->adtag    = NULL;
@@ -743,6 +739,14 @@ struct callback_data *callback_init(struct callback_data *cbd,Blog *blog,Request
   cbd->wmurl    = NULL;
   cbd->navunit  = UNIT_PART;
   cbd->status   = HTTP_OKAY;
+  cbd->template = &blog->config.templates[0]; /* XXX probably document this */
+  cbd->request  = request;
+  cbd->blog     = blog;
+  
+  memset(&cbd->last,    0,sizeof(cbd->last));
+  memset(&cbd->previous,0,sizeof(cbd->previous));
+  memset(&cbd->next,    0,sizeof(cbd->next));
+  
   return cbd;
 }
 
