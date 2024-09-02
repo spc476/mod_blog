@@ -31,7 +31,6 @@ typedef void (*conversion__f)(FILE *restrict,FILE *restrict);
 
 extern bool           TO_email             (char const *,bool);
 extern conversion__f  TO_conversion        (char const *,char const *);
-extern Request       *request_init         (Request *);
 extern void           no_conversion        (FILE *restrict,FILE *restrict);
 extern void           text_conversion      (FILE *restrict,FILE *restrict);
 extern void           mixed_conversion     (FILE *restrict,FILE *restrict);

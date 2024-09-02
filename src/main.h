@@ -30,7 +30,6 @@
 
 #define GENERATOR       "mod_blog" " " PROG_VERSION
 
-extern void request_free  (Request *);
 extern int  main_cgi_GET  (Cgi);
 extern int  main_cgi_POST (Cgi);
 extern int  main_cgi_PUT  (Cgi);
