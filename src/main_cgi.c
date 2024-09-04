@@ -416,11 +416,11 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
   
   entry->when.part = 1; /* doesn't matter what this is */
   entry->timestamp = blog->tnow;
-  entry->title     = req->title;
-  entry->class     = req->class;
-  entry->status    = req->status;
-  entry->author    = req->author;
-  entry->body      = req->body;
+  entry->title     = strdup(req->title);
+  entry->class     = strdup(req->class);
+  entry->status    = strdup(req->status);
+  entry->author    = strdup(req->author);
+  entry->body      = strdup(req->body);
   
   ListAddTail(&cbd.list,&entry->node);
   req->f.edit = true;
@@ -554,8 +554,8 @@ int main_cgi_PUT(Cgi cgi)
     set_m_author(getenv("HTTP_BLOG_AUTHOR"),&request);
     
     request.title      = safe_strdup(getenv("HTTP_BLOG_TITLE"));
-    request.class      = safe_getenv("HTTP_BLOG_CLASS");  // XXX why does this not need freeing?
-    request.status     = safe_getenv("HTTP_BLOG_STATUS"); // XXX why does this not need freeing?
+    request.class      = safe_strdup(getenv("HTTP_BLOG_CLASS"));
+    request.status     = safe_strdup(getenv("HTTP_BLOG_STATUS"));
     request.date       = safe_strdup(getenv("HTTP_BLOG_DATE"));
     request.adtag      = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
     request.conversion = TO_conversion(getenv("HTTP_BLOG_FILTER"),blog->config.conversion);
@@ -594,9 +594,6 @@ int main_cgi_PUT(Cgi cgi)
     else
       cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add entry");
       
-    free(request.author); // XXX needs it here, but not for POST or GET.
-    free(request.title);  // XXX needs it here, entry_add()/fix_entry():198
-    free(request.body);   // XXX
     request_free(&request);
     BlogFree(blog);
     return 0;

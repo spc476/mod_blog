@@ -79,9 +79,14 @@ void request_free(Request *request)
   ;------------------------------------------------------------------------*/
   
   free(request->origauthor);
+  free(request->author);
+  free(request->title);
+  free(request->class);
+  free(request->status);
   free(request->date);
   free(request->adtag);
   free(request->origbody);
+  free(request->body);
 }
 
 /************************************************************************/
