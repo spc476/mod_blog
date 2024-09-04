@@ -473,12 +473,13 @@ int main_cgi_GET(Cgi cgi)
   request.reqtumbler = getenv("PATH_INFO");
   
   if (CgiStatus(cgi) != HTTP_OKAY)
-    return cgi_error(blog,&request,CgiStatus(cgi),"processing error");
+    cgi_error(blog,&request,CgiStatus(cgi),"processing error");
+  else
+    (*set_m_cgi_get_command(CgiGetQValue(cgi,"cmd")))(cgi,blog,&request);
     
-  int rc = (*set_m_cgi_get_command(CgiGetQValue(cgi,"cmd")))(cgi,blog,&request);
   BlogFree(blog);
   request_free(&request);
-  return rc;
+  return 0;
 }
 
 /************************************************************************/
@@ -497,8 +498,11 @@ int main_cgi_POST(Cgi cgi)
   request.f.cgi = true;
       
   if (CgiStatus(cgi) != HTTP_OKAY)
-    return cgi_error(blog,&request,CgiStatus(cgi),"processing error");
-    
+  {
+    cgi_error(blog,&request,CgiStatus(cgi),"processing error");
+    goto cleanup_return;
+  }
+  
   set_m_author(CgiGetValue(cgi,"author"),&request);
   
   request.title      = safe_strdup(CgiGetValue(cgi,"title"));
@@ -517,19 +521,22 @@ int main_cgi_POST(Cgi cgi)
        || (emptynull_string(request.body))
      )
   {
-    return cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
+    cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
+    goto cleanup_return;
   }
   
   if (authenticate_author(blog,&request) == false)
   {
     syslog(LOG_ERR,"'%s' not authorized to post",request.author);
-    return cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiGetValue(cgi,"author"));
+    cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiGetValue(cgi,"author"));
   }
-  
-  int rc = (*set_m_cgi_post_command(CgiGetValue(cgi,"cmd")))(cgi,blog,&request);
+  else
+    (*set_m_cgi_post_command(CgiGetValue(cgi,"cmd")))(cgi,blog,&request);
+    
+cleanup_return:
   BlogFree(blog);
   request_free(&request);
-  return rc;
+  return 0;
 }
 
 /************************************************************************/
@@ -571,18 +578,14 @@ int main_cgi_PUT(Cgi cgi)
       )
     {
       cgi_error(NULL,NULL,HTTP_BADREQ,"errors-missing");
-      request_free(&request);
-      BlogFree(blog);
-      return 0;
+      goto cleanup_return;
     }
     
     if (!authenticate_author(blog,&request))
     {
       syslog(LOG_ERR,"'%s' not authorized to post",request.author);
       cgi_error(NULL,NULL,HTTP_UNAUTHORIZED,"errors-author not authenticatged got [%s] wanted [%s]",request.author,getenv("HTTP_BLOG_AUTHOR"));
-      request_free(&request);
-      BlogFree(blog);
-      return 0;
+      goto cleanup_return;
     }
     
     if (entry_add(blog,&request))
@@ -593,6 +596,7 @@ int main_cgi_PUT(Cgi cgi)
     else
       cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add entry");
       
+cleanup_return:
     request_free(&request);
     BlogFree(blog);
     return 0;
