@@ -27,11 +27,10 @@
 
 int main(int argc,char *argv[])
 {
-  extern char **environ;
   Cgi cgi;
   int rc;
   
-  crashreport_with(argc,argv,environ);
+  crashreport_args(argc,argv);
   crashreport_core();
   
   cgi = CgiNew();
