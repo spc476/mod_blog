@@ -141,6 +141,14 @@ static void redirect(http__e status,char const *base,char const *path)
 
 /**********************************************************************/
 
+static int cmd_error(Cgi cgi,Blog *blog,Request *request)
+{
+  (void)cgi;
+  return cgi_error(blog,request,HTTP_BADREQ,"Bad Request");
+}
+
+/**********************************************************************/
+
 static int cmd_cgi_get_new(Cgi cgi,Blog *blog,Request *req)
 {
   struct callback_data cbd;
@@ -345,10 +353,7 @@ static cgicmd__f set_m_cgi_get_command(char const *value)
   else if (strcmp(value,"last") == 0)
     return cmd_cgi_get_last;
   else
-  {
-    syslog(LOG_WARNING,"'%s' not supported, using 'show'",value);
-    return cmd_cgi_get_show;
-  }
+    return cmd_error;
 }
 
 /***********************************************************************/
@@ -442,10 +447,7 @@ static cgicmd__f set_m_cgi_post_command(char const *value)
   else if (strcmp(value,"show") == 0)
     return cmd_cgi_post_show;
   else
-  {
-    syslog(LOG_WARNING,"'%s' not supported, using 'show'",value);
-    return cmd_cgi_post_show;
-  }
+    return cmd_error;
 }
 
 /************************************************************************/
