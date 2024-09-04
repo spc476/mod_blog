@@ -61,11 +61,6 @@ void request_free(Request *request)
 {
   assert(request != NULL);
   
-  /*-----------------------------------------------------------------------
-  ; Not all fields need to be freed.  I need to figure out why.  Is my code
-  ; now legacy?  That's ...  scary.
-  ;------------------------------------------------------------------------*/
-  
   free(request->origauthor);
   free(request->author);
   free(request->title);
