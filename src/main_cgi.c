@@ -141,7 +141,7 @@ static void redirect(http__e status,char const *base,char const *path)
 
 /**********************************************************************/
 
-static int cmd_error(Cgi cgi,Blog *blog,Request *request)
+static int cmd_cgi_error(Cgi cgi,Blog *blog,Request *request)
 {
   (void)cgi;
   return cgi_error(blog,request,HTTP_BADREQ,"Bad Request");
@@ -353,7 +353,7 @@ static cgicmd__f set_m_cgi_get_command(char const *value)
   else if (strcmp(value,"last") == 0)
     return cmd_cgi_get_last;
   else
-    return cmd_error;
+    return cmd_cgi_error;
 }
 
 /***********************************************************************/
@@ -447,7 +447,7 @@ static cgicmd__f set_m_cgi_post_command(char const *value)
   else if (strcmp(value,"show") == 0)
     return cmd_cgi_post_show;
   else
-    return cmd_error;
+    return cmd_cgi_error;
 }
 
 /************************************************************************/
