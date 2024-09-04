@@ -387,7 +387,8 @@ int main_cli(int argc,char *argv[])
     if (!blog->config.email.notify)
     {
       fprintf(stderr,"No email notifiation list\n");
-      return EXIT_FAILURE;
+      rc = EXIT_FAILURE;
+      goto cleanup_return;
     }
     
     BlogEntry *entry = BlogEntryRead(blog,&blog->last);
@@ -396,16 +397,19 @@ int main_cli(int argc,char *argv[])
     {
       notify_emaillist(entry);
       BlogEntryFree(entry);
-      return EXIT_SUCCESS;
+      rc = EXIT_SUCCESS;
+      goto cleanup_return;
     }
     else
     {
       fprintf(stderr,"Cannot force notify\n");
-      return EXIT_FAILURE;
+      rc = EXIT_FAILURE;
+      goto cleanup_return;
     }
   }
   
   rc = (*command)(blog,&request);
+cleanup_return:
   BlogFree(blog);
   request_free(&request);
   return rc;
