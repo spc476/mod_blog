@@ -54,43 +54,15 @@ static int mailfile_readdata(Blog *blog,Request *req)
   ListInit(&headers);
   RFC822HeadersRead(stdin,&headers);
   
-  req->author     = PairListGetValue(&headers,"AUTHOR");
-  req->title      = PairListGetValue(&headers,"TITLE");
-  req->class      = PairListGetValue(&headers,"CLASS");
-  req->status     = PairListGetValue(&headers,"STATUS");
-  req->date       = PairListGetValue(&headers,"DATE");
-  req->adtag      = PairListGetValue(&headers,"ADTAG");
+  req->author     = safe_strdup(PairListGetValue(&headers,"AUTHOR"));
+  req->title      = safe_strdup(PairListGetValue(&headers,"TITLE"));
+  req->class      = safe_strdup(PairListGetValue(&headers,"CLASS"));
+  req->status     = safe_strdup(PairListGetValue(&headers,"STATUS"));
+  req->date       = safe_strdup(PairListGetValue(&headers,"DATE"));
+  req->adtag      = safe_strdup(PairListGetValue(&headers,"ADTAG"));
   req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"),blog->config.conversion);
   req->f.email    = TO_email(PairListGetValue(&headers,"EMAIL"),blog->config.email.notify);
   
-  if (req->author != NULL)
-    req->author = strdup(req->author);
-  else
-    req->author = strdup("");
-    
-  if (req->title  != NULL)
-    req->title  = strdup(req->title);
-  else
-    req->title = strdup("");
-    
-  if (req->class  != NULL)
-    req->class  = strdup(req->class);
-  else
-    req->class = strdup("");
-    
-  if (req->status != NULL)
-    req->status = strdup(req->status);
-  else
-    req->status = strdup("");
-    
-  if (req->adtag != NULL)
-    req->adtag = strdup(req->adtag);
-  else
-    req->adtag = strdup("");
-    
-  if (req->date != NULL)
-    req->date = strdup(req->date);
-    
   PairListFree(&headers);       /* got everything we need, dump this */
   
   if (authenticate_author(blog,req) == false)
