@@ -538,18 +538,17 @@ int main_cgi_PUT(Cgi cgi)
 {
   assert(cgi != NULL);
   
-  Blog *blog = BlogNew(NULL);
-  
-  if (blog == NULL)
-    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
-    
   if (CgiStatus(cgi) != HTTP_OKAY)
     return cgi_error(NULL,NULL,CgiStatus(cgi),"processing error");
     
   if (getenv("HTTP_BLOG_FILE") == NULL)
   {
-    Request request;
+    Blog    *blog = BlogNew(NULL);
+    Request  request;
     
+    if (blog == NULL)
+      return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
+      
     request_init(&request);
     set_m_author(getenv("HTTP_BLOG_AUTHOR"),&request);
     
