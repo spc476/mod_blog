@@ -36,18 +36,6 @@ char *safe_strdup(char const *orig)
 
 /************************************************************************/
 
-char *safe_getenv(char const *env)
-{
-  assert(env != NULL);
-  
-  char *e = getenv(env);
-  if (e == NULL)
-    e = (char *)"";
-  return e;
-}
-
-/************************************************************************/
-
 Request *request_init(Request *request)
 {
   assert(request != NULL);
