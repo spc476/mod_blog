@@ -156,6 +156,13 @@ static int cli_error(Blog *blog,Request *request,int level,char const *msg, ... 
 
 /*************************************************************************/
 
+static int cmd_cli_error(Blog *blog,Request *req)
+{
+  return cli_error(blog,req,HTTP_BADREQ,"Bad request");
+}
+
+/*************************************************************************/
+  
 static int cmd_cli_new(Blog *blog,Request *req)
 {
   int rc;
@@ -258,10 +265,7 @@ static clicmd__f get_cli_command(char const *value)
   else if (strcmp(value,"preview") == 0)
     return cmd_cli_show;
   else
-  {
-    fprintf(stderr,"'%s' not supported, using 'show'\n",value);
-    return cmd_cli_show;
-  }
+    return cmd_cli_error;
 }
 
 /*************************************************************************/
