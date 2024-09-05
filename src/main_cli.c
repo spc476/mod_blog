@@ -162,7 +162,7 @@ static int cmd_cli_error(Blog *blog,Request *req)
 }
 
 /*************************************************************************/
-  
+
 static int cmd_cli_new(Blog *blog,Request *req)
 {
   int rc;

@@ -469,7 +469,7 @@ int main_cgi_GET(Cgi cgi)
   
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
-
+    
   request_init(&request);
   request.f.cgi      = true;
   request.reqtumbler = getenv("PATH_INFO");
@@ -495,10 +495,10 @@ int main_cgi_POST(Cgi cgi)
   
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
-
+    
   request_init(&request);
   request.f.cgi = true;
-      
+  
   if (CgiStatus(cgi) != HTTP_OKAY)
   {
     cgi_error(blog,&request,CgiStatus(cgi),"processing error");

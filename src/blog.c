@@ -960,7 +960,7 @@ BlogEntry *BlogEntryRead(Blog *blog,struct btm const *which)
     entry->timestamp = status.st_mtime;
   else
     entry->timestamp = blog->tnow;
-  
+    
   if (entry->timestamp > blog->lastmod)
     blog->lastmod = entry->timestamp;
     
@@ -1269,9 +1269,9 @@ size_t BlogLastEntry(Blog *blog,struct btm const *when)
 {
   (void)blog;
   assert(when != NULL);
-
+  
   char name[FILENAME_MAX];
-
+  
   for (int i = 1 ; i < ENTRY_MAX ; i++)
   {
     date_to_part(name,when,i);
