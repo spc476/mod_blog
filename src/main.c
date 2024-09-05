@@ -30,7 +30,7 @@ int main(int argc,char *argv[])
   Cgi cgi;
   int rc;
   
-  crashreport_args(argc,argv);
+  crashreport_args(argc,argv,true);
   crashreport_core();
   
   cgi = CgiNew();
