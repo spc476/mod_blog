@@ -961,9 +961,6 @@ BlogEntry *BlogEntryRead(Blog *blog,struct btm const *which)
   else
     entry->timestamp = blog->tnow;
     
-  if (entry->timestamp > blog->lastmod)
-    blog->lastmod = entry->timestamp;
-    
   sinbody = fopen(pname,"r");
   if (sinbody == NULL)
     entry->body = strdup("");
@@ -1002,6 +999,8 @@ void BlogEntryReadBetweenU(
     entry = BlogEntryRead(blog,&current);
     if (entry != NULL)
     {
+      if (entry->timestamp > blog->lastmod)
+        blog->lastmod = entry->timestamp;
       ListAddTail(list,&entry->node);
       current.part++;
     }
@@ -1075,6 +1074,8 @@ void BlogEntryReadXD(
     BlogEntry *entry = BlogEntryRead(blog,&current);
     if (entry != NULL)
     {
+      if (entry->timestamp > blog->lastmod)
+        blog->lastmod = entry->timestamp;
       ListAddTail(list,&entry->node);
       num--;
     }
@@ -1109,6 +1110,8 @@ void BlogEntryReadXU(
     BlogEntry *entry = BlogEntryRead(blog,&current);
     if (entry != NULL)
     {
+      if (entry->timestamp > blog->lastmod)
+        blog->lastmod = entry->timestamp;
       ListAddTail(list,&entry->node);
       num--;
       current.part++;
