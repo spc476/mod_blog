@@ -550,14 +550,15 @@ int main_cgi_PUT(Cgi cgi)
   if (CgiStatus(cgi) != HTTP_OKAY)
     return cgi_error(NULL,NULL,CgiStatus(cgi),"processing error");
     
+  Blog *blog = BlogNew(NULL);
+  
+  if (blog == NULL)
+    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
+    
   if (getenv("HTTP_BLOG_FILE") == NULL)
   {
-    Blog    *blog = BlogNew(NULL);
     Request  request;
     
-    if (blog == NULL)
-      return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
-      
     request_init(&request);
     set_m_author(getenv("HTTP_BLOG_AUTHOR"),&request);
     
@@ -605,26 +606,37 @@ cleanup_return:
   }
   else
   {
-    char        buffer[BUFSIZ];
+    char        filename[FILENAME_MAX];
     size_t      bytes;
     FILE       *fp;
-    char const *path = getenv("PATH_TRANSLATED");
+    char const *path = getenv("PATH_INFO");
     
     if (path == NULL)
-      return cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add file");
-      
-    fp = fopen(path,"wb");
+    {
+      cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add file");
+      goto cleanup_file_return;
+    }
+    
+    snprintf(filename,sizeof(filename),"%s%s",blog->config.basedir,path);
+    fp = fopen(filename,"wb");
     if (fp == NULL)
-      return cgi_error(NULL,NULL,HTTP_ISERVERERR,"%s: %s",path,strerror(errno));
+    {
+      cgi_error(NULL,NULL,HTTP_ISERVERERR,"%s: %s",path,strerror(errno));
+      goto cleanup_file_return;
+    }
       
     do
     {
+      char buffer[BUFSIZ];
+      
       bytes = fread(buffer,1,sizeof(buffer),stdin);
       fwrite(buffer,1,bytes,fp);
     } while (bytes > 0);
     
     fclose(fp);
     printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
+cleanup_file_return:
+    BlogFree(blog);
     return 0;
   }
 }
