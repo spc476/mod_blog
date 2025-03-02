@@ -27,7 +27,7 @@
 #include <time.h>
 
 #include <lua.h>
-#include <cgilib7/nodelist.h>
+#include <cgilib8/nodelist.h>
 
 #include "timeutil.h"
 

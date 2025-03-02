@@ -23,7 +23,7 @@
 #ifndef I_CA412E0F_D512_5F3E_AB0B_4739574108FF
 #define I_CA412E0F_D512_5F3E_AB0B_4739574108FF
 
-#include <cgilib7/cgi.h>
+#include <cgilib8/cgi.h>
 
 #include "wbtum.h"
 #include "timeutil.h"

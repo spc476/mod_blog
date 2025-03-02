@@ -25,7 +25,7 @@
 #include <errno.h>
 
 #include <syslog.h>
-#include <cgilib7/util.h>
+#include <cgilib8/util.h>
 
 #include "backend.h"
 #include "frontend.h"

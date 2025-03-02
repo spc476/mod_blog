@@ -28,9 +28,9 @@
 #include <getopt.h>
 #include <gdbm.h>
 
-#include <cgilib7/conf.h>
-#include <cgilib7/rfc822.h>
-#include <cgilib7/util.h>
+#include <cgilib8/conf.h>
+#include <cgilib8/rfc822.h>
+#include <cgilib8/util.h>
 
 #include "backend.h"
 #include "frontend.h"

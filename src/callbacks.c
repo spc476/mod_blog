@@ -29,10 +29,10 @@
 #include <gdbm.h>
 #include <syslog.h>
 
-#include <cgilib7/conf.h>
-#include <cgilib7/htmltok.h>
-#include <cgilib7/chunk.h>
-#include <cgilib7/util.h>
+#include <cgilib8/conf.h>
+#include <cgilib8/htmltok.h>
+#include <cgilib8/chunk.h>
+#include <cgilib8/util.h>
 
 #include "backend.h"
 #include "blogutil.h"
