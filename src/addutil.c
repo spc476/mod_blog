@@ -146,7 +146,8 @@ bool entry_add(Blog *blog,Request *req)
     ; XXX maybe in the future move email notifications to this hook?
     ;----------------------------------------------------------------*/
     
-    char url[1024];
+    char const *argv[7];
+    char        url[1024];
     
     snprintf(
       url,
@@ -159,7 +160,15 @@ bool entry_add(Blog *blog,Request *req)
       entry->when.part
     );
     
-    rc = run_hook("entry-post-hook",(char const *[]){ blog->config.posthook , url , NULL });
+    argv[0] = blog->config.posthook;
+    argv[1] = url;
+    argv[2] = req->f.regenerate ? "regenerate" : "new";
+    argv[3] = req->title;
+    argv[4] = req->author;
+    argv[5] = req->status;
+    argv[6] = NULL;
+    
+    rc = run_hook("entry-post-hook",argv);
   }
   
   if (req->f.email)
