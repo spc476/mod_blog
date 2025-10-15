@@ -51,12 +51,13 @@ INSTALLATION
         file and a sample entry to see how the data is stored (each entry is
         a separate file, stored under a Year/Month/Day directory structure).
         
-        And yes, there is code to do email notifications, but it's not
-        enabled by default.  I only left the code in to support the half
-        dozen people that did sign up to receive email notifications.
-        
         The HTML entry form works, but it's not my primary method for new
-        entries---for that, I use email.  I have the following line in
+        entries---for that, I use the program with the PUT method.  Check
+        the sample configuration file for how that is set up.  There's a
+        sample script written in Lua that uses PUT to add entries.  Not much
+        documentation yet.  Sorry.
+
+	I also support new entries via email.  I have the following line in
         '/etc/aliases':
         
                 myjournal: "/path/to/boston.cgi --config /path/to/config --email --cmd new"
