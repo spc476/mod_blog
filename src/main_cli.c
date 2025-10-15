@@ -61,7 +61,6 @@ static int mailfile_readdata(Blog *blog,Request *req)
   req->date       = safe_strdup(PairListGetValue(&headers,"DATE"));
   req->adtag      = safe_strdup(PairListGetValue(&headers,"ADTAG"));
   req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"),blog->config.conversion);
-  req->f.email    = TO_email(PairListGetValue(&headers,"EMAIL"),blog->config.email.notify);
   
   PairListFree(&headers);       /* got everything we need, dump this */
   
@@ -281,7 +280,6 @@ int main_cli(int argc,char *argv[])
     OPT_EMAIL,
     OPT_ENTRY,
     OPT_REGENERATE,
-    OPT_FORCENOTIFY,
     OPT_TODAY,
     OPT_THISDAY,
     OPT_HELP,
@@ -296,16 +294,14 @@ int main_cli(int argc,char *argv[])
     { "file"         , required_argument  , NULL  , OPT_FILE        } ,
     { "email"        , no_argument        , NULL  , OPT_EMAIL       } ,
     { "entry"        , required_argument  , NULL  , OPT_ENTRY       } ,
-    { "force-notify" , no_argument        , NULL  , OPT_FORCENOTIFY } ,
     { "today"        , no_argument        , NULL  , OPT_TODAY       } ,
     { "thisday"      , required_argument  , NULL  , OPT_THISDAY     } ,
     { "help"         , no_argument        , NULL  , OPT_HELP        } ,
     { NULL           , 0                  , NULL  , 0               }
   };
   
-  char      *config      = NULL;
-  bool       forcenotify = false;
-  clicmd__f  command     = cmd_cli_show;
+  char      *config  = NULL;
+  clicmd__f  command = cmd_cli_show;
   Blog      *blog;
   Request    request;
   int        rc;
@@ -338,9 +334,6 @@ int main_cli(int argc,char *argv[])
       case OPT_REGENERATE:
            request.f.regenerate = true;
            break;
-      case OPT_FORCENOTIFY:
-           forcenotify = true;
-           break;
       case OPT_TODAY:
            request.f.today = true;
            break;
@@ -362,7 +355,6 @@ int main_cli(int argc,char *argv[])
                 "\t--file file\n"
                 "\t--email\n"
                 "\t--entry <tumbler>\n"
-                "\t--force-notify\n"
                 "\t--today\n"
                 "\t--thisday <month>/<day>\n"
                 "\t--help\n"
@@ -370,13 +362,11 @@ int main_cli(int argc,char *argv[])
                 "\tVersion: " GENERATOR "\n"
                 "\t\t%s\n"
                 "\t\t%s\n"
-                "\t\t%s\n"
                 "\t* default value\n"
                 "",
                 argv[0],
                 cgilib_version,
-                LUA_RELEASE,
-                gdbm_version
+                LUA_RELEASE
               );
            return EXIT_FAILURE;
     }
@@ -386,34 +376,7 @@ int main_cli(int argc,char *argv[])
   if (blog == NULL)
     return cli_error(NULL,NULL,HTTP_ISERVERERR,"%s: failed to initialize",config ? config : "missing config file");
     
-  if (forcenotify)
-  {
-    if (!blog->config.email.notify)
-    {
-      fprintf(stderr,"No email notifiation list\n");
-      rc = EXIT_FAILURE;
-      goto cleanup_return;
-    }
-    
-    BlogEntry *entry = BlogEntryRead(blog,&blog->last);
-    
-    if (entry != NULL)
-    {
-      notify_emaillist(entry);
-      BlogEntryFree(entry);
-      rc = EXIT_SUCCESS;
-      goto cleanup_return;
-    }
-    else
-    {
-      fprintf(stderr,"Cannot force notify\n");
-      rc = EXIT_FAILURE;
-      goto cleanup_return;
-    }
-  }
-  
   rc = (*command)(blog,&request);
-cleanup_return:
   BlogFree(blog);
   request_free(&request);
   return rc;

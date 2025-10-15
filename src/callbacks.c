@@ -1292,12 +1292,11 @@ static void cb_generator(FILE *out,void *data)
   
   fprintf(
     out,
-    "mod_blog %s, %s, %s, %s"
+    "mod_blog %s, %s, %s"
     "",
     PROG_VERSION,
     cgilib_version,
-    LUA_RELEASE,
-    gdbm_version
+    LUA_RELEASE
   );
 }
 

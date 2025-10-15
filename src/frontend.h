@@ -54,7 +54,6 @@ typedef struct request
     unsigned int edit       : 1;
     unsigned int cgi        : 1;
     unsigned int htmldump   : 1;
-    unsigned int email      : 1;
     unsigned int emailin    : 1;
     unsigned int regenerate : 1;
     unsigned int today      : 1;
@@ -66,7 +65,6 @@ typedef struct request
 
 extern char    *get_remote_user        (void);
 extern bool     authenticate_author    (Blog const *,Request *);
-extern void     notify_emaillist       (BlogEntry *);
 extern bool     entry_add              (Blog *,Request *);
 extern void     fix_entry              (Request *);
 extern char    *entity_conversion      (char const *);

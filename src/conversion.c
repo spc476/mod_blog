@@ -448,21 +448,6 @@ static ssize_t fj_write(void *cookie,char const *buffer,size_t bytes)
 
 /*********************************************************************/
 
-bool TO_email(char const *value,bool def)
-{
-  if (!emptynull_string(value))
-  {
-    if (strcmp(value,"no") == 0)
-      return false;
-    else if (strcmp(value,"yes") == 0)
-      return true;
-  }
-  
-  return def;
-}
-
-/**********************************************************************/
-
 conversion__f TO_conversion(char const *name,char const *def)
 {
   assert(def != NULL);

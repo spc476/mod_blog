@@ -528,35 +528,6 @@ static void confL_toauthor(lua_State *L,int idx,struct author *auth)
 
 /***************************************************************************/
 
-static void confL_toemail(lua_State *L,int idx,struct bemail *email)
-{
-  assert(L     != NULL);
-  assert(idx   != 0);
-  assert(email != NULL);
-  
-  idx = lua_absindex(L,idx);
-  if (lua_isnil(L,idx))
-  {
-    email->list    = NULL;
-    email->message = NULL;
-    email->subject = NULL;
-    email->notify  = false;
-  }
-  else
-  {
-    lua_getfield(L,idx,"list");
-    email->list = confL_checkstring(L,-1,"email","list");
-    lua_getfield(L,idx,"message");
-    email->message = confL_checkstring(L,-1,"email","message");
-    lua_getfield(L,idx,"subject");
-    email->subject = confL_checkstring(L,-1,"email","subject");
-    email->notify  = true;
-    lua_pop(L,3);
-  }
-}
-
-/***************************************************************************/
-
 static void confL_toitems(lua_State *L,int idx,template__t *temp)
 {
   assert(L    != NULL);
@@ -723,8 +694,6 @@ static int confL_config(lua_State *L)
   config->posthook = luaL_optstring(L,-1,NULL);
   lua_getglobal(L,"author");
   confL_toauthor(L,-1,&config->author);
-  lua_getglobal(L,"email");
-  confL_toemail(L,-1,&config->email);
   lua_getglobal(L,"templates");
   config->templatenum = confL_totemplates(L,-1,&config->templates);
   lua_getglobal(L,"affiliate");

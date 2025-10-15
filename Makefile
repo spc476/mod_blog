@@ -29,7 +29,7 @@ endif
 CC      = gcc -std=c99 -Wall -Wextra -pedantic -Wwrite-strings
 CFLAGS  = -g
 LDFLAGS = -g
-LDLIBS  = -lgdbm -lcgi8 -llua -lm -ldl
+LDLIBS  = -lcgi8 -llua -lm -ldl
 SETUID  = /bin/chmod
 
 INSTALL         = /usr/bin/install

@@ -48,14 +48,6 @@ struct author
   struct fields  fields;
 };
 
-struct bemail
-{
-  char const *list;
-  char const *message;
-  char const *subject;
-  bool        notify; /* derived */
-};
-
 typedef struct template
 {
   char const *template;
@@ -90,7 +82,6 @@ struct config
   struct author  author;
   template__t   *templates;
   size_t         templatenum;
-  struct bemail  email;
   aflink__t     *affiliates;
   size_t         affiliatenum;
   char const    *baseurl; /* derived from URL */

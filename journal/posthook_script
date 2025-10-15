@@ -4,16 +4,21 @@
 # the blog.  This could be used to notify some other service that the blog
 # has a new entry.
 #
-# $1 will be the URL of the newly added entry
+# $1 URL of the newly added entry
+# $2 title of the newly added entry
+# $3 author of the newly added entry
+# $4 status of the newly added entry
 
 # For example, let's send ourselves an email when a new entry is added.
 
 sendmail <<EOF
-From: myself@example.com
+From: ($3) <myself@example.com>
 To: myself@example.com
-Subject: New post: $1
+Subject: New post: %2
 
-New post: $1
+URL: %1
+status: $4
+
 EOF
 
 exit 0
