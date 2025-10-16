@@ -568,12 +568,11 @@ static int display_file(
     if (rc == -1)
     {
       if (errno == ENOENT)
-        (*errorf)(blog,request,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
+        return (*errorf)(blog,request,HTTP_NOTFOUND,"%s: %s",fname,strerror(errno));
       else if (errno == EACCES)
-        (*errorf)(blog,request,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
+        return (*errorf)(blog,request,HTTP_FORBIDDEN,"%s: %s",fname,strerror(errno));
       else
-        (*errorf)(blog,request,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
-      return 1;
+        return (*errorf)(blog,request,HTTP_ISERVERERR,"%s: %s",fname,strerror(errno));
     }
     
     if (HttpNotModified(status.st_mtime))
@@ -589,10 +588,7 @@ static int display_file(
     }
     
     if (freopen(fname,"r",stdin) == NULL)
-    {
-      (*errorf)(blog,request,HTTP_NOTFOUND,"%s: some internal error",fname);
-      return 1;
-    }
+      return (*errorf)(blog,request,HTTP_NOTFOUND,"%s: some internal error",fname);
     
     type = mime_type(spec->filename);
     
@@ -968,10 +964,7 @@ int tumbler_page(Blog *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog
     return (*errorf)(blog,request,HTTP_NOTIMP,"redirect on this request not implemented");
     
   if (spec->file)
-  {
-    display_file(spec,blog,request,errorf);
-    return 0; /* XXX hack for now */
-  }
+    return display_file(spec,blog,request,errorf);
   
   callback_init(&cbd,blog,request);
   
@@ -992,11 +985,11 @@ int tumbler_page(Blog *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog
   
   if (!spec->range)
   {
-    request->f.navigation  = true;
-    cbd.navunit      = spec->ustart > spec->ustop
-                     ? spec->ustart
-                     : spec->ustop
-                     ;
+    request->f.navigation = true;
+    cbd.navunit  = spec->ustart > spec->ustop
+                 ? spec->ustart
+                 : spec->ustop
+                 ;
     cbd.previous = calculate_previous(blog,request,start,cbd.navunit);
     cbd.next     = calculate_next(blog,request,end,cbd.navunit);
   }
