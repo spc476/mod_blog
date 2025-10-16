@@ -611,6 +611,7 @@ cleanup_return:
     
     if (path == NULL)
     {
+      syslog(LOG_ERR,"getenv(PATH_INFO) = NULL");
       cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add file");
       goto cleanup_file_return;
     }
@@ -619,6 +620,7 @@ cleanup_return:
     fp = fopen(filename,"wb");
     if (fp == NULL)
     {
+      syslog(LOG_ERR,"%s: %s",filename,strerror(errno));
       cgi_error(NULL,NULL,HTTP_ISERVERERR,"%s: %s",path,strerror(errno));
       goto cleanup_file_return;
     }
