@@ -32,18 +32,6 @@
 
 /**********************************************************************/
 
-struct nested_params
-{
-  FILE        *in;
-  FILE        *out;
-  HtmlToken    token;
-  bool         p;
-  bool         pre;
-  bool         list;
-  bool         blockquote;
-};
-
-/**************************************************************************/
 static void handle_backquote(FILE *restrict input,FILE *restrict output)
 {
   int c;

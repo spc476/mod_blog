@@ -68,7 +68,6 @@ extern bool     entry_add              (Blog *,Request *);
 extern void     fix_entry              (Request *);
 extern char    *entity_conversion      (char const *);
 extern char    *entity_encode          (char const *);
-extern FILE    *fentity_encode_onread  (FILE *);
 extern FILE    *fentity_encode_onwrite (FILE *);
 extern Request *request_init           (Request *);
 extern void     request_free           (Request *);

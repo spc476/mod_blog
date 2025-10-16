@@ -2157,50 +2157,6 @@ static bool char_entity(char const **tag,size_t *ps,int c)
 
 /**********************************************************************/
 
-static ssize_t fer_read(void *cookie,char *buffer,size_t bytes)
-{
-  FILE       *realin = cookie;
-  size_t      s      = 0;
-  char const *replace;
-  size_t      repsize;
-  
-  assert(buffer != NULL);
-  assert(cookie != NULL);
-  
-  if (feof(realin))
-    return 0;
-    
-  while(bytes)
-  {
-    int c = fgetc(realin);
-    if (c == EOF) return s;
-    
-    if (char_entity(&replace,&repsize,c))
-    {
-      if (bytes < repsize)
-      {
-        ungetc(c,realin);
-        return s;
-      }
-      
-      memcpy(buffer,replace,repsize);
-      buffer += repsize;
-      bytes  -= repsize;
-      s      += repsize;
-    }
-    else
-    {
-      *buffer++ = c;
-      bytes--;
-      s++;
-    }
-  }
-  
-  return s;
-}
-
-/*******************************************************************/
-
 static ssize_t few_write(void *cookie,char const *buffer,size_t bytes)
 {
   FILE       *realout = cookie;
@@ -2223,20 +2179,6 @@ static ssize_t few_write(void *cookie,char const *buffer,size_t bytes)
   }
   
   return size;
-}
-
-/*******************************************************************/
-
-FILE *fentity_encode_onread(FILE *in)
-{
-  assert(in != NULL);
-  return fopencookie(in,"r",(cookie_io_functions_t)
-                                {
-                                  fer_read,
-                                  NULL,
-                                  NULL,
-                                  NULL
-                                });
 }
 
 /*******************************************************************/
