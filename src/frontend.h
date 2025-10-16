@@ -43,7 +43,6 @@ typedef struct request
   char const  *reqtumbler;
   struct btm   when;
   tumbler__s   tumbler;
-  void       (*conversion)(FILE *restrict,FILE *restrict);
   struct
   {
     unsigned int fullurl    : 1;

@@ -514,7 +514,6 @@ int main_cgi_POST(Cgi cgi)
   request.adtag      = safe_strdup(CgiGetValue(cgi,"adtag"));
   request.origbody   = safe_strdup(CgiGetValue(cgi,"body"));
   request.body       = safe_strdup(request.origbody);
-  request.conversion = TO_conversion(CgiGetValue(cgi,"filter"),blog->config.conversion);
   
   if (
           (emptynull_string(request.author))
@@ -566,7 +565,6 @@ int main_cgi_PUT(Cgi cgi)
     request.status     = safe_strdup(getenv("HTTP_BLOG_STATUS"));
     request.date       = safe_strdup(getenv("HTTP_BLOG_DATE"));
     request.adtag      = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
-    request.conversion = TO_conversion(getenv("HTTP_BLOG_FILTER"),blog->config.conversion);
     request.body       = malloc(CgiContentLength(cgi) + 1);
     
     fread(request.body,1,CgiContentLength(cgi),stdin);

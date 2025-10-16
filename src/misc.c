@@ -51,7 +51,6 @@ Request *request_init(Request *request)
   request->origbody   = NULL;
   request->body       = NULL;
   request->reqtumbler = NULL;
-  request->conversion = no_conversion;
   return request;
 }
 

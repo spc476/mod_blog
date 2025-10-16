@@ -60,7 +60,6 @@ static int mailfile_readdata(Blog *blog,Request *req)
   req->status     = safe_strdup(PairListGetValue(&headers,"STATUS"));
   req->date       = safe_strdup(PairListGetValue(&headers,"DATE"));
   req->adtag      = safe_strdup(PairListGetValue(&headers,"ADTAG"));
-  req->conversion = TO_conversion(PairListGetValue(&headers,"FILTER"),blog->config.conversion);
   
   PairListFree(&headers);       /* got everything we need, dump this */
   

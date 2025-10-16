@@ -230,7 +230,7 @@ void fix_entry(Request *req)
     out  = open_memstream(&tmp,&size);
     in   = fmemopen(req->body,strlen(req->body),"r");
     
-    (*req->conversion)(in,out);
+    fcopy(out,in);
     fclose(in);
     fclose(out);
     free(req->body);
