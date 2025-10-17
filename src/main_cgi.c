@@ -507,13 +507,13 @@ int main_cgi_POST(Cgi cgi)
   
   set_m_author(CgiGetValue(cgi,"author"),&request);
   
-  request.title      = safe_strdup(CgiGetValue(cgi,"title"));
-  request.class      = safe_strdup(CgiGetValue(cgi,"class"));
-  request.status     = safe_strdup(CgiGetValue(cgi,"status"));
-  request.date       = safe_strdup(CgiGetValue(cgi,"date"));
-  request.adtag      = safe_strdup(CgiGetValue(cgi,"adtag"));
-  request.origbody   = safe_strdup(CgiGetValue(cgi,"body"));
-  request.body       = safe_strdup(request.origbody);
+  request.title    = safe_strdup(CgiGetValue(cgi,"title"));
+  request.class    = safe_strdup(CgiGetValue(cgi,"class"));
+  request.status   = safe_strdup(CgiGetValue(cgi,"status"));
+  request.date     = safe_strdup(CgiGetValue(cgi,"date"));
+  request.adtag    = safe_strdup(CgiGetValue(cgi,"adtag"));
+  request.origbody = safe_strdup(CgiGetValue(cgi,"body"));
+  request.body     = safe_strdup(request.origbody);
   
   if (
           (emptynull_string(request.author))
@@ -560,12 +560,12 @@ int main_cgi_PUT(Cgi cgi)
     request_init(&request);
     set_m_author(getenv("HTTP_BLOG_AUTHOR"),&request);
     
-    request.title      = safe_strdup(getenv("HTTP_BLOG_TITLE"));
-    request.class      = safe_strdup(getenv("HTTP_BLOG_CLASS"));
-    request.status     = safe_strdup(getenv("HTTP_BLOG_STATUS"));
-    request.date       = safe_strdup(getenv("HTTP_BLOG_DATE"));
-    request.adtag      = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
-    request.body       = malloc(CgiContentLength(cgi) + 1);
+    request.title  = safe_strdup(getenv("HTTP_BLOG_TITLE"));
+    request.class  = safe_strdup(getenv("HTTP_BLOG_CLASS"));
+    request.status = safe_strdup(getenv("HTTP_BLOG_STATUS"));
+    request.date   = safe_strdup(getenv("HTTP_BLOG_DATE"));
+    request.adtag  = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
+    request.body   = malloc(CgiContentLength(cgi) + 1);
     
     fread(request.body,1,CgiContentLength(cgi),stdin);
     request.body[CgiContentLength(cgi)] = '\0';
