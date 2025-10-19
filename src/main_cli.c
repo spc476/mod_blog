@@ -174,10 +174,7 @@ static int cmd_cli_new(Blog *blog,Request *req)
     rc = mailfile_readdata(blog,req);
     
   if (rc != 0)
-  {
-    fprintf(stderr,"Cannot process new entry\n");
-    return EXIT_FAILURE;
-  }
+    return cli_error(blog,req,HTTP_BADREQ,"Cannot process new entry");
   
   if (entry_add(blog,req))
   {
@@ -185,10 +182,7 @@ static int cmd_cli_new(Blog *blog,Request *req)
     return 0;
   }
   else
-  {
-    fprintf(stderr,"Failed to create new entry\n");
-    return EXIT_FAILURE;
-  }
+    return cli_error(blog,req,HTTP_BADREQ,"Failed to create new entry");
 }
 
 /****************************************************************************/
