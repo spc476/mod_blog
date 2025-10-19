@@ -64,5 +64,6 @@ extern int                   tumbler_page     (Blog *,Request *,tumbler__s *,int
 extern void                  generic_cb       (char const *,FILE *,void *);
 extern void                  generic_main     (FILE *,struct callback_data *);
 extern bool                  run_hook         (char const *,char const *[]);
+extern int                   mailfile_readdata(Blog *,Request *);
 
 #endif

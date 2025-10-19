@@ -42,7 +42,7 @@ typedef int (*clicmd__f)(Blog *,Request *);
 
 /*******************************************************************/
 
-static int mailfile_readdata(Blog *blog,Request *req)
+int mailfile_readdata(Blog *blog,Request *req)
 {
   FILE   *output;
   List    headers;

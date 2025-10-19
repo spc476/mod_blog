@@ -553,90 +553,67 @@ int main_cgi_PUT(Cgi cgi)
   if (blog == NULL)
     return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
     
-  if (getenv("HTTP_BLOG_FILE") == NULL)
+  if (strcmp(cgi->content_type,"application/mod_blog") == 0)
   {
-    Request  request;
+    Request request;
     
     request_init(&request);
-    set_m_author(getenv("HTTP_BLOG_AUTHOR"),&request);
-    
-    request.title  = safe_strdup(getenv("HTTP_BLOG_TITLE"));
-    request.class  = safe_strdup(getenv("HTTP_BLOG_CLASS"));
-    request.status = safe_strdup(getenv("HTTP_BLOG_STATUS"));
-    request.date   = safe_strdup(getenv("HTTP_BLOG_DATE"));
-    request.adtag  = safe_strdup(getenv("HTTP_BLOG_ADTAG"));
-    request.body   = malloc(CgiContentLength(cgi) + 1);
-    
-    fread(request.body,1,CgiContentLength(cgi),stdin);
-    request.body[CgiContentLength(cgi)] = '\0';
-    
-    if (
-            (emptynull_string(request.author))
-         || (emptynull_string(request.title))
-         || (emptynull_string(request.body))
-      )
+    if (mailfile_readdata(blog,&request) == 0)
     {
-      cgi_error(NULL,NULL,HTTP_BADREQ,"errors-missing");
-      goto cleanup_return;
-    }
-    
-    if (!authenticate_author(blog,&request))
-    {
-      syslog(LOG_ERR,"'%s' not authorized to post",request.author);
-      cgi_error(NULL,NULL,HTTP_UNAUTHORIZED,"errors-author not authenticatged got [%s] wanted [%s]",request.author,getenv("HTTP_BLOG_AUTHOR"));
-      goto cleanup_return;
-    }
-    
-    if (entry_add(blog,&request))
-    {
-      generate_pages(blog,&request);
-      printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
+      if (entry_add(blog,&request))
+      {
+        generate_pages(blog,&request);
+        printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
+      }
+      else
+        cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't create entry");
     }
     else
-      cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add entry");
-      
-cleanup_return:
+      cgi_error(NULL,NULL,HTTP_UNAUTHORIZED,"unauthorized user");
+    
     request_free(&request);
-    BlogFree(blog);
-    return 0;
   }
   else
   {
-    char        filename[FILENAME_MAX];
-    size_t      bytes;
-    FILE       *fp;
     char const *path = getenv("PATH_INFO");
     
     if (path == NULL)
     {
       syslog(LOG_ERR,"getenv(PATH_INFO) = NULL");
       cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't add file");
-      goto cleanup_file_return;
     }
-    
-    snprintf(filename,sizeof(filename),"%s%s",blog->config.basedir,path);
-    fp = fopen(filename,"wb");
-    if (fp == NULL)
+    else
     {
-      syslog(LOG_ERR,"%s: %s",filename,strerror(errno));
-      cgi_error(NULL,NULL,HTTP_ISERVERERR,"%s: %s",path,strerror(errno));
-      goto cleanup_file_return;
+      char  filename[FILENAME_MAX];
+      FILE *fp;
+      
+      snprintf(filename,sizeof(filename),"%s%s",blog->config.basedir,path);
+      fp = fopen(filename,"wb");
+      if (fp == NULL)
+      {
+        syslog(LOG_ERR,"%s: %s",filename,strerror(errno));
+        cgi_error(NULL,NULL,HTTP_ISERVERERR,"%s: %s",path,strerror(errno));
+      }
+      else
+      {
+        size_t bytes;
+        
+        do
+        {
+          char buffer[BUFSIZ];
+      
+          bytes = fread(buffer,1,sizeof(buffer),stdin);
+          fwrite(buffer,1,bytes,fp);
+        } while (bytes > 0);
+    
+        fclose(fp);
+        printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
+      }
     }
-      
-    do
-    {
-      char buffer[BUFSIZ];
-      
-      bytes = fread(buffer,1,sizeof(buffer),stdin);
-      fwrite(buffer,1,bytes,fp);
-    } while (bytes > 0);
-    
-    fclose(fp);
-    printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
-cleanup_file_return:
-    BlogFree(blog);
-    return 0;
   }
+  
+  BlogFree(blog);
+  return 0;
 }
 
 /************************************************************************/

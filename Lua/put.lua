@@ -146,37 +146,26 @@ local function loadentry(filename)
     return
   end
   
-  local d = f:read("*a")
+  local body = f:read("*a")
   f:close()
-  local hdrs,pos = headers:match(d) -- XXX lower case for now
+  
+  if #body == 0 then
+    errmsg("%s: empty",filename);
+    return
+  end
+  
+  local hdrs = headers:match(body)
   
   if not hdrs then
     errmsg("%s: not a proper entry")
     return
   end
   
-  if not hdrs.title then
-    errmsg("%s: missing TITLE",filename)
-    return
+  if not hdrs['Date'] then
+    hdrs['Date'] = os.date("%Y/%m/%d")
   end
   
-  if not hdrs.class then
-    errmsg("%s: missing CLASS",filename)
-    return
-  end
-  
-  if not hdrs.date then
-    hdrs.date = os.date("%Y/%m/%d")
-  end
-  
-  local body = d:sub(pos,-1)
-  
-  if (#body == 0) then
-    errmsg("%s: missing text",filename)
-    return
-  end
-  
-  return hdrs,body
+  return body,hdrs['Date']
 end
 
 -- ************************************************************************
@@ -236,6 +225,8 @@ do
   end
 end
 
+-- ------------------------------------------------------------------
+
 if gf_debug then
   io.stderr:write(string.format([[
 base-url=%q
@@ -243,13 +234,14 @@ entry-file=%q
 ]],BASEURL,arg[fi]))
 end
 
-local hdrs,body = loadentry(arg[fi])
-if not hdrs then
+local body,date = loadentry(arg[fi])
+
+if not body then
   os.exit(1,true)
 end
 
-local base = url:match(BASEURL)
-local path = url:match(hdrs.date .. '/' .. fsys.basename(arg[fi]))
+local base     = url:match(BASEURL)
+local path     = url:match(date .. '/' .. fsys.basename(arg[fi]))
 local location = uurl.merge(base,path)
 
 if gf_debug then
@@ -270,7 +262,7 @@ end
 
 local newurl do
   local basen = url:match(BASEURL)
-  local pathn = url:match("/boston.cgi?cmd=last&date="..hdrs.date)
+  local pathn = url:match("/boston.cgi?cmd=last&date="..date)
   local locationn = uurl.merge(basen,pathn)
   newurl = get(conn,locationn)
   
@@ -286,10 +278,6 @@ end
 location = url:match(newurl)
 
 local http_headers = {} do
-  for name,val in pairs(hdrs) do
-    http_headers['Blog-'..name] = val
-  end
-  
   if USER then
     http_headers['Authorization'] = USER
   end
@@ -304,7 +292,7 @@ local http_headers = {} do
 end
 
 msg("PUT %s (%d)",uurl.toa(location),#body)
-if not put(conn,location,http_headers,"text/html",body) then
+if not put(conn,location,http_headers,"application/mod_blog",body) then
   conn:close()
   errmsg("Failed: PUT %s",uurl.toa(location))
   errmsg("\tForgot credentials?")
@@ -317,7 +305,7 @@ for i = fi + 1 , #arg do
     local bodyf  = f:read("*a")
     f:close()
     
-    local pathf     = url:match(hdrs.date .. '/' .. fsys.basename(arg[i]))
+    local pathf     = url:match(date .. '/' .. fsys.basename(arg[i]))
     local locationf = uurl.merge(base,pathf)
     
     if gf_debug then
