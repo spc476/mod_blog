@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include "frontend.h"
 
-extern void  buff_conversion      (FILE *restrict,FILE *restrict);
 extern FILE *fjson_encode_onwrite (FILE *);
 
 #endif
