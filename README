@@ -20,8 +20,8 @@ REQUIREMENTS
         
 COMPILATION
 
-        You'll need to install my CGILIB library (6.6 or higher) to compile
-        this blog software.  You can install it from
+        You'll need to install my CGILIB library (8.0.5 or higher) to
+        compile this blog software.  You can install it from
         
                 https://github.com/spc476/CGILib
                 
@@ -78,4 +78,3 @@ INSTALLATION
         And that's pretty much it.
         
         Good luck.
-        
