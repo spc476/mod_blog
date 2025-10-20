@@ -489,6 +489,9 @@ int main_cgi_POST(Cgi cgi)
 {
   assert(cgi != NULL);
   
+  if (CgiStatus(cgi) != HTTP_OKAY)
+    return cgi_error(NULL,NULL,CgiStatus(cgi),"processing error");
+    
   Request  request;
   Blog    *blog = BlogNew(NULL);
   
@@ -497,12 +500,6 @@ int main_cgi_POST(Cgi cgi)
     
   request_init(&request);
   request.f.cgi = true;
-  
-  if (CgiStatus(cgi) != HTTP_OKAY)
-  {
-    cgi_error(blog,&request,CgiStatus(cgi),"processing error");
-    goto cleanup_return;
-  }
   
   set_m_author(CgiGetValue(cgi,"author"),&request);
   
@@ -521,20 +518,20 @@ int main_cgi_POST(Cgi cgi)
      )
   {
     cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
-    goto cleanup_return;
-  }
-  
-  if (authenticate_author(blog,&request) == false)
-  {
-    syslog(LOG_ERR,"'%s' not authorized to post",request.author);
-    cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiGetValue(cgi,"author"));
   }
   else
-    (*set_m_cgi_post_command(CgiGetValue(cgi,"cmd")))(cgi,blog,&request);
-    
-cleanup_return:
-  BlogFree(blog);
+  {
+    if (authenticate_author(blog,&request) == false)
+    {
+      syslog(LOG_ERR,"'%s' not authorized to post",request.author);
+      cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiGetValue(cgi,"author"));
+    }
+    else
+      (*set_m_cgi_post_command(CgiGetValue(cgi,"cmd")))(cgi,blog,&request);
+  }
+  
   request_free(&request);
+  BlogFree(blog);
   return 0;
 }
 
