@@ -405,7 +405,6 @@ static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
   ;------------------------------------------------------------------*/
   
   callback_init(&cbd,blog,req);
-  fix_entry(req);
   entry = BlogEntryNew(blog);
   
   if (emptynull_string(req->date))

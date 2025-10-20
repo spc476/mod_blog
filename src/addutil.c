@@ -47,8 +47,6 @@ bool entry_add(Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
-  fix_entry(req);
-  
   if (blog->config.prehook != NULL)
   {
     FILE *fp;
@@ -171,71 +169,3 @@ bool entry_add(Blog *blog,Request *req)
 }
 
 /************************************************************************/
-
-void fix_entry(Request *req)
-{
-  FILE   *out;
-  FILE   *in;
-  char   *tmp;
-  size_t  size;
-  
-  assert(req != NULL);
-  
-  /*---------------------------------
-  ; convert the title
-  ;--------------------------------*/
-  
-  if (!empty_string(req->title))
-  {
-    tmp  = NULL;
-    size = 0;
-    out  = open_memstream(&tmp,&size);
-    in   = fmemopen(req->title,strlen(req->title),"r");
-    
-    buff_conversion(in,out);
-    fclose(in);
-    fclose(out);
-    free(req->title);
-    req->title = entity_conversion(tmp);
-    free(tmp);
-  }
-  
-  /*--------------------------------------
-  ; convert the status
-  ;-------------------------------------*/
-  
-  if (!empty_string(req->status))
-  {
-    tmp = NULL;
-    size = 0;
-    out  = open_memstream(&tmp,&size);
-    in   = fmemopen(req->status,strlen(req->status),"r");
-    
-    buff_conversion(in,out);
-    fclose(in);
-    fclose(out);
-    free(req->status);
-    req->status = entity_conversion(tmp);
-    free(tmp);
-  }
-  
-  /*-------------------------------------
-  ; convert body
-  ;--------------------------------------*/
-  
-  if (!empty_string(req->body))
-  {
-    tmp  = NULL;
-    size = 0;
-    out  = open_memstream(&tmp,&size);
-    in   = fmemopen(req->body,strlen(req->body),"r");
-    
-    fcopy(out,in);
-    fclose(in);
-    fclose(out);
-    free(req->body);
-    req->body = tmp;
-  }
-}
-
-/*************************************************************************/
