@@ -103,6 +103,11 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
   free(file);
   free(errmsg);
   
+  /*-------------------------------------------------------------------------
+  ; Within the context of a CGI script, the script ran fine; any error is to
+  ; be returned via HTTP to the client.
+  ;--------------------------------------------------------------------------*/
+  
   return 0;
 }
 
@@ -235,10 +240,8 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
   char *twhen = CgiGetQValue(cgi,"day");
   
   if ((tpath == NULL) && (twhen == NULL))
-  {
     return generate_thisday(blog,req,stdout,blog->now);
-  }
-  
+    
   if (tpath == NULL)
     return cgi_error(blog,req,HTTP_BADREQ,"bad request");
     
@@ -463,6 +466,9 @@ int main_cgi_GET(Cgi cgi)
 {
   assert(cgi != NULL);
   
+  if (CgiStatus(cgi) != HTTP_OKAY)
+    return cgi_error(NULL,NULL,CgiStatus(cgi),"processing error");
+    
   Request  request;
   Blog    *blog = BlogNew(NULL);
   
@@ -473,13 +479,10 @@ int main_cgi_GET(Cgi cgi)
   request.f.cgi      = true;
   request.reqtumbler = getenv("PATH_INFO");
   
-  if (CgiStatus(cgi) != HTTP_OKAY)
-    cgi_error(blog,&request,CgiStatus(cgi),"processing error");
-  else
-    (*set_m_cgi_get_command(CgiGetQValue(cgi,"cmd")))(cgi,blog,&request);
-    
-  BlogFree(blog);
+  (*set_m_cgi_get_command(CgiGetQValue(cgi,"cmd")))(cgi,blog,&request);
+  
   request_free(&request);
+  BlogFree(blog);
   return 0;
 }
 
