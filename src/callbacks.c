@@ -260,6 +260,18 @@ static void fixup_uri(BlogEntry *entry,HtmlToken token,char const *attrib,Blog *
   }
 }
 
+/*************************************************************************/
+
+static void output_entify(char const *msg,FILE *out)
+{
+  assert(msg != NULL);
+  assert(out != NULL);
+  
+  FILE *tmp = fentity_encode_onwrite(out);
+  fputs(msg,tmp);
+  fclose(tmp);
+}
+
 /***************************************************************
 * TEMPLATE CALL BACK FUNCTIONS
 ****************************************************************/
@@ -746,7 +758,7 @@ static void cb_edit_adtag(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->request->adtag != NULL)
-    fputs(cbd->request->adtag,out);
+    output_entify(cbd->request->adtag,out);
 }
 
 /*********************************************************************/
@@ -759,11 +771,11 @@ static void cb_edit_author(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->request->origauthor != NULL)
-    fputs(cbd->request->origauthor,out);
+    output_entify(cbd->request->origauthor,out);
   else
   {
     char *name = get_remote_user();
-    fputs(name,out);
+    output_entify(name,out);
     free(name);
   }
 }
@@ -778,7 +790,7 @@ static void cb_edit_body(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->request->origbody)
-    fputs(cbd->request->origbody,out);
+    output_entify(cbd->request->origbody,out);
 }
 
 /********************************************************************/
@@ -791,7 +803,7 @@ static void cb_edit_class(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->request->class)
-    fputs(cbd->request->class,out);
+    output_entify(cbd->request->class,out);
 }
 
 /********************************************************************/
@@ -804,7 +816,7 @@ static void cb_edit_date(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->request->date != NULL)
-    fputs(cbd->request->date,out);
+    output_entify(cbd->request->date,out);
   else
   {
     char       buffer[BUFSIZ];
@@ -812,7 +824,7 @@ static void cb_edit_date(FILE *out,void *data)
     time_t     now = time(NULL);
     struct tm *ptm = localtime(&now);
     strftime(buffer,sizeof(buffer),"%Y/%m/%d",ptm);
-    fputs(buffer,out);
+    output_entify(buffer,out);
   }
 }
 
@@ -826,7 +838,7 @@ static void cb_edit_status(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->request->status != NULL)
-    fputs(cbd->request->status,out);
+    output_entify(cbd->request->status,out);
 }
 
 /**********************************************************************/
@@ -839,7 +851,7 @@ static void cb_edit_title(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->request->title != NULL)
-    fputs(cbd->request->title,out);
+    output_entify(cbd->request->title,out);
 }
 
 /********************************************************************/
