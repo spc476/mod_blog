@@ -1,23 +1,19 @@
 
 <div id="edit">
-
   <form method="POST" action="/blog/blog.cgi">
   
   <div class="metacontent">
     <table>
-      <tr><th><label for="author">Author</label></th>            <td><input id="author"   name="author"   type="text"     value="%{edit.author}%"></td></tr>
-      <tr><th><label for="title">Title</label></th>              <td><input id="title"    name="title"    type="text"     value="%{edit.title}%"></td></tr>
-      <tr><th><label for="date">Date</label></th>                <td><input id="date"     name="date"     type="text"     value="%{edit.date}%"></td></tr>
-      <tr><th><label for="class">Class</label></th>              <td><input id="class"    name="class"    type="text"     value="%{edit.class}%"></td></tr>
-      <tr><th><label for="adtag">Adtag</label></th>              <td><input id="adtag"    name="adtag"    type="text"     value="%{edit.adtag}%"></td></tr>
-      <tr><th><label for="status">Status</label></th>            <td><input id="status"   name="status"   type="text"     value="%{edit.status}%"></td></tr>
-      <tr><th><label for="email">Send Email</label></th>         <td><input id="email"    name="email"    type="checkbox"></td></tr>
-      <tr><th>Filter</th>                                        <td><input id="filter1"  name="filter"   type="radio"    value="text"><label for="filter1">Text</label><br>
-                                  <input id="filter2" name="filter" type="radio"    value="mixed"><label for="filter2">Mixed</label><br>
-                                  <input id="filter3" name="filter" type="radio"    value="html"><label for="filter3">HTML</label></td></tr>
-      <tr><th>&nbsp;</th>     <td><input name="cmd"    type="submit"   value="new"></td></tr>
-      <tr><th>&nbsp;</th>     <td><input name="cmd"    type="submit"   value="show"></td></tr>
-      <tr><th>&nbsp;</th>     <td><input               type="reset"    value="reset"></td></tr>
+      <tr><th><label for="author">Author</label></th> <td><input id="author" name="author" type="text" value="%{edit.author}%"></td></tr>
+      <tr><th><label for="title" >Title</label></th>  <td><input id="title"  name="title"  type="text" value="%{edit.title}%"></td></tr>
+      <tr><th><label for="date"  >Date</label></th>   <td><input id="date"   name="date"   type="text" value="%{edit.date}%"></td></tr>
+      <tr><th><label for="class" >Class</label></th>  <td><input id="class"  name="class"  type="text" value="%{edit.class}%"></td></tr>
+      <tr><th><label for="adtag" >Adtag</label></th>  <td><input id="adtag"  name="adtag"  type="text" value="%{edit.adtag}%"></td></tr>
+      <tr><th><label for="status">Status</label></th> <td><input id="status" name="status" type="text" value="%{edit.status}%"></td></tr>
+
+      <tr><th>&nbsp;</th> <td><input name="cmd" type="submit" value="new"></td></tr>
+      <tr><th>&nbsp;</th> <td><input name="cmd" type="submit" value="show"></td></tr>
+      <tr><th>&nbsp;</th> <td><input            type="reset"  value="reset"></td></tr>
     </table>
   </div>
   
@@ -26,5 +22,4 @@
   </div>
   
   </form>
-  
 </div>
