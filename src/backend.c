@@ -589,7 +589,7 @@ static int display_file(
     
     if (freopen(fname,"r",stdin) == NULL)
       return (*errorf)(blog,request,HTTP_NOTFOUND,"%s: some internal error",fname);
-    
+      
     type = mime_type(spec->filename);
     
     if (strcmp(type,"text/x-html") == 0)
@@ -965,7 +965,7 @@ int tumbler_page(Blog *blog,Request *request,tumbler__s *spec,int (*errorf)(Blog
     
   if (spec->file)
     return display_file(spec,blog,request,errorf);
-  
+    
   callback_init(&cbd,blog,request);
   
   assert(spec->start.year  >= blog->first.year);
