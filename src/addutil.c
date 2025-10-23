@@ -39,7 +39,7 @@
 
 /*********************************************************************/
 
-bool entry_add(Blog *blog,Request *req)
+http__e entry_add(Blog *blog,Request *req)
 {
   BlogEntry *entry;
   bool       rc = true;
@@ -65,7 +65,7 @@ bool entry_add(Blog *blog,Request *req)
     else
     {
       syslog(LOG_ERR,"entry_add: tmp-body: %s",strerror(errno));
-      return false;
+      return HTTP_ISERVERERR;
     }
     
     fp = fopen(fnmeta,"w");
@@ -100,7 +100,7 @@ bool entry_add(Blog *blog,Request *req)
     {
       remove(fnbody);
       syslog(LOG_ERR,"entry_add: tmp-meta: %s",strerror(errno));
-      return false;
+      return HTTP_ISERVERERR;
     }
     
     rc = run_hook("entry-pre-hook",(char const *[]){ blog->config.prehook , fnbody , fnmeta , NULL });
@@ -109,7 +109,7 @@ bool entry_add(Blog *blog,Request *req)
     remove(fnbody);
     
     if (!rc)
-      return rc;
+      return HTTP_UNPROCESSENTITY;
   }
   
   entry = BlogEntryNew(blog);
@@ -161,11 +161,12 @@ bool entry_add(Blog *blog,Request *req)
     argv[4] = req->status;
     argv[5] = NULL;
     
-    rc = run_hook("entry-post-hook",argv);
+    if (!run_hook("entry-post-hook",argv))
+      return HTTP_ACCEPTED;
   }
   
   free(entry);
-  return rc;
+  return HTTP_CREATED;
 }
 
 /************************************************************************/

@@ -163,7 +163,8 @@ static int cmd_cli_error(Blog *blog,Request *req)
 
 static int cmd_cli_new(Blog *blog,Request *req)
 {
-  int rc;
+  int     rc;
+  http__e status;
   
   assert(blog != NULL);
   assert(req  != NULL);
@@ -176,13 +177,14 @@ static int cmd_cli_new(Blog *blog,Request *req)
   if (rc != 0)
     return cli_error(blog,req,HTTP_BADREQ,"Cannot process new entry");
   
-  if (entry_add(blog,req))
+  status = entry_add(blog,req);
+  if (status < HTTP_300)
   {
     generate_pages(blog,req);
     return 0;
   }
   else
-    return cli_error(blog,req,HTTP_BADREQ,"Failed to create new entry");
+    return cli_error(blog,req,status,"Failed to create new entry");
 }
 
 /****************************************************************************/

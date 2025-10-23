@@ -381,14 +381,15 @@ static int cmd_cgi_post_new(Cgi cgi,Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
-  if (entry_add(blog,req))
+  http__e rc = entry_add(blog,req);
+  if (rc < HTTP_300)
   {
     generate_pages(blog,req);
     redirect(HTTP_MOVETEMP,blog->config.url,"");
     return 0;
   }
   else
-    return cgi_error(blog,req,HTTP_ISERVERERR,"couldn't add entry");
+    return cgi_error(blog,req,rc,"couldn't add entry");
 }
 
 /***********************************************************************/
@@ -559,13 +560,14 @@ int main_cgi_PUT(Cgi cgi)
     request_init(&request);
     if (mailfile_readdata(blog,&request) == 0)
     {
-      if (entry_add(blog,&request))
+      http__e rc = entry_add(blog,&request);
+      if (rc < HTTP_300)
       {
         generate_pages(blog,&request);
-        printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
+        printf("Status: %d\r\n\r\n",rc);
       }
       else
-        cgi_error(NULL,NULL,HTTP_ISERVERERR,"couldn't create entry");
+        cgi_error(NULL,NULL,rc,"couldn't create entry");
     }
     else
       cgi_error(NULL,NULL,HTTP_UNAUTHORIZED,"unauthorized user");

@@ -64,7 +64,7 @@ typedef struct request
 
 extern char    *get_remote_user        (void);
 extern bool     authenticate_author    (Blog const *,Request *);
-extern bool     entry_add              (Blog *,Request *);
+extern http__e  entry_add              (Blog *,Request *);
 extern FILE    *fentity_encode_onwrite (FILE *);
 extern Request *request_init           (Request *);
 extern void     request_free           (Request *);
