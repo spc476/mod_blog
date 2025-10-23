@@ -20,6 +20,7 @@
 *
 *************************************************************************/
 
+#include <stdlib.h>
 #include <cgilib8/crashreport.h>
 #include "main.h"
 
@@ -27,30 +28,13 @@
 
 int main(int argc,char *argv[])
 {
-  Cgi cgi;
-  int rc;
-  
   crashreport_args(argc,argv,true);
   crashreport_core();
   
-  cgi = CgiNew();
-  
-  if (cgi != NULL)
-  {
-    switch(CgiMethod(cgi))
-    {
-      case HEAD:
-      case GET:  rc = main_cgi_GET (cgi); break;
-      case POST: rc = main_cgi_POST(cgi); break;
-      case PUT:  rc = main_cgi_PUT (cgi); break;
-      default:   rc = main_cgi_bad (cgi); break;
-    }
-    CgiFree(cgi);
-  }
+  if (getenv("GATEWAY_INTERFACE") == NULL)
+    return main_cli(argc,argv);
   else
-    rc = main_cli(argc,argv);
-    
-  return rc;
+    return main_cgi();
 }
 
 /***********************************************************************/

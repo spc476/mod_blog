@@ -455,7 +455,7 @@ static cgicmd__f set_m_cgi_post_command(char const *value)
 
 /************************************************************************/
 
-int main_cgi_bad(Cgi cgi)
+static int main_cgi_bad(Cgi cgi)
 {
   (void)cgi;
   return cgi_error(NULL,NULL,HTTP_METHODNOTALLOWED,"Nope, not allowed.");
@@ -463,7 +463,7 @@ int main_cgi_bad(Cgi cgi)
 
 /*************************************************************************/
 
-int main_cgi_GET(Cgi cgi)
+static int main_cgi_GET(Cgi cgi)
 {
   assert(cgi != NULL);
   
@@ -489,7 +489,7 @@ int main_cgi_GET(Cgi cgi)
 
 /************************************************************************/
 
-int main_cgi_POST(Cgi cgi)
+static int main_cgi_POST(Cgi cgi)
 {
   assert(cgi != NULL);
   
@@ -541,7 +541,7 @@ int main_cgi_POST(Cgi cgi)
 
 /************************************************************************/
 
-int main_cgi_PUT(Cgi cgi)
+static int main_cgi_PUT(Cgi cgi)
 {
   assert(cgi != NULL);
   
@@ -615,6 +615,31 @@ int main_cgi_PUT(Cgi cgi)
   
   BlogFree(blog);
   return 0;
+}
+
+/************************************************************************/
+
+int main_cgi(void)
+{
+  Cgi cgi = CgiNew();
+  
+  if (cgi == NULL)
+    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"");
+  else
+  {
+    int rc;
+    
+    switch(CgiMethod(cgi))
+    {
+      case HEAD:
+      case GET:  rc = main_cgi_GET (cgi); break;
+      case POST: rc = main_cgi_POST(cgi); break;
+      case PUT:  rc = main_cgi_PUT (cgi); break;
+      default:   rc = main_cgi_bad (cgi); break;
+    }
+    CgiFree(cgi);
+    return rc;
+  }
 }
 
 /************************************************************************/
