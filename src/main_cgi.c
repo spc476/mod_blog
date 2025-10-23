@@ -608,7 +608,7 @@ int main_cgi_PUT(Cgi cgi)
         } while (bytes > 0);
     
         fclose(fp);
-        printf("Status: %d\r\n\r\n",HTTP_NOCONTENT);
+        printf("Status: %d\r\n\r\n",HTTP_CREATED);
       }
     }
   }
