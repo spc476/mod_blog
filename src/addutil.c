@@ -42,6 +42,7 @@
 http__e entry_add(Blog *blog,Request *req)
 {
   BlogEntry *entry;
+  http__e    status;
   
   assert(blog != NULL);
   assert(req  != NULL);
@@ -113,6 +114,8 @@ http__e entry_add(Blog *blog,Request *req)
   }
   
   entry = BlogEntryNew(blog);
+  if (entry == NULL)
+    return HTTP_ISERVERERR;
   
   if (emptynull_string(req->date))
     entry->when = blog->now;
@@ -134,37 +137,44 @@ http__e entry_add(Blog *blog,Request *req)
   entry->adtag     = req->adtag;
   entry->body      = req->body;
   
-  BlogEntryWrite(entry);
-  
-  req->when = entry->when;
-  
-  if (blog->config.posthook != NULL)
+  if (BlogEntryWrite(entry) == 0)
   {
-    char const *argv[6];
-    char        url[1024];
+    req->when = entry->when;
     
-    snprintf(
-      url,
-      sizeof(url),
-      "%s/%04d/%02d/%02d.%d",
-      blog->config.url,
-      entry->when.year,
-      entry->when.month,
-      entry->when.day,
-      entry->when.part
-    );
-    
-    argv[0] = blog->config.posthook;
-    argv[1] = url;
-    argv[2] = req->title;
-    argv[3] = req->author;
-    argv[4] = req->status;
-    argv[5] = NULL;
-    
-    if (!run_hook("entry-post-hook",argv))
-      return HTTP_ACCEPTED;
+    if (blog->config.posthook != NULL)
+    {
+      char const *argv[6];
+      char        url[1024];
+      
+      snprintf(
+        url,
+        sizeof(url),
+        "%s/%04d/%02d/%02d.%d",
+        blog->config.url,
+        entry->when.year,
+        entry->when.month,
+        entry->when.day,
+        entry->when.part
+      );
+      
+      argv[0] = blog->config.posthook;
+      argv[1] = url;
+      argv[2] = req->title;
+      argv[3] = req->author;
+      argv[4] = req->status;
+      argv[5] = NULL;
+      
+      if (!run_hook("entry-post-hook",argv))
+        status = HTTP_ACCEPTED;
+      else
+        status = HTTP_CREATED;
+    }
+    else
+      status = HTTP_CREATED;
   }
-  
+  else
+    status = HTTP_ISERVERERR;
+    
   /*-----------------------------------------------------------------------------
   ; DO NOT CALL BlogFreeEntry() here!  It is NOT The Right Thing To Do(TM) here!
   ; The fields of entry are not allocated, but are merely referenced from
@@ -173,7 +183,7 @@ http__e entry_add(Blog *blog,Request *req)
   ;------------------------------------------------------------------------------*/
   
   free(entry);
-  return HTTP_CREATED;
+  return status;
 }
 
 /************************************************************************/
