@@ -174,8 +174,15 @@ http__e entry_add(Blog *blog,Request *req)
   }
   else
     status = HTTP_ISERVERERR;
+
+  /*-----------------------------------------------------------------------------
+  ; DO NOT CALL BlogFreeEntry() here!  It is NOT The Right Thing To Do(TM) here!
+  ; The fields of entry are not allocated, but are merely referenced from
+  ; other structures, so they don't need freeing; only the base structure
+  ; itself needs to be freed.
+  ;------------------------------------------------------------------------------*/
     
-  BlogEntryFree(entry);
+  free(entry);
   return status;
 }
 
