@@ -104,14 +104,8 @@ end
 
 -- ***********************************************************************
 -- 201 Created
--- 202 Accepted (but post-hook failed)
--- 204 No Content
--- 400 Bad Request
--- 411 Length Required
--- 413 Too Large
--- 415 Media Type
--- 422 Unprocessed Entity
--- 500 Internal Server Error
+-- 202 Accepted           (entry-post-hook failed)
+-- 422 Unprocessed Entity (entry-pre-hook failed)
 -- ***********************************************************************
 
 local function put(conn,location,hdrs,mimetype,body)
