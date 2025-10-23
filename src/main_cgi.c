@@ -455,115 +455,73 @@ static cgicmd__f set_m_cgi_post_command(char const *value)
 
 /************************************************************************/
 
-static int main_cgi_bad(Cgi cgi)
+static void main_cgi_GET(Cgi cgi,Blog *blog,Request *request)
 {
-  (void)cgi;
-  return cgi_error(NULL,NULL,HTTP_METHODNOTALLOWED,"Nope, not allowed.");
-}
-
-/*************************************************************************/
-
-static int main_cgi_GET(Cgi cgi)
-{
-  assert(cgi != NULL);
+  assert(cgi     != NULL);
+  assert(blog    != NULL);
+  assert(request != NULL);
+  assert(request->f.cgi);
   
-  if (CgiStatus(cgi) != HTTP_OKAY)
-    return cgi_error(NULL,NULL,CgiStatus(cgi),"processing error");
-    
-  Request  request;
-  Blog    *blog = BlogNew(NULL);
-  
-  if (blog == NULL)
-    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
-    
-  request_init(&request);
-  request.f.cgi      = true;
-  request.reqtumbler = getenv("PATH_INFO");
-  
-  (*set_m_cgi_get_command(CgiGetQValue(cgi,"cmd")))(cgi,blog,&request);
-  
-  request_free(&request);
-  BlogFree(blog);
-  return 0;
+  request->reqtumbler = getenv("PATH_INFO");
+  (*set_m_cgi_get_command(CgiGetQValue(cgi,"cmd")))(cgi,blog,request);
 }
 
 /************************************************************************/
 
-static int main_cgi_POST(Cgi cgi)
+static void main_cgi_POST(Cgi cgi,Blog *blog,Request *request)
 {
-  assert(cgi != NULL);
+  assert(cgi     != NULL);
+  assert(blog    != NULL);
+  assert(request != NULL);
+  assert(request->f.cgi);
   
-  if (CgiStatus(cgi) != HTTP_OKAY)
-    return cgi_error(NULL,NULL,CgiStatus(cgi),"processing error");
-    
-  Request  request;
-  Blog    *blog = BlogNew(NULL);
+  set_m_author(CgiGetValue(cgi,"author"),request);
   
-  if (blog == NULL)
-    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
-    
-  request_init(&request);
-  request.f.cgi = true;
-  
-  set_m_author(CgiGetValue(cgi,"author"),&request);
-  
-  request.title    = safe_strdup(CgiGetValue(cgi,"title"));
-  request.class    = safe_strdup(CgiGetValue(cgi,"class"));
-  request.status   = safe_strdup(CgiGetValue(cgi,"status"));
-  request.date     = safe_strdup(CgiGetValue(cgi,"date"));
-  request.adtag    = safe_strdup(CgiGetValue(cgi,"adtag"));
-  request.origbody = safe_strdup(CgiGetValue(cgi,"body"));
-  request.body     = safe_strdup(request.origbody);
+  request->title    = safe_strdup(CgiGetValue(cgi,"title"));
+  request->class    = safe_strdup(CgiGetValue(cgi,"class"));
+  request->status   = safe_strdup(CgiGetValue(cgi,"status"));
+  request->date     = safe_strdup(CgiGetValue(cgi,"date"));
+  request->adtag    = safe_strdup(CgiGetValue(cgi,"adtag"));
+  request->origbody = safe_strdup(CgiGetValue(cgi,"body"));
+  request->body     = safe_strdup(request->origbody);
   
   if (
-          (emptynull_string(request.author))
-       || (emptynull_string(request.title))
-       || (emptynull_string(request.body))
+          (emptynull_string(request->author))
+       || (emptynull_string(request->title))
+       || (emptynull_string(request->body))
      )
   {
-    cgi_error(blog,&request,HTTP_BADREQ,"errors-missing");
+    cgi_error(blog,request,HTTP_BADREQ,"errors-missing");
   }
   else
   {
-    if (authenticate_author(blog,&request) == false)
+    if (authenticate_author(blog,request) == false)
     {
-      syslog(LOG_ERR,"'%s' not authorized to post",request.author);
-      cgi_error(blog,&request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request.author,CgiGetValue(cgi,"author"));
+      syslog(LOG_ERR,"'%s' not authorized to post",request->author);
+      cgi_error(blog,request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request->author,CgiGetValue(cgi,"author"));
     }
     else
-      (*set_m_cgi_post_command(CgiGetValue(cgi,"cmd")))(cgi,blog,&request);
+      (*set_m_cgi_post_command(CgiGetValue(cgi,"cmd")))(cgi,blog,request);
   }
-  
-  request_free(&request);
-  BlogFree(blog);
-  return 0;
 }
 
 /************************************************************************/
 
-static int main_cgi_PUT(Cgi cgi)
+static void main_cgi_PUT(Cgi cgi,Blog *blog,Request *request)
 {
-  assert(cgi != NULL);
+  assert(cgi     != NULL);
+  assert(blog    != NULL);
+  assert(request != NULL);
+  assert(request->f.cgi);
   
-  if (CgiStatus(cgi) != HTTP_OKAY)
-    return cgi_error(NULL,NULL,CgiStatus(cgi),"processing error");
-    
-  Blog *blog = BlogNew(NULL);
-  
-  if (blog == NULL)
-    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
-    
   if (strcmp(cgi->content_type,"application/mod_blog") == 0)
   {
-    Request request;
-    
-    request_init(&request);
-    if (mailfile_readdata(blog,&request) == 0)
+    if (mailfile_readdata(blog,request) == 0)
     {
-      http__e rc = entry_add(blog,&request);
+      http__e rc = entry_add(blog,request);
       if (rc < HTTP_300)
       {
-        generate_pages(blog,&request);
+        generate_pages(blog,request);
         printf("Status: %d\r\n\r\n",rc);
       }
       else
@@ -571,8 +529,6 @@ static int main_cgi_PUT(Cgi cgi)
     }
     else
       cgi_error(NULL,NULL,HTTP_UNAUTHORIZED,"unauthorized user");
-    
-    request_free(&request);
   }
   else
   {
@@ -602,19 +558,16 @@ static int main_cgi_PUT(Cgi cgi)
         do
         {
           char buffer[BUFSIZ];
-      
+          
           bytes = fread(buffer,1,sizeof(buffer),stdin);
           fwrite(buffer,1,bytes,fp);
         } while (bytes > 0);
-    
+        
         fclose(fp);
         printf("Status: %d\r\n\r\n",HTTP_CREATED);
       }
     }
   }
-  
-  BlogFree(blog);
-  return 0;
 }
 
 /************************************************************************/
@@ -624,22 +577,41 @@ int main_cgi(void)
   Cgi cgi = CgiNew();
   
   if (cgi == NULL)
-    return cgi_error(NULL,NULL,HTTP_ISERVERERR,"");
+    cgi_error(NULL,NULL,HTTP_ISERVERERR,"");
   else
   {
-    int rc;
-    
-    switch(CgiMethod(cgi))
+    if (CgiStatus(cgi) != HTTP_OKAY)
+      cgi_error(NULL,NULL,CgiStatus(cgi),"processing error");
+    else
     {
-      case HEAD:
-      case GET:  rc = main_cgi_GET (cgi); break;
-      case POST: rc = main_cgi_POST(cgi); break;
-      case PUT:  rc = main_cgi_PUT (cgi); break;
-      default:   rc = main_cgi_bad (cgi); break;
+      Blog *blog = BlogNew(NULL);
+      
+      if (blog == NULL)
+        cgi_error(NULL,NULL,HTTP_ISERVERERR,"Could not instantiate the blog");
+      else
+      {
+        Request request;
+        
+        request_init(&request);
+        request.f.cgi = true;
+        
+        switch(CgiMethod(cgi))
+        {
+          case HEAD:
+          case GET:  main_cgi_GET (cgi,blog,&request); break;
+          case POST: main_cgi_POST(cgi,blog,&request); break;
+          case PUT:  main_cgi_PUT (cgi,blog,&request); break;
+          default:   cgi_error(NULL,NULL,HTTP_METHODNOTALLOWED,"Nope, not allowed."); break;
+        }
+        
+        request_free(&request);
+        BlogFree(blog);
+      }
     }
     CgiFree(cgi);
-    return rc;
   }
+  
+  return 0;
 }
 
 /************************************************************************/
