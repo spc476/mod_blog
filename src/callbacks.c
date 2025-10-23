@@ -1706,7 +1706,6 @@ static void cb_webmention(FILE *out,void *data)
             );
   if (rc < 0)
   {
-    syslog(LOG_DEBUG,"fileno('%s') = %d",fname,fileno(cbd->wm));
     syslog(LOG_ERR,"fcntl('%s',F_SETLKW) = %s",fname,strerror(errno));
     fclose(cbd->wm);
     return;
