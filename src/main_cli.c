@@ -23,10 +23,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 
 #include <syslog.h>
 #include <getopt.h>
-#include <gdbm.h>
 
 #include <cgilib8/conf.h>
 #include <cgilib8/rfc822.h>
@@ -35,7 +35,6 @@
 #include "backend.h"
 #include "frontend.h"
 #include "blogutil.h"
-#include "conversion.h"
 #include "main.h"
 
 typedef int (*clicmd__f)(Blog *,Request *);

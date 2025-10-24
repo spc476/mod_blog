@@ -25,17 +25,9 @@
 #include <errno.h>
 
 #include <syslog.h>
-#include <gdbm.h>
-
-#include <cgilib8/mail.h>
 #include <cgilib8/util.h>
-#include <cgilib8/chunk.h>
 
-#include "conversion.h"
 #include "backend.h"
-#include "blogutil.h"
-
-#define DB_BLOCK 1024
 
 /*********************************************************************/
 

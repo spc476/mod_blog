@@ -20,15 +20,9 @@
 *
 *********************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
-#include <syslog.h>
-#include <cgilib8/util.h>
-#include <cgilib8/htmltok.h>
-
-#include "conversion.h"
-#include "blogutil.h"
+#include <assert.h>
 
 /*********************************************************************/
 
