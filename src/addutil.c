@@ -39,6 +39,12 @@ http__e entry_add(Blog *blog,Request *req)
   assert(blog != NULL);
   assert(req  != NULL);
   
+  if (emptynull_string(req->body))
+    return HTTP_BADREQ;
+  
+  if (!authenticate_author(blog,req))
+    return HTTP_UNAUTHORIZED;
+    
   if (blog->config.prehook != NULL)
   {
     FILE *fp;

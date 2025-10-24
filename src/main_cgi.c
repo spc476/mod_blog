@@ -482,24 +482,7 @@ static void main_cgi_POST(Cgi cgi,Blog *blog,Request *request)
   request->origbody = safe_strdup(CgiGetValue(cgi,"body"));
   request->body     = safe_strdup(request->origbody);
   
-  if (
-          (emptynull_string(request->author))
-       || (emptynull_string(request->title))
-       || (emptynull_string(request->body))
-     )
-  {
-    cgi_error(blog,request,HTTP_BADREQ,"errors-missing");
-  }
-  else
-  {
-    if (authenticate_author(blog,request) == false)
-    {
-      syslog(LOG_ERR,"'%s' not authorized to post",request->author);
-      cgi_error(blog,request,HTTP_UNAUTHORIZED,"errors-author not authenticated got [%s] wanted [%s]",request->author,CgiGetValue(cgi,"author"));
-    }
-    else
-      (*set_m_cgi_post_command(CgiGetValue(cgi,"cmd")))(cgi,blog,request);
-  }
+  (*set_m_cgi_post_command(CgiGetValue(cgi,"cmd")))(cgi,blog,request);
 }
 
 /************************************************************************/

@@ -62,12 +62,6 @@ int mailfile_readdata(Blog *blog,Request *req)
   
   PairListFree(&headers);       /* got everything we need, dump this */
   
-  if (authenticate_author(blog,req) == false)
-  {
-    syslog(LOG_ERR,"'%s' not authorized to post",req->author);
-    return EPERM;
-  }
-  
   output = open_memstream(&req->origbody,&size);
   fcopy(output,stdin);
   fclose(output);
