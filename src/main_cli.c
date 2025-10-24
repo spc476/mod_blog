@@ -53,12 +53,12 @@ int mailfile_readdata(Blog *blog,Request *req)
   ListInit(&headers);
   RFC822HeadersRead(stdin,&headers);
   
-  req->author     = safe_strdup(PairListGetValue(&headers,"AUTHOR"));
-  req->title      = safe_strdup(PairListGetValue(&headers,"TITLE"));
-  req->class      = safe_strdup(PairListGetValue(&headers,"CLASS"));
-  req->status     = safe_strdup(PairListGetValue(&headers,"STATUS"));
-  req->date       = safe_strdup(PairListGetValue(&headers,"DATE"));
-  req->adtag      = safe_strdup(PairListGetValue(&headers,"ADTAG"));
+  req->author = safe_strdup(PairListGetValue(&headers,"AUTHOR"));
+  req->title  = safe_strdup(PairListGetValue(&headers,"TITLE"));
+  req->class  = safe_strdup(PairListGetValue(&headers,"CLASS"));
+  req->status = safe_strdup(PairListGetValue(&headers,"STATUS"));
+  req->date   = safe_strdup(PairListGetValue(&headers,"DATE"));
+  req->adtag  = safe_strdup(PairListGetValue(&headers,"ADTAG"));
   
   PairListFree(&headers);       /* got everything we need, dump this */
   
@@ -275,33 +275,32 @@ int main_cli(int argc,char *argv[])
   
   static struct option const coptions[] =
   {
-    { "config"       , required_argument  , NULL  , OPT_CONFIG      } ,
-    { "regenerate"   , no_argument        , NULL  , OPT_REGENERATE  } ,
-    { "regen"        , no_argument        , NULL  , OPT_REGENERATE  } ,
-    { "cmd"          , required_argument  , NULL  , OPT_CMD         } ,
-    { "file"         , required_argument  , NULL  , OPT_FILE        } ,
-    { "email"        , no_argument        , NULL  , OPT_EMAIL       } ,
-    { "entry"        , required_argument  , NULL  , OPT_ENTRY       } ,
-    { "today"        , no_argument        , NULL  , OPT_TODAY       } ,
-    { "thisday"      , required_argument  , NULL  , OPT_THISDAY     } ,
-    { "help"         , no_argument        , NULL  , OPT_HELP        } ,
-    { NULL           , 0                  , NULL  , 0               }
+    { "config"     , required_argument , NULL , OPT_CONFIG     } ,
+    { "regenerate" , no_argument       , NULL , OPT_REGENERATE } ,
+    { "regen"      , no_argument       , NULL , OPT_REGENERATE } ,
+    { "cmd"        , required_argument , NULL , OPT_CMD        } ,
+    { "file"       , required_argument , NULL , OPT_FILE       } ,
+    { "email"      , no_argument       , NULL , OPT_EMAIL      } ,
+    { "entry"      , required_argument , NULL , OPT_ENTRY      } ,
+    { "today"      , no_argument       , NULL , OPT_TODAY      } ,
+    { "thisday"    , required_argument , NULL , OPT_THISDAY    } ,
+    { "help"       , no_argument       , NULL , OPT_HELP       } ,
+    { NULL         , 0                 , NULL , 0               }
   };
   
-  char      *config  = NULL;
-  clicmd__f  command = cmd_cli_show;
-  Blog      *blog;
-  Request    request;
-  int        rc;
+  char       *config  = NULL;
+  clicmd__f   command = cmd_cli_show;
+  Blog       *blog;
+  Request     request;
+  int         rc;
   
   request_init(&request);
   
   while(true)
   {
-    int   option = 0;
-    int   c;
+    int option = 0;
+    int c      = getopt_long_only(argc,argv,"",coptions,&option);
     
-    c = getopt_long_only(argc,argv,"",coptions,&option);
     if (c == EOF)
       break;
     else switch(c)

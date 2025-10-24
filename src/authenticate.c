@@ -60,12 +60,12 @@ char *get_remote_user(void)
 
 static size_t breakline(char *dest[],size_t dsize,FILE *in)
 {
-  char   *line = NULL;
-  char   *p;
-  char   *colon;
-  size_t  cnt;
-  size_t  size = 0;
-  ssize_t rc;
+  char    *line = NULL;
+  char    *p;
+  char    *colon;
+  size_t   cnt;
+  size_t   size = 0;
+  ssize_t  rc;
   
   assert(dest  != NULL);
   assert(dsize >  0);
