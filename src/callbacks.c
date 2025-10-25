@@ -1910,7 +1910,7 @@ void generic_main(FILE *out,struct callback_data *cbd)
   assert(out != NULL);
   assert(cbd != NULL);
   
-  if (cbd->request->f.cgi)
+  if (cbd->request->f.cgiget)
   {
     if ((cbd->status == HTTP_OKAY) && HttpNotModified(cbd->blog->lastmod))
     {

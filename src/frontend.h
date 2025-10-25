@@ -51,7 +51,7 @@ typedef struct request
     unsigned int navprev    : 1;
     unsigned int navnext    : 1;
     unsigned int edit       : 1;
-    unsigned int cgi        : 1;
+    unsigned int cgiget     : 1;
     unsigned int htmldump   : 1;
     unsigned int emailin    : 1;
     unsigned int regenerate : 1;

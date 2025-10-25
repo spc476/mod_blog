@@ -89,7 +89,6 @@ static int cgi_error(Blog *blog,Request *request,int level,char const *msg, ... 
     
     assert(blog    != NULL);
     assert(request != NULL);
-    assert(request->f.cgi);
     
     request->f.htmldump = true;
     callback_init(&cbd,blog,request);
@@ -457,9 +456,9 @@ static void main_cgi_GET(Cgi cgi,Blog *blog,Request *request)
   assert(cgi     != NULL);
   assert(blog    != NULL);
   assert(request != NULL);
-  assert(request->f.cgi);
   
   request->reqtumbler = getenv("PATH_INFO");
+  request->f.cgiget   = true;
   (*set_m_cgi_get_command(CgiGetQValue(cgi,"cmd")))(cgi,blog,request);
 }
 
@@ -470,7 +469,6 @@ static void main_cgi_POST(Cgi cgi,Blog *blog,Request *request)
   assert(cgi     != NULL);
   assert(blog    != NULL);
   assert(request != NULL);
-  assert(request->f.cgi);
   
   set_m_author(CgiGetValue(cgi,"author"),request);
   
@@ -492,7 +490,6 @@ static void main_cgi_PUT(Cgi cgi,Blog *blog,Request *request)
   assert(cgi     != NULL);
   assert(blog    != NULL);
   assert(request != NULL);
-  assert(request->f.cgi);
   
   if (strcmp(cgi->content_type,"application/mod_blog") == 0)
   {
@@ -573,8 +570,6 @@ int main_cgi(void)
         Request request;
         
         request_init(&request);
-        request.f.cgi = true;
-        
         switch(CgiMethod(cgi))
         {
           case HEAD:

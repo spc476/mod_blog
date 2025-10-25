@@ -558,7 +558,7 @@ static int display_file(
       spec->filename
   );
   
-  if (request->f.cgi)
+  if (request->f.cgiget)
   {
     struct stat  status;
     char const  *type;
