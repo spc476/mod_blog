@@ -428,21 +428,6 @@ static int blog_meta_write(
 
 /************************************************************************/
 
-#if LUA_VERSION_NUM == 501
-#  define LUA_OK                0
-#  define lua_rawlen(L,idx)     lua_objlen((L),(idx))
-
-   int lua_absindex(lua_State *L,int idx)
-   {
-     return (idx > 0) || (idx <= LUA_REGISTRYINDEX)
-            ? idx
-            : lua_gettop(L) + idx + 1
-            ;
-   }
-#endif
-
-/***************************************************************************/
-
 static char const *confL_checklstring(lua_State *L,int idx,size_t *ps,char const *table,char const *field)
 {
   assert(L     != NULL);

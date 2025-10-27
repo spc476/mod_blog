@@ -14,7 +14,7 @@ REQUIREMENTS
                 * Linux (or any POSIX compilant UNIX system)
                 * GCC   (or any C99 compiler that may come with your system)
                 * Apache
-                * Lua 5.1 or higher
+                * Lua 5.2 or higher
                 
         The code right now assumes you'll be running this under Apache.
         
