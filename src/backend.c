@@ -225,9 +225,6 @@ static struct btm calculate_previous(Blog *blog,Request *request,struct btm cons
            request->f.navprev = false;
          }
          break;
-         
-    default:
-         assert(0);
   }
   
   return previous;
@@ -328,9 +325,6 @@ static struct btm calculate_next(Blog *blog,Request *request,struct btm const en
            request->f.navnext = false;
          }
          break;
-         
-    default:
-         assert(0);
   }
   
   return next;

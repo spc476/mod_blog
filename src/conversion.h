@@ -23,9 +23,7 @@
 #ifndef I_18C80596_12AD_588C_8AC5_C30F6FDDBF24
 #define I_18C80596_12AD_588C_8AC5_C30F6FDDBF24
 
-#include <stdbool.h>
 #include <stdio.h>
-#include "frontend.h"
 
 extern FILE *fjson_encode_onwrite (FILE *);
 

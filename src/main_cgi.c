@@ -28,6 +28,7 @@
 #include <cgilib8/util.h>
 
 #include "backend.h"
+#include "main.h"
 
 typedef int (*cgicmd__f)(Cgi,Blog *,struct request *);
 

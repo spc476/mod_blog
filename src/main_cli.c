@@ -346,7 +346,7 @@ int main_cli(int argc,char *argv[])
                 "\t--thisday <month>/<day>\n"
                 "\t--help\n"
                 "\n"
-                "\tVersion: " GENERATOR "\n"
+                "\tVersion: mod_blog " PROG_VERSION "\n"
                 "\t\t%s\n"
                 "\t\t%s\n"
                 "\t* default value\n"

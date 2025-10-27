@@ -73,8 +73,8 @@ depend:
 
 # DO NOT DELETE
 
-src/addutil.o: src/conversion.h src/frontend.h src/wbtum.h src/timeutil.h
-src/addutil.o: src/blog.h src/backend.h src/blogutil.h
+src/addutil.o: src/backend.h src/frontend.h src/wbtum.h src/timeutil.h
+src/addutil.o: src/blog.h
 src/authenticate.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
 src/backend.o: src/blogutil.h src/backend.h src/frontend.h src/wbtum.h
 src/backend.o: src/timeutil.h src/blog.h
@@ -83,13 +83,12 @@ src/blogutil.o: src/blogutil.h
 src/callbacks.o: src/backend.h src/frontend.h src/wbtum.h src/timeutil.h
 src/callbacks.o: src/blog.h src/blogutil.h src/conversion.h
 src/conversion.o: src/conversion.h src/frontend.h src/wbtum.h src/timeutil.h
-src/conversion.o: src/blog.h src/blogutil.h
-src/main.o: src/main.h src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
+src/conversion.o: src/blog.h
+src/main.o: src/main.h
 src/main_cgi.o: src/backend.h src/frontend.h src/wbtum.h src/timeutil.h
-src/main_cgi.o: src/blog.h src/conversion.h src/main.h
+src/main_cgi.o: src/blog.h src/main.h
 src/main_cli.o: src/backend.h src/frontend.h src/wbtum.h src/timeutil.h
-src/main_cli.o: src/blog.h src/blogutil.h src/conversion.h src/main.h
+src/main_cli.o: src/blog.h src/blogutil.h src/main.h
 src/misc.o: src/frontend.h src/wbtum.h src/timeutil.h src/blog.h
-src/misc.o: src/conversion.h
 src/timeutil.o: src/wbtum.h src/timeutil.h
 src/wbtum.o: src/wbtum.h src/timeutil.h

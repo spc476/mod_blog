@@ -23,13 +23,6 @@
 #ifndef I_1B359890_EC8E_56D4_BF49_DB5787BC3EB7
 #define I_1B359890_EC8E_56D4_BF49_DB5787BC3EB7
 
-#include <stdbool.h>
-#include <cgilib8/cgi.h>
-
-#include "frontend.h"
-
-#define GENERATOR       "mod_blog" " " PROG_VERSION
-
 extern int main_cli (int,char *[]);
 extern int main_cgi (void);
 

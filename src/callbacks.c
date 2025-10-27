@@ -71,9 +71,6 @@ static void print_nav_name(FILE *out,struct btm const *date,unit__e unit,char se
     case UNIT_PART:
          fprintf(out,"%04d%c%02d%c%02d.%d",date->year,sep,date->month,sep,date->day,date->part);
          break;
-    default:
-         assert(0);
-         break;
   }
 }
 

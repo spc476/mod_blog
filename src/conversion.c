@@ -24,6 +24,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "conversion.h"
+
 /*********************************************************************/
 
 static ssize_t fj_write(void *cookie,char const *buffer,size_t bytes)
