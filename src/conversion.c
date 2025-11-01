@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <assert.h>
 
 #include "conversion.h"
@@ -70,3 +71,60 @@ FILE *fjson_encode_onwrite(FILE *out)
 }
 
 /*********************************************************************/
+
+static bool char_entity(char const **tag,size_t *ps,int c)
+{
+  assert(tag != NULL);
+  assert(ps  != NULL);
+  
+  switch(c)
+  {
+    case '<': *tag = "&lt;";   *ps = 4; return true;
+    case '>': *tag = "&gt;";   *ps = 4; return true;
+    case '&': *tag = "&amp;";  *ps = 5; return true;
+    case '"': *tag = "&quot;"; *ps = 6; return true;
+    default:                            return false;
+  }
+}
+
+/**********************************************************************/
+
+static ssize_t few_write(void *cookie,char const *buffer,size_t bytes)
+{
+  FILE       *realout = cookie;
+  size_t      size    = bytes;
+  char const *replace;
+  size_t      repsize;
+  
+  assert(buffer != NULL);
+  assert(cookie != NULL);
+  
+  while(bytes)
+  {
+    if (char_entity(&replace,&repsize,*buffer))
+      fputs(replace,realout);
+    else
+      fputc(*buffer,realout);
+      
+    buffer++;
+    bytes--;
+  }
+  
+  return size;
+}
+
+/*******************************************************************/
+
+FILE *fentity_encode_onwrite(FILE *out)
+{
+  assert(out != NULL);
+  return fopencookie(out,"w",(cookie_io_functions_t)
+                                {
+                                  NULL,
+                                  few_write,
+                                  NULL,
+                                  NULL
+                                });
+}
+
+/******************************************************************/
