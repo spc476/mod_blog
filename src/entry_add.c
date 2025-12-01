@@ -147,7 +147,7 @@ http__e entry_add(Blog *blog,Request *req)
       snprintf(
         url,
         sizeof(url),
-        "%s/%04d/%02d/%02d.%d",
+        "%s%04d/%02d/%02d.%d",
         blog->config.url,
         entry->when.year,
         entry->when.month,
