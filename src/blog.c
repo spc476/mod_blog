@@ -345,7 +345,7 @@ static size_t blog_meta_read(
   assert(name   != NULL);
   assert(date   != NULL);
   
-  lines = calloc(100,sizeof(char *));
+  lines = calloc(ENTRY_MAX,sizeof(char *));
   if (lines == NULL)
   {
     *plines = NULL;
@@ -360,7 +360,7 @@ static size_t blog_meta_read(
     return 0;
   }
   
-  for(i = 0 ; i < 100 ; i++)
+  for(i = 0 ; i < ENTRY_MAX ; i++)
   {
     char    *nl;
     ssize_t  bytes;
@@ -390,8 +390,8 @@ static void blog_meta_adjust(char **plines[],size_t num,size_t maxnum)
   assert(plines  != NULL);
   assert(*plines != NULL);
   assert(num     <= maxnum);
-  assert(num     <= 100);
-  assert(maxnum  <= 100);
+  assert(num     <= ENTRY_MAX);
+  assert(maxnum  <= ENTRY_MAX);
   
   char **lines = *plines;
   
