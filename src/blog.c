@@ -1101,7 +1101,8 @@ int BlogEntryWrite(BlogEntry *entry)
   assert(entry != NULL);
   assert(entry->valid);
   
-  rc = date_checkcreate(&entry->when);
+  lock = blog_lock(entry->blog->config.lockfile);
+  rc   = date_checkcreate(&entry->when);
   if (rc != 0)
     return rc;
     
@@ -1157,8 +1158,6 @@ int BlogEntryWrite(BlogEntry *entry)
   blog_meta_write("status" ,&entry->when,status, maxnum);
   blog_meta_write("titles" ,&entry->when,titles, maxnum);
   blog_meta_write("adtag"  ,&entry->when,adtag,  maxnum);
-  
-  lock = blog_lock(entry->blog->config.lockfile);
   
   /*-------------------------------
   ; update the actual entry body
