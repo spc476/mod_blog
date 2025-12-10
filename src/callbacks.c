@@ -26,7 +26,6 @@
 
 #include <unistd.h>
 #include <fcntl.h>
-#include <gdbm.h>
 #include <syslog.h>
 
 #include <cgilib8/conf.h>
