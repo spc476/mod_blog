@@ -285,7 +285,7 @@ int main_cli(int argc,char *argv[])
     { "today"      , no_argument       , NULL , OPT_TODAY      } ,
     { "thisday"    , required_argument , NULL , OPT_THISDAY    } ,
     { "help"       , no_argument       , NULL , OPT_HELP       } ,
-    { NULL         , 0                 , NULL , 0               }
+    { NULL         , 0                 , NULL , OPT_NONE       } ,
   };
   
   char       *config  = NULL;
