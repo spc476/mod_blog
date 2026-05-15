@@ -105,6 +105,7 @@ end
 -- ***********************************************************************
 -- 201 Created
 -- 202 Accepted           (entry-post-hook failed)
+-- 408 Timed out          (entry-post-hook failed)
 -- 422 Unprocessed Entity (entry-pre-hook failed)
 -- ***********************************************************************
 
