@@ -393,8 +393,8 @@ static int cmd_cgi_post_new(Cgi cgi,Blog *blog,Request *req)
 
 static int cmd_cgi_post_show(Cgi cgi,Blog *blog,Request *req)
 {
-  struct callback_data cbd;
-  BlogEntry           *entry;
+  struct callback_data  cbd;
+  BlogEntry            *entry;
   
   (void)cgi;
   assert(blog != NULL);
