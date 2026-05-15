@@ -284,11 +284,11 @@ int main_cli(int argc,char *argv[])
     { NULL         , 0                 , NULL , OPT_NONE       } ,
   };
   
-  char       *config  = NULL;
-  clicmd__f   command = cmd_cli_show;
-  Blog       *blog;
-  Request     request;
-  int         rc;
+  char      *config  = NULL;
+  clicmd__f  command = cmd_cli_show;
+  Blog      *blog;
+  Request    request;
+  int        rc;
   
   request_init(&request);
   
