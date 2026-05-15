@@ -180,7 +180,7 @@ static int cmd_cli_new(Blog *blog,Request *req)
 
 static int cmd_cli_show(Blog *blog,Request *req)
 {
-  int rc = -1;
+  int rc;
   
   assert(blog != NULL);
   assert(req  != NULL);
@@ -230,7 +230,6 @@ static int cmd_cli_show(Blog *blog,Request *req)
     }
   }
   
-  assert(rc != -1);
   return rc;
 }
 

@@ -169,7 +169,7 @@ static int cmd_cgi_get_new(Cgi cgi,Blog *blog,Request *req)
 static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
 {
   char *status;
-  int   rc = -1;
+  int   rc;
   
   assert(cgi  != NULL);
   assert(blog != NULL);
@@ -221,7 +221,6 @@ static int cmd_cgi_get_show(Cgi cgi,Blog *blog,Request *req)
     }
   }
   
-  assert(rc != -1);
   return rc;
 }
 
