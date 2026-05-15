@@ -43,9 +43,8 @@ typedef int (*clicmd__f)(Blog *,Request *);
 
 int mailfile_readdata(Blog *blog,Request *req)
 {
-  FILE   *output;
-  List    headers;
-  size_t  size;
+  FILE *output;
+  List  headers;
   
   assert(blog != NULL);
   assert(req  != NULL);
@@ -62,7 +61,7 @@ int mailfile_readdata(Blog *blog,Request *req)
   
   PairListFree(&headers);       /* got everything we need, dump this */
   
-  output = open_memstream(&req->origbody,&size);
+  output = open_memstream(&req->origbody,&(size_t){0});
   fcopy(output,stdin);
   fclose(output);
   
@@ -74,15 +73,14 @@ int mailfile_readdata(Blog *blog,Request *req)
 
 static int mail_setup_data(Blog *blog,Request *req)
 {
-  List    headers;
-  char   *line = NULL;
-  size_t  size = 0;
+  List  headers;
+  char *line = NULL;
   
   assert(blog != NULL);
   assert(req  != NULL);
   
   ListInit(&headers);
-  getline(&line,&size,stdin); /* skip Unix 'From ' line */
+  getline(&line,&(size_t){0},stdin); /* skip Unix 'From ' line */
   free(line);
   
   /*----------------------------------------------------------------------
