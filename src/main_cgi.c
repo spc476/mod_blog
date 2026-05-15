@@ -494,7 +494,7 @@ static void main_cgi_PUT(Cgi cgi,Blog *blog,Request *request)
   
   if (strcmp(cgi->content_type,"application/mod_blog") == 0)
   {
-    if (mailfile_readdata(blog,request) == 0)
+    if (mailfile_readdata(request) == 0)
     {
       http__e rc = entry_add(blog,request);
       if (rc < HTTP_300)

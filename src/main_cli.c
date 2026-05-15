@@ -41,12 +41,11 @@ typedef int (*clicmd__f)(Blog *,Request *);
 
 /*******************************************************************/
 
-int mailfile_readdata(Blog *blog,Request *req)
+int mailfile_readdata(Request *req)
 {
   FILE *output;
   List  headers;
   
-  assert(blog != NULL);
   assert(req  != NULL);
   
   ListInit(&headers);
@@ -71,12 +70,11 @@ int mailfile_readdata(Blog *blog,Request *req)
 
 /***************************************************************************/
 
-static int mail_setup_data(Blog *blog,Request *req)
+static int mail_setup_data(Request *req)
 {
   List  headers;
   char *line = NULL;
   
-  assert(blog != NULL);
   assert(req  != NULL);
   
   ListInit(&headers);
@@ -118,7 +116,7 @@ static int mail_setup_data(Blog *blog,Request *req)
   
   PairListFree(&headers);
   
-  return mailfile_readdata(blog,req);
+  return mailfile_readdata(req);
 }
 
 /*******************************************************************/
@@ -161,9 +159,9 @@ static int cmd_cli_new(Blog *blog,Request *req)
   assert(req  != NULL);
   
   if (req->f.emailin)
-    rc = mail_setup_data(blog,req);
+    rc = mail_setup_data(req);
   else
-    rc = mailfile_readdata(blog,req);
+    rc = mailfile_readdata(req);
     
   if (rc != 0)
     return cli_error(blog,req,HTTP_BADREQ,"Cannot process new entry");
