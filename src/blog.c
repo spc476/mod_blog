@@ -292,39 +292,34 @@ static int date_checkcreate(struct btm const *date)
 
 static char *blog_meta_entry(char const *name,struct btm const *date)
 {
-  FILE         *fp;
-  char         *text;
-  size_t        size;
-  unsigned int  num;
-  
   assert(name != NULL);
   assert(date != NULL);
   
-  text = NULL;
-  size = 0;
-  num  = date->part;
-  fp   = open_file_r(name,date);
+  char         *text = NULL;
+  size_t        size = 0;
+  unsigned int  num  = date->part;
+  FILE         *fp   = open_file_r(name,date);
   
   while(!feof(fp) && (num--))
   {
     ssize_t bytes = getline(&text,&size,fp);
     if (bytes == -1)
     {
-      fclose(fp);
       free(text);
-      return strdup("");
+      text = strdup("");
+      break;
     }
   }
   
   fclose(fp);
   
-  if (text)
+  if (text != NULL)
   {
     char *nl = strchr(text,'\n');
     if (nl) *nl = '\0';
   }
   else
-    return strdup("");
+    text = strdup("");
     
   return text;
 }
