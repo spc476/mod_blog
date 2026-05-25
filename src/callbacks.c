@@ -770,9 +770,8 @@ static void cb_edit_author(FILE *out,void *data)
     output_entify(cbd->request->origauthor,out);
   else
   {
-    char *name = get_remote_user();
+    char const *name = get_remote_user();
     output_entify(name,out);
-    free(name);
   }
 }
 

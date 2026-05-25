@@ -362,7 +362,7 @@ static void set_m_author(char *value,Request *req)
   assert(req != NULL);
   
   if (emptynull_string(value))
-    req->author = get_remote_user();
+    req->author = strdup(get_remote_user());
   else
     req->author = safe_strdup(value);
     
