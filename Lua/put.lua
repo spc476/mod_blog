@@ -164,6 +164,7 @@ local CONF = "/home/spc/.config/mod-blog-put.config"
 local BLOG = 'default'
 local BASEURL
 local USER
+local CGI = "boston.cgi"
 local opts =
 {
   { "b" , "blog"  , true  , function(b) BLOG = b end },
@@ -194,11 +195,24 @@ do
   if not BASEURL then
     os.exit(errmsg("%s: missing %s.url directive",CONF,BLOG),true)
   end
-
-  USER = confenv[BLOG].user
-  if USER then
-    USER = "Basic " .. base64:encode(USER)
+  
+  if confenv[BLOG].cgi then
+    CGI = confenv[BLOG].cgi
   end
+  
+  if not confenv[BLOG].user then
+    os.exit(errmsg("%s: midding %s.user directive",CONF,BLOG),true)
+  end
+  
+  if not confenv[BLOG].pass then
+    os.exit(errmsg("%s: midding %s.pass directive",CONF,BLOG),true)
+  end
+  
+  USER =  "BASIC "
+       .. base64:encode(string.format(
+            "%s:%s",
+            confenv[BLOG].user,confenv[BLOG].pass
+          ))
 end
 
 -- ************************************************************************
@@ -232,7 +246,7 @@ end
 local newurl do
   local status,bodyg
   local basen = url:match(BASEURL)
-  local pathn = url:match("/boston.cgi?cmd=last&date="..date)
+  local pathn = url:match("/" .. CGI .. "?cmd=last&date=" .. date)
   location    = uurl.merge(basen,pathn)
   
   msg("GET '%s'",uurl.toa(location))
