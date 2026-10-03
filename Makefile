@@ -26,7 +26,7 @@ ifeq ($(VERSION),)
   VERSION=v72
 endif
 
-CC      = gcc -std=c99 -Wall -Wextra -pedantic -Wwrite-strings
+CC      = gcc -std=c99 -Wall -Wextra -pedantic -Wwrite-strings -fmerge-all-constants
 CFLAGS  = -g
 LDFLAGS = -g
 LDLIBS  = -lcgi8 -llua -lm -ldl
