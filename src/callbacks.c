@@ -1091,6 +1091,7 @@ static void cb_entry_cond_author(FILE *out,void *data)
 }
 
 /*********************************************************************/
+
 static void cb_entry_cond_date(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
@@ -1757,6 +1758,7 @@ static void cb_webmention_item(FILE *out,void *data)
 }
 
 /*******************************************************************/
+
 static void cb_webmention_title(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
