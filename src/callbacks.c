@@ -533,6 +533,38 @@ static void cb_blog_title(FILE *out,void *data)
 
 /*********************************************************************/
 
+static void cb_blog_title_detag(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->navunit == UNIT_PART)
+  {
+    BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
+    if (NodeValid(&entry->node) && entry->valid)
+    {
+      for (char *p = entry->title ; *p != '\0' ; p++)
+      {
+        if (*p == '<')
+        {
+          while (*(++p) != '>')
+            ;
+        }
+        else
+          fputc(*p,out);
+      }
+      
+      fputs(" - ",out);
+    }
+  }
+  
+  fputs(cbd->blog->config.name,out);
+}
+
+/*********************************************************************/
+
 static void cb_blog_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
@@ -1813,6 +1845,7 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "blog.name"              , cb_blog_name              } ,
     { "blog.script"            , cb_blog_script            } ,
     { "blog.title"             , cb_blog_title             } ,
+    { "blog.title.detag"       , cb_blog_title_detag       } ,
     { "blog.url"               , cb_blog_url               } ,
     { "blog.url.base"          , cb_blog_url_base          } ,
     { "blog.url.home"          , cb_blog_url_home          } ,
