@@ -545,7 +545,7 @@ static void cb_blog_title_detag(FILE *out,void *data)
     BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
     if (NodeValid(&entry->node) && entry->valid)
     {
-      for (char *p = entry->title ; *p != '\0' ; p++)
+      for (char const *p = entry->title ; *p != '\0' ; p++)
       {
         if (*p == '<')
         {
@@ -1310,6 +1310,28 @@ static void cb_entry_title(FILE *out,void *data)
 
 /***********************************************************************/
 
+static void cb_entry_title_dehtml(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  syslog(LOG_DEBUG,"HERE!");
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  for (char const *p = cbd->entry->title ; *p != '\0' ; p++)
+  {
+    if (*p == '<')
+      while (*(++p) != '>')
+        ;
+    else if (*p == '&')
+      p = de_entify(out,p) - 1; /* because this consumes the ';' */
+    else
+      fputc(*p,out);
+  }
+}
+
+/*********************************************************************/
+
 static void cb_entry_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
@@ -1885,6 +1907,7 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "entry.pubdatetime"      , cb_entry_pubdatetime      } ,
     { "entry.status"           , cb_entry_status           } ,
     { "entry.title"            , cb_entry_title            } ,
+    { "entry.title.dehtml"     , cb_entry_title_dehtml     } ,
     { "entry.url"              , cb_entry_url              } ,
     { "generator"              , cb_generator              } ,
     { "json.item"              , cb_json_item              } , /* template "item" */
