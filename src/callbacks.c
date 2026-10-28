@@ -268,6 +268,22 @@ static void output_entify(char const *msg,FILE *out)
   fclose(tmp);
 }
 
+/*************************************************************************/
+
+static void dehtml(FILE *out,char const *s)
+{
+  for ( ; *s != '\0' ; s++)
+  {
+    if (*s == '<')
+      while (*(++s) != '>')
+        ;
+    else if (*s == '&')
+      s = de_entify(out,s) - 1; /* because this consumes the ';' */
+    else
+      fputc(*s,out);
+  }
+}
+
 /***************************************************************
 * TEMPLATE CALL BACK FUNCTIONS
 ****************************************************************/
@@ -1312,20 +1328,10 @@ static void cb_entry_title_dehtml(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
   
-  syslog(LOG_DEBUG,"HERE!");
   assert(out  != NULL);
   assert(data != NULL);
   
-  for (char const *p = cbd->entry->title ; *p != '\0' ; p++)
-  {
-    if (*p == '<')
-      while (*(++p) != '>')
-        ;
-    else if (*p == '&')
-      p = de_entify(out,p) - 1; /* because this consumes the ';' */
-    else
-      fputc(*p,out);
-  }
+  dehtml(out,cbd->entry->title);
 }
 
 /*********************************************************************/
