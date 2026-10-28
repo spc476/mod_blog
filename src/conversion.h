@@ -25,8 +25,8 @@
 
 #include <stdio.h>
 
-extern FILE *fjson_encode_onwrite   (FILE *);
-extern FILE *fentity_encode_onwrite (FILE *);
-extern char *de_entify              (FILE *,char const *);
+extern FILE       *fjson_encode_onwrite   (FILE *);
+extern FILE       *fentity_encode_onwrite (FILE *);
+extern char const *de_entify              (FILE *,char const *);
 
 #endif
