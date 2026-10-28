@@ -30,8 +30,8 @@
 
 struct entity_conv
 {
-  char const *name;
-  int  const  value;
+  char    const *name;
+  wchar_t const  value;
 };
 
 /********************************************************************/
@@ -2099,7 +2099,7 @@ char const *de_entify(FILE *out,char const *s)
     { "zwnj"                            ,   8204 },
   };
   
-  int code;
+  wchar_t code;
   s++; /* skip past the '&' */
   
   if (s[0] == '#')
