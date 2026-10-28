@@ -548,10 +548,8 @@ static void cb_blog_title_detag(FILE *out,void *data)
       for (char const *p = entry->title ; *p != '\0' ; p++)
       {
         if (*p == '<')
-        {
           while (*(++p) != '>')
             ;
-        }
         else
           fputc(*p,out);
       }
