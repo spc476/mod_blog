@@ -284,6 +284,20 @@ static void dehtml(FILE *out,char const *s)
   }
 }
 
+/*********************************************************************/
+
+static void detag(FILE *out,char const *s)
+{
+  for ( ; *s != '\0' ; s++)
+  {
+    if (*s == '<')
+      while(*(++s) != '>')
+        ;
+    else
+      putc(*s,out);
+  }
+}
+
 /***************************************************************
 * TEMPLATE CALL BACK FUNCTIONS
 ****************************************************************/
@@ -583,15 +597,7 @@ static void cb_blog_title_detag(FILE *out,void *data)
     BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
     if (NodeValid(&entry->node) && entry->valid)
     {
-      for (char const *p = entry->title ; *p != '\0' ; p++)
-      {
-        if (*p == '<')
-          while (*(++p) != '>')
-            ;
-        else
-          fputc(*p,out);
-      }
-      
+      detag(out,entry->title);
       fputs(" - ",out);
     }
   }
@@ -1358,6 +1364,18 @@ static void cb_entry_title_dehtml(FILE *out,void *data)
 
 /*********************************************************************/
 
+static void cb_entry_title_detag(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  detag(out,cbd->entry->title);
+}
+
+/*********************************************************************/
+
 static void cb_entry_url(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
@@ -1935,6 +1953,7 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "entry.status"           , cb_entry_status           } ,
     { "entry.title"            , cb_entry_title            } ,
     { "entry.title.dehtml"     , cb_entry_title_dehtml     } ,
+    { "entry.title.detag"      , cb_entry_title_detag      } ,
     { "entry.url"              , cb_entry_url              } ,
     { "generator"              , cb_generator              } ,
     { "json.item"              , cb_json_item              } , /* template "item" */
