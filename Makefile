@@ -23,7 +23,7 @@
 VERSION := $(shell git describe --tag)
 
 ifeq ($(VERSION),)
-  VERSION=v73
+  VERSION=v74
 endif
 
 CC      = gcc -std=c99 -Wall -Wextra -pedantic -Wwrite-strings -fmerge-all-constants
