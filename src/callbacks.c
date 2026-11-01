@@ -37,6 +37,13 @@
 #include "blogutil.h"
 #include "conversion.h"
 
+enum output_mode
+{
+  HTML,
+  DETAG,
+  DEHTML,
+ };
+ 
 /*****************************************************************/
 
 static void tm_init(struct tm *ptm)
@@ -84,9 +91,45 @@ static void print_nav_url(FILE *out,struct btm const *date,unit__e unit,char con
   print_nav_name(out,date,unit,'/');
 }
 
+/*************************************************************************/
+
+static void dehtml(FILE *out,char const *s)
+{
+  for ( ; *s != '\0' ; s++)
+  {
+    if (*s == '<')
+      while (*(++s) != '>')
+        ;
+    else if (*s == '&')
+      s = de_entify(out,s) - 1; /* because this consumes the ';' */
+    else
+      fputc(*s,out);
+  }
+}
+
+/*********************************************************************/
+
+static void detag(FILE *out,char const *s)
+{
+  for ( ; *s != '\0' ; s++)
+  {
+    if (*s == '<')
+      while(*(++s) != '>')
+        ;
+    else
+      fputc(*s,out);
+  }
+}
+
 /*******************************************************************/
 
-static void print_nav_title(FILE *out,Blog *blog,struct btm const *date,unit__e unit)
+static void print_nav_title(
+        FILE             *out,
+        Blog             *blog,
+        struct btm const *date,
+        unit__e           unit,
+        enum output_mode  mode
+)
 {
   BlogEntry *entry;
   struct tm  stm;
@@ -122,7 +165,12 @@ static void print_nav_title(FILE *out,Blog *blog,struct btm const *date,unit__e 
          if (entry)
          {
            assert(entry->valid);
-           fputs(entry->title,out);
+           switch(mode)
+           {
+             case HTML:   fputs(entry->title,out);  break;
+             case DETAG:  detag(out,entry->title);  break;
+             case DEHTML: dehtml(out,entry->title); break;
+           }
            BlogEntryFree(entry);
          }
          break;
@@ -266,36 +314,6 @@ static void output_entify(char const *msg,FILE *out)
   FILE *tmp = fentity_encode_onwrite(out);
   fputs(msg,tmp);
   fclose(tmp);
-}
-
-/*************************************************************************/
-
-static void dehtml(FILE *out,char const *s)
-{
-  for ( ; *s != '\0' ; s++)
-  {
-    if (*s == '<')
-      while (*(++s) != '>')
-        ;
-    else if (*s == '&')
-      s = de_entify(out,s) - 1; /* because this consumes the ';' */
-    else
-      fputc(*s,out);
-  }
-}
-
-/*********************************************************************/
-
-static void detag(FILE *out,char const *s)
-{
-  for ( ; *s != '\0' ; s++)
-  {
-    if (*s == '<')
-      while(*(++s) != '>')
-        ;
-    else
-      fputc(*s,out);
-  }
 }
 
 /***************************************************************
@@ -1504,9 +1522,39 @@ static void cb_navigation_first_title(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->request->f.navigation == false)
-    print_nav_title(out,cbd->blog,&cbd->blog->first,UNIT_PART);
+    print_nav_title(out,cbd->blog,&cbd->blog->first,UNIT_PART,HTML);
   else
-    print_nav_title(out,cbd->blog,&cbd->blog->first,cbd->navunit);
+    print_nav_title(out,cbd->blog,&cbd->blog->first,cbd->navunit,HTML);
+}
+
+/*******************************************************************/
+
+static void cb_navigation_first_title_dehtml(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+
+  if (cbd->request->f.navigation == false)
+    print_nav_title(out,cbd->blog,&cbd->blog->first,UNIT_PART,DEHTML);
+  else
+    print_nav_title(out,cbd->blog,&cbd->blog->first,cbd->navunit,DEHTML);
+}
+
+/*******************************************************************/
+
+static void cb_navigation_first_title_detag(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+
+  if (cbd->request->f.navigation == false)
+    print_nav_title(out,cbd->blog,&cbd->blog->first,UNIT_PART,DETAG);
+  else
+    print_nav_title(out,cbd->blog,&cbd->blog->first,cbd->navunit,DETAG);
 }
 
 /*******************************************************************/
@@ -1534,9 +1582,39 @@ static void cb_navigation_last_title(FILE *out,void *data)
   assert(data != NULL);
   
   if (cbd->request->f.navigation == false)
-    print_nav_title(out,cbd->blog,&cbd->blog->last,UNIT_PART);
+    print_nav_title(out,cbd->blog,&cbd->blog->last,UNIT_PART,HTML);
   else
-    print_nav_title(out,cbd->blog,&cbd->blog->last,cbd->navunit);
+    print_nav_title(out,cbd->blog,&cbd->blog->last,cbd->navunit,HTML);
+}
+
+/*****************************************************************/
+
+static void cb_navigation_last_title_dehtml(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->f.navigation == false)
+    print_nav_title(out,cbd->blog,&cbd->blog->last,UNIT_PART,DEHTML);
+  else
+    print_nav_title(out,cbd->blog,&cbd->blog->last,cbd->navunit,DEHTML);
+}
+
+/*****************************************************************/
+
+static void cb_navigation_last_title_detag(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->request->f.navigation == false)
+    print_nav_title(out,cbd->blog,&cbd->blog->last,UNIT_PART,DETAG);
+  else
+    print_nav_title(out,cbd->blog,&cbd->blog->last,cbd->navunit,DETAG);
 }
 
 /*****************************************************************/
@@ -1602,7 +1680,31 @@ static void cb_navigation_next_title(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_title(out,cbd->blog,&cbd->next,cbd->navunit);
+  print_nav_title(out,cbd->blog,&cbd->next,cbd->navunit,HTML);
+}
+
+/********************************************************************/
+
+static void cb_navigation_next_title_dehtml(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  print_nav_title(out,cbd->blog,&cbd->next,cbd->navunit,DEHTML);
+}
+
+/********************************************************************/
+
+static void cb_navigation_next_title_detag(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  print_nav_title(out,cbd->blog,&cbd->next,cbd->navunit,DETAG);
 }
 
 /********************************************************************/
@@ -1626,7 +1728,31 @@ static void cb_navigation_prev_title(FILE *out,void *data)
   assert(out  != NULL);
   assert(data != NULL);
   
-  print_nav_title(out,cbd->blog,&cbd->previous,cbd->navunit);
+  print_nav_title(out,cbd->blog,&cbd->previous,cbd->navunit,HTML);
+}
+
+/*******************************************************************/
+
+static void cb_navigation_prev_title_dehtml(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  print_nav_title(out,cbd->blog,&cbd->previous,cbd->navunit,DEHTML);
+}
+
+/*******************************************************************/
+
+static void cb_navigation_prev_title_detag(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  print_nav_title(out,cbd->blog,&cbd->previous,cbd->navunit,DETAG);
 }
 
 /*******************************************************************/
@@ -1896,96 +2022,104 @@ void generic_cb(char const *which,FILE *out,void *data)
   
   static struct chunk_callback const callbacks[] =
   {
-    { "ad"                     , cb_ad                     } , /* template "ad" */
-    { "ad.content"             , cb_ad_content             } ,
-    { "atom.categories"        , cb_atom_categories        } , /* template "categories" */
-    { "atom.category"          , cb_atom_category          } ,
-    { "atom.entry"             , cb_atom_entry             } , /* template "entry" */
-    { "begin.year"             , cb_begin_year             } ,
-    { "blog.adtag"             , cb_blog_adtag             } ,
-    { "blog.adtag.entity"      , cb_blog_adtag_entity      } ,
-    { "blog.author"            , cb_blog_author            } ,
-    { "blog.author.email"      , cb_blog_author_email      } ,
-    { "blog.class"             , cb_blog_class             } ,
-    { "blog.description"       , cb_blog_description       } ,
-    { "blog.name"              , cb_blog_name              } ,
-    { "blog.script"            , cb_blog_script            } ,
-    { "blog.title"             , cb_blog_title             } ,
-    { "blog.title.dehtml"      , cb_blog_title_dehtml      } ,
-    { "blog.title.detag"       , cb_blog_title_detag       } ,
-    { "blog.url"               , cb_blog_url               } ,
-    { "blog.url.base"          , cb_blog_url_base          } ,
-    { "blog.url.home"          , cb_blog_url_home          } ,
-    { "comments"               , cb_comments               } , /* template "comments" */
-    { "comments.body"          , cb_comments_body          } ,
-    { "comments.check"         , cb_comments_check         } ,
-    { "comments.filename"      , cb_comments_filename      } ,
-    { "cond.hr"                , cb_cond_hr                } , /* template "cond.hr" */
-    { "date.day"               , cb_date_day               } ,
-    { "date.day.normal"        , cb_date_day_normal        } ,
-    { "date.day.url"           , cb_date_day_url           } ,
-    { "edit"                   , cb_edit                   } , /* template "edit" */
-    { "edit.adtag"             , cb_edit_adtag             } ,
-    { "edit.author"            , cb_edit_author            } ,
-    { "edit.body"              , cb_edit_body              } ,
-    { "edit.class"             , cb_edit_class             } ,
-    { "edit.date"              , cb_edit_date              } ,
-    { "edit.status"            , cb_edit_status            } ,
-    { "edit.title"             , cb_edit_title             } ,
-    { "entry"                  , cb_entry                  } , /* template "entry" */
-    { "entry.author"           , cb_entry_author           } ,
-    { "entry.body"             , cb_entry_body             } ,
-    { "entry.body.entified"    , cb_entry_body_entified    } ,
-    { "entry.body.jsonified"   , cb_entry_body_jsonified   } ,
-    { "entry.class"            , cb_entry_class            } ,
-    { "entry.class.jsonified"  , cb_entry_class_jsonified  } ,
-    { "entry.cond.author"      , cb_entry_cond_author      } , /* template "entry.cond.author" */
-    { "entry.cond.date"        , cb_entry_cond_date        } , /* template "entry.cond.date" */
-    { "entry.date"             , cb_entry_date             } ,
-    { "entry.description"      , cb_entry_description      } ,
-    { "entry.id"               , cb_entry_id               } ,
-    { "entry.linkdate"         , cb_entry_linkdate         } ,
-    { "entry.linkdated"        , cb_entry_linkdated        } ,
-    { "entry.name"             , cb_entry_name             } ,
-    { "entry.path"             , cb_entry_path             } ,
-    { "entry.pubdate"          , cb_entry_pubdate          } ,
-    { "entry.pubdatetime"      , cb_entry_pubdatetime      } ,
-    { "entry.status"           , cb_entry_status           } ,
-    { "entry.title"            , cb_entry_title            } ,
-    { "entry.title.dehtml"     , cb_entry_title_dehtml     } ,
-    { "entry.title.detag"      , cb_entry_title_detag      } ,
-    { "entry.url"              , cb_entry_url              } ,
-    { "generator"              , cb_generator              } ,
-    { "json.item"              , cb_json_item              } , /* template "item" */
-    { "navigation.bar"         , cb_navigation_bar         } , /* template "navigation.bar" */
-    { "navigation.bar.next"    , cb_navigation_bar_next    } , /* template "navigation.bar.next" */
-    { "navigation.bar.prev"    , cb_navigation_bar_prev    } , /* template "navigation.bar.prev" */
-    { "navigation.current"     , cb_navigation_current     } , /* template "navigation.current" */
-    { "navigation.current.url" , cb_navigation_current_url } ,
-    { "navigation.first.title" , cb_navigation_first_title } ,
-    { "navigation.first.url"   , cb_navigation_first_url   } ,
-    { "navigation.last.title"  , cb_navigation_last_title  } ,
-    { "navigation.last.url"    , cb_navigation_last_url    } ,
-    { "navigation.link"        , cb_navigation_link        } , /* template "navigation.link" */
-    { "navigation.link.next"   , cb_navigation_link_next   } , /* template "navigation.link.next" */
-    { "navigation.link.prev"   , cb_navigation_link_prev   } , /* template "navigation.link.prev" */
-    { "navigation.next.title"  , cb_navigation_next_title  } ,
-    { "navigation.next.url"    , cb_navigation_next_url    } ,
-    { "navigation.prev.title"  , cb_navigation_prev_title  } ,
-    { "navigation.prev.url"    , cb_navigation_prev_url    } ,
-    { "now.year"               , cb_now_year               } ,
-    { "request.url"            , cb_request_url            } ,
-    { "robots.index"           , cb_robots_index           } ,
-    { "rss.item"               , cb_rss_item               } , /* template "item" */
-    { "rss.item.url"           , cb_rss_item_url           } ,
-    { "rss.pubdate"            , cb_rss_pubdate            } ,
-    { "rss.url"                , cb_rss_url                } ,
-    { "update.time"            , cb_update_time            } ,
-    { "webmention"             , cb_webmention             } , /* template "webmention" */
-    { "webmention.item"        , cb_webmention_item        } , /* template "webmention.item" */
-    { "webmention.title"       , cb_webmention_title       } ,
-    { "webmention.url"         , cb_webmention_url         } ,
-    { "xyzzy"                  , cb_xyzzy                  } ,
+    { "ad"                            , cb_ad                            } , /* template "ad" */
+    { "ad.content"                    , cb_ad_content                    } ,
+    { "atom.categories"               , cb_atom_categories               } , /* template "categories" */
+    { "atom.category"                 , cb_atom_category                 } ,
+    { "atom.entry"                    , cb_atom_entry                    } , /* template "entry" */
+    { "begin.year"                    , cb_begin_year                    } ,
+    { "blog.adtag"                    , cb_blog_adtag                    } ,
+    { "blog.adtag.entity"             , cb_blog_adtag_entity             } ,
+    { "blog.author"                   , cb_blog_author                   } ,
+    { "blog.author.email"             , cb_blog_author_email             } ,
+    { "blog.class"                    , cb_blog_class                    } ,
+    { "blog.description"              , cb_blog_description              } ,
+    { "blog.name"                     , cb_blog_name                     } ,
+    { "blog.script"                   , cb_blog_script                   } ,
+    { "blog.title"                    , cb_blog_title                    } ,
+    { "blog.title.dehtml"             , cb_blog_title_dehtml             } ,
+    { "blog.title.detag"              , cb_blog_title_detag              } ,
+    { "blog.url"                      , cb_blog_url                      } ,
+    { "blog.url.base"                 , cb_blog_url_base                 } ,
+    { "blog.url.home"                 , cb_blog_url_home                 } ,
+    { "comments"                      , cb_comments                      } , /* template "comments" */
+    { "comments.body"                 , cb_comments_body                 } ,
+    { "comments.check"                , cb_comments_check                } ,
+    { "comments.filename"             , cb_comments_filename             } ,
+    { "cond.hr"                       , cb_cond_hr                       } , /* template "cond.hr" */
+    { "date.day"                      , cb_date_day                      } ,
+    { "date.day.normal"               , cb_date_day_normal               } ,
+    { "date.day.url"                  , cb_date_day_url                  } ,
+    { "edit"                          , cb_edit                          } , /* template "edit" */
+    { "edit.adtag"                    , cb_edit_adtag                    } ,
+    { "edit.author"                   , cb_edit_author                   } ,
+    { "edit.body"                     , cb_edit_body                     } ,
+    { "edit.class"                    , cb_edit_class                    } ,
+    { "edit.date"                     , cb_edit_date                     } ,
+    { "edit.status"                   , cb_edit_status                   } ,
+    { "edit.title"                    , cb_edit_title                    } ,
+    { "entry"                         , cb_entry                         } , /* template "entry" */
+    { "entry.author"                  , cb_entry_author                  } ,
+    { "entry.body"                    , cb_entry_body                    } ,
+    { "entry.body.entified"           , cb_entry_body_entified           } ,
+    { "entry.body.jsonified"          , cb_entry_body_jsonified          } ,
+    { "entry.class"                   , cb_entry_class                   } ,
+    { "entry.class.jsonified"         , cb_entry_class_jsonified         } ,
+    { "entry.cond.author"             , cb_entry_cond_author             } , /* template "entry.cond.author" */
+    { "entry.cond.date"               , cb_entry_cond_date               } , /* template "entry.cond.date" */
+    { "entry.date"                    , cb_entry_date                    } ,
+    { "entry.description"             , cb_entry_description             } ,
+    { "entry.id"                      , cb_entry_id                      } ,
+    { "entry.linkdate"                , cb_entry_linkdate                } ,
+    { "entry.linkdated"               , cb_entry_linkdated               } ,
+    { "entry.name"                    , cb_entry_name                    } ,
+    { "entry.path"                    , cb_entry_path                    } ,
+    { "entry.pubdate"                 , cb_entry_pubdate                 } ,
+    { "entry.pubdatetime"             , cb_entry_pubdatetime             } ,
+    { "entry.status"                  , cb_entry_status                  } ,
+    { "entry.title"                   , cb_entry_title                   } ,
+    { "entry.title.dehtml"            , cb_entry_title_dehtml            } ,
+    { "entry.title.detag"             , cb_entry_title_detag             } ,
+    { "entry.url"                     , cb_entry_url                     } ,
+    { "generator"                     , cb_generator                     } ,
+    { "json.item"                     , cb_json_item                     } , /* template "item" */
+    { "navigation.bar"                , cb_navigation_bar                } , /* template "navigation.bar" */
+    { "navigation.bar.next"           , cb_navigation_bar_next           } , /* template "navigation.bar.next" */
+    { "navigation.bar.prev"           , cb_navigation_bar_prev           } , /* template "navigation.bar.prev" */
+    { "navigation.current"            , cb_navigation_current            } , /* template "navigation.current" */
+    { "navigation.current.url"        , cb_navigation_current_url        } ,
+    { "navigation.first.title"        , cb_navigation_first_title        } ,
+    { "navigation.first.title.dehtml" , cb_navigation_first_title_dehtml } ,
+    { "navigation.first.title.detag"  , cb_navigation_first_title_detag  } ,
+    { "navigation.first.url"          , cb_navigation_first_url          } ,
+    { "navigation.last.title"         , cb_navigation_last_title         } ,
+    { "navigation.last.title.dehtml"  , cb_navigation_last_title_dehtml  } ,
+    { "navigation.last.title.detag"   , cb_navigation_last_title_detag   } ,
+    { "navigation.last.url"           , cb_navigation_last_url           } ,
+    { "navigation.link"               , cb_navigation_link               } , /* template "navigation.link" */
+    { "navigation.link.next"          , cb_navigation_link_next          } , /* template "navigation.link.next" */
+    { "navigation.link.prev"          , cb_navigation_link_prev          } , /* template "navigation.link.prev" */
+    { "navigation.next.title"         , cb_navigation_next_title         } ,
+    { "navigation.next.title.dehtml"  , cb_navigation_next_title_dehtml  } ,
+    { "navigation.next.title.detag"   , cb_navigation_next_title_detag   } ,
+    { "navigation.next.url"           , cb_navigation_next_url           } ,
+    { "navigation.prev.title"         , cb_navigation_prev_title         } ,
+    { "navigation.prev.title.dehtml"  , cb_navigation_prev_title_dehtml  } ,
+    { "navigation.prev.title.detag"   , cb_navigation_prev_title_detag   } ,
+    { "navigation.prev.url"           , cb_navigation_prev_url           } ,
+    { "now.year"                      , cb_now_year                      } ,
+    { "request.url"                   , cb_request_url                   } ,
+    { "robots.index"                  , cb_robots_index                  } ,
+    { "rss.item"                      , cb_rss_item                      } , /* template "item" */
+    { "rss.item.url"                  , cb_rss_item_url                  } ,
+    { "rss.pubdate"                   , cb_rss_pubdate                   } ,
+    { "rss.url"                       , cb_rss_url                       } ,
+    { "update.time"                   , cb_update_time                   } ,
+    { "webmention"                    , cb_webmention                    } , /* template "webmention" */
+    { "webmention.item"               , cb_webmention_item               } , /* template "webmention.item" */
+    { "webmention.title"              , cb_webmention_title              } ,
+    { "webmention.url"                , cb_webmention_url                } ,
+    { "xyzzy"                         , cb_xyzzy                         } ,
   };
   
   assert(which != NULL);
