@@ -294,7 +294,7 @@ static void detag(FILE *out,char const *s)
       while(*(++s) != '>')
         ;
     else
-      putc(*s,out);
+      fputc(*s,out);
   }
 }
 
