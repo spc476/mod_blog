@@ -1240,6 +1240,56 @@ static void cb_entry_description(FILE *out,void *data)
 
 /*********************************************************************/
 
+static void cb_entry_description_dehtml(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->navunit == UNIT_PART)
+  {
+    BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
+    
+    if (NodeValid(&entry->node) && entry->valid)
+    {
+      if (!empty_string(entry->status))
+        dehtml(out,entry->status);
+      else if (!empty_string(entry->title))
+        dehtml(out,entry->title);
+      else
+        dehtml(out,cbd->blog->config.description);
+    }
+  }  
+}
+
+/*********************************************************************/
+
+static void cb_entry_description_detag(FILE *out,void *data)
+{
+  struct callback_data *cbd = data;
+  
+  assert(out  != NULL);
+  assert(data != NULL);
+  
+  if (cbd->navunit == UNIT_PART)
+  {
+    BlogEntry *entry = (BlogEntry *)ListGetHead(&cbd->list);
+    
+    if (NodeValid(&entry->node) && entry->valid)
+    {
+      if (!empty_string(entry->status))
+        detag(out,entry->status);
+      else if (!empty_string(entry->title))
+        detag(out,entry->title);
+      else
+        detag(out,cbd->blog->config.description);
+    }
+  }  
+}
+
+/*********************************************************************/
+
 static void cb_entry_id(FILE *out,void *data)
 {
   struct callback_data *cbd = data;
@@ -2069,6 +2119,8 @@ void generic_cb(char const *which,FILE *out,void *data)
     { "entry.cond.date"               , cb_entry_cond_date               } , /* template "entry.cond.date" */
     { "entry.date"                    , cb_entry_date                    } ,
     { "entry.description"             , cb_entry_description             } ,
+    { "entry.description.dehtml"      , cb_entry_description_dehtml      } ,
+    { "entry.description.detag"       , cb_entry_description_detag       } ,
     { "entry.id"                      , cb_entry_id                      } ,
     { "entry.linkdate"                , cb_entry_linkdate                } ,
     { "entry.linkdated"               , cb_entry_linkdated               } ,
