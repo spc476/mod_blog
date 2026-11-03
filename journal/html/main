@@ -5,15 +5,15 @@
 <head>
   <meta name="robots"                content="%{robots.index}%,follow">
   <meta name="generator"             content="%{generator}% (%{blog.url.home}%about/)">
-  <meta name="description"           content="%{entry.description}%">
+  <meta name="description"           content="%{entry.description.detag}%">
   <meta name="keywords"              content="%{entry.class}%">
   
   <meta http-equiv="Content-Type"    content="text/html; charset=UTF-8">
   
   <link rel="Content"       href="#content">
   %{navigation.link}%
-  <link rel="First"         href="%{navigation.first.url}%" title="%{navigation.first.title}%">
-  <link rel="Last"          href="%{navigation.last.url}%" title="%{navigation.last.title}%">
+  <link rel="First"         href="%{navigation.first.url}%" title="%{navigation.first.title.detag}%">
+  <link rel="Last"          href="%{navigation.last.url}%" title="%{navigation.last.title.detag}%">
   <link rel="Up"            href="/">
   <link rel="Top"           href="/">
   <link rel="Home"          href="%{blog.url.base}%">
@@ -21,7 +21,7 @@
   <link rel="alternate"     href="%{blog.url.base}%index.rss"  type="application/rss+xml"     title="RSS 0.91">
   <link rev="Made"          href="%{blog.author.email}%" title="%{blog.author}%">
   
-  <title>%{blog.title}%%{blog.name}%</title>
+  <title>%{blog.title.detag}%%{blog.name}%</title>
   
 </head>
 
@@ -45,8 +45,8 @@
   <ul>
     %{navigation.current}%
     %{navigation.bar}%
-    <li><a href="%{navigation.first.url}%" title="%{navigation.first.title}%">First</a></li>
-    <li><a href="%{navigation.last.url}%"  title="%{navigation.last.title}%">Last</a></li>
+    <li><a href="%{navigation.first.url}%" title="%{navigation.first.title.detag}%">First</a></li>
+    <li><a href="%{navigation.last.url}%"  title="%{navigation.last.title.detag}%">Last</a></li>
     <li><a href="/">Top</a></li>
     <li><a href="%{blog.url.base}%">Home</a></li>
   </ul>

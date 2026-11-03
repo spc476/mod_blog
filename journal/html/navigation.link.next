@@ -1,1 +1,1 @@
-<link rel="Next" href="%{navigation.next.url}%" title="%{navigation.next.title}%">
+<link rel="Next" href="%{navigation.next.url}%" title="%{navigation.next.title.detag}%">

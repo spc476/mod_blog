@@ -1,7 +1,7 @@
 {
   "id"             : "%{rss.item.url}%",
   "url"            : "%{rss.item.url}%",
-  "title"          : "%{entry.title}%",
+  "title"          : "%{entry.title.detag}%",
   "content_html"   : "%{entry.body.jsonified}%",
   "date_published" : "%{entry.pubdatetime}%",
   "authors"        : [ { "name" : "%{entry.author}%" } ],

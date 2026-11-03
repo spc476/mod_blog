@@ -1,5 +1,5 @@
   <item>
-    <title>%{entry.title}%</title>
+    <title>%{entry.title.detag}%</title>
     <!-- <author>%{entry.author}%</author> -->
     <link>%{rss.item.url}%</link>
     <description>
