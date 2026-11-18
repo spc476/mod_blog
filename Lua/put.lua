@@ -164,7 +164,7 @@ local CONF = "/home/spc/.config/mod-blog-put.config"
 local BLOG = 'default'
 local BASEURL
 local USER
-local CGI = "boston.cgi"
+local CGI = "/boston.cgi"
 local opts =
 {
   { "b" , "blog"  , true  , function(b) BLOG = b end },
@@ -246,7 +246,7 @@ end
 local newurl do
   local status,bodyg
   local basen = url:match(BASEURL)
-  local pathn = url:match("/" .. CGI .. "?cmd=last&date=" .. date)
+  local pathn = url:match(CGI .. "?cmd=last&date=" .. date)
   location    = uurl.merge(basen,pathn)
   
   msg("GET '%s'",uurl.toa(location))
