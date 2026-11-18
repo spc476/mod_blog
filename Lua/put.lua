@@ -201,11 +201,11 @@ do
   end
   
   if not confenv[BLOG].user then
-    os.exit(errmsg("%s: midding %s.user directive",CONF,BLOG),true)
+    os.exit(errmsg("%s: missing %s.user directive",CONF,BLOG),true)
   end
   
   if not confenv[BLOG].pass then
-    os.exit(errmsg("%s: midding %s.pass directive",CONF,BLOG),true)
+    os.exit(errmsg("%s: missing %s.pass directive",CONF,BLOG),true)
   end
   
   USER =  "BASIC "
