@@ -308,7 +308,7 @@ static int cmd_cgi_get_next(Cgi cgi,Blog *blog,Request *req)
   
   if (!get_next(&when,cgi,blog))
     return cgi_error(blog,req,HTTP_BADREQ,"date out of range");
-  
+    
   len = snprintf(
             buf,
             sizeof(buf),
@@ -319,7 +319,7 @@ static int cmd_cgi_get_next(Cgi cgi,Blog *blog,Request *req)
             when.day,
             when.part
         );
-  
+        
   printf(
       "Status: %d\r\n"
       "Content-Type: text/plain\r\n"
@@ -348,7 +348,7 @@ static int cmd_cgi_get_path(Cgi cgi,Blog *blog,Request *req)
   
   if (!get_next(&when,cgi,blog))
     return cgi_error(blog,req,HTTP_BADREQ,"date out of range");
-  
+    
   len = snprintf(
             buf,
             sizeof(buf),
@@ -358,7 +358,7 @@ static int cmd_cgi_get_path(Cgi cgi,Blog *blog,Request *req)
             when.month,
             when.day
         );
-  
+        
   printf(
       "Status: %d\r\n"
       "Content-Type: text/plain\r\n"

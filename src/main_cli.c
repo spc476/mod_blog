@@ -165,7 +165,7 @@ static int cmd_cli_new(Blog *blog,Request *req)
     
   if (rc != 0)
     return cli_error(blog,req,HTTP_BADREQ,"Cannot process new entry");
-  
+    
   status = entry_add(blog,req);
   if (status < HTTP_300)
   {

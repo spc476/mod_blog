@@ -2128,7 +2128,7 @@ char const *de_entify(FILE *out,char const *s)
     s++;
     entity[elen] = '\0';
     pe           = bsearch(entity,table,sizeof(table) / sizeof(table[0]),sizeof(struct entity_conv),entity_cmp);
-  
+    
     if (pe == NULL)
       code = '?';
     else

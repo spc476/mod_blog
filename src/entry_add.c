@@ -41,7 +41,7 @@ http__e entry_add(Blog *blog,Request *req)
   
   if (emptynull_string(req->body))
     return HTTP_BADREQ;
-  
+    
   if (!authenticate_author(blog,req))
     return HTTP_UNAUTHORIZED;
     
@@ -114,7 +114,7 @@ http__e entry_add(Blog *blog,Request *req)
   entry = BlogEntryNew(blog);
   if (entry == NULL)
     return HTTP_ISERVERERR;
-  
+    
   if (emptynull_string(req->date))
     entry->when = blog->now;
   else

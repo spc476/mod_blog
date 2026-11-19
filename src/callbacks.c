@@ -1260,7 +1260,7 @@ static void cb_entry_description_dehtml(FILE *out,void *data)
       else
         dehtml(out,cbd->blog->config.description);
     }
-  }  
+  }
 }
 
 /*********************************************************************/
@@ -1285,7 +1285,7 @@ static void cb_entry_description_detag(FILE *out,void *data)
       else
         detag(out,cbd->blog->config.description);
     }
-  }  
+  }
 }
 
 /*********************************************************************/
@@ -1585,7 +1585,7 @@ static void cb_navigation_first_title_dehtml(FILE *out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   if (cbd->request->f.navigation == false)
     print_nav_title(out,cbd->blog,&cbd->blog->first,UNIT_PART,DEHTML);
   else
@@ -1600,7 +1600,7 @@ static void cb_navigation_first_title_detag(FILE *out,void *data)
   
   assert(out  != NULL);
   assert(data != NULL);
-
+  
   if (cbd->request->f.navigation == false)
     print_nav_title(out,cbd->blog,&cbd->blog->first,UNIT_PART,DETAG);
   else
