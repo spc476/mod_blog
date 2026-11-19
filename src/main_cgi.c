@@ -20,6 +20,7 @@
 *
 *************************************************************************/
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -268,58 +269,95 @@ static int cmd_cgi_get_today(Cgi cgi,Blog *blog,Request *req)
 
 /**********************************************************************/
 
-static int cmd_cgi_get_last(Cgi cgi,Blog *blog,Request *req)
+static bool get_next(struct btm *when,Cgi cgi,Blog *blog)
 {
-  char buf[BUFSIZ];
-  int  len;
+  char *date = CgiGetQValue(cgi,"date");
+  if (date == NULL)
+    *when = blog->last;
+  else
+  {
+    char *p;
+    when->year  = strtoul(date,&p,10); p++;
+    when->month = strtoul(p,&p,10); p++;
+    when->day   = strtoul(p,&p,10); p++;
+    when->part  = 0;
+    
+    if (btm_cmp(when,&blog->first) < 0)
+      return false;
+    if (btm_cmp(when,&blog->last) <= 0)
+      when->part = BlogLastEntry(blog,when);
+    else
+      when->part = 0;
+  }
+  
+  when->part++;
+  return true;
+}
+
+/**********************************************************************/
+
+static int cmd_cgi_get_next(Cgi cgi,Blog *blog,Request *req)
+{
+  struct btm when;
+  char       buf[BUFSIZ];
+  int        len;
   
   assert(cgi  != NULL);
   assert(blog != NULL);
   assert(req  != NULL);
   
-  char *date = CgiGetQValue(cgi,"date");
-  if (date == NULL)
-  {
-    len = snprintf(
-                 buf,
-                 sizeof(buf),
-                 "%s%04d/%02d/%02d.%d",
-                 blog->config.url,
-                 blog->last.year,
-                 blog->last.month,
-                 blog->last.day,
-                 blog->last.part
-               );
-  }
-  else
-  {
-    struct btm  when;
-    char       *p;
-    size_t      last;
-    
-    when.year  = strtoul(date,&p,10); p++;
-    when.month = strtoul(p,   &p,10); p++;
-    when.day   = strtoul(p,   &p,10);
-    when.part  = 1;
-    
-    if (btm_cmp(&when,&blog->first) < 0)
-      return cgi_error(blog,req,HTTP_BADREQ,"date out of range");
-    if (btm_cmp(&when,&blog->last) <= 0)
-      last = BlogLastEntry(blog,&when);
-    else
-      last = 0;
-      
-    len  = snprintf(
-                  buf,
-                  sizeof(buf),
-                  "%s%04d/%02d/%02d.%zu",
-                  blog->config.url,
-                  when.year,
-                  when.month,
-                  when.day,
-                  last
-            );
-  }
+  if (!get_next(&when,cgi,blog))
+    return cgi_error(blog,req,HTTP_BADREQ,"date out of range");
+  
+  len = snprintf(
+            buf,
+            sizeof(buf),
+            "%s%04d/%02d/%02d.%zu",
+            blog->config.url,
+            when.year,
+            when.month,
+            when.day,
+            when.part
+        );
+  
+  printf(
+      "Status: %d\r\n"
+      "Content-Type: text/plain\r\n"
+      "Content-Length: %d\r\n"
+      "\r\n"
+      "%s",
+      HTTP_OKAY,
+      len,
+      buf
+  );
+  
+  return 0;
+}
+
+/**********************************************************************/
+
+static int cmd_cgi_get_path(Cgi cgi,Blog *blog,Request *req)
+{
+  struct btm when;
+  char       buf[BUFSIZ];
+  int        len;
+  
+  assert(cgi  != NULL);
+  assert(blog != NULL);
+  assert(req  != NULL);
+  
+  if (!get_next(&when,cgi,blog))
+    return cgi_error(blog,req,HTTP_BADREQ,"date out of range");
+  
+  len = snprintf(
+            buf,
+            sizeof(buf),
+            "%s%04d/%02d/%02d/",
+            blog->config.url,
+            when.year,
+            when.month,
+            when.day
+        );
   
   printf(
       "Status: %d\r\n"
@@ -349,8 +387,10 @@ static cgicmd__f set_m_cgi_get_command(char const *value)
     return cmd_cgi_get_show;
   else if (strcmp(value,"today") == 0)
     return cmd_cgi_get_today;
-  else if (strcmp(value,"last") == 0)
-    return cmd_cgi_get_last;
+  else if (strcmp(value,"next") == 0)
+    return cmd_cgi_get_next;
+  else if (strcmp(value,"path") == 0)
+    return cmd_cgi_get_path;
   else
     return cmd_cgi_error;
 }

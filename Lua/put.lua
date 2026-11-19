@@ -3,13 +3,13 @@
 -- luacheck: ignore 611
 -- ************************************************************************
 -- for PUT:
---	201 Created
---	202 Accepted		entry-post-hook failed
---	400 Bad Request
---	401 Unauthorized
---	408 Timed out
---	422 Unprocess Entiry	entry-pre-hook failed
---	500 Internal Server Error
+--      201 Created
+--      202 Accepted            entry-post-hook failed
+--      400 Bad Request
+--      401 Unauthorized
+--      408 Timed out
+--      422 Unprocess Entiry    entry-pre-hook failed
+--      500 Internal Server Error
 -- ************************************************************************
 
 local tls         = require "org.conman.net.tls"
@@ -56,7 +56,7 @@ local function request(conn,method,location,closef,user,mimetype,body)
   conn:write(
           string.format("%s %s HTTP/1.1\r\n",method,path),
           string.format("Host: %s:%d\r\n",location.host,location.port),
-          "User-Agent: mod-blog-updater/1.2\r\n",
+          "User-Agent: mod-blog-updater/4\r\n",
           "Accept: */*\r\n"
   )
   
@@ -86,7 +86,7 @@ local function request(conn,method,location,closef,user,mimetype,body)
       body = body:sub(1025,-1)
     end
   end
-    
+  
   local r   = conn:read("l")
   local h   = conn:read("h")
   local res = http.response:match(r)
@@ -152,8 +152,8 @@ end
 local function usage()
   io.stderr:write(string.format([[
 usage: %s [options] entryfile [files...]
-	-b | --blog blogref
-	-h | --help
+        -b | --blog blogref
+        -h | --help
 ]],arg[0]))
   os.exit(1,true)
 end
@@ -164,7 +164,7 @@ local CONF = "/home/spc/.config/mod-blog-put.config"
 local BLOG = 'default'
 local BASEURL
 local USER
-local CGI = "/boston.cgi"
+
 local opts =
 {
   { "b" , "blog"  , true  , function(b) BLOG = b end },
@@ -183,21 +183,15 @@ do
   if not conf then
     os.exit(errmsg("%s: %s",CONF,err),true)
   end
-
+  
   conf()
-
+  
   if not confenv[BLOG] then
     os.exit(errmsg("%s: missing %q config block",CONF,BLOG),true)
   end
-
-  BASEURL = confenv[BLOG].url
-
-  if not BASEURL then
-    os.exit(errmsg("%s: missing %s.url directive",CONF,BLOG),true)
-  end
   
-  if confenv[BLOG].cgi then
-    CGI = confenv[BLOG].cgi
+  if not confenv[BLOG].url then
+    os.exit(errmsg("%s: missing %s.url directive",CONF,BLOG),true)
   end
   
   if not confenv[BLOG].user then
@@ -208,11 +202,12 @@ do
     os.exit(errmsg("%s: missing %s.pass directive",CONF,BLOG),true)
   end
   
-  USER =  "BASIC "
-       .. base64:encode(string.format(
-            "%s:%s",
-            confenv[BLOG].user,confenv[BLOG].pass
-          ))
+  BASEURL = confenv[BLOG].url
+  USER    =  "BASIC "
+          .. base64:encode(string.format(
+               "%s:%s",
+               confenv[BLOG].user,confenv[BLOG].pass
+             ))
 end
 
 -- ************************************************************************
@@ -223,54 +218,43 @@ if not body then
   os.exit(1,true)
 end
 
-local base     = url:match(BASEURL)
-local path     = url:match(date .. '/' .. fsys.basename(arg[fi]))
-local location = uurl.merge(base,path)
+local base = url:match(BASEURL)
 
 local conn,err do
-  if location.scheme == 'https' then
-    conn,err = tls.connect(location.host,location.port)
+  if base.scheme == 'https' then
+    conn,err = tls.connect(base.host,base.port)
   else
-    conn,err = tcp.connect(location.host,location.port)
+    conn,err = tcp.connect(base.host,base.port)
   end
 end
 
 if not conn then
-  os.exit(errmsg("%s: %s",location.host,err),true)
+  os.exit(errmsg("%s: %s",base.host,err),true)
 end
 
 -- --------------------------------
 -- Get next entry URL
 -- --------------------------------
 
-local newurl do
-  local status,bodyg
-  local basen = url:match(BASEURL)
-  local pathn = url:match(CGI .. "?cmd=last&date=" .. date)
-  location    = uurl.merge(basen,pathn)
-  
-  msg("GET '%s'",uurl.toa(location))
-  status,bodyg = request(conn,"GET",location)
-  
-  if status ~= http_status.SUCCESS.OKAY then
-    os.exit(errmsg("%d `%s`",status,uurl.toa(location)),true)
-  end
-  
-  local front,part = bodyg:match("^(.*)(%d+)$")
-  part   = tonumber(part) + 1
-  newurl = front .. part
+base.query = "cmd=next&date=" .. date
+
+msg("GET %q",uurl.toa(base))
+local status,newurl = request(conn,"GET",base)
+
+if status ~= http_status.SUCCESS.OKAY then
+  os.exit(errmsg("%d %q",status,uurl.toa(base)),true)
 end
 
-location = url:match(newurl)
+local location = url:match(newurl)
 
 -- ------------------------------------------
 -- PUT the new entry
 -- ------------------------------------------
 
-msg("PUT '%s' (%d)",uurl.toa(location),#body)
-local status = request(conn,"PUT",location,fi == #arg,USER,"application/mod_blog",body)
+msg("PUT %q (%d)",uurl.toa(location),#body)
+status = request(conn,"PUT",location,fi == #arg,USER,"application/mod_blog",body)
 if status ~= http_status.SUCCESS.CREATED then
-  os.exit(errmsg("PUT: %d '%s'",status,uurl.toa(location)),true)
+  os.exit(errmsg("PUT: %d %q",status,uurl.toa(location)),true)
 end
 
 -- -----------------------------------
@@ -279,23 +263,36 @@ end
 
 local excode = 0
 
-for i = fi + 1 , #arg do
-  local f,err2 = io.open(arg[i],"rb")
-  if f then
-    body = f:read("*a")
-    f:close()
-    
-    local pathf     = url:match(date .. '/' .. fsys.basename(arg[i]))
-    local locationf = uurl.merge(base,pathf)
-    
-    msg("PUT '%s' (%d)",uurl.toa(locationf),#body)
-    status = request(conn,"PUT",locationf,i==#arg,USER,magic(body,true),body)
-    
-    if status ~= http_status.SUCCESS.CREATED then
-      excode = errmsg("PUT: %d '%s'",status,uurl.toa(locationf))
+if fi < #arg then
+  base.query = "cmd=path&date=" .. date
+  
+  msg("GET %q",uurl.toa(base))
+  status,newurl = request(conn,"GET",base)
+  
+  if status ~= http_status.SUCCESS.OKAY then
+    os.exit(errmsg("%d %q",status,uurl.toa(base)),true)
+  end
+  
+  location = url:match(newurl)
+  
+  for i = fi + 1 , #arg do
+    local f,err2 = io.open(arg[i],"rb")
+    if f then
+      body = f:read("*a")
+      f:close()
+      
+      local pathf     = url:match(fsys.basename(arg[i]))
+      local locationf = uurl.merge(location,pathf)
+      
+      msg("PUT %q (%d)",uurl.toa(locationf),#body)
+      status = request(conn,"PUT",locationf,i==#arg,USER,magic(body,true),body)
+      
+      if status ~= http_status.SUCCESS.CREATED then
+        excode = errmsg("PUT: %d %q",status,uurl.toa(locationf))
+      end
+    else
+      excode = errmsg("%s: %s",arg[i],err2)
     end
-  else
-    excode = errmsg("%s: %s",arg[i],err2)
   end
 end
 
